@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.CargoDao">
+	<select id="getCargoRecordVids" resultType="java.lang.String">
+		select vehicle_id from zw_m_cargo_group_vehicle where `type` = #{type}
+		and flag = 1
+		and `time` between #{startTime} and #{endTime}
+	</select>
+
+	<select id="getCargoRecordByGroupId" resultType="com.zw.platform.domain.generalCargoReport.CargoRecordForm">
+		select id,time,group_id,type, vehicle_id, operating_state
+		from zw_m_cargo_group_vehicle
+		where flag = 1
+		and time between #{startTime} and #{endTime}
+		and group_id IN
+		<foreach item="item" collection="groupId" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getMonthData" resultType="com.zw.platform.domain.generalCargoReport.CargoMonthReportInfo">
+		select  (@i:=@i+1) as serialNumber,zw.group_id as groupId,zw.group_name as groupName,zw.time,zw.vehicle_total as vehicleTotal,zw.add_number as addNumber,
+		zw.delete_number as deleteNumber,zw.online_rate as onlineRate,zw.online_number as onlineNumber,zw.nerver_online_number as nerverOnlineNumber,
+		zw.speed_number as speedNumber,zw.speed_rate as speedRate,zw.tired_number as tiredNumber,zw.tired_rate as tiredRate
+		from zw_m_cargo_month_report zw,(select @i:=0) num
+		where zw.flag = 1
+		and zw.time = #{time}
+		and zw.group_id IN
+		<foreach item="item" collection="groupIds" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+
+</mapper>

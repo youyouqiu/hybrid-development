@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.SensorUpgradeDao">
+    <select id = "getAllSensorList" resultType="com.zw.platform.domain.vas.sensorUpgrade.SensorType">
+        select
+        st.sensor_name,st.sensor_id,sm.model_name
+        from
+        zw_m_sensor_type st
+        INNER JOIN zw_m_sensor_model sm ON sm.id = st.model_id
+    </select>
+
+    <!-- 获取监控对象外设升级状态 -->
+    <select id="getMonitorSensorUpgradeStatus" parameterType="com.zw.platform.domain.vas.sensorUpgrade.SensorBind"
+                                                resultType="com.zw.platform.domain.vas.sensorUpgrade.SensorUpgrade">
+        select
+        vehicle_id,sensor_upgrade_date,sensor_upgrade_status
+        from zw_m_sensor_upgrade
+        where vehicle_id IN
+        <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="identId != null and identId != ''">
+            AND sensor_id = #{identId}
+        </if>
+        order by sensor_upgrade_date desc
+    </select>
+
+    <select id="getOilSensorBasicInfo" resultType="com.zw.platform.domain.param.RemoteUpgradeSensorBasicInfo">
+      SELECT ov.vehicle_id monitorId,mi.monitorName monitorName,os.sensor_number sensorNumber
+      FROM zw_m_oil_box_vehicle ov
+      INNER JOIN zw_m_oil_box ob ON ob.id = ov.oil_box_id AND ob.flag = 1
+      INNER JOIN zw_m_oil_rod_sensor_info os ON os.id = ov.sensor_type AND os.flag = 1
+      INNER JOIN (SELECT id,brand monitorName FROM zw_m_vehicle_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+		          SELECT id,people_number monitorName FROM zw_m_people_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+		          SELECT id,thing_number monitorName FROM zw_m_thing_info WHERE flag = 1 AND id = #{monitorId}) mi ON mi.id = ov.vehicle_id
+      WHERE ov.flag = 1 AND ov.oil_box_type = #{sequenceNumber}
+    </select>
+
+    <select id="getFluxSensorBasicInfo" resultType="com.zw.platform.domain.param.RemoteUpgradeSensorBasicInfo">
+        SELECT ov.vehicle_id monitorId,mi.monitorName monitorName,ow.oil_wear_number sensorNumber
+        FROM zw_o_oil_wear_vehicle ov
+        INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+        INNER JOIN (SELECT id,brand monitorName FROM zw_m_vehicle_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+        SELECT id,people_number monitorName FROM zw_m_people_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+        SELECT id,thing_number monitorName FROM zw_m_thing_info WHERE flag = 1 AND id = #{monitorId}) mi ON mi.id = ov.vehicle_id
+        WHERE ov.flag = 1
+    </select>
+
+    <select id="getGeneralSensorBasicInfo" resultType="com.zw.platform.domain.param.RemoteUpgradeSensorBasicInfo">
+        SELECT sv.vehicle_id monitorId,mi.monitorName monitorName,si.sensor_number sensorNumber
+        FROM zw_m_sensor_vehicle sv
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        INNER JOIN (SELECT id,brand monitorName FROM zw_m_vehicle_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+		            SELECT id,people_number monitorName FROM zw_m_people_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+		            SELECT id,thing_number monitorName FROM zw_m_thing_info WHERE flag = 1 AND id = #{monitorId}) mi ON mi.id = sv.vehicle_id
+        WHERE sv.flag = 1 AND sv.sensor_out_id = #{sequenceNumber}
+    </select>
+
+    <select id="getMileSensorBasicInfo" resultType="com.zw.platform.domain.param.RemoteUpgradeSensorBasicInfo">
+        SELECT mc.vehicle_id monitorId,mi.monitorName monitorName,ms.sensor_type sensorNumber
+        FROM zw_m_mileage_sensor_config mc
+        INNER JOIN zw_m_mileage_sensor ms ON ms.id = mc.mileage_sensor_id AND ms.flag = 1
+        INNER JOIN (SELECT id,brand monitorName FROM zw_m_vehicle_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+        SELECT id,people_number monitorName FROM zw_m_people_info WHERE flag = 1 AND id = #{monitorId} UNION ALL
+        SELECT id,thing_number monitorName FROM zw_m_thing_info WHERE flag = 1 AND id = #{monitorId}) mi ON mi.id = mc.vehicle_id
+        WHERE mc.flag = 1
+    </select>
+
+    <insert id="addSensorUpgrade" parameterType="com.zw.platform.domain.vas.sensorUpgrade.SensorUpgrade">
+      INSERT INTO zw_m_sensor_upgrade(id,vehicle_id,sensor_id,sensor_upgrade_date,sensor_upgrade_status,flag,create_data_time,create_data_username)
+      VALUES(#{id},#{vehicleId},#{sensorId},#{sensorUpgradeDate},#{sensorUpgradeStatus},#{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <select id="getSensorUpgradeBy" resultType="com.zw.platform.domain.vas.sensorUpgrade.SensorUpgrade">
+        SELECT * FROM zw_m_sensor_upgrade su WHERE su.vehicle_id = #{monitorId} and su.sensor_id = #{sensorId}
+    </select>
+
+    <update id="updateSensorUpgrade" parameterType="com.zw.platform.domain.vas.sensorUpgrade.SensorUpgrade">
+        UPDATE zw_m_sensor_upgrade SET sensor_upgrade_date = #{sensorUpgradeDate}, sensor_upgrade_status = #{sensorUpgradeStatus},
+        update_data_time = #{updateDataTime}, update_data_username = #{updateDataUsername} WHERE id = #{id}
+    </update>
+</mapper>

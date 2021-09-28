@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>风险证据库</title>
+	<div th:replace="fragments/header">header</div>
+</head>
+<style>
+	#detailDriver {
+		word-break: break-all;
+	}
+	.jk-box .delIcon {
+		right: 45px;
+	}
+	#dataTable tbody tr {
+		cursor: pointer;
+	}
+	#contentPanelBody{
+		min-height:900px;
+	}
+
+	#showBox{
+		position:absolute;
+		top:47px;
+		left:calc(50% - 100px);
+		width:200px;
+		padding:5px 0px;
+		z-index:999;
+	}
+	.show-wraper{
+		background-color: #F6F6F6;
+		border:1px solid #CACFD2;
+		border-radius:4px;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		padding: 6px;
+		max-height: 200px!important;
+		line-height:20px;
+		overflow-y:auto;
+	}
+	.show-item{
+		border-bottom: 1px solid #ddd;
+		font-weight:normal;
+		padding:5px;
+		cursor:pointer;
+		text-align:left;
+	}
+	.show-item:hover,.show-item.active{
+		background: #07d;
+		color: #fff;
+	}
+	#carName{
+		min-width:150px;
+	}
+	#preview{
+		height:310px;
+		position:relative;
+		background-color:#f2f2f2;
+	}
+	#previewContent{
+		height:100%;
+	}
+	#detailTable td{
+		padding:2px 0px;
+		font-size:17px;
+		color:black;
+		vertical-align:top;
+	}
+	#detailTable td:first-child{
+		width:130px;
+	}
+	#previewMask{
+		visibility:hidden;
+		height:60px;
+		width:100%;
+		padding:10px;
+		position:absolute;
+		left:0px;
+		right:0px;
+		top:0px;
+		background-color:rgba(0,0,0,.7)
+	}
+	#previewContent>audio,#previewContent>video,#previewContent>img,#previewContent>embed{
+		position:absolute;
+		width:100%;
+		height:100%;
+		left:0px;
+		right:0px;
+		bottom:0px;
+	}
+	.bottom-item{
+		min-height:90px;
+		max-width:100px;
+	}
+
+	.bottom-item .audio{
+		width:50%;
+		height:auto;
+		display:block;
+		margin-bottom:-20px;
+	}
+	.bottom-table td{
+		color:black;
+		font-size:13px;
+		vertical-align:top;
+	}
+	.bottom-table td:first-child{
+		width:70px;
+
+	}
+	.own-row{
+		width:100%;
+		overflow:hidden;
+
+	}
+	.own-row:after{
+		content:' ';
+		display:block;
+		clear:both;
+	}
+	.own-col{
+		width:20%;
+		float:left;
+		padding-right:10px;
+		padding-bottom:20px;
+		box-sizing:border-box;
+		height:230px;
+	}
+	#tomorrowChange,#yestodayChange{
+		height:450px;
+	}
+	#tomorrowChange:hover,#yestodayChange:hover{
+		height:450px;
+	}
+	.own-col.active>div {
+		border:2px solid lightblue;
+	}
+	.own-col>div{
+		padding:15px;
+		border:1px solid #fff;
+		height:220px;
+	}
+	.own-col>div:hover{
+		border-color:#e9e9e9;
+		box-shadow: 0 0 2px 2px #f8f8f8;
+		cursor:pointer;
+	}
+	.mask-img{
+		float:right;
+		padding:12px;
+		cursor:pointer;
+		width:45px;
+		height:45px;
+		position:relative;
+		display:block;
+	}
+	.mask-img img{
+		width:100%;
+		height:auto;
+		display:block;
+		margin:auto;
+
+	}
+
+	.mask-img hr{
+		border-top: none rgb(0, 188, 212);
+		border-left: none rgb(0, 188, 212);
+		border-right: none rgb(0, 188, 212);
+		border-bottom: 2px solid #64bde1;
+		bottom: 0px;
+		box-sizing: content-box;
+		margin: 0px;
+		position: absolute;
+		width: 100%;
+		transform: scaleX(0);
+		left:0px;
+		transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+	}
+	audio::-webkit-media-controls {
+		overflow: hidden !important
+	}
+	audio::-webkit-media-controls-enclosure {
+		width: calc(100% + 32px);
+		margin-left: auto;
+	}
+	video::-webkit-media-controls {
+		overflow: hidden !important
+	}
+	video::-webkit-media-controls-enclosure {
+		width: calc(100% + 32px);
+		margin-left: auto;
+	}
+	@media screen and (max-width:1700px){
+		.own-col{
+			padding-right:20px;
+			height:290px;
+		}
+	}
+	@media screen and (max-width:1400px){
+		.own-col{
+			padding-right:10px;
+			height:350px;
+		}
+	}
+</style>
+<body>
+<section id="container">
+	<div th:replace="fragments/nav">nav</div>
+	<section class="main-content-wrapper">
+		<div th:replace="fragments/menu">menu</div>
+		<section id="main-content">
+			<div class="row eightIsZero">
+				<div class="col-md-12">
+					<ul class="breadcrumb">
+						<li><a th:href="@{/}">首页</a></li>
+						<li class="active">报表管理</li>
+						<li class="active">主动安全报表</li>
+						<li class="active">风险证据库</li>
+					</ul>
+					<h1 class="h1 ">风险证据库</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="col-md-12 col-sm-12"
+						 style="padding-right: 0px; padding-left: 0px;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">查询</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div class="col-md-12 alarmSearchToolPanel">
+									<form id="riskDislist" class="form-horizontal" action="#"
+										  method="post" role="form">
+										<div class="form-group">
+											<label class="col-md-1 col-sm-3 control-label">组织：</label> <input
+												class="form-control hidden" />
+											<div class="has-feedback col-md-2 col-sm-8 jk-box">
+												<select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+													<option value="monitor">监控对象</option>
+													<option value="group">企业</option>
+													<option value="assignment">分组</option>
+												</select>
+												<input type="text" style="cursor: pointer; background-color: #fafafa;" autocomplete="off"
+													   class="form-control moreQueryGroup" placeholder="请选择" maxlength="20" id="groupSelect" name="groupSelect"
+													    /> <span
+													class="fa fa-chevron-down form-control-feedback"
+													style="top: 0; right: 15px; cursor: pointer;"
+													aria-hidden="true" id="groupSelectSpan"></span>
+												<div id="menuContent" class="menuContent">
+													<ul id="treeDemo" class="ztree"></ul>
+												</div>
+											</div>
+											<label class="col-md-1 col-sm-3 control-label">证据类型：</label>
+											<div class="col-md-2">
+												<select class="form-control" id="evidenceType">
+													<option value="2">终端视频</option>
+													<option value="1">终端图片</option>
+													<!--<option value="fkAudio">风控音频</option>-->
+													<!--<option value="fkVideo">风控视频</option>-->
+												</select>
+											</div>
+											<label
+													class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+											<div class="col-md-3 col-sm-8 searchListSelect">
+												<input style="cursor: pointer; background-color: #fafafa;"
+													   class="form-control layer-date laydate-icon"
+													   id="timeInterval" name="timeInterval" readonly />
+											</div>
+											<div id="highlever" class="col-md-1 col-sm-3 control-label"
+												 style="float: right; margin-right: 30px; font-weight: bold; cursor: pointer; padding: 0px;">
+												高级搜索<span class="fa fa-caret-down"
+														  style="font-size: 22px; position: relative; top: 2px; left: 2px;"></span>
+											</div>
+										</div>
+										<div id="highsearch" class="highsearch"
+											 style="display: none;">
+											<div class="form-group">
+												<label class="col-md-1 col-sm-3 control-label">风险类型：</label>
+												<input class="form-control hidden" />
+												<div class="has-feedback col-md-2 col-sm-8">
+													<input style="cursor: pointer; background-color: #fafafa;"
+														   class="form-control" placeholder="所有"
+														   id="alarmTypeSelect" readonly />
+
+													<div id="alarmTypeContent" class="menuContent">
+														<ul id="alarmTypeTree" class="ztree"></ul>
+													</div>
+													<span class="fa fa-chevron-down form-control-feedback"
+														  style="top: 0; right: 15px; cursor: pointer;"
+														  aria-hidden="true" id="alarmTypeSelectSpan"></span>
+												</div>
+												<label class="col-md-1 col-sm-3 control-label">风险等级：</label>
+												<div class="col-md-2 has-feedback col-sm-8">
+													<input style="cursor:pointer;background-color:#fafafa;" class="form-control" placeholder="所有" id="riskLevel" readonly>
+													<div id="alarmLevelContent" class="menuContent">
+														<ul id="alarmLevelTree" class="ztree"></ul>
+													</div>
+													<span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px; cursor: pointer;" aria-hidden="true" id="alarmTypeSelectSpan1"></span>
+													<!--<select class="form-control" id="riskLevel">-->
+														<!--<option value="">所有</option>-->
+														<!--<option value="1">一般低</option>-->
+														<!--<option value="2">一般中</option>-->
+														<!--<option value="3">一般高</option>-->
+														<!--<option value="4">较重低</option>-->
+														<!--<option value="5">较重中</option>-->
+														<!--<option value="6">较重高</option>-->
+														<!--<option value="7">严重低</option>-->
+														<!--<option value="8">严重中</option>-->
+														<!--<option value="9">严重高</option>-->
+														<!--<option value="10">特重低</option>-->
+														<!--<option value="11">特重中</option>-->
+														<!--<option value="12">特重高</option>-->
+													<!--</select>-->
+												</div>
+												<label class="col-md-1 col-sm-3 control-label">风险事件：</label>
+												<div class="col-md-2">
+													<select class="form-control" id="riskEvent">
+														<option value="">所有</option>
+														<!--疑似疲劳-->
+														<option value="6506">闭眼</option>
+														<option value="6507">打哈欠</option>
+														<option value="126513,136513,146513,156513,166513,176513,186513,246501">疲劳驾驶</option>
+														<option value="166514,176514">超时驾驶</option>
+														<!--注意力分散-->
+														<option value="6503,126503,136503,146503,156503,166503,176503,186503,246504">抽烟</option>
+														<option value="6502,126502,136502,146502,166502,186502,176502,156502,246503">接打手持电话</option>
+														<option value="6508,126508,146508,176504">长时间不目视前方</option>
+														<option value="136508,166508,186508,156505,246502">分神驾驶</option>
+														<option value="136510,166504,186504,156504,246505">驾驶员异常</option>
+														<!--违规异常-->
+														<option value="6511,166516,176509,246507">遮挡</option>
+														<option value="6512,176508,246508">红外阻断</option>
+														<option value="6509,126515,126516,136516,146516,186516,156516,186514,166515,176516">人证不符</option>
+														<option value="6510,126510,136511,146510,176505">驾驶员不在驾驶位置</option>
+														<option value="126519,146410,176507">驾驶辅助功能失效</option>
+														<option value="126514,146514,246509">驾驶员行为监测功能失效</option>
+														<option value="246514">车辆运行监测失效报警</option>
+														<option value="126517,146517,176517,246518">双手同时脱离方向盘</option>
+														<option value="126518,176506,246506">未系安全带报警</option>
+														<option value="206802">不按规定上下客报警</option>
+														<option value="206801">超员报警</option>
+														<option value="253903">超速报警</option>
+														<option value="253904">路线偏离报警</option>
+														<option value="253905">禁行报警</option>
+														<option value="253906,254103,254104,254105,254106,254107,254108,254109">设备异常</option>
+														<!--碰撞危险-->
+														<option value="6401,126401,136401,146401,166401,186401,176401,156401,246401">前向碰撞</option>
+														<option value="246402">车道偏离报警</option>
+														<option value="64021,1264021,1364021,1464021,1864021,1564021,1684021,1784021">车道左偏离</option>
+														<option value="64022,1264022,1364022,1464022,1864022,1564022,1684022,1784022">车道右偏离</option>
+														<option value="-2539021">车道左偏离预警</option>
+														<option value="-2539022">车道右偏离预警</option>
+														<option value="6403,126403,136403,146403,166403,186403,176403,156403,246403">车距过近</option>
+														<option value="6404,126404,136404,146404,166404,186404,176404,156404,246404">行人碰撞</option>
+														<option value="6405,126405,136405,146405,166405,186405,176405,156405">频繁变道</option>
+														<option value="166410">路口快速通过</option>
+														<option value="64081,1264081,1464081">急加速</option>
+														<option value="64082,1264082,1464082">急减速</option>
+														<option value="64083,1264083,1464083">急转弯</option>
+														<option value="6409,126409,136409,146409,166409,186409,176409,156409">道路标识超限</option>
+														<option value="126407,136407,146407,186407,176407,156516">障碍物</option>
+														<option value="146601,156601,126601">胎压过高</option>
+														<option value="146602,156602,126602">胎压过低</option>
+														<option value="146603,156603,126603">胎温过高</option>
+														<option value="146604,156604,126604">传感器异常</option>
+														<option value="146605,156605,126605">胎压不平衡</option>
+														<option value="146606,156606,126606">慢漏气</option>
+														<option value="146607,156607,126607">电池电量低</option>
+														<option value="146701,166701,186701,176701,156701,126701">后方接近</option>
+														<option value="146702,166702,186702,176701,156702,126702">左侧后方接近</option>
+														<option value="146703,166703,186703,176701,156703,126703">右侧后方接近</option>
+														<option value="246405">盲区监测</option>
+														<option value="176704">左侧盲区预警</option>
+														<option value="176705">右侧盲区预警</option>
+														<option value="246406">限速</option>
+														<option value="246407">限高</option>
+														<option value="246408">限宽</option>
+														<option value="246409">限重</option>
+														<!--激烈驾驶-->
+														<option value="127001,147001">怠速</option>
+														<option value="127002,147002">异常熄火</option>
+														<option value="127003,147003">空挡滑行</option>
+														<option value="127004,147004">发动机超转</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-md-1 col-sm-3 control-label">监控对象：</label>
+												<div class="col-md-2 col-sm-8 searchListSelect">
+													<div style="position:relative;">
+														<div class="input-group">
+															<input name="charSelect" type="text" placeholder="请选择监控对象" class="form-control" maxlength="20" id="charSelect">
+															<div class="input-group-btn">
+																<button type="button" id="button" class="btn btn-white dropdown-toggle disabled loading-state-button" data-toggle="dropdown">
+																	<i class="fa fa-spinner loading-state"></i>
+																</button>
+																<ul class="dropdown-menu dropdown-menu-right" role="menu">
+																</ul>
+															</div>
+														</div>
+													</div>
+												</div>
+												<label class="col-md-1 col-sm-3 control-label">驾驶员：</label>
+												<div class="col-md-2">
+													<input placeholder="请输入驾驶员" id="driver" type="text"
+														   class="form-control" />
+												</div>
+												<label class="col-md-1 col-sm-3 control-label">处理人：</label>
+												<div class="col-md-2">
+													<input id="dealUser" type="text" class="form-control"
+														   placeholder="请输入处理人" />
+												</div>
+											</div>
+
+											<div class="form-group">
+												<label class="col-md-1 col-sm-3 control-label">风控结果：</label>
+												<div class="col-md-2">
+													<select id="riskResult" class="form-control">
+														<option value="">所有</option>
+														<option value="0">事故未发生</option>
+														<option value="1">事故已发生</option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-md-12 control-label" id="dateSearchData">
+												<button id="todayClick" type="button"
+														class="btn btn-primary" name="0"
+														onclick="riskEvidence.inquireClick(0)">今天</button>
+												<button id="yesterdayClick" type="button"
+														class="btn btn-primary" name="-1"
+														onclick="riskEvidence.inquireClick(-1)">前一天</button>
+												<button id="nearlyThreeDays" type="button"
+														class="btn btn-primary" name="-3"
+														onclick="riskEvidence.inquireClick(-3)">前三天</button>
+												<button id="nearlySevenDays" type="button"
+												class="btn btn-primary" name="-7"
+												onclick="riskEvidence.inquireClick(-7)">前七天</button>
+												<button id="inquireClick" type="button"
+														class="btn btn-primary search-btn" name="1"
+														onclick="riskEvidence.inquireClick(1)">
+													<i class="glyphicon glyphicon-search"></i> 查询
+												</button>
+												<!--<button id="exportAlarm" type="button"-->
+														<!--class="btn btn-primary ">-->
+													<!--<i class="glyphicon glyphicon-download-alt"></i> 下载-->
+												<!--</button>-->
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12 col-sm-12"
+						 style="padding-right: 0px; padding-left: 0px;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">
+									风险证据展示
+									<div class="carName">
+										<i id="leftClickVehicle" class="toopTip-btn-left"
+										   style="display: inline-block;"> <img
+												data-toggle="tooltip" data-placement="left" title=""
+												src="/clbs/resources/img/car-left.svg"
+												width="16px" data-original-title="上一辆">
+										</i><span id="carName" ></span><i
+											id="rightClickVehicle" class="toopTip-btn-right"
+											style="display: inline-block;"> <img
+											data-toggle="tooltip" data-placement="right" title=""
+											src="/clbs/resources/img/car-right.svg"
+											width="16px" data-original-title="下一辆">
+									</i>
+										<div id="showBox" class="hidden">
+											<div class="show-wraper">
+												<div class="show-content">
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+
+							<div class="panel-body" id="contentPanelBody">
+								<div style="width:70%;margin:10px auto;">
+									<div class="row">
+										<div class="col-md-6">
+											<div id="preview">
+												<div id="previewContent" class="detail-content">
+
+												</div>
+												<div id="previewMask">
+													<a id="downloadImg" href="#"  download class="mask-img">
+														<img src="/clbs/resources/img/fkzjk_download.svg" />
+														<hr/>
+													</a>
+
+													<div class="mask-img">
+														<img src="/clbs/resources/img/fkzjk_delete.svg" id="deleteSvg"/>
+														<hr/>
+													</div>
+
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<table id="detailTable">
+												<tr>
+													<td>监控对象：</td>
+													<td id="detailBrand" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>风险类型：</td>
+													<td id="detailRiskType" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>风险等级：</td>
+													<td id="detailRiskLevel" class="detail-content"></td>
+												</tr>
+												<tr id="detailRiskEventTr">
+													<td>风险事件：</td>
+													<td id="detailRiskEvent" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>天气：</td>
+													<td id="detailweather" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>速度：</td>
+													<td id="detailspeed" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td id="detailNumberLabel">事件编号：</td>
+													<td id="deailNumber" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>预警时间：</td>
+													<td id="detailTime" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>预警位置：</td>
+													<td id="detailAddr" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>所属企业：</td>
+													<td id="detailCompany" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>驾驶员：</td>
+													<td id="detailDriver" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>处理人：</td>
+													<td id="detailDealUser" class="detail-content"></td>
+												</tr>
+												<tr>
+													<td>风控结果：</td>
+													<td id="detailResult" class="detail-content"></td>
+												</tr>
+											</table>
+										</div>
+									</div>
+
+
+								</div>
+								<div>
+									<div class="container-area">
+										<div style="padding:20px 80px 20px 100px">
+											<div class="own-row">
+
+
+											</div>
+
+										</div>
+										<div class="pull-right">
+											<div class="M-box dataTables_paginate paging_full_numbers"></div>
+										</div>
+										<i class="left-btn" id="yesterdayChange" style="display: none;"></i>
+										<i class="right-btn" id="tomorrowChange" style="display: none;"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var monitoringObjecNull = [[#{monitoring.objec.null}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+</script>
+<script src="/clbs/resources/js/riskEvidence.js"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+</html>

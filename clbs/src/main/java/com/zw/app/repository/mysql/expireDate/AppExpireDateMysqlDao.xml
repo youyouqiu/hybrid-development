@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.expireDate.AppExpireDateMysqlDao">
+
+    <select id="findInsuranceExpireList" resultType="com.zw.app.domain.expireDate.AppExpireDateEntity">
+        SELECT vin.id, DATE_FORMAT(vin.start_time, '%Y-%m-%d') as startTime,DATE_FORMAT(vin.end_time, '%Y-%m-%d') as
+        endTime,veh.brand as monitorName
+        from zw_m_vehicle_insurance vin ,zw_m_vehicle_info veh where
+        <if test="vehicleIds != null and vehicleIds.size > 0">
+            vin.vehicle_id in
+            <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        vin.vehicle_id=veh.id and vin.flag =1 and veh.flag =1
+        order by endTime asc,monitorName
+    </select>
+
+    <select id="findLifecycleExpireList" resultType="com.zw.app.domain.expireDate.AppExpireDateEntity">
+
+        select DATE_FORMAT(sl.billing_date, '%Y-%m-%d') as startTime,DATE_FORMAT(sl.expire_date, '%Y-%m-%d') as
+        endTime,veh.brand as monitorName
+        FROM zw_m_config c, zw_m_service_lifecycle sl,zw_m_vehicle_info veh
+        WHERE
+        <if test="vehicleIds != null and vehicleIds.size > 0">
+            c.vehicle_id in
+            <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        sl.id = c.service_lifecycle_id and c.vehicle_id=veh.id and c.flag = 1 AND sl.flag = 1 and veh.flag =1 order by
+        endTime asc,monitorName
+
+    </select>
+    <select id="findMaintenanceExpireList" resultType="com.zw.app.domain.expireDate.AppExpireDateEntity">
+        SELECT '-' as startTime,veh.brand as monitorName, IFNULL(DATE_FORMAT(veh.maintain_validity, '%Y-%m-%d'),'-') as endTime
+        FROM zw_m_vehicle_info veh WHERE
+        <if test="vehicleIds != null and vehicleIds.size > 0">
+            veh.id in
+            <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        veh.flag = 1 order by endTime asc,monitorName
+
+    </select>
+
+    <select id="findDrivingLicenseExpireList" resultType="com.zw.app.domain.expireDate.AppExpireDateEntity">
+        SELECT DATE_FORMAT(veh.registration_start_date, '%Y-%m-%d') as
+        startTime,veh.brand as monitorName,DATE_FORMAT(veh.registration_end_date, '%Y-%m-%d') as endTime
+        FROM zw_m_vehicle_info veh WHERE
+        <if test="vehicleIds != null and vehicleIds.size > 0">
+            veh.id in
+            <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        veh.flag = 1 order by endTime asc,monitorName
+    </select>
+    <select id="findRoadTransportExpireList" resultType="com.zw.app.domain.expireDate.AppExpireDateEntity">
+        SELECT DATE_FORMAT(veh.road_transport_validity_start, '%Y-%m-%d') as
+        startTime,veh.brand as monitorName,DATE_FORMAT(veh.road_transport__validity, '%Y-%m-%d') as endTime
+        FROM zw_m_vehicle_info veh WHERE
+        <if test="vehicleIds != null and vehicleIds.size > 0">
+            veh.id in
+            <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        veh.flag = 1 order by endTime asc,monitorName
+    </select>
+</mapper>

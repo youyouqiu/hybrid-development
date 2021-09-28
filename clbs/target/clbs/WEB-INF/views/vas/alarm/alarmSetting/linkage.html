@@ -1,0 +1,774 @@
+<input type="hidden" th:value="${alarmTypeList}" id="alarmTypeList"/>
+<input type="hidden" th:value="${referVehicleList}" id="referVehicleList"/>
+<input type="hidden" th:value="${settingList}" id="settingList"/>
+<input type="hidden" th:value="${linkageFlag}" id="linkageFlag">
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+            aria-hidden="true">&times;
+    </button>
+    <h4 class="modal-title">智能联动</h4>
+    <style>
+        .analogInfo{display: none}
+        .driverTree{
+            display: none;
+            z-index: 200;
+            position: absolute;
+            background: rgb(255, 255, 255);
+            width: calc(100% - 35px);
+            box-shadow: black 0px 0px 2px;
+            max-height: 320px;
+            left: 17px;
+            overflow: auto;
+        }
+        #toolTip{
+            position: absolute;
+            display:none;
+            top: 36px;
+            margin: 0;
+            background: #fff;
+            color: #cf0000;
+            font-weight: normal;
+            width: 310px;
+            border: 1px solid #e4e4e4;
+            text-align: center;
+            height: 30px;
+            line-height: 30px;
+            box-shadow: 0px 2px 2px #e2e2e2;
+        }
+    </style>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="mult-check-ul" id="alarmTypeUl">
+
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> <label
+                            class="text-danger">*</label> 监控对象：
+                    </label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer" name="vehicleBrand" th:value="${brands}"
+                               placeholder="请输入监控对象" class="form-control" readonly/>
+                        <input id="alarmLinkageVehicleId" name="vehicleId" type="hidden" th:value="${vehicleIds}"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 参考对象：</label>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input name="brands" type="text" class="form-control"
+                                   id="refers">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-white dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu"
+                                    style="width: 100% !important" id="refersUl">
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <!--报警处理联动-->
+                <div class="show-more-wrapper alarmLinkage">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="alarmLinkage"
+                                data-target="#alarmLinkageMore"/> <span>报警处理联动</span>
+                        </label>
+                        <div class="col-md-4"></div>
+                        <label class="col-md-4"></label>
+                        <div class="col-md-2 control-label text-right ">
+                                <span class="show-more-title"
+                                      data-target="#alarmLinkageMore"><font>显示更多</font><span
+                                        class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div id="alarmLinkageMore" class="show-more-content" style="padding:0px 0px 10px 0px;display: none">
+                            <form id="alarmLinkage-text" action="#" novalidate="novalidate">
+                                <div class="form-group">
+                                    <div class="col-md-8">
+                                        <label class="col-md-2 control-label">处理方式：</label>
+                                        <div class="col-md-10" style="padding: 0">
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0">
+                                                <div class="checkbox">
+                                                    <label><input name="handleMethod" value="1" type="radio" disabled="disabled"/>下发短信</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input name="handleMethod" value="2"  type="radio"  disabled="disabled"/>拍照</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input  name="handleMethod" value="3" type="radio"  disabled="disabled"/>不做处理</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <label class="col-md-2 control-label">处理结果：</label>
+                                        <div class="col-md-10" style="padding: 0">
+                                            <div class="col-md-3"  style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input name="handleResult" value="1" type="radio" disabled="disabled"/>处理中</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input name="handleResult" value="2" type="radio"  disabled="disabled"/>已处理完毕</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input  name="handleResult" value="3" type="radio"  disabled="disabled"/>不做处理</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="padding-right: 0;padding-left: 0;">
+                                                <div class="checkbox">
+                                                    <label><input  name="handleResult" value="4" type="radio"  disabled="disabled"/>将来处理</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 control-label"> 处理人：</label>
+                                    <div class="col-md-3 has-feedback fastClear">
+                                        <input name="groupName" style="background-color: #fafafa;" class="form-control" id="managerTreeInput" type="text"  autocomplete="off" placeholder="请选择处理人">
+                                        <span style="top: 0px;right: 14px;cursor: pointer;" class="fa fa-chevron-down form-control-feedback" aria-hidden="true"></span>
+                                        <input class="form-control hidden" id="groupId">
+                                        <div id="managerTreeBox" class="driverTree">
+                                            <ul id="managerTree" class="ztree"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+                <!--下发短信-->
+                <div class="show-more-wrapper">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="msgAreaCheckbox"
+                                data-target="#sendMsgShowMore-content"/> <span>下发短信</span>
+                        </label>
+                        <div class="col-md-4"></div>
+                        <label class="col-md-4"></label>
+                        <div class="col-md-2 control-label text-right ">
+                                <span class="show-more-title"
+                                      data-target="#sendMsgShowMore-content"><font>显示更多</font><span
+                                        class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div id="sendMsgShowMore-content" class="show-more-content"
+                         style="padding:10px 0px 10px 0px;display: none">
+                        <form id="sendText" action="#" novalidate="novalidate">
+                            <div class="form-group" th:if="${deviceType=='11'}">
+                                <div class="col-md-9 col-md-offset-2">
+                                    <label class="radio-inline radioLabel"><input type="radio" name="textType" value="1"
+                                                                                  checked>
+                                        通知</label>
+                                    <label class="radio-inline radioLabel"><input type="radio" name="textType"
+                                                                                  value="2">
+                                        服务</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <!--  <input class="hidden" id="vidSendTxtForAlarm" name="vid" value="">
+                                  <input class="hidden" name="orderType" value="5">
+                                  <input class="hidden" id="brandTxt" name="plateNumber" value="">
+                                  <input class="hidden" id="alarmTxt" name="alarm" value="">
+                                  <input class="hidden" id="startTimeTxt" name="startTime" value="">  -->
+                                <input class="hidden" id="deviceTypeTxt" name="deviceType"
+                                       th:value="${deviceType}">
+                                <label class="col-md-2 control-label">文本内容：</label>
+
+                                <div class=" col-md-9">
+                                    <textarea class="form-control" id="msgContent" name="msgContent" rows="3"
+                                              maxlength="512"></textarea>
+                                    <div class="fastMessage" data-target="#fastMessage" data-toggle="modal" onclick="showFastModal()">快捷消息</div>
+<!--                                    <div class="fastMessage" data-target="#commonLgWin" data-toggle="modal">快捷消息</div>-->
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-9 noPadding">
+                                    <div class="col-md-6">
+                                        <select name="messageTypeOne" class="form-control"
+                                                th:if="${deviceType=='11'}">
+                                            <option value="1">服务</option>
+                                            <option value="2">紧急</option>
+                                            <option value="3">通知</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="messageTypeTwo" class="form-control"
+                                                th:if="${deviceType=='11'}">
+                                            <option value="0">中心导航信息</option>
+                                            <option value="1">CAN故障码信息</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 oldDeviceInfo" th:if="${deviceType!='11'}">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="1" type="checkbox">紧急</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="3"  type="checkbox"/>终端显示器显示</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input class="alternativeTts" name="marks" value="4"
+                                                          checked="checked" type="checkbox"/>终端TTS语音</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" th:if="${deviceType != '11'}">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="5" type="checkbox"/>广告屏显示</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- 拍照区域 -->
+                <div class="show-more-wrapper">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="photoAreaCheckbox"
+                                data-target="#photoShowMore-content"/> <span>拍照</span>
+                        </label>
+                        <div class="col-md-4"></div>
+                        <label class="col-md-4"></label>
+                        <div class="col-md-2 control-label text-right ">
+								<span class="show-more-title"
+                                      data-target="#photoShowMore-content"><font>显示更多</font><span
+                                        class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div id="photoShowMore-content" style="display: none" class="show-more-content">
+                        <form id="takePhoto" action="#" novalidate="novalidate">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class="col-md-4" id="wayIdBox">
+                                    <div class="form-control" >
+                                        <p id="multiInput" style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">请选择通道号</p>
+                                    </div>
+                                    <div id="multiOptions" onclick="handleOptionsClick()">
+                                        <label><input name="wayId" value="1" type="checkbox"/>1</label>
+                                        <label><input name="wayId" value="2" type="checkbox"/>2</label>
+                                        <label><input name="wayId" value="3" type="checkbox"/>3</label>
+                                        <label><input name="wayId" value="4" type="checkbox"/>4</label>
+                                        <label><input name="wayId" value="5" type="checkbox"/>5</label>
+                                        <label><input name="wayId" value="6" type="checkbox"/>6</label>
+                                        <label><input name="wayId" value="7" type="checkbox"/>7</label>
+                                        <label><input name="wayId" value="8" type="checkbox"/>8</label>
+                                        <label><input name="wayId" value="9" type="checkbox"/>9</label>
+                                        <label><input name="wayId" value="10" type="checkbox"/>10</label>
+                                        <label><input name="wayId" value="11" type="checkbox"/>11</label>
+                                        <label><input name="wayId" value="12" type="checkbox"/>12</label>
+                                        <label><input name="wayId" value="13" type="checkbox"/>13</label>
+                                        <label><input name="wayId" value="14" type="checkbox"/>14</label>
+                                        <label><input name="wayId" value="15" type="checkbox"/>15</label>
+                                        <label><input name="wayId" value="16" type="checkbox"/>16</label>
+                                        <label><input name="wayId" value="64" type="checkbox"/>64</label>
+                                        <label><input name="wayId" value="65" type="checkbox"/>65</label>
+                                    </div>
+                                </div>
+                                <label class="col-md-2 control-label">间隔时间(秒)：</label>
+                                <div class=" col-md-4">
+                                    <input type="text" placeholder="0表示按最小间隔拍照"
+                                           class="form-control" name="time" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">拍照张数：</label>
+                                <div class=" col-md-4">
+                                    <input type="text" placeholder="默认1,最大10" value="1"
+                                           class="form-control" name="command"
+                                           onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label">保存标志：</label>
+                                <div class=" col-md-4">
+                                    <select name="saveSign" class="form-control">
+                                        <option value="0" selected="true">实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class=" col-md-4">
+                                    <select name="resolution" id="resolution" class="form-control"
+                                            th:value="${deviceType == '11'?'0':'1'}">
+                                        <option value="0" th:if="${deviceType == '11'}">
+                                            最低分辨率
+                                        </option>
+                                        <option value="1" class="defaultValue">320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">176*144</option>
+                                        <option value="6">352*288</option>
+                                        <option value="7">704*288</option>
+                                        <option value="8">704*576</option>
+                                        <option value="255" th:if="${deviceType == '11'}">最高分辨率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"> <i
+                                        class="fa fa-question-circle fa-lg" data-toggle="tooltip"
+                                        data-placement="top" title=""
+                                        data-original-title="范围1-10,1代表质量损失最小，10代表压缩比最大"> </i> 图像质量：
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" value="5" name="quality"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" value="125" name="luminance"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label">对比度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" value="60" name="contrast"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" value="60" name="saturability"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label">色度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" value="125" name="chroma"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+                <!-- 录像区域 -->
+                <div class="show-more-wrapper">
+                    <div class="form-group">
+
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="recordingAreaCheckbox"
+                                data-target="#recordingShowMore-content"/> <span>录像</span>
+                        </label>
+                        <div class="col-md-4"></div>
+                        <label class="col-md-4"></label>
+                        <div class="col-md-2 control-label text-right ">
+								<span class="show-more-title"
+                                      data-target="#recordingShowMore-content"><font>显示更多</font><span
+                                        class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div id="recordingShowMore-content" class="show-more-content" style="display: none">
+                        <form id="getRecording" action="#" novalidate="novalidate">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class=" col-md-4">
+                                    <select name="wayId" class="form-control">
+                                        <option value="1" selected="true">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">间隔时间(秒)：</label>
+                                <div class="col-md-4">
+                                    <input type="text" placeholder="0表示一直录像" class="form-control"
+                                           value="3" name="time" id="vtime" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">保存标志：</label>
+                                <div class="col-md-4">
+                                    <select name="saveSign" class="form-control">
+                                        <option value="0" selected="true">实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class="col-md-4">
+                                    <select name="resolution" class="form-control"
+                                            th:value="${deviceType == '11'?'0':'1'}">
+                                        <option value="0" th:if="${deviceType == '11'}">最低分辨率</option>
+                                        <option value="1" class="defaultValue">320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">176*144</option>
+                                        <option value="6">352*288</option>
+                                        <option value="7">704*288</option>
+                                        <option value="8">704*576</option>
+                                        <option value="255" th:if="${deviceType == '11'}">最高分辨率</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <i
+                                        class="fa fa-question-circle fa-lg" data-toggle="tooltip"
+                                        data-placement="top" title="范围1-10,1代表质量损失最小，10代表压缩比最大"> </i>
+                                    图像质量：
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="text" id="vquality" value="5" name="quality"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="vluminance" value="125" name="luminance"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">对比度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="vcontrast" value="60" name="contrast"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="vsaturability" value="60"
+                                           name="saturability" class="form-control"
+                                           onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">色度：</label>
+                                <div class="col-md-4">
+                                    <input type="text" id="vchroma" value="125" name="chroma"
+                                           class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                </div>
+                                <label class="col-md-2 control-label"></label>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- I/O输出控制 -->
+                <div id="ioBox" style="display: none" class="show-more-wrapper">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="outputControl"
+                                data-target="#outputControl-content"/> <span>I/O输出控制</span>
+                        </label>
+                        <div class="col-md-4"></div>
+                        <label class="col-md-4"></label>
+                        <div class="col-md-2 control-label text-right ">
+								<span class="show-more-title"
+                                      data-target="#outputControl-content"><font>显示更多</font><span
+                                        class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                    <div id="outputControl-content" class="show-more-content" style="display: none">
+                        <form id="outputControlForm" action="#" novalidate="novalidate">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">外设ID：</label>
+                                <div class="col-md-3">
+                                    <select name="peripheralId" id="peripheralId" class="form-control">
+                                        <option value="144" selected>自带IO</option>
+                                        <option value="145">外部控制器91</option>
+                                        <option value="146">外部控制器92</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">控制时长(秒)：</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="controlTime" autocomplete="off" maxlength="5"
+                                           id="controlTime" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                    <p>注：填写范围1~65534,不限时长则置空</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">控制子类型：</label>
+                                <div class="col-md-3">
+                                    <select name="controlSubtype" id="controlSubtype" class="form-control">
+                                        <option value="1" selected>IO控制</option>
+                                        <option value="2">断油电</option>
+                                        <option value="3">模拟量控制</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">输出口设置：</label>
+                                <div class="col-md-3">
+                                    <select name="outletSet" class="form-control">
+                                        <option value="0" selected>0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label analogInfo">
+                                    <label class="text-danger">*</label> 模拟量输出比例(%)：
+                                </label>
+                                <div class="col-md-4 analogInfo">
+                                    <input type="text" class="form-control" name="analogOutputRatio" maxlength="5"
+                                           id="analogOutputRatio" autocomplete="off"/>
+                                    <p>注：填写范围0~100,可保留一位小数</p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- 实时视频区域 -->
+                <div class="show-more-wrapper" style="border-bottom:none;">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" id="videoAreaCheckbox"/> <span>实时视频</span>
+                        </label>
+
+                    </div>
+                </div>
+                <!-- 上传音视频资源列表 -->
+                <div class="show-more-wrapper" style="border-bottom:none;">
+                    <div class="form-group">
+                        <label class="col-md-6 control-label" style="text-align:left"> <input
+                                type="checkbox" class="lower-checkbox" name="uploadAudioResourcesFlag"
+                                id="uploadAudioResourcesFlag"/> <span>上传音视频资源列表</span>
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" id="saveAlarmLinkage">
+        <strong>提 交</strong>
+    </button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">
+        <strong>关 闭</strong>
+    </button>
+</div>
+<!--快捷消息弹窗-->
+<div class="modal fade" id="fastMessage" tabindex="3" aria-hidden="true" data-backdrop="static" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 850px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" aria-label="Close" onclick="hideFastModal()">×</button>
+                <h4 class="modal-title"><span>选择消息模板</span></h4>
+            </div>
+            <div class="modal-body">
+                <div style="margin: 0 15px;">
+                <div class="row" style="margin-bottom: 20px;">
+                    <div role="form" id="fastQueryForm" style="width: 310px;position: relative;display: inline-block;">
+                        <input type="text" oninput="fastInputChange()" class=" form-control" id="fastMsgQueryParam" name="fastMsgQueryParam" placeholder="请输入查询内容" autocomplete="off">
+                        <p id="toolTip" class="toolTip">请不要输入空格、换行和`^*;'\"|, /&lt;&gt;?</p>
+                    </div>
+                    <button type="button" id="search_button" onclick="fastSearch()" class="btn btn-outline btn-primary">查询</button>
+                </div>
+                <div class="row">
+                    <table id="fastMessageTable"
+                           class="table table-striped table-bordered table-hover checkTable"
+                           cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>选择</th>
+                            <th>消息内容</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary"  onclick="sumbitFastModal()">提交</button>
+                <button type="button" class="btn btn-default" onclick="hideFastModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+    var saveSuccessTip = [[#{public.save.success}]];
+    var publicErrorTip = [[#{public.error}]];
+    var publicPerverseData = [[#{public.perverse.data}]];
+    var alarmSearchChannelID = [[#{alarmSearch.channel.ID}]];
+    var alarmSearchIntervalTime = [[#{alarmSearch.interval.time}]];
+    var alarmSearchIntervalError = [[#{alarmSearch.interval.error}]];
+    var alarmSearchIntervalSize = [[#{alarmSearch.interval.size}]];
+    var alarmSearchPhotoSize = [[#{alarmSearch.photo.size}]];
+    var alarmSearchPhotoNull = [[#{alarmSearch.photo.null}]];
+    var alarmSearchSaveNull = [[#{alarmSearch.save.null}]];
+    var alarmSearchResolutionNull = [[#{alarmSearch.resolution.null}]];
+    var alarmSearchMovieSize = [[#{alarmSearch.movie.size}]];
+    var alarmSearchMovieNull = [[#{alarmSearch.movie.null}]];
+    var alarmSearchBrightnessSize = [[#{alarmSearch.brightness.size}]];
+    var alarmSearchBrightnessNull = [[#{alarmSearch.brightness.null}]];
+    var alarmSearchContrastSize = [[#{alarmSearch.contrast.size}]];
+    var alarmSearchContrastNull = [[#{alarmSearch.contrast.null}]];
+    var alarmSearchSaturatedSize = [[#{alarmSearch.saturated.size}]];
+    var alarmSearchSaturatedNull = [[#{alarmSearch.saturated.null}]];
+    var alarmSearchColorSize = [[#{alarmSearch.color.size}]];
+    var alarmSearchColorNull = [[#{alarmSearch.color.null}]];
+</script>
+<script>
+    var fastMsgQueryParam= ''
+    //输入框改变事件
+    function fastInputChange(){
+        var value = $("#fastMsgQueryParam").val()
+        if(value.length >= 30){
+            $("#fastMsgQueryParam").val(value.slice(0, 30))
+        }
+        function validateFastInput(){
+            var regularText = /^[^`\s\^\*;'"\\|,/<>\?]*$/
+            if(!regularText.test(value)){
+                $("#toolTip").show()
+            }else {
+                $("#toolTip").hide()
+            }
+        }
+        validateFastInput()
+    }
+    //快捷消息 查询按钮
+    function fastSearch() {
+        //常规字符串
+        var regularText = /^[^`\s\^\*;'"\\|,/<>\?]*$/
+        var value = $("#fastMsgQueryParam").val()
+        if(regularText.test(value)){
+            fastMsgQueryParam = value
+            myMsgTable.requestData()
+            fastMsgQueryParam = ""
+        }
+    }
+
+    function handleOptionsClick() {
+        var res = []
+        if($("#multiOptions input[name='wayId']:checked").length == 0){
+            $("#multiInput").text('请选择通道号')
+            return
+        }
+        $("#multiOptions input[name='wayId']:checked").each(function(){
+            res.push($(this).val())
+        })
+        $("#multiInput").text(res.join('、'))
+    }
+    //显示快捷消息弹窗
+    function showFastModal() {
+        myMsgTable.init();
+        $("#fastMessage").show()
+    }
+    //隐藏快捷消息弹窗
+    function hideFastModal() {
+        $("#fastMessage input[type='radio']").prop('checked',false)
+        $("#fastMsgQueryParam").val("")
+        $("#fastMessage").hide()
+    }
+    //快捷消息提交确认
+    function sumbitFastModal(){
+        var selected = $("#fastMessage input[name='fastMsgChk']:checked")
+        if(selected.size() == 0){
+            layer.msg("请选择模板消息！")
+            return
+        }
+        $("#fastMsgQueryParam").val("")
+        $("#msgContent").val(selected.attr("data-msg"))
+        $("#fastMessage").hide()
+    }
+    // 快捷消息表格
+    $(function(){
+        var columns = [
+            {
+                //第一列，用来显示序号
+                data: null,
+                class: "text-center",
+                width:30,
+            },
+            {
+                data: null,
+                class: "text-center",
+                width:30,
+                render: function (data, type, row, meta) {
+                    var result = "<input  data-msg=" + html2Escape(data.textString) + " type='radio' name='fastMsgChk'/>";
+                    return result;
+                }
+            },
+            {
+                data: "textString",
+                width:100,
+                class: "text-center",
+                render: function (data, type, row, meta) {
+                    return html2Escape(data);
+                }
+            }
+        ];
+        //表格列定义
+        var columnDefs = [
+            {
+                //第一列，用来显示序号
+                searchable: true,
+                orderable: false,
+                targets: 0,
+            }
+        ];
+        // 服务器数据预处理
+        // 注意这里是引用类型的值  直接修改，不用return
+        var handleRowData = function (json) {
+            var newData = json.records.map(function (item) {
+                return{textString:item}
+            })
+            json.records = newData
+        }
+        //ajax参数
+        var ajaxDataParamFun = function (d) {
+            d.simpleQueryParam = fastMsgQueryParam; //$('#fastMsgQueryParam').val(); //模糊查询
+            d.groupId = selectGroupId;
+            d.assignmentId = selectAssignmentId;
+            d.deviceType = $("input[name='deviceCheck']:checked").val();
+        };
+        //表格setting
+        var setting = {
+            listUrl: '/clbs/lkyw/message/template/page',
+            columnDefs: columnDefs, //表格列定义
+            columns: columns, //表格列
+            dataTableDiv: 'fastMessageTable', //表格
+            ajaxDataParamFun: ajaxDataParamFun, //ajax参数
+            pageable: true, //是否分页
+            showIndexColumn: true, //是否显示第一列的索引列
+            ajaxCallBack: handleRowData, //服务器数据预处理
+            enabledChange: false,
+            pageNumber: 5,
+            autoWidth: false,
+        };
+        //创建表格
+        myMsgTable = new TG_Tabel.createNew(setting);
+        //表格初始化
+        // myTable2.init();
+    })
+    //回车搜索
+    $("#fastMsgQueryParam").on('keydown',function (e) {
+        var key = e.which;
+        if (key == 13) {
+            e.preventDefault();
+            fastSearch()
+        }
+    })
+    $("#fastMessage").on('hide.bs.shown',function (e) {
+        myMsgTable.init()
+    })
+</script>
+<script src="/wro/alarmLinkage.js" th:src="@{/wro/alarmLinkage.js}"></script>

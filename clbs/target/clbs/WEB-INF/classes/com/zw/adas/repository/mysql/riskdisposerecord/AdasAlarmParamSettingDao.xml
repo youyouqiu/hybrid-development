@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasAlarmParamSettingDao">
+
+    <sql id="Base_Column_List">
+    id,vehicle_id, risk_function_id, alarm_enable, gravity_acceleration_threshold, time_threshold,
+    engine_threshold, speed_threshold, one_level_alarm_enable, two_level_alarm_enable,
+    video_recording_time, photograph_number, photograph_time, time_distance_threshold,
+    time_slot_threshold, alarm_level_speed_threshold, frequency_threshold, touch_status,
+    road_sign_recognition, flag, road_sign_enable,tyre_number,unit,pressure,pressure_threshold,
+    slow_leak_threshold,low_pressure,high_pressure,high_temperature,rear,sideRear,upload_time,electricity_threshold,
+    primary_channel,subcode_channel,capture_channel,day_time,night_time,min_stop_time,night_time_value,one_day_drive_time,
+    voice_reminder_enable,one_level_voice_reminder,two_level_voice_reminder,one_level_auxiliary_multimedia,
+    two_level_auxiliary_multimedia,auxiliary_enable,compensating_enable,smoothing,automatic_upload_time,compensation_factor_k,
+    compensation_factor_b,left_distance,right_distance,warning_time_threshold,
+    initiative_picture_enable,driver_change_enable,offline_face_compare_enable, dsm_compare_success_percent,phone_compare_success_percent,
+    voice_broadcast_comparison_enable,pedestrian_inspect
+  </sql>
+    <select id="selectByVehicleId" resultType="com.zw.adas.domain.define.setting.AdasAlarmParamSetting">
+        select
+        <include refid="Base_Column_List"/>
+        from zw_m_adas_alarm_param_setting
+        where vehicle_id = #{param1} and param_type = #{param2} and flag =1
+    </select>
+
+    <insert id="insertAlarmParamBatch" parameterType="com.zw.adas.domain.define.setting.AdasAlarmParamSetting">
+        insert into zw_m_adas_alarm_param_setting (id,vehicle_id, risk_function_id, alarm_enable,
+        gravity_acceleration_threshold, time_threshold,
+        engine_threshold, speed_threshold, one_level_alarm_enable,
+        two_level_alarm_enable, video_recording_time,
+        photograph_number, photograph_time, time_distance_threshold,
+        time_slot_threshold, alarm_level_speed_threshold,
+        frequency_threshold, touch_status, road_sign_recognition,
+        flag,road_sign_enable,param_type,tyre_number,unit,pressure,
+        pressure_threshold,slow_leak_threshold,low_pressure,
+        high_pressure,high_temperature,rear,sideRear,upload_time,
+        electricity_threshold,primary_channel,subcode_channel,
+        capture_channel,day_time,night_time,min_stop_time,night_time_value,one_day_drive_time,
+        voice_reminder_enable,one_level_voice_reminder,two_level_voice_reminder,
+        one_level_auxiliary_multimedia,two_level_auxiliary_multimedia,auxiliary_enable,compensating_enable,
+        smoothing,automatic_upload_time,compensation_factor_k,compensation_factor_b,left_distance,right_distance,warning_time_threshold,
+        initiative_picture_enable,driver_change_enable,offline_face_compare_enable,
+        dsm_compare_success_percent,phone_compare_success_percent,
+        voice_broadcast_comparison_enable,pedestrian_inspect)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">(#{item.id},#{item.vehicleId}, #{item.riskFunctionId}, #{item.alarmEnable},
+            #{item.gravityAccelerationThreshold}, #{item.timeThreshold},#{item.engineThreshold},
+            #{item.speedThreshold}, #{item.oneLevelAlarmEnable},#{item.twoLevelAlarmEnable},
+            #{item.videoRecordingTime},#{item.photographNumber}, #{item.photographTime},
+            #{item.timeDistanceThreshold},#{item.timeSlotThreshold}, #{item.alarmLevelSpeedThreshold},
+            #{item.frequencyThreshold}, #{item.touchStatus}, #{item.roadSignRecognition},
+            #{item.flag}, #{item.roadSignEnable} ,#{item.paramType},#{item.tyreNumber},#{item.unit},
+            #{item.pressure},#{item.pressureThreshold},#{item.slowLeakThreshold},#{item.lowPressure},
+            #{item.highPressure},#{item.highTemperature},#{item.rear},#{item.sideRear},#{item.uploadTime},
+            #{item.electricityThreshold},#{item.primaryChannel},#{item.subcodeChannel},#{item.captureChannel},
+            #{item.dayTime},#{item.nightTime},#{item.minStopTime},#{item.nightTimeValue},#{item.oneDayDriveTime},
+            #{item.voiceReminderEnable},#{item.oneLevelVoiceReminder},#{item.twoLevelVoiceReminder},
+            #{item.oneLevelAuxiliaryMultimedia},#{item.twoLevelAuxiliaryMultimedia},#{item.auxiliaryEnable},
+            #{item.compensatingEnable},#{item.smoothing},#{item.automaticUploadTime},
+            #{item.compensationFactorK},#{item.compensationFactorB},#{item.leftDistance},#{item.rightDistance},#{item.warningTimeThreshold},
+            #{item.initiativePictureEnable},#{item.driverChangeEnable},#{item.offlineFaceCompareEnable},#{item.dsmCompareSuccessPercent},
+            #{item.phoneCompareSuccessPercent},#{item.voiceBroadcastComparisonEnable},#{item.pedestrianInspect})
+        </foreach>
+    </insert>
+
+    <insert id="insertPlatformParams" parameterType="com.zw.adas.domain.define.setting.AdasPlatformParamSetting">
+        insert into zw_m_adas_platform_param_setting (vehicle_id,param_type,event_code,one_level_remind,
+        two_level_remind,distance_threshold,distance_remind,distance_num,time_num,time_remind,time_threshold,
+        one_level_deal_time_interval,two_level_deal_time_interval,push_switch,three_level_remind,three_level_deal_time_interval,
+        one_level_automatic_get,two_level_automatic_get,three_level_automatic_get,one_level_automatic_deal,two_level_automatic_deal,
+        three_level_automatic_deal)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.vehicleId},#{item.paramType},#{item.riskFunctionId},#{item.alarmRemindOne},#{item.alarmRemindTwo},
+            #{item.distanceThreshold},#{item.distanceAlarmRemind},
+            #{item.distanceAlarmNumThreshold},#{item.timeAlarmNumThreshold},#{item.timeAlarmRemind},
+            #{item.timeThreshold},#{item.processingIntervalOne},#{item.processingIntervalTwo},
+            #{item.alarmSwitch},#{item.alarmRemindThree},#{item.processingIntervalThree},#{item.automaticGetOne},
+            #{item.automaticGetTwo},#{item.automaticGetThree},#{item.automaticDealOne},#{item.automaticDealTwo},
+            #{item.automaticDealThree})
+        </foreach>
+    </insert>
+    <update id="updateAlarmParamById" parameterType="com.zw.adas.domain.define.setting.AdasAlarmParamSetting">
+        update zw_m_adas_alarm_param_setting
+        <set>
+            <if test="adasParam.riskFunctionId != null">
+                risk_function_id = #{adasParam.riskFunctionId,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.alarmEnable != null">
+                alarm_enable = #{adasParam.alarmEnable,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.gravityAccelerationThreshold != null">
+                gravity_acceleration_threshold = #{adasParam.gravityAccelerationThreshold,jdbcType=VARCHAR},
+            </if>
+            <if test="adasParam.timeThreshold != null">
+                time_threshold = #{adasParam.timeThreshold,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.engineThreshold != null">
+                engine_threshold = #{adasParam.engineThreshold,jdbcType=VARCHAR},
+            </if>
+            <if test="adasParam.speedThreshold != null">
+                speed_threshold = #{adasParam.speedThreshold,jdbcType=VARCHAR},
+            </if>
+            <if test="adasParam.oneLevelAlarmEnable != null">
+                one_level_alarm_enable = #{adasParam.oneLevelAlarmEnable,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.twoLevelAlarmEnable != null">
+                two_level_alarm_enable = #{adasParam.twoLevelAlarmEnable,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.videoRecordingTime != null">
+                video_recording_time = #{adasParam.videoRecordingTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.photographNumber != null">
+                photograph_number = #{adasParam.photographNumber,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.photographTime != null">
+                photograph_time = #{adasParam.photographTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.timeDistanceThreshold != null">
+                time_distance_threshold = #{adasParam.timeDistanceThreshold,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.timeSlotThreshold != null">
+                time_slot_threshold = #{adasParam.timeSlotThreshold,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.alarmLevelSpeedThreshold != null">
+                alarm_level_speed_threshold = #{adasParam.alarmLevelSpeedThreshold,jdbcType=DECIMAL},
+            </if>
+            <if test="adasParam.frequencyThreshold != null">
+                frequency_threshold = #{adasParam.frequencyThreshold,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.touchStatus != null">
+                touch_status = #{adasParam.touchStatus,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.roadSignRecognition != null">
+                road_sign_recognition = #{adasParam.roadSignRecognition,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.flag != null">
+                flag = #{adasParam.flag,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.roadSignEnable != null">
+                road_sign_enable = #{adasParam.roadSignEnable,jdbcType=TINYINT},
+            </if>
+            <if test="adasParam.tyreNumber != null">
+                tyre_number = #{adasParam.tyreNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="adasParam.unit != null">
+                unit = #{adasParam.unit,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.pressure != null">
+                pressure = #{adasParam.pressure,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.pressureThreshold != null">
+                pressure_threshold = #{adasParam.pressureThreshold,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.slowLeakThreshold != null">
+                slow_leak_threshold = #{adasParam.slowLeakThreshold,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.lowPressure != null">
+                low_pressure = #{adasParam.lowPressure,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.highPressure != null">
+                high_pressure = #{adasParam.highPressure,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.highTemperature != null">
+                high_temperature = #{adasParam.highTemperature,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.rear != null">
+                rear = #{adasParam.rear,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.sideRear != null">
+                sideRear = #{adasParam.sideRear,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.uploadTime != null">
+                upload_time = #{adasParam.uploadTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.electricityThreshold != null">
+                electricity_threshold = #{adasParam.electricityThreshold,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.primaryChannel != null">
+                primary_channel = #{adasParam.primaryChannel,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.subcodeChannel != null">
+                subcode_channel = #{adasParam.subcodeChannel,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.captureChannel != null">
+                capture_channel = #{adasParam.captureChannel,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.dayTime != null">
+                day_time = #{adasParam.dayTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.nightTime != null">
+                night_time = #{adasParam.nightTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.minStopTime != null">
+                min_stop_time = #{adasParam.minStopTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.nightTimeValue != null">
+                night_time_value = #{adasParam.nightTimeValue,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.oneDayDriveTime != null">
+                one_day_drive_time = #{adasParam.oneDayDriveTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.voiceReminderEnable != null">
+                voice_reminder_enable = #{adasParam.voiceReminderEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.oneLevelVoiceReminder != null">
+                one_level_voice_reminder = #{adasParam.oneLevelVoiceReminder,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.twoLevelVoiceReminder != null">
+                two_level_voice_reminder = #{adasParam.twoLevelVoiceReminder,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.oneLevelAuxiliaryMultimedia != null">
+                one_level_auxiliary_multimedia = #{adasParam.oneLevelAuxiliaryMultimedia,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.twoLevelAuxiliaryMultimedia != null">
+                two_level_auxiliary_multimedia = #{adasParam.twoLevelAuxiliaryMultimedia,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.auxiliaryEnable != null">
+                auxiliary_enable = #{adasParam.auxiliaryEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.compensatingEnable != null">
+                compensating_enable = #{adasParam.compensatingEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.smoothing != null">
+                smoothing = #{adasParam.smoothing,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.automaticUploadTime != null">
+                automatic_upload_time = #{adasParam.automaticUploadTime,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.compensationFactorK != null">
+                compensation_factor_k = #{adasParam.compensationFactorK,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.compensationFactorB != null">
+                compensation_factor_b = #{adasParam.compensationFactorB,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.leftDistance != null">
+                left_distance = #{adasParam.leftDistance,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.rightDistance != null">
+                right_distance = #{adasParam.rightDistance,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.warningTimeThreshold != null">
+                warning_time_threshold = #{adasParam.warningTimeThreshold,jdbcType=INTEGER},
+            </if>
+
+            <if test="adasParam.initiativePictureEnable != null">
+                initiative_picture_enable = #{adasParam.initiativePictureEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.driverChangeEnable != null">
+                driver_change_enable = #{adasParam.driverChangeEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.offlineFaceCompareEnable != null">
+                offline_face_compare_enable = #{adasParam.offlineFaceCompareEnable,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.dsmCompareSuccessPercent != null">
+                dsm_compare_success_percent = #{adasParam.dsmCompareSuccessPercent,jdbcType=INTEGER},
+            </if>
+            <if test="adasParam.phoneCompareSuccessPercent != null">
+                phone_compare_success_percent = #{adasParam.phoneCompareSuccessPercent,jdbcType=INTEGER},
+            </if>
+
+            <if test="adasParam.voiceBroadcastComparisonEnable != null">
+                voice_broadcast_comparison_enable = #{adasParam.voiceBroadcastComparisonEnable,jdbcType=INTEGER},
+            </if>
+
+            <if test="adasParam.pedestrianInspect != null">
+                pedestrian_inspect = #{adasParam.pedestrianInspect,jdbcType=INTEGER},
+            </if>
+        </set>
+        where vehicle_id = #{vid} and risk_function_id = #{adasParam.riskFunctionId} and flag =1
+    </update>
+    <delete id="deleteCommonByBatch">
+        delete from zw_m_adas_alarm_param_setting WHERE vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+    <update id="updateDirectiveStatus">
+        insert into zw_m_directive (id, directive_name, monitor_object_id, parameter_type, parameter_name,
+        status, down_time, swift_number, reply_code, remark, flag, create_data_time, create_data_username)
+        values
+        <foreach collection="directiveForms" item="item" separator=",">
+            (#{item.id}, #{item.directiveName}, #{item.monitorObjectId}, #{item.parameterType}, #{item.parameterName},
+            #{item.status}, #{item.downTime}, #{item.swiftNumber}, #{item.replyCode}, #{item.remark}, #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        id=values(id),directive_name=values(directive_name),monitor_object_id=values(monitor_object_id),parameter_type=values(parameter_type),parameter_name=values(parameter_name),status=values(status),down_time=values(down_time),swift_number=values(swift_number),
+        reply_code=values(reply_code),remark=values(remark),flag=values(flag),create_data_time=values(create_data_time),create_data_username=values(create_data_username)
+    </update>
+
+
+    <select id="findPlatformSetting" resultType="com.zw.adas.domain.define.setting.AdasPlatformParamSetting">
+        select
+        vehicle_id as vehicleId,
+        event_code as riskFunctionId,
+        one_level_remind as alarmRemindOne,
+        two_level_remind as alarmRemindTwo,
+        distance_threshold distanceThreshold,
+        distance_remind as distanceAlarmRemind,
+        distance_num as distanceAlarmNumThreshold,
+        time_num as timeAlarmNumThreshold,
+        time_remind as timeAlarmRemind,
+        time_threshold as timeThreshold,
+        one_level_deal_time_interval as processingIntervalOne,
+        two_level_deal_time_interval as processingIntervalTwo,
+        push_switch as alarmSwitch,
+        param_type as paramType,
+        three_level_remind as alarmRemindThree,
+        three_level_deal_time_interval as processingIntervalThree,
+        one_level_automatic_get as automaticGetOne,
+        two_level_automatic_get as automaticGetTwo,
+        three_level_automatic_get as automaticGetThree,
+        one_level_automatic_deal as automaticDealOne,
+        two_level_automatic_deal as automaticDealTwo,
+        three_level_automatic_deal as automaticDealThree
+        from
+        zw_m_adas_platform_param_setting
+        where vehicle_id=#{vehicleId}
+    </select>
+
+
+    <select id="findAllPlatformSetting"
+            resultType="com.zw.adas.domain.define.setting.AdasPlatformParamSetting">
+        select
+        vehicle_id as vehicleId,
+        event_code as riskFunctionId,
+        one_level_remind as alarmRemindOne,
+        two_level_remind as alarmRemindTwo,
+        distance_threshold distanceThreshold,
+        distance_remind as distanceAlarmRemind,
+        distance_num as distanceAlarmNumThreshold,
+        time_num as timeAlarmNumThreshold,
+        time_remind as timeAlarmRemind,
+        time_threshold as timeThreshold,
+        one_level_deal_time_interval as processingIntervalOne,
+        two_level_deal_time_interval as processingIntervalTwo,
+        push_switch as alarmSwitch,
+        param_type as paramType,
+        three_level_remind as alarmRemindThree,
+        three_level_deal_time_interval as processingIntervalThree,
+        one_level_automatic_get as automaticGetOne,
+        two_level_automatic_get as automaticGetTwo,
+        three_level_automatic_get as automaticGetThree,
+        one_level_automatic_deal as automaticDealOne,
+        two_level_automatic_deal as automaticDealTwo,
+        three_level_automatic_deal as automaticDealThree
+        from
+        zw_m_adas_platform_param_setting
+
+    </select>
+    <select id="findAllTireModel" resultType="java.util.Map">
+        select
+        id as tireModelId,
+        size_name as name
+        from zw_m_tyre_size t
+        WHERE flag = 1
+    </select>
+
+
+    <select id="findTireModelById" resultType="java.lang.String">
+        select
+        size_name as name
+        from zw_m_tyre_size
+        WHERE flag = 1 and id=#{id}
+    </select>
+
+    <delete id="deletePlatformParamByVehicleId">
+        delete from zw_m_adas_platform_param_setting where vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+    <delete id="deleteAdasByParamType">
+        delete from zw_m_adas_alarm_param_setting where vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+        and param_type in
+        <foreach item="paramType" collection="paramTypeSet" open="(" separator=","
+                 close=")">
+            #{paramType}
+        </foreach>
+    </delete>
+
+    <update id="updateDirectiveStatusByIdSet">
+        SELECT id FROM zw_m_directive WHERE id IN
+        <foreach item="idItem" collection="directiveIdSet" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        FOR UPDATE;
+
+        UPDATE zw_m_directive set status = 8 where id in
+        <foreach item="idItem" collection="directiveIdSet" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        and status = 4
+    </update>
+    <select id="findLogicChannelsByVehicleIds" parameterType="arraylist" resultType="java.util.Map">
+        SELECT vehicle_id as vehicleId,logic_channel as channel from zw_m_video_channel_setting
+        where vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+        and flag=1
+    </select>
+
+
+</mapper>

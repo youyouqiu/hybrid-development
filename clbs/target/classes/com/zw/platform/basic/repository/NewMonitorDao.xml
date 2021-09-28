@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewMonitorDao">
+
+    <select id="getMonitorIdByOrgId" resultType="java.lang.String">
+        SELECT vg.id AS monitorId FROM zw_m_vehicle_info vg WHERE vg.group_id =#{groupId} and flag =1
+        UNION All
+        SELECT pg.id AS monitorId FROM zw_m_people_info pg WHERE pg.org_id =#{groupId} and flag =1
+        UNION All
+        SELECT th.id AS monitorId FROM zw_m_thing_info th WHERE th.group_id =#{groupId} and flag =1
+    </select>
+
+    <select id="getMonitorIdNameMap" resultType="com.zw.platform.basic.domain.BaseKvDo">
+    SELECT monitor.* from (SELECT v.brand as firstVal,v.id as keyName from zw_m_vehicle_info v where v.flag =1 and v.id IN
+        <foreach collection="monitorIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        union all SELECT t.thing_number as firstVal ,t.id as keyName from zw_m_thing_info t where t.flag =1 and
+        t.id IN
+        <foreach collection="monitorIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        union all SELECT p.people_number as firstVal,p.id as keyName from zw_m_people_info p where p.flag =1 and
+        p.id IN
+        <foreach collection="monitorIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ) monitor
+        <if test="search != null and search != ''">
+         where monitor.firstVal like CONCAT('%',#{search},'%')
+         </if>
+
+    </select>
+
+    <select id="findSendParmId" parameterType="string" resultType="string">
+		SELECT id from zw_m_directive where monitor_object_id=#{monitorId} and
+		parameter_type='8' and flag=1 ORDER BY create_data_time desc
+	</select>
+</mapper>

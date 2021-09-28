@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.SwitchTypeDao">
+
+    <!-- 查询  -->
+    <select id="findByPage" parameterType="com.zw.platform.util.common.BaseQueryBean" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT * FROM zw_m_switch_type
+        WHERE flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+                AND
+              (
+                BINARY `name` LIKE
+                CONCAT('%',#{simpleQueryParam},'%')
+                OR description LIKE BINARY
+                CONCAT('%',#{simpleQueryParam},'%')
+                OR identify LIKE BINARY
+                CONCAT('%',#{simpleQueryParam},'%')
+              )
+        </if>
+        ORDER BY create_data_time desc,id DESC
+    </select>
+
+
+    <!-- 通过id得到一个 -->
+    <select id="findByid" parameterType="string" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT * FROM zw_m_switch_type WHERE flag=1 and id = #{id}
+    </select>
+
+
+    <!-- 通过id得到一个 -->
+    <select id="findByName" parameterType="string" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT * FROM zw_m_switch_type WHERE flag=1 and name = BINARY #{name}
+    </select>
+
+    <select id="findByIdentify" parameterType="string" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT * FROM zw_m_switch_type WHERE flag=1 and identify = #{identify}
+    </select>
+
+
+
+    <!-- 通过id检查是否已被绑定 -->
+    <select id="checkBind" parameterType="string" resultType="java.lang.Integer">
+        SELECT count(1) FROM zw_m_io_vehicle_config c
+         WHERE c.flag=1 and
+         c.function_id = #{id}
+    </select>
+
+
+
+    <!-- 查询  -->
+    <select id="findAllow" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT * FROM zw_m_switch_type
+        WHERE flag=1
+        ORDER BY `name` asc
+    </select>
+
+
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.vas.switching.SwitchType">
+        INSERT INTO zw_m_switch_type (
+        id, name, description,identify,flag,create_data_time,create_data_username,state_one,state_two
+        )
+        VALUES(
+         #{id}, #{name}, #{description}, #{identify},#{flag},#{createDataTime},#{createDataUsername},#{stateOne}, #{stateTwo}
+        )
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="addBatch" parameterType="java.util.List">
+        INSERT INTO zw_m_switch_type (
+        id, name, description,identify,flag,create_data_time,create_data_username,state_one,state_two
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.name}, #{item.description}, #{item.identify}, #{item.flag},#{item.createDataTime},
+            #{item.createDataUsername},#{item.stateOne}, #{item.stateTwo})
+        </foreach>
+    </insert>
+
+    <!-- 根据id删除一个 Peopel -->
+    <update id="deleteById" parameterType="string">
+        UPDATE zw_m_switch_type set flag=0 WHERE id = #{id}
+    </update>
+
+    <!-- 批量解除外设信息 -->
+    <update id="deleteBatchSwitchType"  parameterType="java.util.List">
+        update zw_m_switch_type
+        set flag = 0
+        where
+        flag = 1
+        and id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 修改 -->
+    <update id="updateSwitchType" parameterType="com.zw.platform.domain.vas.switching.SwitchType">
+        UPDATE zw_m_switch_type SET
+        name = #{name}, description = #{description},identify = #{identify},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        state_one = #{stateOne},state_two = #{stateTwo}
+        WHERE id = #{id}
+    </update>
+
+    <select id="findByStateRepetition" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        select * from zw_m_switch_type where flag = 1
+        <if test="flag == 1 ">
+            AND state_one = BINARY #{state}
+        </if>
+        <if test="flag == 2 ">
+            AND state_two = BINARY #{state}
+        </if>
+        <if test="id != null and id != ''">
+            AND <![CDATA[ id <> #{id} ]]>
+        </if>
+    </select>
+
+    <select id="getIoSwitchType" resultType="com.zw.platform.domain.vas.switching.SwitchType">
+        SELECT
+            name,
+            identify,
+            state_one AS stateOne,
+            state_two AS stateTwo
+        FROM
+          zw_m_switch_type
+        WHERE
+        flag = 1
+         <!-- identify LIKE "0x4%" -->
+        ORDER BY identify
+    </select>
+
+    <select id="getFuntcionIdBingIoSite" resultType="com.zw.platform.domain.vas.alram.IoVehicleConfigInfo">
+        SELECT
+        vc.vehicle_id,
+        st.name,
+        vc.io_site AS ioSite,
+        vc.io_type AS ioType,
+        vc.high_signal_type AS highSignalType,
+        vc.low_signal_type AS lowSignalType,
+        st.state_one AS stateOne,
+        st.state_two AS stateTwo,
+        st.identify
+        FROM
+        zw_m_io_vehicle_config vc
+        LEFT JOIN  zw_m_switch_type st ON st.id = vc.function_id
+        AND st.flag = 1
+        WHERE
+        vc.flag = 1
+        <if test="identify != null ">
+            AND st.identify LIKE CONCAT('',#{identify},'%')
+        </if>
+        AND vc.vehicle_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

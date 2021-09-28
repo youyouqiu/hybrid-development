@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.NetCarDao">
+    <cache/>
+    <select id="list" resultType="com.zw.platform.domain.connectionparamsset_809.T809ForwardConfig">
+        select m.vehicle_id id, m.platform_id as plantFormId, v.brand from zw_m_net_car_mapping m
+        inner join zw_m_vehicle_info v on v.id = m.vehicle_id
+        where exists(
+            select av.id from zw_m_assignment_vehicle av
+            inner join zw_m_assignment_user au on au.assignment_id = av.assignment_id and au.user_id = #{userId}
+            where av.vehicle_id = vehicle_id
+        )
+        <if test="query!=null and query != ''">
+        and brand like concat('%',#{query},'%')
+        </if>
+        <if test="platformId != 0">
+        and m.platform_id = #{platformId}
+        </if>
+    </select>
+
+    <insert id="add">
+        insert ignore into zw_m_net_car_mapping(vehicle_id, platform_id, create_data_time, create_data_username) values
+        <foreach collection="vehicleList" item="item" separator=",">
+            (#{item}, #{platformId}, now(), #{creator})
+        </foreach>
+    </insert>
+
+    <delete id="delete" parameterType="com.zw.platform.domain.forwardplatform.ForwardMapping">
+        delete from zw_m_net_car_mapping where (vehicle_id, platform_id) in
+        <foreach collection="vehicleList" item="item" open="(" separator="," close=")">
+            (#{item.monitorId}, #{item.platformId})
+        </foreach>
+    </delete>
+</mapper>

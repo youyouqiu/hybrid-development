@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.alarm.AppRiskRankDao">
+
+    <select id="filterVehicleIds" resultType="java.lang.String">
+        SELECT DISTINCT
+        (vehicle_id)
+        FROM
+        zw_m_risk_vehicle_config_zh
+        WHERE
+        flag = 1
+        <if test="mids != null and mids.size > 0">
+            AND
+            vehicle_id in
+            <foreach item="item" collection="mids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="findAllVids" resultType="java.lang.String">
+         SELECT DISTINCT
+        (vehicle_id)
+        FROM
+        zw_m_risk_vehicle_config_zh
+        WHERE
+        flag = 1
+    </select>
+    <select id="findJingStandardVids" resultType="java.lang.String">
+
+     SELECT DISTINCT
+        (vehicle_id)
+        FROM
+        zw_m_adas_jing_alarm_param_setting
+        WHERE
+        flag = 1
+
+    </select>
+    <select id="findOtherStandardVids" resultType="java.lang.String">
+         SELECT DISTINCT
+        (vehicle_id)
+        FROM
+        zw_m_adas_alarm_param_setting
+        WHERE
+        flag = 1
+    </select>
+    <select id="findMidsBytype" resultType="java.lang.String">
+        SELECT
+        vehicle_id
+        from
+        zw_m_config
+        where
+        flag=1
+        <if test="type != null and type != 3">
+            and
+            monitor_type=#{type}
+        </if>
+        <!--<if test="monitorSet != null and monitorSet.size > 0">-->
+        <!--and vehicle_id in-->
+        <!--<foreach item="item" collection="monitorSet" separator="," open="(" close=")">-->
+        <!--#{item}-->
+        <!--</foreach>-->
+        <!--</if>-->
+    </select>
+
+    <select id="findOtherVids" resultType="java.lang.String">
+        SELECT DISTINCT
+        (vehicle_id)
+        FROM zw_m_adas_alarm_param_setting
+        WHERE
+        flag = 1
+    </select>
+    <select id="searchMonitor" resultType="com.zw.app.domain.alarm.MonitorAppInfo">
+        SELECT
+        DISTINCT
+        a. NAME AS assignmentName,
+        a.id AS assignmentId,
+        r.monitorName,
+        r.monitorId,
+        r.monitorType
+        FROM
+        zw_m_assignment a
+        INNER JOIN zw_m_assignment_user u ON a.id = u.assignment_id
+        INNER JOIN zw_m_assignment_vehicle v ON u.assignment_id = v.assignment_id
+        INNER JOIN (
+        <if test="type ==0">
+            SELECT id AS monitorId, brand AS monitorName, 0 AS monitorType FROM zw_m_vehicle_info WHERE flag = 1
+        </if>
+        <if test="type ==1">
+            SELECT id AS monitorId, people_number AS monitorName, 1 AS monitorType FROM zw_m_people_info WHERE flag = 1
+        </if>
+        <if test="type ==2">
+            SELECT id AS monitorId, thing_number AS monitorName, 2 AS monitorType FROM zw_m_thing_info WHERE flag = 1
+        </if>
+        <if test="type ==3">
+            SELECT id AS monitorId, brand AS monitorName, 0 AS monitorType FROM zw_m_vehicle_info WHERE flag = 1
+            UNION ALL
+            SELECT id AS monitorId, people_number AS monitorName, 1 AS monitorType FROM zw_m_people_info WHERE flag = 1
+            UNION ALL
+            SELECT id AS monitorId, thing_number AS monitorName, 2 AS monitorType FROM zw_m_thing_info WHERE flag = 1
+        </if>
+        ) r ON r.monitorId = v.vehicle_id
+        WHERE
+        1=0
+        <if test="userId!=null and userId!=''">
+            or ( a.flag = 1
+            AND u.flag = 1
+            AND v.flag = 1
+            <if test="searchType!=null and searchType ==0">
+                AND r.monitorName like CONCAT('%',#{search},'%')
+            </if>
+            <if test="searchType!=null and searchType ==1">
+                AND a.NAME like CONCAT('%',#{search},'%')
+            </if>
+            AND u.user_id = #{userId})
+            <if test="type !=null and type!=3">
+                AND r.monitorType=#{type}
+            </if>
+        </if>
+        order by a.create_data_time desc, a.name
+    </select>
+    <select id="searchAssignmentIs" resultType="java.lang.String">
+        SELECT
+        DISTINCT
+        a.id AS assignmentId
+        FROM
+        zw_m_assignment a
+        INNER JOIN zw_m_assignment_user u ON a.id = u.assignment_id
+        INNER JOIN zw_m_assignment_vehicle v ON u.assignment_id = v.assignment_id
+        INNER JOIN (
+        <if test="type ==0">
+            SELECT id AS monitorId, brand AS monitorName, 0 AS monitorType FROM zw_m_vehicle_info WHERE flag = 1
+        </if>
+        <if test="type ==1">
+            SELECT id AS monitorId, people_number AS monitorName, 1 AS monitorType FROM zw_m_people_info WHERE flag = 1
+        </if>
+        <if test="type ==2">
+            SELECT id AS monitorId, thing_number AS monitorName, 2 AS monitorType FROM zw_m_thing_info WHERE flag = 1
+        </if>
+        <if test="type ==3">
+            SELECT id AS monitorId, brand AS monitorName, 0 AS monitorType FROM zw_m_vehicle_info WHERE flag = 1
+            UNION ALL
+            SELECT id AS monitorId, people_number AS monitorName, 1 AS monitorType FROM zw_m_people_info WHERE flag = 1
+            UNION ALL
+            SELECT id AS monitorId, thing_number AS monitorName, 2 AS monitorType FROM zw_m_thing_info WHERE flag = 1
+        </if>
+        ) r ON r.monitorId = v.vehicle_id
+        WHERE
+        1=0
+        <if test="userId!=null and userId!=''">
+            or ( a.flag = 1
+            AND u.flag = 1
+            AND v.flag = 1
+            AND u.user_id = #{userId})
+            <if test="type !=null and type!=3">
+                AND v.monitor_type=#{type}
+            </if>
+        </if>
+        order by a.create_data_time desc, a.name
+    </select>
+
+</mapper>

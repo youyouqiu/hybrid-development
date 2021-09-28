@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>OBD行程报表</title>
+    <style>
+        .glyphicon.glyphicon-log-out::before{
+            content: "";
+            background-image: url(/clbs/resources/img/export.svg);
+            width: 14px;
+            height: 14px;
+            display: block;
+            position: absolute;
+            top: -13px;
+            left: -14px;
+            background-size: 14px 14px;
+        }
+    </style>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+    	<div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">传感器报表</li>
+                        <li class="active">OBD行程报表</li>
+                    </ul>
+                    <h1 class="h1 ">OBD行程报表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                	<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                        <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                            <option value="vehicle" selected="">监控对象</option>
+                                            <option value="group">企业</option>
+                                            <option value="assignment">分组</option>
+                                        </select>
+                                        <input type="text" autocomplete="off" style="cursor: pointer; background-color: #fafafa;" placeholder="请选择" name="groupSelect" class="form-control moreQueryGroup" id="groupSelect"/>
+                                        <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;" aria-hidden="true" id="groupSelectSpan"></span>
+                                        <div id="menuContent" class="menuContent">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+									<div class="col-md-4 col-sm-8 searchListSelect">
+										<input style="cursor: pointer; background-color: #fafafa;"
+											class="form-control layer-date laydate-icon"
+											id="timeInterval" name="timeInterval" readonly />
+									</div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                onclick="itineraryReportList.inquireClick(0)">今天
+                                        </button>
+                                        <button id="yesterdayClick" type="button" class="btn btn-primary" name="-1"
+                                                onclick="itineraryReportList.inquireClick(-1)">前一天
+                                        </button>
+                                        <button id="nearlyThreeDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="itineraryReportList.inquireClick(-3)">前三天
+                                        </button>
+                                        <button id="nearlySevenDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="itineraryReportList.inquireClick(-7)">前七天
+                                        </button>
+                                        <button id="inquireClick" type="button" class="btn btn-primary search-btn"
+                                                name="1" onclick="itineraryReportList.inquireClick(1)"><i
+                                                class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                        <button onclick="itineraryReportList.export()" id="exportRisk" type="button" class="btn btn-purple export-btn"><i
+                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">OBD行程列表</h3>
+                            <div class="actions pull-right listActions">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch2-body">
+                            <div class="ToolPanel" style="">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                          id="simpleQueryParam" name="simpleQueryParam"
+                                                          style="width:300px" placeholder="请输入监控对象"></label>
+                                            <button  onclick="itineraryReportList.searchTable()" type="button" id="search_button"
+                                                     class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" style="display:none"/>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="columns btn-group pull-right fuelConsumptionS">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                            title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns" type="button"
+                                                class="btn btn-default dropdown-toggle btn-border-radius"
+                                                data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable"
+                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>监控对象</th>
+                                    <th>所属企业</th>
+                                    <th>分组</th>
+                                    <th>开始时间</th>
+                                    <th>结束时间</th>
+                                    <th>行程时长</th>
+                                    <th>行驶时长</th>
+                                    <th>行驶里程(Km)</th>
+                                    <th>怠速次数</th>
+                                    <th>怠速时长</th>
+                                    <th>总油耗(L)</th>
+                                    <th>行驶油耗(L)</th>
+                                    <th>行驶百公里油耗(L/100km)</th>
+                                    <th>怠速油耗(L)</th>
+                                    <th>怠速小时油耗(L/h)</th>
+                                    <th>急加速次数</th>
+                                    <th>急减速次数</th>
+                                    <th>急转弯次数</th>
+                                    <th>刹车次数</th>
+                                    <th>离合次数</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+</script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/itineraryReportList.js"></script>
+</html>

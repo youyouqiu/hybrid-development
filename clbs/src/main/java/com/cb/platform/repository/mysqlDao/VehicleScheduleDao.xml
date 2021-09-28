@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.VehicleScheduleDao">
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.cb.platform.domain.VehicleScheduler">
+        INSERT INTO zw_m_vehicle_schedule (
+        id,vehicle_id,group_id, send_time,send_date,send_username,content, create_data_time, create_data_username
+        )
+        VALUES(
+         #{id}, #{vehicleId}, #{groupId}, #{sendTime},#{sendDate},#{sendUsername},#{content},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+    <insert id="addByBatch" parameterType="com.cb.platform.domain.VehicleScheduler">
+        INSERT INTO zw_m_vehicle_schedule (
+        id,vehicle_id,group_id, send_time,send_date,send_username,content, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+            #{item.id}, #{item.vehicleId}, #{item.groupId}, #{item.sendTime},#{item.sendDate},#{item.sendUsername},#{item.content},#{item.createDataTime},#{item.createDataUsername}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getEnterpriseList" parameterType="com.cb.platform.domain.VehicleScheduler" resultType="com.cb.platform.domain.VehicleScheduler">
+    select count(t.group_id) AS times,group_id,t.send_date  from (
+    SELECT vs.group_id ,vs.send_date from zw_m_vehicle_schedule vs where vs.group_id
+    in
+        <foreach item="item" collection="list" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+        and vs.vehicle_id in
+        <foreach item="item" collection="vehiclelist" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    ) t where t.send_date  LIKE CONCAT(#{sendDate},'%') group by t.group_id, t.send_date
+    </select>
+
+    <select id="getVehicleList" parameterType="com.cb.platform.domain.VehicleScheduler" resultType="com.cb.platform.domain.VehicleScheduler">
+        select count(t.vehicle_id) AS times,vehicle_id,t.send_date  from (
+        SELECT vs.vehicle_id ,vs.send_date from zw_m_vehicle_schedule vs where vs.vehicle_id
+        in
+        <foreach item="item" collection="list" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+        ) t where  t.send_date  LIKE CONCAT(#{sendDate},'%') group by t.vehicle_id, t.send_date
+    </select>
+
+    <select id="getDetailList"  resultType="com.cb.platform.domain.VehicleScheduler">
+        SELECT vehicle_id,group_id,send_time,send_username,content from  zw_m_vehicle_schedule  where vehicle_id
+        in
+        <foreach item="item" collection="list" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+        and  send_time &gt;=  #{startTime}
+        and  send_time &lt;= #{endTime}
+        and  flag = 1  ORDER BY send_time DESC
+    </select>
+
+</mapper>

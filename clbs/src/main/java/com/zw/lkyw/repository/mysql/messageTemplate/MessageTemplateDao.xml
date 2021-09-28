@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.lkyw.repository.mysql.messageTemplate.MessageTemplateDao">
+    <!-- 单个新增消息模板  -->
+    <insert id="addMessageTemplate" parameterType="com.zw.lkyw.domain.messageTemplate.MessageTemplateForm">
+		INSERT into zw_m_message_template (id,
+		                        content,
+		                        status,
+								flag,
+								remark,
+								create_data_time,
+								create_data_username,
+								update_data_time,
+								update_data_username
+							    )
+					     values (#{id},
+					           #{content},
+					           #{status},
+					           #{flag},
+					           #{remark},
+					           #{createDataTime},
+					           #{createDataUsername},
+					           #{updateDataTime},
+					           #{updateDataUsername}
+					           )
+	</insert>
+
+    <!-- 查找消息模板（可模糊搜索） -->
+    <select id="findMessageTemplate" resultType="com.zw.lkyw.domain.messageTemplate.MessageTemplateInfo">
+        select id as id,
+        content as content,
+        status,
+        flag,
+        remark,
+        create_data_time as createDataTime,
+        create_data_username as createDataUsername,
+        update_data_time as updateDataTime,
+        update_data_username as updateDataUsername
+        from zw_m_message_template where flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam !='' ">
+            AND content LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <!-- 查找消息模板（可模糊搜索） -->
+    <select id="accurateFindMessageTemplate" resultType="com.zw.lkyw.domain.messageTemplate.MessageTemplateInfo"
+            parameterType="string">
+        select id as id,
+        content as content,
+        status,
+        flag,
+        remark,
+        create_data_time as createDataTime,
+        create_data_username as createDataUsername,
+        update_data_time as updateDataTime,
+        update_data_username as updateDataUsername
+        from zw_m_message_template where flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam !='' ">
+            AND content = #{simpleQueryParam}
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <!-- 批量新增消息模板 -->
+    <insert id="addTemplateList" parameterType="com.zw.lkyw.domain.messageTemplate.MessageTemplateForm">
+        insert into zw_m_message_template (id,
+        content,
+        status,
+        flag,
+        remark,
+        create_data_time,
+        create_data_username,
+        update_data_time,
+        update_data_username
+        )
+        value
+        <foreach collection="messageTemplateForms" item="item" index="index" separator=",">
+            (#{item.id}, #{item.content}, #{item.status},
+            #{item.flag},#{item.remark},#{item.createDataTime},
+            #{item.createDataUsername},#{item.updateDataTime},#{item.updateDataUsername})
+        </foreach>
+    </insert>
+
+    <!--  删除消息模板  -->
+    <update id="deleteTemplate" parameterType="string">
+        update zw_m_message_template
+        SET flag = 0
+        where 1=1
+        and id in
+        <foreach collection="templateIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 修改消息模板 -->
+    <update id="updateTemplate" parameterType="com.zw.lkyw.domain.messageTemplate.MessageTemplateBean">
+        update zw_m_message_template mt
+        set
+        <if test="info.content != null and info.content != ''">
+            mt.content = #{info.content},
+        </if>
+        <if test="info.status !=null">
+            mt.status = #{info.status},
+        </if>
+        <if test="info.remark !=null and info.remark != ''">
+            mt.remark = #{info.remark},
+        </if>
+        <if test="info.updateDataTime != null">
+            mt.update_data_time = #{info.updateDataTime},
+        </if>
+        <if test="info.updateDataUsername != null and info.updateDataUsername != ''">
+            mt.update_data_username = #{info.updateDataUsername}
+        </if>
+        where
+        id = #{info.id}
+        and flag = 1
+    </update>
+
+    <select id="findTemplatesById" parameterType="string"
+            resultType="com.zw.lkyw.domain.messageTemplate.MessageTemplateInfo">
+        select  mt.id as id, mt.content, mt.remark, mt.status
+        from zw_m_message_template mt
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

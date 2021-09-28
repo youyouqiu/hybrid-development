@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>技能管理</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section class="leftMenuBg">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">对讲管理</li>
+                        <li class="active">人员信息</li>
+                        <li class="active">技能管理</li>
+                    </ul>
+                    <h1 class="h1 ">技能管理</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch" style="cursor:pointer;position: relative" >
+                            <h3 class="panel-title fwb">技能类别</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down"  id="stretch-chevron" ></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" style="display: none"  id="stretch-body">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" placeholder="请输入技能类别"></label>
+                                            <button type="button" id="search_button"
+                                                    onclick="myTable.requestData()"
+                                                    class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" style="display:none" />
+                                        </form>
+                                    </div>
+
+                                    <button th:if="${hasRole}" type="button" id="add_button"
+                                            th:href="@{/talkback/basicinfo/skill/addSkillsCategories}"  data-toggle="modal" data-target="#commonSmWin"
+                                            class="btn btn-outline btn-default">新增
+                                    </button>
+                                </div>
+                                <div class="columns btn-group pull-right personnelInformation">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh" title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable" class="table table-striped table-bordered table-hover checkTable" cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <!--<th><input type="checkbox" id="checkAll"></th>-->
+                                    <th th:if="${hasRole}">操作设置</th>
+                                    <th>技能类别</th>
+                                    <th>类别备注</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2" style="cursor:pointer;position: relative" >
+                            <h3 class="panel-title fwb">技能列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down"  id="stretch2-chevron" ></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body"  id="stretch2-body">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam2" onkeydown="if(event.keyCode==13){modelTable.requestData();}" name="simpleQueryParam2" placeholder="请输入技能名称"></label>
+                                            <button type="button" id="search_button2"
+                                                    onclick="modelTable.requestData()"
+                                                    class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText2" type="text" style="display:none" />
+                                        </form>
+                                    </div>
+                                    <button th:if="${hasRole}" type="button" id="add_button2"
+                                            th:href="@{/talkback/basicinfo/skill/addSkill}"  data-toggle="modal" data-target="#commonSmWin"
+                                            class="btn btn-outline btn-default">新增
+                                    </button>
+                                </div>
+                                <div class="columns btn-group pull-right personnelInformation">
+                                    <button id="refreshTable2" class="btn btn-default" type="button" name="refresh" title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns2" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text2">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable2" class="table table-striped table-bordered table-hover checkTable" cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <!--<th><input type="checkbox" id="checkAll"></th>-->
+                                    <th th:if="${hasRole}">操作设置</th>
+                                    <th>技能名称</th>
+                                    <th>技能类别</th>
+                                    <th>技能备注</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var selectItem = [[#{select.item}]];
+    var publicDelete = [[#{public.delete}]];
+    var publicError = [[#{public.error}]];
+</script>
+<script src="/clbs/resources/js/ManagementSkills.js"></script>
+</html>

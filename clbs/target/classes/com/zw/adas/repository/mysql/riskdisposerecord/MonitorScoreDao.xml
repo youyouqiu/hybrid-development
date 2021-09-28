@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.MonitorScoreDao">
+
+    <select id="getMonitorScoreDataListByGroupIds" resultType="com.zw.adas.domain.monitorScore.MonitorScore">
+        select
+        vehicle_id,
+        travel_mile,
+        travel_num,
+        travel_time,
+        average_travel_time,
+        travel_speed,
+        alarm_total,
+        score,
+        group_id
+        from zw_m_monitor_score_month_report where 1=0
+        <if test="groupIds != null and groupIds.size() > 0">
+            OR ( group_id in
+            <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            )
+            and
+            time =#{time}
+        </if>
+    </select>
+    <select id="getMonitorScoreInfo" resultType="com.zw.adas.domain.monitorScore.MonitorScoreInfo">
+        SELECT
+            s.vehicle_id,
+            info.brand,
+            info.purpose_category,
+            info.using_nature,
+            info.is_start,
+            info.plate_color,
+            info.group_id,
+            info.chassis_number,
+            info.license_issuance_date as licenseIssuanceFormDate,
+            info.registration_end_date as registrationEndFormDate,
+            info.vehicle_photo,
+            s.score,
+            s.score_ring_ratio,
+            s.alarm_total,
+            s.alarm_ring_ratio,
+            s.hundreds_alarm_total,
+            s.hundreds_alarm_ring_ratio,
+            s.travel_mile,
+            s.average_travel_time,
+            s.event_infos
+        FROM
+            zw_m_monitor_score_month_report s
+        LEFT JOIN (
+            SELECT
+                i.id,
+                i.brand,
+                i.vehicle_photo,
+                i.using_nature,
+                p.purpose_category,
+                i.is_start,
+                i.plate_color,
+                i.group_id,
+                i.chassis_number,
+                i.license_issuance_date,
+                i.registration_end_date
+            FROM
+                zw_m_vehicle_info i
+            LEFT JOIN zw_m_vehicle_purpose p ON i.vehicle_purpose = p.id
+            WHERE
+                i.id = #{vehicleId}
+            AND i.flag = 1
+            AND p.flag = 1
+        ) info ON s.vehicle_id = info.id
+        WHERE
+            s.time = #{time}
+            and s.vehicle_id =#{vehicleId}
+    </select>
+    <select id="getMonitorScoreInfoList" resultType="com.zw.adas.domain.monitorScore.MonitorScoreInfo">
+        SELECT
+        s.vehicle_id,
+        info.brand,
+        info.purpose_category,
+        info.using_nature,
+        info.is_start,
+        info.plate_color,
+        info.group_id,
+        info.chassis_number,
+        info.license_issuance_date as licenseIssuanceFormDate,
+        info.registration_end_date as registrationEndFormDate,
+        info.vehicle_photo,
+        s.score,
+        s.score_ring_ratio,
+        s.alarm_total,
+        s.alarm_ring_ratio,
+        s.hundreds_alarm_total,
+        s.hundreds_alarm_ring_ratio,
+        s.travel_mile,
+        s.average_travel_time
+        FROM
+        zw_m_monitor_score_month_report s
+        LEFT JOIN (
+        SELECT
+        i.id,
+        i.brand,
+        i.vehicle_photo,
+        i.using_nature,
+        p.purpose_category,
+        i.is_start,
+        i.plate_color,
+        i.group_id,
+        i.chassis_number,
+        i.license_issuance_date,
+        i.registration_end_date
+        FROM
+        zw_m_vehicle_info i
+        LEFT JOIN zw_m_vehicle_purpose p ON i.vehicle_purpose = p.id
+        WHERE
+        i.id in
+        <foreach item="item" collection="vehicleIdSet" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND i.flag = 1
+        AND p.flag = 1
+        ) info ON s.vehicle_id = info.id
+        WHERE
+        s.time = #{time}
+        and s.vehicle_id in
+        <foreach item="item" collection="vehicleIdSet" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="sortByAverageTravelTime" resultType="com.zw.adas.domain.monitorScore.MonitorScore">
+        SELECT
+        vehicle_id,
+        travel_mile,
+        travel_num,
+        travel_time,
+        average_travel_time,
+        travel_speed,
+        alarm_total,
+        score,
+        group_id
+        FROM
+        zw_m_monitor_score_month_report score
+        INNER JOIN zw_m_vehicle_info info ON score.vehicle_id = info.id
+        WHERE 1=0
+        <if test="groupIds != null and groupIds.size() > 0">
+            OR ( score.group_id in
+            <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            )
+            AND score.time = #{time}
+        </if>
+        <if test="parameter != null and parameter!=''">
+            AND info.brand LIKE CONCAT('%',#{parameter},'%')
+        </if>
+        ORDER BY
+        score.travel_time
+        <if test="isDownSort">
+            DESC
+        </if>
+
+    </select>
+</mapper>

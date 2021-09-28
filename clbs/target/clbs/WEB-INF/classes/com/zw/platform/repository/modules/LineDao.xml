@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.LineDao">
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.functionconfig.form.LineForm">
+        INSERT INTO zw_m_line (
+        id, name, description, type, width, group_id,create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{name}, #{description}, #{type}, #{width},#{groupId},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 修改线路主表信息 -->
+    <update id="updateLine" parameterType="com.zw.platform.domain.functionconfig.form.LineForm">
+        UPDATE zw_m_line
+        SET
+        <if test="name != null and name != ''">
+            name = #{name},
+        </if>
+        description = #{description},
+        <if test="type != null and type != ''">
+            type = #{type},
+        </if>
+        <if test="width != null and width != ''">
+            width = #{width},
+        </if>
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{lineId}
+    </update>
+    <!-- 新增线路点信息 -->
+    <insert id="addLineContent" parameterType="com.zw.platform.domain.functionconfig.form.LineForm">
+        INSERT INTO zw_m_line_content (
+        line_id, sort_order, longitude, latitude,type, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{pointSeq}, #{longitude}, #{latitude}, #{pointType},#{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+    <update id="deleteLine">
+		update zw_m_line
+		set flag = 0
+		where id = #{fenceId}
+	</update>
+
+    <update id="deleteLineContent">
+		update zw_m_line_content
+		set flag = 0
+		where line_id = #{fenceId}
+	</update>
+
+    <!-- 更新线路点坐标：删除后再插入 -->
+    <insert id="updateLineContent" parameterType="com.zw.platform.domain.functionconfig.form.LineForm">
+    	INSERT INTO zw_m_line_content (
+        	line_id, sort_order, longitude, latitude,type, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        	#{lineId}, #{pointSeq}, #{longitude}, #{latitude}, #{pointType},#{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 新增电子围栏总表 -->
+    <insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.FenceInfoForm">
+		INSERT INTO zw_m_fence_info (id, type, shape, flag, create_data_time, create_data_username, fence_type_id, area)
+		VALUES (#{id}, #{type}, #{shape}, #{flag}, #{createDataTime}, #{createDataUsername}, #{typeId}, #{area})
+    </insert>
+
+
+    <select id="getFenceIdByLineId" resultType="string">
+        select id from zw_m_fence_info where flag =1 and shape=#{lineId}
+    </select>
+    <!-- 根据终端id查询line点 -->
+    <select id="findLineContentById" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.LineContent">
+        SELECT lineContent.*, zmft.color_code, zmft.transparency,zml.name,zml.description,zml.width FROM
+        zw_m_line_content lineContent
+        left join zw_m_line zml on lineContent.line_id = zml.id and zml.flag = 1
+        left join zw_m_fence_info zmfi on zmfi.shape = lineContent.line_id and zmfi.flag = 1
+        left join zw_m_fence_type zmft on zmft.id = zmfi.fence_type_id and zmft.flag = 1
+        WHERE lineContent.flag = 1
+        and lineContent.type = '0'
+        <if test="id != null and id != ''">
+            AND lineContent.line_id = #{id}
+        </if>
+        ORDER BY lineContent.sort_order
+    </select>
+
+    <!-- 根据终端id查询line点 -->
+    <select id="findLineContentsById" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.LineContent">
+        SELECT lineContent.* FROM zw_m_line_content lineContent
+        WHERE flag = 1
+        <if test="id != null and id != ''">
+            AND line_id = #{id}
+        </if>
+        ORDER BY sort_order
+    </select>
+
+    <!-- 根据lid查询lines点 -->
+    <select id="findLineSpotByLid" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.LineSpot">
+        SELECT lineSpot.* FROM zw_m_line_spot lineSpot
+        WHERE flag = 1
+        <if test="id != null and id != ''">
+            AND line_id = #{id}
+        </if>
+    </select>
+
+
+    <!--根据lid查路段信息-->
+    <select id="findSegmentContentByLid" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.query.LineSegmentInfo">
+	      SELECT
+	      sc.line_segment_id ,se.maximum_speed maximumSpeed,se.offset offset,se.overspeed_time overspeedTime,se.overlength_threshold overlengthThreshold,se.shortage_threshold shortageThreshold,
+	      GROUP_CONCAT( sc.longitude order by sc.sort_order  SEPARATOR ',') longitude, GROUP_CONCAT( sc.latitude order by sc.sort_order  SEPARATOR ',') latitude,se.night_max_speed
+	      FROM
+	      zw_m_line_segment_content sc
+	      LEFT JOIN zw_m_line_segment se ON se.id = sc.line_segment_id
+	      AND se.flag = 1
+	      WHERE se.line_id=#{id} and  sc.flag=1
+	      GROUP BY sc.line_segment_id
+          order by se.segment_sort
+	</select>
+    <!-- 根据线路id查询线路主表信息 -->
+    <select id="findLineById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.Line">
+        SELECT line.* FROM zw_m_line line WHERE flag = 1
+        <if test="id != null and id != ''">
+            AND id = #{id}
+        </if>
+    </select>
+
+    <!-- 根据线路id查询线路主表信息 -->
+    <select id="findLineByIds" resultType="com.zw.platform.domain.functionconfig.Line">
+        SELECT line.* FROM zw_m_line line WHERE line.flag = 1
+        AND line.id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <!-- 获取所有的线路信息-客户端用 -->
+    <select id="findAllLine" resultType="com.zw.platform.domain.functionconfig.Line">
+		SELECT * FROM zw_m_line WHERE flag = 1  ORDER BY name
+	</select>
+    <!-- 新增关键点 -->
+    <insert id="addMonitoringTag" parameterType="com.zw.platform.domain.functionconfig.form.LineSpotForm">
+		INSERT INTO zw_m_line_spot (
+		id,line_id, name, longitude,latitude, arrive_time,leave_time,description,flag,create_data_time, create_data_username
+		)
+		VALUES(
+		#{id},#{lineId}, #{name},#{longitude},#{latitude},#{arriveTime},#{leaveTime},#{description}, #{flag},#{createDataTime},#{createDataUsername}
+		)
+	</insert>
+
+    <insert id="addLineContentBatch" parameterType="com.zw.platform.domain.functionconfig.form.LineForm">
+        INSERT INTO zw_m_line_content (
+        line_id, sort_order, longitude, latitude,type, flag, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.lineId}, #{item.pointSeq}, #{item.longitude}, #{item.latitude}, #{item.pointType},#{item.flag},
+            #{item.createDataTime},#{item.createDataUsername}
+            )
+        </foreach>
+    </insert>
+
+    <select id="findLineSpotByVid" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.LineSpot">
+		SELECT
+		s.*
+		FROM
+		zw_m_line_spot s
+		LEFT JOIN zw_m_line l ON s.line_id = l.id and l.flag=1
+		LEFT JOIN zw_m_fence_info i on i.shape = l.id and i.flag=1
+		LEFT JOIN zw_m_fence_config c ON c.fence_id=i.id and c.flag=1
+		where  c.vehicle_id=#{id} and s.flag=1
+	</select>
+
+    <select id="findBindInfoByLid" parameterType="string"
+            resultType="map">
+		SELECT
+	    v.*,d.device_number
+        FROM
+	    zw_m_vehicle_info v
+		LEFT JOIN zw_m_fence_config fc ON v.id = fc.vehicle_id and fc.flag=1
+		LEFT JOIN zw_m_fence_info fi on fc.fence_id=fi.id and fi.flag=1
+		LEFT JOIN zw_m_config c on c.vehicle_id=v.id and c.flag=1
+		LEFT JOIN zw_m_device_info d on d.id=c.device_id=1 and d.flag=1
+		where fi.shape = #{id} and v.flag=1
+	</select>
+
+    <!-- 获取所有的线路信息-客户端用 -->
+    <select id="findLineByName" resultType="string">
+		SELECT id FROM zw_m_line WHERE flag = 1 and binary name = #{name}
+	</select>
+
+</mapper>

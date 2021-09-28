@@ -1,0 +1,1577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ConfigDao">
+
+
+    <select id="get" parameterType="string" resultType="java.util.Map">
+      SELECT
+      A.id configId, B.id brandID, B.brand brands, C.id deviceID, C.device_number devices,C.device_name deviceName,C.device_type deviceType,C.functional_type functionalType,
+      C.manu_facturer manuFacturer, D.id simID, D.simcard_number sims,D.operator,D.sim_flow simFlow,D.use_flow useFlow, D.open_card_time openCardTime,D.iccid iccid_sim,D.real_id realId,
+      E.billing_date billingDateStr, E.expire_date durDateStr, A.service_lifecycle_id serviceLifecycleId, A.peripherals_id peripheralsId,
+      B.vehicle_owner_phone vehicleOwnerPhone,B.plate_color plateColor,
+      B.group_id car_groupId,
+      G.vehicle_type vehicleType,G.id vehicleTypeId,
+      D.org_id simParentGroupid,A.monitor_type monitorType,
+      P.people_number peopleNumber,P.id peopleID,
+      P.org_id people_groupId,C.org_id device_groupId,
+      ti.id thingID,ti.thing_number thingNumber,ti.group_id thing_groupId,ti.type thingType,ti.name thingName,
+      tt.id terminalTypeId, tt.terminal_manufacturer terminalManufacturer, tt.terminal_type terminalType,
+      A.vehicle_password as vehiclePassword
+      FROM
+      zw_m_config A
+      LEFT JOIN zw_m_vehicle_info B on A.vehicle_id=B.id and B.flag = 1
+      LEFT JOIN zw_m_vehicle_type G on B.vehicle_type = G.id and G.flag = 1
+      LEFT JOIN zw_m_device_info C on A.device_id=C.id and C.flag = 1
+      LEFT JOIN zw_m_sim_card_info D on A.sim_card_id=D.id and D.flag = 1
+      LEFT JOIN zw_m_service_lifecycle E on A.service_lifecycle_id = E.id and E.flag = 1
+      LEFT JOIN zw_m_people_info P on A.vehicle_id=P.id and P.flag=1
+      LEFT JOIN zw_m_thing_info ti on ti.id = A.vehicle_id and ti.flag = 1
+      LEFT JOIN zw_m_terminal_type tt on tt.id = C.terminal_type_id and tt.flag = 1
+      WHERE A.flag = 1 and
+      A.id = #{id}
+    </select>
+
+    <select id="getSimIdById" parameterType="string" resultType="string">
+      SELECT
+      A.sim_card_id simID
+      FROM
+      zw_m_config A
+      WHERE A.flag = 1 and
+      A.id = #{id}
+    </select>
+
+    <!-- 根据config的id获取config_professional数据 -->
+    <select id="getProfessionalForConfigListByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.form.ProfessionalForConfigFrom">
+    	select p.name professionalsName, cp.professionals_id professionalsid, cp.config_id configid
+		from zw_m_config c, zw_m_config_professionals cp, zw_m_professionals_info p
+		where c.flag = 1 and cp.flag = 1 and p.flag = 1 and c.id = cp.config_id and p.id = cp.professionals_id and c.id = #{id}
+		order by p.name 
+    </select>
+
+    <!-- 查询车辆信息 -->
+    <select id="getVehicleInfoList" parameterType="com.zw.platform.domain.basicinfo.query.VehicleQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT t.* FROM (
+        SELECT v2.*,'0' monitorType
+        FROM zw_m_vehicle_info v2
+        INNER JOIN zw_m_assignment_vehicle av ON v2.id = av.vehicle_id AND av.flag = 1 AND av.monitor_type = '0'
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+        WHERE v2.flag =1
+        AND au.user_id = #{userId}
+        AND ag.group_id IN
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND NOT EXISTS (
+        SELECT B.id FROM zw_m_config B WHERE v2.id = B.vehicle_id AND B.flag=1 AND B.monitor_type = '0'
+        )
+        AND brand NOT LIKE '扫%'
+        UNION
+        SELECT v1.*,'0' monitorType
+        FROM zw_m_vehicle_info v1
+        WHERE v1.flag = 1
+        AND NOT EXISTS (SELECT id FROM zw_m_assignment_vehicle av1 WHERE v1.id = av1.vehicle_id AND av1.flag = 1)
+        AND v1.group_id IN
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND NOT EXISTS(
+        SELECT B.id FROM zw_m_config B WHERE v1.id = B.vehicle_id AND B.flag=1 AND B.monitor_type = '0'
+        )
+        AND v1.brand NOT LIKE '扫%'
+        ) t ORDER BY t.create_data_time DESC
+    </select>
+
+    <!-- 查询人员信息 -->
+    <select id="getPersonelInfoList" parameterType="com.zw.platform.domain.basicinfo.query.VehicleQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT peo.id id, peo.people_number brand,
+        peo.org_id groupId, '1' monitorType,peo.create_data_time createDataTime
+        FROM zw_m_people_info peo
+        WHERE peo.flag=1 and peo.id in (
+        SELECT p.id
+        FROM zw_m_people_info p
+        INNER JOIN zw_m_assignment_vehicle av ON p.id = av.vehicle_id AND av.flag = 1 AND av.monitor_type = '1'
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+        WHERE p.flag =1
+        AND au.user_id = #{userId}
+        AND ag.group_id IN
+        <foreach collection="groupList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        UNION
+        SELECT p1.id
+        FROM zw_m_people_info p1
+        WHERE p1.flag = 1
+        AND NOT EXISTS (SELECT id FROM zw_m_assignment_vehicle av1 WHERE p1.id = av1.vehicle_id AND av1.flag = 1)
+        AND p1.org_id IN
+        <foreach collection="groupList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        )
+        and peo.id NOT IN (
+        SELECT
+        peo.id
+        FROM
+        zw_m_config B WHERE peo.id = B.vehicle_id
+        and B.flag=1 and B.monitor_type = '1'
+        )
+        ORDER BY peo.create_data_time DESC
+    </select>
+
+    <!-- 根据信息配置表id查询车辆信息 -->
+    <select id="getVehicleInfoByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+		SELECT car.id id, car.brand brand,'0' monitorType,car.create_data_time createDataTime 
+        FROM zw_m_vehicle_info car 
+        INNER JOIN zw_m_config c ON c.vehicle_id = car.id AND c.flag = 1
+        WHERE car.flag=1
+        AND c.id = #{configId}
+		UNION
+		SELECT peo.id id,  CONCAT(peo.people_number,IF(peo.name='','','('),peo.name,IF(peo.name='','',')')) brand,'1' monitorType,peo.create_data_time createDataTime 
+		FROM zw_m_people_info peo 
+		INNER JOIN zw_m_config pc ON pc.vehicle_id = peo.id AND pc.flag = 1
+		WHERE peo.flag = 1
+		AND pc.id = #{configId}
+    </select>
+
+    <select id="getVehicleInfoListForUser" parameterType="com.zw.platform.domain.basicinfo.query.VehicleQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT
+        zw_m_vehicle_info.id,brand
+        FROM
+        zw_m_vehicle_info
+        LEFT JOIN zw_m_user_vehicle uv ON
+ 		    zw_m_vehicle_info.id = uv.vehicle_id
+        WHERE zw_m_vehicle_info.id 
+        NOT IN (
+        SELECT
+        A.id
+        FROM
+        zw_m_vehicle_info A
+        INNER JOIN zw_m_config B ON A.id = B.vehicle_id
+        WHERE A.flag = 1 and B.flag=1
+        )
+        and zw_m_vehicle_info.flag=1 and uv.flag = 1 and  uv.user_id= #{userId}
+    </select>
+    <!-- 查询人员信息  -->
+    <select id="getPeopleInfoList" parameterType="com.zw.platform.domain.basicinfo.query.PersonnelQuery"
+            resultType="com.zw.platform.domain.basicinfo.Personnel">
+       SELECT DISTINCT
+	   A.name FROM zw_m_people_info A
+       LEFT JOIN zw_m_config B ON A.id != B.people_id
+       WHERE
+	   A.flag = 1
+       ORDER BY
+	   NAME ASC
+    </select>
+    <!-- 查询物品信息  -->
+    <select id="getThingInfoList" parameterType="com.zw.platform.domain.basicinfo.query.ThingInfoQuery"
+            resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+        SELECT DISTINCT
+	    A.name
+        FROM
+	    zw_m_thing_info A
+        left JOIN zw_m_config B ON A.id != B.thing_id
+        WHERE
+	    A.flag = 1
+        ORDER BY
+	    NAME ASC
+    </select>
+    <!-- 查询外设信息  -->
+    <select id="getDeviceInfoList" parameterType="com.zw.platform.domain.basicinfo.query.DeviceQuery"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id,di.device_number,di.device_name,di.device_type,di.manu_facturer
+        FROM zw_m_device_info di
+        WHERE
+        di.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND NOT EXISTS (
+        SELECT B.device_id FROM zw_m_config B WHERE di.id = B.device_id AND B.flag = 1
+        <if test="id != null and id != ''">
+            AND B.id != #{id}
+        </if>
+        )
+        and di.flag=1
+        AND di.device_type <![CDATA[<>]]> '5'
+        AND di.functional_type <![CDATA[<>]]> '4'
+    </select>
+
+    <!-- 查询外设信息  -->
+    <select id="getDeviceInfoListForPeople" parameterType="com.zw.platform.domain.basicinfo.query.DeviceQuery"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id,di.device_number,di.device_name,di.device_type,di.manu_facturer
+        FROM zw_m_device_info di
+        WHERE
+        di.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        and di.id NOT IN (
+        SELECT A.id
+        FROM zw_m_device_info A
+        INNER JOIN zw_m_config B ON A.id = B.device_id
+        WHERE B.flag=1
+        <if test="id != null and id != ''">
+            AND B.id != #{id}
+        </if>
+        )
+        and di.flag=1
+        AND di.device_type = '5'
+        AND di.functional_type = '4'
+    </select>
+
+    <!-- 查询sim信息  -->
+    <select id="getSimcardInfoList" parameterType="com.zw.platform.domain.basicinfo.query.SimcardQuery"
+            resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT sci.id,sci.simcard_number,sci.operator,sci.sim_flow,sci.use_flow
+        FROM zw_m_sim_card_info sci
+        WHERE NOT EXISTS (
+        SELECT B.sim_card_id
+        FROM zw_m_config B WHERE sci.id = B.sim_card_id
+        AND B.flag=1
+        <if test="id != null and id != ''">
+            AND B.id != #{id}
+        </if>
+        )
+        AND sci.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND sci.flag=1
+    </select>
+    <!-- 查询从业人员信息  -->
+    <select id="getProfessionalsInfoList" parameterType="com.zw.platform.domain.basicinfo.query.ProfessionalsQuery"
+            resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+        SELECT
+        pi.id,pi.name
+        FROM
+        zw_m_professionals_info pi
+        INNER JOIN zw_c_professionals_group pg ON pg.professionals_id = pi.id
+        WHERE pi.id
+        NOT IN (
+        SELECT
+        A.id
+        FROM
+        zw_m_professionals_info A
+        INNER JOIN zw_m_config B ON A.id = B.sim_card_id
+        WHERE B.flag=1 AND pi.state=0
+        )
+        and pg.group_id in
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and pi.flag=1 and pg.flag = 1 and pi.state='0'
+    </select>
+
+    <!-- 根据从业人员姓名查询id -->
+    <select id="getProfessionalInfoByName" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+    	SELECT id,name FROM zw_m_professionals_info WHERE flag = 1 and name = #{name}
+    </select>
+
+    <!-- 根据config id 查询 -->
+    <select id="findById" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.ConfigList">
+		select config.id configId,  config.vehicle_id vehicleId, t.carLicense, t.groupId,GROUP_CONCAT(distinct a.name SEPARATOR ',') assignmentName, GROUP_CONCAT(distinct a.id SEPARATOR ',') assignmentId,
+			device.device_number deviceNumber, device.device_type deviceType, device.functional_type functionalType, simcard.simcard_number simcardNumber, 
+			sl.billing_date billingDate, sl.expire_date expireDate , GROUP_CONCAT(distinct pi.id SEPARATOR ',') professionalIds,
+		    config.peripherals_id peripheralsId,config.create_data_time as createDateTime,
+			config.update_data_time as updateDateTime,config.monitor_type as monitorType
+        from zw_m_config config
+      	INNER JOIN (
+			SELECT car.id monitorId, car.brand carLicense,car.group_id groupId
+			FROM zw_m_vehicle_info car
+			where car.flag=1
+			UNION
+			SELECT peo.id monitorId, CONCAT(peo.people_number,IF(peo.name='','','('),peo.name,IF(peo.name='','',')')) carLicense,
+			peo.org_id groupId FROM zw_m_people_info peo where peo.flag=1
+			
+		) t ON t.monitorId = config.vehicle_id
+		inner join zw_m_device_info device on config.device_id = device.id and device.flag = 1
+inner join zw_m_sim_card_info simcard on config.sim_card_id = simcard.id and simcard.flag = 1
+inner join zw_m_assignment_vehicle av on config.vehicle_id = av.vehicle_id  and av.flag = 1
+      	inner join zw_m_assignment a on av.assignment_id = a.id and a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+        left join zw_m_service_lifecycle sl on config.service_lifecycle_id = sl.id and sl.flag = 1
+ left join zw_m_config_professionals cp on config.id = cp.config_id and cp.flag = 1
+ left join zw_m_professionals_info pi on pi.id = cp.professionals_id and pi.flag = 1
+where config.flag = 1
+and config.id = #{id}
+    </select>
+
+    <!-- 查询  -->
+    <!-- 查询用户权限的车 + 用户组织下的车 -->
+    <select id="find" parameterType="com.zw.platform.domain.infoconfig.query.ConfigQuery"
+            resultType="com.zw.platform.domain.infoconfig.ConfigList">
+        select config.id configId, config.vehicle_id vehicleId, t.carLicense, t.groupId,GROUP_CONCAT(distinct a.name
+        SEPARATOR ',') assignmentName, GROUP_CONCAT(distinct a.id SEPARATOR ',') assignmentId,
+        device.device_number deviceNumber, device.device_type deviceType, device.functional_type functionalType,
+        simcard.simcard_number simcardNumber,
+        sl.billing_date billingDate, sl.expire_date expireDate , GROUP_CONCAT(distinct pi.id SEPARATOR ',')
+        professionalIds,
+        config.peripherals_id peripheralsId,config.create_data_time as createDateTime,
+        config.update_data_time as updateDateTime,config.monitor_type as monitorType
+        from zw_m_config config
+        INNER JOIN (
+        SELECT car.id monitorId, car.brand carLicense,car.group_id groupId
+        FROM zw_m_vehicle_info car
+        where car.flag=1
+        UNION
+        SELECT peo.id monitorId, CONCAT(peo.people_number,IF(peo.name='','','('),peo.name,IF(peo.name='','',')'))
+        carLicense,
+        peo.org_id groupId FROM zw_m_people_info peo INNER JOIN where peo.flag=1
+
+        ) t ON t.monitorId = config.vehicle_id
+        inner join zw_m_device_info device on config.device_id = device.id and device.flag = 1
+        inner join zw_m_sim_card_info simcard on config.sim_card_id = simcard.id and simcard.flag = 1
+        inner join zw_m_assignment_vehicle av on config.vehicle_id = av.vehicle_id and av.flag = 1
+        inner join zw_m_assignment a on av.assignment_id = a.id and a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+        left join zw_m_service_lifecycle sl on config.service_lifecycle_id = sl.id and sl.flag = 1
+        left join zw_m_config_professionals cp on config.id = cp.config_id and cp.flag = 1
+        left join zw_m_professionals_info pi on pi.id = cp.professionals_id and pi.flag = 1
+        where config.flag = 1
+        and au.user_id = #{userId}
+        AND ag.group_id IN
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+            and (
+            (t.carLicense LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            or (device.device_number LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            or (simcard.simcard_number LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            )
+        </if>
+        group by config.create_data_time desc,config.id order by null
+    </select>
+    <select id="findAllConfig" parameterType="com.zw.platform.domain.infoconfig.query.ConfigQuery"
+            resultType="com.zw.platform.domain.infoconfig.ConfigList">
+        select config.id configId, config.vehicle_id vehicleId,config.device_id deviceId,config.sim_card_id simcardId,
+        vType.vehicle_type vehicleType,t.province,t.province,t.province_id,t.city,t.city_id,t.county,t.transType,t.carLicense, t.groupId,t.vehicle_purpose as
+        vehiclePurpose,t.thingType,t.isStart,GROUP_CONCAT(a.name SEPARATOR ',') assignmentName,
+        GROUP_CONCAT(distinct a.id SEPARATOR ',') assignmentId,
+        device.device_number deviceNumber, device.is_video isVideo,t.plateColor,device.device_type deviceType,
+        device.compliance_requirements AS complianceRequirements,device.install_company AS
+        installCompany,device.contacts,device.telephone,device.install_time AS installTime,
+        device.functional_type functionalType, simcard.simcard_number simcardNumber,simcard.real_id realId,
+        DATE_FORMAT(sl.billing_date, '%Y-%m-%d %k:%i:%s') billingDate,
+        DATE_FORMAT(sl.expire_date, '%Y-%m-%d %k:%i:%s') expireDate , GROUP_CONCAT(distinct pi.id SEPARATOR ',')
+        professionalIds, GROUP_CONCAT(distinct pi.name SEPARATOR ',') professionalNames,
+        config.peripherals_id peripheralsId,DATE_FORMAT(config.create_data_time, '%Y-%m-%d %k:%i:%s') as createDateTime,
+        DATE_FORMAT(config.update_data_time, '%Y-%m-%d %k:%i:%s') as updateDateTime,config.monitor_type as monitorType,
+        tt.terminal_manufacturer as terminalManufacturer,tt.terminal_type as terminalType
+        from zw_m_config config
+        INNER JOIN (
+        SELECT car.id monitorId, car.brand carLicense,car.group_id groupId,car.plate_color plateColor,car.vehicle_type
+        vehicleType, car.vehicle_purpose,car.province,car.province_id,car.city,car.city_id,car.county,vp.purpose_category as transType,NULL AS thingType,car.is_start as
+        isStart
+        FROM zw_m_vehicle_info car
+        LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = car.vehicle_purpose and vp.flag = 1 where car.flag=1
+        UNION
+        SELECT peo.id monitorId,
+        <!--  CONCAT(peo.people_number,IF(peo.name='','','('),peo.name,IF(peo.name='','',')')) carLicense, -->
+        peo.people_number carLicense,
+        peo.org_id groupId,'' as plateColor,'' as vehicleType ,'' AS vehicle_purpose,NULL AS province,
+        NULL AS province_id,  NULL AS city,  NULL AS city_id,  NULL AS county,
+        NULL AS
+        transType,NULL AS thingType,NULL as isStart
+        FROM zw_m_people_info peo  where peo.flag=1
+        UNION
+        SELECT th.id monitorId,
+        <!--  CONCAT(th.thing_number,IF(th.name='','','('),th.name,IF(th.name='','',')')) carLicense,-->
+        th.thing_number carLicense,
+        th.group_id groupId,'' AS plateColor,'' AS vehicleType ,'' AS vehicle_purpose,NULL AS province,
+        NULL AS province_id,  NULL AS city,  NULL AS city_id,  NULL AS county,
+        NULL AS
+        transType,th.type AS thingType,NULL as isStart
+        FROM zw_m_thing_info th WHERE th.flag=1
+        ) t ON t.monitorId = config.vehicle_id
+        LEFT JOIN zw_m_vehicle_type vType ON vType.id = t.vehicleType AND vType.flag = 1
+        inner join zw_m_device_info device on config.device_id = device.id and device.flag = 1
+        inner join zw_m_sim_card_info simcard on config.sim_card_id = simcard.id and simcard.flag = 1
+        inner join zw_m_assignment_vehicle av on config.vehicle_id = av.vehicle_id and av.flag = 1
+        inner join zw_m_assignment a on av.assignment_id = a.id and a.flag = 1
+        left join zw_m_service_lifecycle sl on config.service_lifecycle_id = sl.id and sl.flag = 1
+        left join zw_m_config_professionals cp on config.id = cp.config_id and cp.flag = 1
+        left join zw_m_professionals_info pi on pi.id = cp.professionals_id and pi.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = device.terminal_type_id and tt.flag = 1
+        where config.flag = 1
+        group by config.create_data_time desc,config.id order by null
+    </select>
+    <!-- 新增车辆 -->
+    <insert id="addVehicleInfo" parameterType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+		INSERT INTO zw_m_vehicle_info (
+			id, vehicle_number, vehicle_owner, vehicle_owner_phone, aliases,
+			vehicle_type, chassis_number, engine_number, brand, area_attribute,
+			province, city, fuel_type, plate_color, flag, create_data_time,
+			create_data_username)
+		VALUES (
+			#{id}, #{vehicleNumber}, #{vehicleOwner}, #{vehicleOwnerPhone},
+			#{aliases}, #{vehicleType}, #{chassisNumber}, #{engineNumber}, #{brand}, #{areaAttribute},
+			#{province}, #{city}, #{fuelType}, #{plateColor}, #{flag},
+			#{createDataTime}, #{createDataUsername})
+	</insert>
+    <!--新增信息配置关联从业人员-->
+    <insert id="addConfigProfessionals"
+            parameterType="com.zw.platform.domain.infoconfig.form.ProfessionalForConfigFrom">
+        INSERT INTO zw_m_config_professionals (
+        id,config_id,professionals_id,flag, create_data_time,
+        create_data_username
+        )
+        VALUES (
+        #{id}, #{configid}, #{professionalsid}, #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+    <!--新增信息配置关联从业人员-->
+    <insert id="addConfigProfessionalList">
+        INSERT INTO zw_m_config_professionals (
+        id,config_id,professionals_id,flag, create_data_time,create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.configid}, #{item.professionalsid}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+    <!-- 新增信息配置 -->
+    <insert id="addConfig" parameterType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+		INSERT INTO zw_m_config (
+			id, vehicle_id, device_id, sim_card_id, peripherals_id,
+			service_lifecycle_id, alarm_status, alarm_time, online_status, offline_time, 
+			online_time, longitude, latitude, speed, orientation, location, altitude, 
+			is_location, gps_time, return_time, acc_status, flag, create_data_time, 
+			create_data_username, update_data_time, update_data_username, people_id, 
+			thing_id,monitor_type)
+		VALUES (
+			#{id}, #{vehicleid}, #{deviceid}, #{simcardid}, #{peripheralsId},
+			#{serviceLifecycleId}, #{alarmStatus}, #{alarmTime}, #{onlineStatus},
+			#{offlineTime}, #{onlineTime}, #{longitude}, #{latitude}, #{speed}, #{orientation}, 
+			#{location}, #{altitude}, #{isLocation}, #{gpsTime}, #{returnTime}, #{accStatus}, 
+			#{flag}, #{createDataTime}, #{createDataUsername}, #{updateDataTime}, #{updateDataUsername},
+			#{peopleId}, #{thingId}, #{monitorType})
+	</insert>
+    <!-- 根据id删除Config -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_config set flag=0,update_data_time = now()  WHERE id = #{id}
+    </delete>
+
+
+    <!-- 根据信息配置表id删除服务期限 -->
+    <delete id="deleteLifecycleByConfigId" parameterType="string">
+    	update zw_m_service_lifecycle set flag = 0 where id = (
+    		select service_lifecycle_id from zw_m_config where flag = 1 and id = #{configId}
+    	)
+    </delete>
+
+    <!-- 根据信息配置主表id删除配置与从业人员关联表 -->
+    <delete id="deleteConfigProfessionals" parameterType="string">
+    	DELETE FROM zw_m_config_professionals WHERE config_id = #{id}
+    </delete>
+    <!-- 批量新增信息配置 -->
+    <insert id="addConfigByBatch" parameterType="com.zw.platform.domain.infoconfig.form.ConfigImportForm">
+        INSERT INTO zw_m_config (
+        id, vehicle_id, device_id, sim_card_id, peripherals_id, service_lifecycle_id,monitor_type, flag,
+        create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="importList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.brandID}, #{item.deviceID},
+            #{item.simID}, #{item.peripheralsId}, #{item.serviceLifecycleId},#{item.monitorType},#{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <insert id="addConfigTransportByBatch" parameterType="com.zw.platform.domain.infoconfig.form.ConfigImportForm">
+        INSERT INTO zw_m_config (
+        id, vehicle_id, device_id, sim_card_id, peripherals_id, service_lifecycle_id,monitor_type, flag,
+        create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.brandID}, #{item.deviceID},
+            #{item.simID}, #{item.peripheralsId}, #{item.serviceLifecycleId},#{item.monitorType},#{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+    <!--根据id查询车辆配置详情-->
+    <select id="configDetails" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+       SELECT
+	    A.id,A.peripherals_id, 
+	    B.brand ,B.vehicle_owner vehicleOwner,B.aliases,B.vehicle_owner_phone vehicleOwnerPhone,B.plate_color plateColor,B.chassis_number chassisNumber,
+	    B.engine_number engineNumber,B.province,B.city,B.fuel_type flType,B.area_attribute areaAttribute,
+        C.device_number deviceNumber,C.device_name deviceName,C.is_start isStart, C.device_type deviceType, C.functional_type functionalType, tt.channel_number channelNumber,
+        tt.support_photo_flag isVideo,C.bar_code barCode,C.manu_facturer manuFacturer,C.install_time installTime,
+        D.simcard_number simcardNumber, D.is_start simIsStart,D.operator,D.open_card_time openCardTime,D.capacity,D.network_type networkType,
+        D.sim_flow simFlow,D.use_flow useFlow,D.iccid iccid,D.imsi imsi,D.real_id realId,D.end_time endTime,
+        E.vehicle_type vehicleType, 
+        B.group_id parentGroupid,
+        C.org_id deviceParentGroupid,
+        D.org_id simParentGroupid,A.monitor_type monitorType,
+        T.fuel_type fuelType,vc.vehicle_category AS category,
+        B.province province,B.city city,B.county county,
+        tt.terminal_manufacturer terminalManufacturer,tt.terminal_type terminalType,
+        vp.purpose_category vehiclePurpose
+	  FROM zw_m_config A
+      LEFT JOIN zw_m_vehicle_info B on A.vehicle_id=B.id and B.flag = 1
+      LEFT JOIN zw_m_vehicle_type E on B.vehicle_type = E.id and E.flag = 1
+      LEFT JOIN zw_m_device_info C on A.device_id=C.id and C.flag = 1
+      LEFT JOIN zw_m_terminal_type tt on tt.id = C.terminal_type_id AND tt.flag = 1
+      LEFT JOIN zw_m_sim_card_info D on A.sim_card_id=D.id and D.flag = 1
+      LEFT JOIN zw_m_fuel_type T on B.fuel_type = T.id and T.flag = 1
+      LEFT JOIN zw_m_vehicle_category vc ON vc.id = E.vehicle_category AND vc.flag = 1
+      LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = B.vehicle_purpose AND vp.flag = 1
+      WHERE A.flag = 1 and A.id = #{id}
+    </select>
+    <!--根据id查询人员配置详情-->
+    <select id="peopleConfigDetails" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+        SELECT
+        A.id,A.peripherals_id, B.people_number brand,B.name peopleName,
+        B.gender,B.identity,B.phone,B.email,
+        C.device_number deviceNumber,C.device_name deviceName,C.is_start isStart, C.device_type deviceType, C.functional_type functionalType, tt.channel_number channelNumber,
+        tt.support_photo_flag isVideo,C.bar_code barCode,C.manu_facturer manuFacturer,C.install_time installTime,
+        D.simcard_number simcardNumber, D.is_start simIsStart,D.operator,D.open_card_time openCardTime,D.capacity,D.network_type networkType,
+        D.sim_flow simFlow,D.use_flow useFlow,D.iccid iccid,D.imsi imsi,D.real_id realId,D.end_time endTime,
+        B.org_id parentGroupid,
+        C.org_id deviceParentGroupid,
+        D.org_id simParentGroupid,A.monitor_type monitorType,
+        tt.terminal_manufacturer terminalManufacturer,tt.terminal_type terminalType
+        FROM zw_m_config A
+        LEFT JOIN zw_m_people_info B on A.vehicle_id=B.id and B.flag = 1
+        LEFT JOIN zw_m_device_info C on A.device_id=C.id and C.flag = 1
+        LEFT JOIN zw_m_terminal_type tt on tt.id = C.terminal_type_id AND tt.flag = 1
+        LEFT JOIN zw_m_sim_card_info D on A.sim_card_id=D.id and D.flag = 1
+        WHERE A.flag = 1 and A.id = #{id}
+    </select>
+    <!--根据id查询物品配置详情-->
+    <select id="thingConfigDetails" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+        SELECT
+        A.id,A.peripherals_id,
+        B.thing_number brand,B.name thingName,B.category thingCategory,B.type thingType,B.model model,B.manufacture manufacture,
+        C.device_number deviceNumber,C.device_name deviceName,C.is_start isStart, C.device_type deviceType, C.functional_type functionalType, tt.channel_number channelNumber,
+        tt.support_photo_flag isVideo,C.bar_code barCode,C.manu_facturer manuFacturer,C.install_time installTime,
+        D.simcard_number simcardNumber, D.is_start simIsStart,D.operator,D.open_card_time openCardTime,D.capacity,D.network_type networkType,
+        D.sim_flow simFlow,D.use_flow useFlow,D.iccid iccid,D.imsi imsi,D.real_id realId,D.end_time endTime,
+        B.group_id parentGroupid,
+        C.org_id deviceParentGroupid,
+        D.org_id simParentGroupid,A.monitor_type monitorType,
+        tt.terminal_manufacturer terminalManufacturer,tt.terminal_type terminalType
+        FROM zw_m_config A
+        LEFT JOIN zw_m_thing_info B on A.vehicle_id=B.id and B.flag = 1
+        LEFT JOIN zw_m_device_info C on A.device_id=C.id and C.flag = 1
+        LEFT JOIN zw_m_terminal_type tt on tt.id = C.terminal_type_id AND tt.flag = 1
+        LEFT JOIN zw_m_sim_card_info D on A.sim_card_id=D.id and D.flag = 1
+        WHERE A.flag = 1 and A.id = #{id}
+    </select>
+    <!--配置详情-->
+    <select id="configDetailsall" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+        SELECT DISTINCT
+        A.id,A.vehicle_id,B.group_id groupId ,B.brand ,B.vehicle_owner vehicleOwner,B.aliases,B.vehicle_owner_phone vehicleOwnerPhone,
+        B.vehicle_type vehicleType,B.plate_color plateColor,B.chassis_number chassisNumber,B.engine_number engineNumber,B.province,B.city,B.fuel_type fuelType,
+        C.id deviceId, C.device_number deviceNumber,C.device_name deviceName,C.is_start isStart, C.device_type deviceType,tt.channel_number channelNumber,tt.support_photo_flag isVideo,C.bar_code barCode,C.manu_facturer manuFacturer,
+        D.simcard_number simcardNumber, D.is_start simIsStart,D.operator,D.open_card_time openCardTime,D.capacity,D.network_type networkType,D.sim_flow simFlow,D.use_flow useFlow
+        FROM
+        zw_m_config A
+        INNER JOIN  zw_m_vehicle_info B on A.vehicle_id=B.id
+        INNER JOIN zw_m_device_info C on A.device_id=C.id
+        LEFT JOIN zw_m_terminal_type tt on tt.id = C.terminal_type_id AND tt.flag = 1
+        INNER JOIN zw_m_sim_card_info D on A.sim_card_id=D.id
+        WHERE A.flag=1
+    </select>
+
+    <!-- 修改config -->
+    <update id="updateConfig" parameterType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+        UPDATE zw_m_config
+        <set>
+            <if test="brands != null and brands != ''">
+                vehicle_id = #{brands},
+            </if>
+            <if test="devices != null and devices !=''">
+                device_id = #{devices},
+            </if>
+            <if test="sims != null and sims !=''">
+                sim_card_id = #{sims},
+            </if>
+            <if test="peripheralsId != null">
+                peripherals_id = #{peripheralsId},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+            <if test="serviceLifecycleId != null">
+                service_lifecycle_id = #{serviceLifecycleId},
+            </if>
+            <if test="vehiclePassword != null and vehiclePassword != ''">
+                vehicle_password = #{vehiclePassword},
+            </if>
+            <if test="accessNetwork != null">
+                access_network = #{accessNetwork}
+            </if>
+        </set>
+        WHERE id = #{configId}
+    </update>
+    <!--  根据车辆ID  拿到vehicleID  -->
+    <select id="getVehicleIdByDeviceID" parameterType="string" resultType="java.lang.String">
+		 SELECT DISTINCT
+		    A.vehicle_id
+	        FROM
+		    zw_m_config A
+		    INNER JOIN zw_m_device_info C ON A.device_id=C.id AND C.flag = 1
+	        WHERE A.flag = 1
+		    AND C.id = #{id}
+    </select>
+
+    <select id="getVehicleByDeviceNumber" parameterType="string" resultType="java.util.Map">
+        SELECT B.*,
+               A.id                                         AS configId,
+               D.vehicle_type                               AS vehiclet,
+               D.vehicle_category                           AS vehicleCategory,
+               sc.simcard_number                            AS phone,
+               sc.simcard_number                            AS mobile,
+               sc.simcard_number                            AS simcardNumber,
+               C.id                                         AS deviceId,
+               C.device_number                              AS deviceNumber,
+               C.device_type                                AS deviceType,
+               C.telephone                                  AS telephone,
+               C.contacts                                   AS contacts,
+               C.install_company                            AS installCompany,
+               C.compliance_requirements                    AS complianceRequirements,
+               C.install_time                               AS installTime,
+               B.group_id                                   AS groupId,
+               ic.ico_name                                  AS vehicleTypeIcon,
+               B.province_id                                AS provinceId,
+               B.city_id                                    AS cityId
+        FROM zw_m_device_info C
+                 INNER JOIN zw_m_config A ON A.device_id = C.id AND A.flag = 1
+                 INNER JOIN zw_m_vehicle_info B ON A.vehicle_id = B.id AND B.flag = 1
+                 LEFT JOIN zw_m_vehicle_type D ON D.id = B.vehicle_type AND D.flag = 1
+                 LEFT JOIN zw_m_sim_card_info sc on A.sim_card_id= sc.id
+                 LEFT JOIN zw_c_ico_config ic ON ic.id = B.vehicle_icon AND ic.flag =1
+        WHERE C.flag = 1
+          AND C.device_number = BINARY #{deviceNumber}
+        LIMIT 1
+    </select>
+
+    <select id="getAssignmentNamesByVehicleId" parameterType="string" resultType="string">
+        SELECT ma.name
+        FROM zw_m_assignment_vehicle av
+                 LEFT JOIN zw_m_assignment ma ON ma.id = av.assignment_id AND ma.flag = 1
+        WHERE av.vehicle_id = #{vehicleId}
+          AND av.flag = 1
+    </select>
+
+    <select id="getProfessionalInfoByConfigId" parameterType="string" resultType="java.util.Map">
+        SELECT I.name        AS professionalsName,
+               I.card_number AS cardNumber
+        FROM zw_m_config_professionals P
+                 LEFT JOIN zw_m_professionals_info I ON I.id = P.professionals_id
+        WHERE P.config_id = #{configId}
+    </select>
+
+    <select id="getCategoryIconByCategoryId" parameterType="string" resultType="string">
+        SELECT ic.ico_name AS categoryIcon
+        FROM zw_m_vehicle_category vc
+                 LEFT JOIN zw_c_ico_config ic ON ic.id = vc.ico AND ic.flag = 1
+        WHERE vc.id = #{categoryId}
+        LIMIT 1
+    </select>
+
+    <select id="getVehicleByDeviceNew" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        select
+        B.*,
+        D.vehicle_type                              AS vehiclet,
+        GROUP_CONCAT(DISTINCT I.name SEPARATOR ',') AS professionalsName,
+        I.card_number                               AS cardNumber,
+        ic.ico_name                                 AS  vehicleTypeIcon,
+        ic.ico_name                                 AS  categoryIcon
+        from zw_m_config A
+        INNER JOIN zw_m_vehicle_info B ON A.vehicle_id = B.id AND B.flag = 1
+        INNER JOIN zw_m_device_info C ON A.device_id = C.id AND C.flag = 1
+        LEFT JOIN zw_m_vehicle_type D ON D.id = B.vehicle_type AND D.flag = 1
+        LEFT JOIN zw_m_config_professionals P ON P.config_id = A.id
+        LEFT JOIN zw_m_professionals_info I ON I.id = P.professionals_id
+        LEFT JOIN zw_c_ico_config ic ON ic.id = B.vehicle_icon AND ic.flag = 1
+        WHERE A.flag = 1
+        AND C.device_number = BINARY #{id}
+        GROUP BY B.id
+    </select>
+
+    <!--根据设备id获得人员id-->
+    <select id="getPeopleByDevice" parameterType="string" resultType="com.zw.platform.domain.basicinfo.PersonnelInfo">
+		    SELECT DISTINCT
+		    P.*,GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS groupName,sc.simcard_number AS simcardNumber
+	        FROM
+		    zw_m_config A
+	        INNER JOIN zw_m_people_info P ON A.vehicle_id=P.id  AND P.flag = 1
+	        INNER JOIN zw_m_device_info C ON A.device_id=C.id AND C.flag = 1
+	        LEFT JOIN zw_m_assignment_vehicle av ON P.id = av.vehicle_id AND av.flag = 1
+	        LEFT JOIN zw_m_assignment ma ON ma.id = av.assignment_id AND ma.flag = 1
+		    LEFT JOIN zw_m_sim_card_info sc ON A.sim_card_id= sc.id
+	        WHERE A.flag = 1
+		    AND C.device_number = BINARY #{id}
+		    GROUP BY P.id
+	</select>
+    <!--判断是否绑定, 这里不需要返回监控对象编号, 如果实现需要, 自己去调对应的方法查询-->
+    <select id="getIsBand" parameterType="string" resultType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+        SELECT
+        c.vehicle_id AS brandID
+        FROM
+        zw_m_config c
+        WHERE
+        c.flag = 1
+        <if test="vid!=null and vid!=''">
+            AND c.vehicle_id = #{vid}
+        </if>
+        <if test="did!=null and did!=''">
+            AND c.device_id = #{did}
+        </if>
+        <if test="cid!=null and cid!=''">
+            AND c.sim_card_id = #{cid}
+        </if>
+        limit 1
+    </select>
+
+    <select id="getBandList" resultType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+        SELECT
+        t.brand brands
+        FROM
+        zw_m_config c
+        INNER JOIN
+        (select car.brand brand, car.id vid from zw_m_vehicle_info car where car.flag = 1
+        UNION ALL
+        select people.people_number brand, people.id vid from zw_m_people_info people where people.flag = 1
+        UNION ALL
+        select thing.thing_number brand, thing.id vid from zw_m_thing_info thing where thing.flag = 1
+        ) t on t.vid = c.vehicle_id
+        WHERE
+        c.flag = 1
+        <if test="vids!=null and vids.size > 0">
+            and c.vehicle_id in
+            <foreach collection="vids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dids!=null and dids.size > 0">
+            and c.device_id in
+            <foreach collection="dids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="cids!=null and cids.size > 0">
+            and c.sim_card_id in
+            <foreach collection="cids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <!--判断是否绑定-->
+    <select id="getIsBands" parameterType="string" resultType="com.zw.platform.domain.infoconfig.form.ConfigForm">
+		SELECT * from  zw_m_config
+		where flag = 1 and (vehicle_id = #{vid} or device_id = #{did} or sim_card_id = #{cid})
+	</select>
+    <!--根据车辆ID查询设备编号-->
+    <select id="getDeviceNumByVid" parameterType="string" resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+      SELECT
+        A.device_id id,C.device_number deviceNumber
+        FROM
+        zw_m_config A
+        LEFT JOIN  zw_m_vehicle_info B on A.vehicle_id=B.id
+        LEFT JOIN zw_m_device_info C on A.device_id=C.id
+        WHERE
+        A.flag = 1 and B.flag = 1 and C.flag = 1 and 
+        A.vehicle_id = #{id}
+    </select>
+
+    <!-- 根据车辆ID查询sim卡 -->
+    <select id="getSimcardByVid" parameterType="list" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT DISTINCT
+        sim.*
+        FROM
+        zw_m_config config
+        INNER JOIN zw_m_vehicle_info info ON config.vehicle_id = info.id AND info.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON config.sim_card_id = sim.id AND sim.flag = 1
+        WHERE
+        config.flag = 1 AND
+        config.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--判断组织是否绑定从业人员-->
+    <select id="isBnadP" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.form.GroupForConfigForm">
+      SELECT * from zw_m_vehicle_info WHERE
+      flag=1
+      and
+      group_id = #{id}
+    </select>
+
+    <!--判断组织是否绑定从业人员-->
+    <select id="isBnadPeo" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.form.GroupForConfigForm">
+      SELECT * from zw_m_people_info WHERE
+      flag=1
+      and
+      org_id = #{id}
+    </select>
+
+    <!--判断从业人员是否绑定组织-->
+    <select id="isBnadG" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.form.GroupForConfigForm">
+        SELECT * from zw_c_professionals_group WHERE
+        flag=1
+        and
+        group_id = #{id}
+    </select>
+    <!--判断组织下是否有终端-->
+    <select id="isBandDevice" parameterType="string"
+            resultType="int">
+        SELECT count(*) from zw_m_device_info WHERE
+        flag=1
+        and
+        org_id = #{id}
+    </select>
+    <!--判断组织下是否有sim卡-->
+    <select id="isBandSimcard" parameterType="string"
+            resultType="int">
+        SELECT count(*) from zw_m_sim_card_info WHERE
+        flag=1
+        and
+        org_id = #{id}
+    </select>
+    <!--配置详情-->
+    <select id="getOrgAndVehicle"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+        SELECT DISTINCT
+        config.id,config.vehicle_id,vehicle.group_id groupId,vehicle.brand,vehicle.vehicle_owner vehicleOwner,
+        vehicle.aliases,vehicle.vehicle_owner_phone vehicleOwnerPhone,
+        vehicle.vehicle_type vehicleType,vehicle.plate_color
+        plateColor,vehicle.chassis_number chassisNumber,vehicle.engine_number
+        engineNumber,
+        vehicle.province,
+        vehicle.city,vehicle.fuel_type fuelType,
+        device.id deviceId, device.device_number deviceNumber,device.device_name
+        deviceName,device.is_start isStart,device.device_type deviceType,
+        tt.channel_number channelNumber,tt.support_photo_flag
+        isVideo,device.bar_code barCode,device.manu_facturer manuFacturer,
+        simcard.simcard_number simcardNumber, simcard.is_start
+        simIsStart,simcard.operator,simcard.open_card_time
+        openCardTime,simcard.capacity,
+        simcard.network_type networkType,simcard.sim_flow simFlow,simcard.use_flow useFlow
+        FROM
+        (
+        select uv_config.* from zw_m_config as uv_config
+        inner join zw_m_user_vehicle as uv on uv_config.vehicle_id=uv.vehicle_id where uv_config.flag=1 and uv.flag=1
+        and uv.user_id=#{userId}
+        union
+        select config2.* from zw_m_config as config2
+        inner join zw_m_vehicle_info as vinfo on config2.vehicle_id=vinfo.id
+        where config2.flag=1 and vinfo.flag=1 and (vinfo.create_data_username = #{userName} OR
+        vinfo.group_id in
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>)
+        )as config
+        INNER JOIN zw_m_vehicle_info vehicle ON config.vehicle_id=vehicle.id
+        INNER JOIN zw_m_device_info device ON config.device_id=device.id
+        INNER JOIN zw_m_terminal_type tt on tt.id = device.terminal_type_id AND tt.flag = 1
+        INNER JOIN zw_m_sim_card_info simcard ON config.sim_card_id=simcard.id
+        WHERE config.flag=1 AND vehicle.flag=1 AND device.flag=1 AND simcard.flag=1
+    </select>
+
+    <!-- 根据车辆id获取其组织信息 -->
+    <select id="getGroupListByConfigId" parameterType="string" resultType="string">
+		select a.id from zw_m_config c
+		left join zw_m_vehicle_info vi on c.vehicle_id = vi.id
+		left join zw_m_assignment_vehicle av on vi.id = av.vehicle_id
+		left join zw_m_assignment a on av.assignment_id = a.id
+		where c.flag = 1 and vi.flag = 1 and av.flag = 1 and a.flag = 1 and c.id = #{configId}
+	</select>
+
+    <!-- 根据configId获取车辆分组信息 -->
+    <select id="getAssignmentByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+		select distinct a.id, a.*, ag.group_id groupId from zw_m_config c
+		left join zw_m_vehicle_info vi on c.vehicle_id = vi.id
+		left join zw_m_assignment_vehicle av on vi.id = av.vehicle_id
+		left join zw_m_assignment a on av.assignment_id = a.id
+		left join zw_m_assignment_group ag on a.id = ag.assignment_id
+		where c.flag = 1 and vi.flag = 1 and av.flag = 1 and a.flag = 1 and ag.flag = 1 and c.id = #{configId}
+	</select>
+    <!-- 根据configId获取人员分组信息 -->
+    <select id="getPeopleAssignmentByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+		select distinct a.id, a.*, ag.group_id groupId from zw_m_config c
+		left join zw_m_people_info vi on c.vehicle_id = vi.id
+		left join zw_m_assignment_vehicle av on vi.id = av.vehicle_id
+		left join zw_m_assignment a on av.assignment_id = a.id
+		left join zw_m_assignment_group ag on a.id = ag.assignment_id
+		where c.flag = 1 and vi.flag = 1 and av.flag = 1 and a.flag = 1 and ag.flag = 1 and c.id = #{configId}
+	</select>
+    <!-- 根据configId获取物品分组信息 -->
+    <select id="getThingAssignmentByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        select distinct a.id, a.*, ag.group_id groupId from zw_m_config c
+        left join zw_m_thing_info ti on c.vehicle_id = ti.id
+        left join zw_m_assignment_vehicle av on ti.id = av.vehicle_id
+        left join zw_m_assignment a on av.assignment_id = a.id
+        left join zw_m_assignment_group ag on a.id = ag.assignment_id
+        where c.flag = 1 and ti.flag = 1 and av.flag = 1 and a.flag = 1 and ag.flag = 1 and c.id = #{configId}
+    </select>
+    <!-- 根据车辆id查询其分组信息 -->
+    <select id="getAssignmentVehicleByVid" parameterType="string" resultType="java.lang.String">
+		select v.assignment_id from zw_m_assignment_vehicle v
+		where v.flag = 1 and v.vehicle_id = #{vehicleId}
+	</select>
+
+    <insert id="addConfigForms"
+            parameterType="com.zw.platform.util.imports.lock.dto.ConfigDo">
+        INSERT INTO zw_m_config
+        (id,
+        vehicle_id,
+        device_id,
+        sim_card_id,
+        service_lifecycle_id,
+        create_data_time,
+        create_data_username,
+        monitor_type)
+        VALUES
+        <foreach collection="configs" item="item" index="index" separator=",">
+            (#{item.id},
+            #{item.vehicleId},
+            #{item.deviceId},
+            #{item.simCardId},
+            #{item.serviceLifecycleId},
+            #{item.createDataTime},
+            #{item.createDataUsername},
+            #{item.monitorType})
+        </foreach>
+    </insert>
+
+
+    <select id="getBrand" parameterType="string" resultType="com.zw.platform.domain.infoconfig.EditConfig">
+        SELECT id configIdForBrand,vehicle_id vehicleId from zw_m_config WHERE
+        flag=1
+        and
+        vehicle_id = #{brand}
+    </select>
+    <select id="getDevice" parameterType="string" resultType="com.zw.platform.domain.infoconfig.EditConfig">
+        SELECT id configIdForDevice,device_id deviceId from zw_m_config WHERE
+        flag=1
+        and
+        device_id = #{id}
+    </select>
+    <select id="getSim" parameterType="string" resultType="com.zw.platform.domain.infoconfig.EditConfig">
+        SELECT id configIdForSim,sim_card_id simCardId from zw_m_config WHERE
+        flag=1
+        and
+        sim_card_id = #{id}
+    </select>
+    <!--判断组织下是否有分组-->
+    <select id="isBandAssignment" parameterType="String"
+            resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM zw_m_assignment_group WHERE
+        flag=1
+        AND
+        group_id = #{id}
+    </select>
+
+    <!--判断组织下是否有围栏-->
+    <select id="isBandFence" parameterType="String"
+            resultType="java.lang.Integer">
+       SELECT COUNT(t.group_id) FROM 
+		(SELECT a.group_id FROM zw_m_administration a WHERE a.flag = 1
+		UNION SELECT c.group_id FROM zw_m_circle c WHERE c.flag = 1
+		UNION SELECT l.group_id FROM zw_m_line l WHERE l.flag = 1
+		UNION SELECT m.group_id FROM zw_m_marker m WHERE m.flag = 1
+		UNION SELECT p.group_id FROM zw_m_polygon p WHERE p.flag = 1
+		UNION SELECT r.group_id FROM zw_m_rectangle r WHERE r.flag = 1
+		UNION SELECT t.group_id FROM zw_m_travel_line t WHERE t.flag = 1
+		) t WHERE t.group_id = #{id}
+    </select>
+
+    <!-- 根据所属企业id和分组名称获取分组id -->
+    <select id="getAssignmentIdByOrgId_name" parameterType="string" resultType="java.lang.String">
+    	select a.id 
+    	from zw_m_assignment a left join zw_m_assignment_group ag on a.id = ag.assignment_id and ag.flag = 1
+    	where a.flag = 1 and ag.group_id = #{orgId} and a.name = #{assignmentName}
+    </select>
+
+    <!--根据车辆id查询sim卡信息-->
+    <select id="getSimByVehicleId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT s.* FROM zw_m_config c 
+		INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id AND v.flag = 1
+		INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+		WHERE c.flag = 1
+		AND v.id = #{vehicleId}
+    </select>
+
+    <!-- 根据id查找设备编号 -->
+    <select id="getDeviceNumber" parameterType="string" resultType="java.lang.String">
+		select i.device_number from zw_m_device_info i LEFT JOIN zw_m_config c on c.device_id=i.id
+        where c.id=#{id} and c.flag=1
+	</select>
+
+    <select id="getDeviceType" parameterType="string" resultType="java.lang.String">
+		select i.device_type from zw_m_device_info i INNER JOIN zw_m_config c on c.device_id=i.id
+		where c.id=#{id} and c.flag=1
+	</select>
+
+    <!-- 根据id查找设备编号 -->
+    <select id="getDNumber" parameterType="string" resultType="java.lang.String">
+		select i.device_number from zw_m_device_info i
+		where i.id=#{id} and i.flag=1
+	</select>
+
+    <!-- 根据信息配置id获取车辆id -->
+    <select id="getVehicleIdByConfigId" parameterType="string" resultType="java.lang.String">
+		select vehicle_id from zw_m_config t where t.id = #{configId} and t.flag = 1
+	</select>
+
+    <!-- 根据车辆id获取信息配置表id -->
+    <select id="getConfigIdByVehicleId" parameterType="string" resultType="java.lang.String">
+		select id from zw_m_config t where t.vehicle_id = #{vehicleId} and t.flag = 1
+	</select>
+
+    <select id="getDeNumber" parameterType="string" resultType="java.lang.String">
+	SELECT
+	i.device_number
+	FROM
+	zw_m_device_info i
+	LEFT JOIN zw_m_config c ON c.device_id = i.id
+	WHERE
+	c.vehicle_id = #{id}
+	AND c.flag = 1
+	</select>
+
+    <!--根据ids查询配置详情-->
+    <select id="getConfigByConfigIds" parameterType="string"
+            resultType="com.zw.platform.domain.infoconfig.query.ConfigDetailsQuery">
+        SELECT
+        A.id,
+        B.brand ,
+        C.device_number deviceNumber,
+        D.simcard_number simcardNumber
+        FROM zw_m_config A
+        LEFT JOIN zw_m_vehicle_info B on A.vehicle_id=B.id and B.flag = 1
+        LEFT JOIN zw_m_device_info C on A.device_id=C.id and C.flag = 1
+        LEFT JOIN zw_m_sim_card_info D on A.sim_card_id=D.id and D.flag = 1
+        WHERE A.flag = 1 and A.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <!-- 车辆上线率查询 -->
+    <select id="findOnline" resultType="com.zw.platform.domain.infoconfig.ConfigList">
+        SELECT GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') assignmentName, i.brand carLicense, i.plate_color color,
+        c.vehicle_id vehicleId,i.plate_color plateColor,vt.vehicle_type vehicleType, GROUP_CONCAT(DISTINCT pi.name
+        SEPARATOR ',') professionalNames
+        FROM zw_m_config c
+        INNER JOIN zw_m_vehicle_info i ON c.vehicle_id=i.id AND i.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id=c.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON av.assignment_id=a.id AND a.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON i.vehicle_type=vt.id AND vt.flag = 1
+        LEFT JOIN zw_m_config_professionals p ON c.id=p.config_id AND p.flag = 1
+        LEFT JOIN zw_m_professionals_info pi on pi.id = p.professionals_id and pi.flag = 1
+        WHERE c.flag = 1
+        AND c.vehicle_id IN
+        <foreach item="item" collection="vehicleList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY i.id
+    </select>
+    <!-- 根据关联id查询关联信息(车辆) -->
+    <select id="findRelateConfigById" resultType="com.zw.platform.domain.infoconfig.RelateConfig">
+    	SELECT GROUP_CONCAT(DISTINCT pin.name  SEPARATOR ',') professionalNames,
+			GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') assignmentName, 
+			i.brand carLicense,s.simcard_number simCardNumber,
+			d.device_number deviceNumber
+			FROM zw_m_config c 
+			INNER JOIN zw_m_vehicle_info i ON c.vehicle_id=i.id AND i.flag = 1
+			LEFT JOIN zw_m_config_professionals p ON c.id=p.config_id AND p.flag = 1
+			LEFT JOIN zw_m_professionals_info pin  ON p.professionals_id=pin.id AND pin.flag = 1
+			LEFT JOIN zw_m_assignment_vehicle av ON av.vehicle_id=c.vehicle_id AND av.flag = 1
+			LEFT JOIN zw_m_assignment a ON  av.assignment_id=a.id AND a.flag = 1
+			INNER JOIN zw_m_sim_card_info s ON c.sim_card_id=s.id AND s.flag=1
+			INNER JOIN zw_m_device_info d ON c.device_id=d.id AND d.flag=1   
+			WHERE c.flag = 1 
+			AND c.id = #{id}
+			GROUP BY i.id
+    </select>
+    <!-- 根据关联id查询关联信息(人员) -->
+    <select id="findPeopleRelateConfigById" resultType="com.zw.platform.domain.infoconfig.RelateConfig">
+    	SELECT GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') assignmentName,
+			s.simcard_number simCardNumber,
+			d.device_number deviceNumber,U.people_number carLicense,U.org_id groupId
+			FROM zw_m_config c 
+			LEFT JOIN zw_m_config_professionals p ON c.id=p.config_id AND p.flag = 1
+			INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id=c.vehicle_id AND av.flag = 1
+			INNER JOIN zw_m_assignment a ON  av.assignment_id=a.id AND a.flag = 1
+			INNER JOIN zw_m_sim_card_info s ON c.sim_card_id=s.id AND s.flag=1
+			INNER JOIN zw_m_device_info d ON c.device_id=d.id AND d.flag=1  
+			INNER JOIN zw_m_people_info U ON c.vehicle_id=U.id AND U.flag=1 
+			WHERE c.flag = 1
+			AND c.id = #{id}
+    </select>
+    <!-- 根据车辆id查询关联信息 -->
+    <select id="findRelateInfoByVId" resultType="com.zw.platform.domain.infoconfig.RelateConfig">
+        SELECT GROUP_CONCAT(DISTINCT pin.name SEPARATOR ',') professionalNames,
+        GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') assignmentName,
+        i.brand carLicense,s.simcard_number simCardNumber,
+        d.device_number deviceNumber,i.id vehicleId
+        FROM zw_m_config c
+        INNER JOIN zw_m_vehicle_info i ON c.vehicle_id=i.id AND i.flag = 1
+        LEFT JOIN zw_m_config_professionals p ON c.id=p.config_id AND p.flag = 1
+        LEFT JOIN zw_m_professionals_info pin ON p.professionals_id=pin.id AND pin.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id=c.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON av.assignment_id=a.id AND a.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON c.sim_card_id=s.id AND s.flag=1
+        INNER JOIN zw_m_device_info d ON c.device_id=d.id AND d.flag=1
+        WHERE c.flag = 1
+        AND i.id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY carLicense,simCardNumber,deviceNumber
+    </select>
+    <select id="findMonitorTypeById" resultType="java.lang.String">
+    	SELECT monitor_type FROM zw_m_config WHERE flag=1 AND id= #{id}
+    </select>
+    <!--根据设备id查询sim卡信息-->
+    <select id="getSimByDeviceId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT s.* , c.vehicle_id vehicleId FROM zw_m_config c
+		INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+		INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+		WHERE c.flag = 1
+		AND d.id = #{deviceId}
+    </select>
+
+    <select id="getDeviceIdsByVIds" resultType="java.lang.String">
+        SELECT c.device_id FROM zw_m_config c WHERE c.flag = 1 AND c.vehicle_id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDeviceIdByVId" resultType="java.lang.String">
+		SELECT c.device_id FROM zw_m_config c WHERE c.flag = 1 AND c.vehicle_id = #{id}
+	</select>
+
+
+    <select id="getVehicleIdByDeviceId" resultType="java.lang.String">
+		SELECT c.vehicle_id FROM zw_m_config c WHERE c.flag = 1 AND c.device_id = #{id}
+	</select>
+
+    <select id="getDeviceTypeByVId" resultType="java.lang.String">
+		SELECT di.device_type FROM zw_m_config c
+		left join zw_m_device_info di on di.id = c.device_id
+		WHERE c.flag = 1 AND c.vehicle_id = #{id}
+	</select>
+
+    <!--根据车辆id查询车辆info信息 -->
+    <select id="findVehicleInfoByVehicleId" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT
+        i.id,
+        i.brand brand,
+        i.plate_color color,
+        c.vehicle_id vehicleId,
+        i.plate_color plateColor,
+        vt.vehicle_type vehicleType
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_vehicle_info i ON c.vehicle_id = i.id AND i.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON i.vehicle_type = vt.id
+        AND vt.flag = 1
+        WHERE
+        c.flag = 1
+        AND c.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="getConfigCount" resultType="java.lang.Integer">
+        select count(1) from
+        (select GROUP_CONCAT(distinct a.name SEPARATOR ',') assignmentName, GROUP_CONCAT(distinct a.id SEPARATOR ',')
+        assignmentId,
+        GROUP_CONCAT(distinct pi.id SEPARATOR ',') professionalIds
+        from zw_m_config config
+        INNER JOIN (
+        SELECT car.id monitorId, car.brand carLicense,car.group_id groupId
+        FROM zw_m_vehicle_info car
+        where car.flag=1
+        UNION
+        SELECT peo.id monitorId, CONCAT(peo.people_number,IF(peo.name='','','('),peo.name,IF(peo.name='','',')'))
+        carLicense,
+        peo.org_id groupId FROM zw_m_people_info peo where peo.flag=1
+
+        ) t ON t.monitorId = config.vehicle_id
+        inner join zw_m_device_info device on config.device_id = device.id and device.flag = 1
+        inner join zw_m_sim_card_info simcard on config.sim_card_id = simcard.id and simcard.flag = 1
+        inner join zw_m_assignment_vehicle av on config.vehicle_id = av.vehicle_id and av.flag = 1
+        inner join zw_m_assignment a on av.assignment_id = a.id and a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+        left join zw_m_config_professionals cp on config.id = cp.config_id and cp.flag = 1
+        left join zw_m_professionals_info pi on pi.id = cp.professionals_id and pi.flag = 1
+        where config.flag = 1
+        and au.user_id = #{userId}
+        AND ag.group_id IN
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+            and (
+            (t.carLicense LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            or (device.device_number LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            or (simcard.simcard_number LIKE CONCAT('%',#{param.simpleQueryParam},'%'))
+            )
+        </if>
+        group by config.id order by null )tmp
+    </select>
+    <select id="findVehicleIdBySimCardId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+            vei.id AS vehicleId,
+            vei.brand
+        FROM zw_m_config con, zw_m_vehicle_info vei
+        WHERE
+              vei.id = con.vehicle_id AND con.sim_card_id = #{simCardId} AND con.flag = 1 AND vei.flag = 1
+    </select>
+
+    <select id="findPeopleIdBySimCardId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        pei.id AS vehicleId,
+        pei.people_number
+        FROM zw_m_config con, zw_m_people_info pei
+        WHERE
+        pei.id = con.vehicle_id AND con.sim_card_id = #{simCardId} AND con.flag = 1 AND pei.flag = 1
+    </select>
+
+    <select id="findThingIdBySimCardId" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        thi.id AS vehicleId,
+        thi.thing_number
+        FROM zw_m_config con, zw_m_thing_info thi
+        WHERE
+        thi.id = con.vehicle_id AND con.sim_card_id = #{simCardId} AND con.flag = 1 AND thi.flag = 1
+    </select>
+
+    <!--根据终端编号获得人员信息-->
+    <select id="getPeopleInfoByDevice" parameterType="string" resultType="com.zw.platform.domain.basicinfo.PeopleInfo">
+        SELECT DISTINCT
+        B.*,GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assignmentId,
+        GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assignmentName,sc.simcard_number as simcardNumber,
+        C.id as deviceId,C.device_number as deviceNumber,C.device_type as deviceType,
+        GROUP_CONCAT(DISTINCT I.name SEPARATOR ',') as professionalsName,
+        I.card_number as cardNumber,B.org_id groupId
+        FROM
+        zw_m_config A
+        INNER JOIN zw_m_people_info B ON A.vehicle_id=B.id  AND B.flag = 1
+        INNER JOIN zw_m_device_info C ON A.device_id=C.id AND C.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle av ON B.id = av.vehicle_id AND av.flag = 1
+        LEFT JOIN zw_m_assignment ma ON ma.id = av.assignment_id AND ma.flag = 1
+        LEFT JOIN zw_m_sim_card_info sc on A.sim_card_id= sc.id
+        LEFT JOIN zw_m_config_professionals P ON P.config_id=A.id
+        LEFT JOIN zw_m_professionals_info I ON I.id=P.professionals_id
+        WHERE A.flag = 1
+        AND C.device_number = BINARY #{id}
+        GROUP BY B.id
+    </select>
+
+    <!--根据终端编号获得物品信息-->
+    <select id="getThingInfoByDevice" parameterType="string" resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+        SELECT DISTINCT
+        <include refid="thingValue"/>
+        GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assignmentId,
+        GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assignmentName,sc.simcard_number as simcardNumber,
+        C.id as deviceId,C.device_number as deviceNumber,C.device_type as deviceType,
+        GROUP_CONCAT(DISTINCT I.name SEPARATOR ',') as professionalsName,
+        I.card_number as cardNumber
+        FROM
+        zw_m_config A
+        INNER JOIN zw_m_thing_info B ON A.vehicle_id=B.id AND B.flag = 1
+        INNER JOIN zw_m_device_info C ON A.device_id=C.id AND C.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle av ON B.id = av.vehicle_id AND av.flag = 1
+        LEFT JOIN zw_m_assignment ma ON ma.id = av.assignment_id AND ma.flag = 1
+        LEFT JOIN zw_m_sim_card_info sc on A.sim_card_id= sc.id
+        LEFT JOIN zw_m_config_professionals P ON P.config_id=A.id
+        LEFT JOIN zw_m_professionals_info I ON I.id=P.professionals_id
+        WHERE A.flag = 1
+        AND C.device_number = BINARY #{id}
+        GROUP BY B.id
+    </select>
+
+    <sql id="thingValue">
+        B.id,
+        B.name,
+        B.thing_number,
+        B.group_id,
+        B.category,
+        B.type,
+        B.label,
+        B.model,
+        B.material,
+        B.weight,
+        B.spec,
+        B.manufacture,
+        B.dealer,
+        B.place,
+        B.product_date,
+        B.thing_photo,
+        B.remark,
+        B.create_data_time,
+        B.create_data_username,
+        B.update_data_time,
+        B.update_data_username,
+    </sql>
+
+    <select id="findMonitoryConfigByMonitoryId" parameterType="string" resultType="map">
+        SELECT con.device_id ,dev.id deviceId,
+		dev.device_number,dev.functional_type,con.sim_card_id,ci.simcard_number
+		simcardNumber,vehicleInfo.*,dev.device_type
+		FROM (
+		   SELECT car.id, car.brand, car.flag FROM zw_m_vehicle_info car WHERE car.flag = 1 AND car.id = #{monitoryId}
+		   UNION
+		   SELECT peo.id, peo.people_number AS brand, peo.flag FROM zw_m_people_info peo WHERE peo.flag = 1 AND peo.id = #{monitoryId}
+		   UNION
+		   SELECT th.id, th.thing_number AS brand, th.flag FROM zw_m_thing_info th WHERE th.flag = 1 AND th.id = #{monitoryId}
+        ) vehicleInfo
+		INNER JOIN zw_m_config con ON vehicleInfo.id = con.vehicle_id AND con.flag = 1
+		INNER JOIN zw_m_device_info dev ON dev.id = con.device_id AND dev.flag = 1
+		INNER JOIN zw_m_sim_card_info ci ON ci.id = con.sim_card_id AND ci.flag = 1
+		WHERE vehicleInfo.flag = 1
+    </select>
+
+    <select id="findVehicleInfoBySimCardNumber" parameterType="string" resultType="java.util.Map">
+        SELECT
+        vehicle_id as vehicleId,
+        device_id as deviceId,
+        sim_card_id as simCardId
+        FROM zw_m_config mc
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = mc.sim_card_id AND sci.flag = 1
+        where sci.simcard_number = #{simCard} and mc.flag = 1
+    </select>
+
+    <select id="findConfigIdByVehicleIdList" resultType="string">
+        SELECT c.id FROM zw_m_config c WHERE c.flag = 1
+        AND c.vehicle_id in
+        <foreach collection="vehicleIdList" item="vehicleId" open="(" separator="," close=")">
+            #{vehicleId}
+        </foreach>
+    </select>
+
+    <select id="findConfigListByConfigIdList" resultType="com.zw.platform.domain.infoconfig.ConfigList">
+        SELECT c.id as configId,c.vehicle_id FROM zw_m_config c WHERE c.flag = 1
+        AND c.id in
+        <foreach collection="configIdList" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </select>
+
+    <delete id="deleteProfessionalsByConfigIds">
+        DELETE FROM zw_m_config_professionals
+        WHERE config_id in
+        <foreach collection="configIds" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+    <update id="deleteMonitorAssignmentByMonitorIds">
+        update zw_m_assignment_vehicle set flag = 0 ,update_data_time = now() where vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </update>
+
+    <update id="deleteByConfigIds">
+        UPDATE zw_m_config set flag=0
+        WHERE id in
+        <foreach collection="configIds" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </update>
+
+    <delete id="deleteLifecycleById" parameterType="string">
+        update zw_m_service_lifecycle set flag = 0
+        where id IN
+        <foreach collection="lifecycleSet" item="lifecycleId" open="(" separator="," close=")">
+            #{lifecycleId}
+        </foreach>
+    </delete>
+
+    <select id="getConfigIdByMonitorIds" resultType="string">
+        SELECT id FROM zw_m_config WHERE vehicle_id IN
+        <foreach item="item" collection="monitorIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND flag = 1
+    </select>
+    <select id="findBandSimcardConfigIds" resultType="java.lang.String">
+        select id from zw_m_config where 1 = 0
+        <if test="simCardIds != null and simCardIds.size > 0">
+            or (sim_card_id in
+            <foreach item="item" collection="simCardIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            and flag=1)
+        </if>
+    </select>
+
+    <select id="getConfigByBrand" resultType="java.util.Map" parameterType="string">
+     SELECT A.id                    AS configId,
+			A.vehicle_password		AS vehiclePassword,
+			B.plate_color			AS plateColor,
+			A.vehicle_id            AS vehicleId
+        FROM zw_m_config A
+                 left join zw_m_vehicle_info B ON A.vehicle_id = B.id AND B.flag = 1
+        WHERE A.flag = 1
+          AND B.brand = BINARY  #{brand}
+        LIMIT 1
+    </select>
+
+    <update id="updateVehiclePassword" parameterType="string">
+        update
+        zw_m_config A
+        set
+        A.vehicle_password = #{vehiclePassword}
+        WHERE
+        A.flag = 1
+        and vehicle_id = #{vehicleId}
+    </update>
+
+    <select id="getConfigByVehicle" resultType="map" parameterType="string">
+        SELECT zc.device_id deviceId ,zc.vehicle_id vehicleId, zd.device_type deviceType, zs.simcard_number simCardNumber FROM zw_m_config zc
+                LEFT JOIN zw_m_sim_card_info zs ON zs.id = zc.sim_card_id AND zs.flag = 1
+                LEFT JOIN zw_m_device_info zd ON zd.id = zc.device_id AND zd.flag = 1
+                WHERE
+                zc.flag = 1
+                AND
+                zc.vehicle_id = #{vid}
+    </select>
+
+    <select id="getConfigByPidAndVid" parameterType="string" resultType="map">
+        SELECT zc.device_id deviceId ,zc.vehicle_id vehicleId, zd.device_type deviceType, zs.simcard_number simCardNumber,
+            zpi.card_number cardNumber , zpi.photograph photograph
+        FROM zw_m_config_professionals zp
+                LEFT JOIN zw_m_config zc ON zp.config_id = zc.id
+                LEFT JOIN zw_m_sim_card_info zs ON zs.id = zc.sim_card_id AND zs.flag = 1
+                LEFT JOIN zw_m_device_info zd ON zd.id = zc.device_id AND zd.flag = 1
+				LEFT JOIN zw_m_professionals_info zpi ON zp.professionals_id = zpi.id AND zpi.flag = 1
+                WHERE
+                zp.flag=1
+                AND
+                zpi.card_number = #{cardNumber}
+                AND
+                zd.device_type = 24
+				AND
+				zc.vehicle_id = #{vid}
+				LIMIT 1
+    </select>
+    <select id="findAllProfessional" resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+        SELECT id,name FROM zw_m_professionals_info WHERE flag = 1
+    </select>
+    <select id="getConfig" resultType="com.zw.platform.domain.infoconfig.ConfigList">
+        SELECT id, vehicle_id, sim_card_id, device_id from zw_m_config where  id = #{configId} and flag = 1
+    </select>
+
+
+    <select id="getNetWorkByDeviceIds" resultType="com.zw.platform.basic.domain.BaseKvDo">
+        select device_id as keyname, access_network as firstVal from zw_m_config where device_id in
+        <foreach item="item" collection="deviceIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and flag =1
+    </select>
+
+    <select id="getMoIdByDeviceTypes" resultType="java.lang.String">
+        select zmc.vehicle_id
+        from zw_m_config zmc
+        inner join zw_m_device_info zmdi on zmc.device_id = zmdi.id and zmdi.flag = 1
+        where zmc.flag = 1
+        and zmdi.device_type in
+        <foreach item="item" collection="deviceTypes" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getMonitorByDeviceTypes" resultType="com.zw.platform.basic.domain.MonitorDeviceTypeDO">
+        select zmc.vehicle_id monitor_id, zmdi.device_type deviceType
+        from zw_m_config zmc
+        inner join zw_m_device_info zmdi on zmc.device_id = zmdi.id and zmdi.flag = 1
+        where zmc.flag = 1
+        and zmdi.device_type in
+        <foreach item="item" collection="deviceTypes" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getMoIdsByFuzzyMoName" resultType="java.lang.String">
+        SELECT monitor.id
+        FROM (SELECT zmvi.id, zmvi.brand moName
+              FROM zw_m_vehicle_info zmvi
+              WHERE zmvi.flag = 1
+              UNION
+              SELECT zmpi.id, zmpi.people_number moName
+              FROM zw_m_people_info zmpi
+              WHERE zmpi.flag = 1
+              UNION
+              SELECT zmti.id, zmti.thing_number moName
+              FROM zw_m_thing_info zmti
+              WHERE zmti.flag = 1
+             ) monitor
+        WHERE monitor.moName like CONCAT('%',#{fuzzyMoName},'%')
+    </select>
+
+    <select id="getMoIdsByOrgIds" resultType="java.lang.String">
+        SELECT monitor.id
+        FROM (SELECT zmvi.id, zmvi.group_id orgId
+              FROM zw_m_vehicle_info zmvi
+              WHERE zmvi.flag = 1
+              UNION
+              SELECT zmpi.id, zmpi.org_id orgId
+              FROM zw_m_people_info zmpi
+              WHERE zmpi.flag = 1
+              UNION
+              SELECT zmti.id, zmti.group_id orgId
+              FROM zw_m_thing_info zmti
+              WHERE zmti.flag = 1
+             ) monitor
+        WHERE monitor.orgId in
+        <foreach item="item" collection="orgIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="filterMoIdsByMoType" resultType="java.lang.String">
+        select vehicle_id from zw_m_config where flag = 1 and vehicle_id in
+        <foreach item="moId" collection="moIds" separator="," open="(" close=")">
+            #{moId}
+        </foreach>
+        and monitor_type = #{moType}
+    </select>
+</mapper>

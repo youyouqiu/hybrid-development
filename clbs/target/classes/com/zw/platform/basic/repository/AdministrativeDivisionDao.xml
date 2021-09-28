@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.AdministrativeDivisionDao">
+    <select id="getByDivisionCode" parameterType="string"
+            resultType="com.zw.platform.basic.dto.AdministrativeDivisionDTO">
+        SELECT province_name,city_name,county_name,divisions_code
+        FROM zw_m_administrative_divisions
+        WHERE divisions_code = #{divisionCode}
+    </select>
+
+    <select id="getByName" resultType="com.zw.platform.basic.dto.AdministrativeDivisionDTO">
+        SELECT province_name,city_name,county_name,divisions_code
+        FROM zw_m_administrative_divisions
+        WHERE 1=1
+        <choose>
+            <when test="province != null and province != ''">
+                AND province_name = #{province}
+            </when>
+            <otherwise>
+                AND province_name is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="city != null and city != ''">
+                and city_name = #{city}
+            </when>
+            <otherwise>
+                and city_name is null
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="county != null and county !=''">
+                and county_name = #{county}
+            </when>
+            <otherwise>
+                and county_name is null
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <select id="getAll" resultType="com.zw.platform.basic.dto.AdministrativeDivisionDTO">
+        SELECT province_name,city_name,county_name,divisions_code
+        FROM zw_m_administrative_divisions
+    </select>
+</mapper>

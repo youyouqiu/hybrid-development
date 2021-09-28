@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.LoadAdDao">
+    <insert id="addByBatch" >
+        INSERT INTO  zw_m_calibration (
+        id,
+        flag,
+        vehicle_id,
+        sensor_id,
+        sensor_vehicle_id,
+        create_data_username,
+        calibration
+        ) VALUES (
+        #{id},#{flag},#{vehicleId},#{sensorId},#{sensorVehicleId},#{userName},#{calibation}
+        )
+    </insert>
+    <update id="updateCalibration">
+        update  zw_m_calibration
+        SET calibration = #{calibrationValue},
+        sensor_id = #{sensorId}
+        WHERE sensor_vehicle_id = #{id} and flag = 1
+    </update>
+    <select id="findBySensorVehicleId" parameterType="string" resultType="com.zw.platform.domain.vas.loadmgt.ZwMCalibration">
+        select * from zw_m_calibration zw where
+        1=1 and zw.flag =1
+        <if test="sensorVehicleId!=null and sensorVehicleId!='' ">
+            and zw.sensor_vehicle_id =#{sensorVehicleId}
+        </if>
+    </select>
+    <select id="findByIdAndSensorId" resultType="com.zw.platform.domain.vas.loadmgt.ZwMCalibration">
+        select * from zw_m_calibration zw where
+        1=1 and  zw.flag =1
+        <if test="id!=null and id!=''">
+            and zw.id=#{id}
+        </if>
+        <if test="sensorVehicleId!=null and sensorVehicleId!='' ">
+            and zw.sensor_vehicle_id =#{sensorVehicleId}
+        </if>
+    </select>
+    <update id="deleteAdLoad">
+        update zw_m_calibration
+        set flag =0
+        where sensor_vehicle_id=#{id}
+    </update>
+</mapper>

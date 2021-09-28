@@ -1,0 +1,547 @@
+<form th:action="@{/m/infoconfig/infoinput/edit.gsp}" th:object="${result}" id="editForm" action="#" role="form"
+    method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改</h4>
+        <style>
+            .readBack {
+                background-color: #eee;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" type="text" hidden="true" />
+                <input th:field="*{configId}" type="hidden" id="configId" />
+                <input th:value="*{vehiclePassword}" type="hidden" id="hidePwd" />
+                <div class="form-group col-md-4 form-one">
+                    <label class="col-sm-12 col-md-12 titleCenter">监控对象*</label>
+                    <div class="col-sm-12 col-md-12 object-area">
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label" style="padding-top:15px;">监控对象：</label>
+                            <div class="col-sm-8 col-md-8 " style="padding-top:10px; margin:0px;">
+                                <input type="hidden" id="vehicleid" th:field="*{brandID}" />
+                                <input type="hidden" id="monitorType" th:field="*{monitorType}" />
+                                <input type="hidden" id="checkEdit" name="checkEdit" />
+                                <input type="hidden" name="professionalsId" id="professionalIds" />
+                                <input type="hidden" name="brands" id="hideBrands" />
+                                <input type="hidden" name="devices" id="hideDevices" />
+                                <input type="hidden" name="sims" id="hideSims" />
+                                <input type="hidden" name="editBrand" id="isEditBrands" disabled />
+                                <input type="hidden" name="editDeviceNum" id="isEditDevices" disabled />
+                                <input type="hidden" name="editSimNum" id="isEditSims" disabled />
+                                <!--<div class="input-group">
+                                    <input th:value="*{brands}" type="text" placeholder="" class="form-control"
+                                           maxlength="20" id="editBrands"/>
+                                    <div class="input-group-btn">
+                                        &lt;!&ndash; <input type="hidden" class="hidenSubmitControl"/> &ndash;&gt;
+                                        <button type="button" id="buttonBtn"
+                                                class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                data-toggle="dropdown">
+                                            <i class="fa fa-spinner loading-state"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%">
+                                        </ul>
+                                    </div>
+                                </div>-->
+                                <div class="input-group i-dropdown-container" id="editBrandsContainer">
+                                    <input th:value="*{brands}" type="text" class="form-control i-input-field"
+                                        maxlength="20" id="editBrands" />
+                                    <div class="input-group-btn i-arrow">
+                                        <button type="button" class="btn btn-white dropdown-toggle" data-toggle="">
+                                            <i class="caret"></i>
+                                        </button>
+                                    </div>
+                                    <div class="i-list-container">
+                                        <div class="i-list-wraper">
+                                            <div class="i-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                            <div class="col-sm-8 col-md-8 has-feedback fastClear">
+                                <input type="text" name="carGroupName" th:value="*{car_groupName}" id="carGroupName"
+                                    class="form-control groupCitySel readBack" style="cursor: pointer;"
+                                    autocomplete="off" />
+                                <span class="fa fa-chevron-down form-control-feedback groupCitySel"
+                                    style="top: 0; right: 18px!important;cursor:pointer;" aria-hidden="true"></span>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+	                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="vehicleGroupDiv">
+                                </div>
+                                <input th:value="*{car_groupId}" id="carGroupId" class="editGroupId fakeHide"
+                                    name="carGroupId" />
+                                <input type="hidden" th:value="*{peo_groupId}" id="peoGroupId" name="peoGroupId" />
+                            </div>
+                        </div>
+                        <div class="form-group monitoring-people">
+                            <label class="col-sm-3 col-md-3 control-label">车牌颜色：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <!--<input type="text" th:field="*{vehicleOwnerPhone}" id="vehicleOwnerPhone"-->
+                                <!--class="form-control vehicleList" READONLY/>-->
+                                <select th:field="*{plateColor}" id="plateColor" placeholder="请选择车牌颜色"
+                                    class="form-control vehicleList" readonly>
+                                    <option value="1">蓝色</option>
+                                    <option selected="selected" value="2">黄色</option>
+                                    <option value="3">黑色</option>
+                                    <option value="4">白色</option>
+                                    <option value="5">绿色</option>
+                                    <option value="94">渐变绿色</option>
+                                    <option value="93">黄绿色</option>
+                                    <option value="91">农黄</option>
+                                    <option value="90">农蓝</option>
+                                    <option value="92">农绿</option>
+                                    <option value="9">其他</option>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+	                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="plateColorDiv">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group monitoring-people">
+                            <label class="col-sm-3 col-md-3 control-label">车辆类型：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <!-- <input type="text" th:value="*{vehicleType}" class="form-control" READONLY/> -->
+                                <select name="editVehicleType" placeholder="请输入车辆类型" id="editVehicleType"
+                                    class="form-control vehicleList" readonly>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+	                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="vehicleTypeDiv">
+                                </div>
+                                <input type="text" th:value="*{vehicleTypeId}" id="firstVehicleType" hidden>
+                            </div>
+                        </div>
+                        <div class="form-group monitoring-people">
+                            <label class="col-sm-3 col-md-3 control-label">车辆密码：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input type="text" name="vehiclePassword" id="vehiclePassword" maxlength="6"
+                                    class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="form-group monitoring-thing">
+                            <label class="col-sm-3 col-md-3 control-label">物品名称：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input type="text" id="thingNameEdit" name="thingName" class="form-control thingList"
+                                    th:value="${result.thingName}" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 form-one">
+                    <label class="col-sm-12 col-md-12 titleCenter">分组*</label>
+                    <div class="col-sm-12 col-md-12 object-area" id="edit-object-area"
+                        style="overflow:visible;overflow-y:scroll;">
+                        <div>
+                            <div class="form-group" style="padding-top:9px;margin-bottom: 2px;">
+                                <input type="hidden" id="groupID" name="groupid" th:field="*{groupid}" />
+                                <input type="hidden" id="groupName" th:value="*{groupName}" />
+                                <div id="edit-area">
+                                    <label class="col-sm-3 col-md-3 control-label">分组：</label>
+                                    <div class="col-sm-7 col-md-6 form-group assignment-div">
+                                        <input name="groupName" class="form-control zTreeCitySel" type="text"
+                                            style="background-color: #fafafa; cursor: pointer;" id="zTreeCitySel"
+                                            placeholder="请选择组织" autocomplete="off" />
+                                        <input id="assignmentId" class="assignmentId" type="hidden" />
+                                    </div>
+                                </div>
+                                <button id="edit-add-btn" type="button" class="btn btn-primary btnPaddLeft">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                            <div id="edit-list"></div>
+                            <div id="edit-add-area"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label class="col-sm-12 col-md-12 titleCenter">终端*</label>
+                    <div class="col-sm-12 col-md-12 object-area" style="overflow:visible !important">
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label" style="padding-top:15px;">终端号：</label>
+                            <div class="col-sm-8 col-md-8 form-group" style="padding-top:10px; margin:0px;">
+                                <div style="position:relative;">
+                                    <span style="overflow:hidden;">
+                                        <input type="hidden" id="deviceid" th:field="*{deviceID}" />
+                                        <div class="input-group i-dropdown-container" id="editDevicesContainer">
+                                            <!--<input th:value="*{devices}" type="text" placeholder=""-->
+                                            <!--class="form-control" maxlength="30" id="editDevices">-->
+                                            <!--<div class="input-group-btn">-->
+                                            <!--&lt;!&ndash; <input type="hidden" class="hidenSubmitControl"/> &ndash;&gt;-->
+                                            <!--<button type="button" id="button"-->
+                                            <!--class="btn btn-white dropdown-toggle disabled loading-state-button"-->
+                                            <!--data-toggle="dropdown">-->
+                                            <!--<i class="fa fa-spinner loading-state"></i>-->
+                                            <!--</button>-->
+                                            <!--<ul class="dropdown-menu dropdown-menu-right" role="menu"-->
+                                            <!--style="width:100%">-->
+                                            <!--</ul>-->
+                                            <!--</div>-->
+                                            <input th:value="*{devices}" type="text" placeholder=""
+                                                class="form-control i-input-field" maxlength="30" name="editDevices"
+                                                id="editDevices">
+                                            <div class="input-group-btn i-arrow">
+                                                <!--<button type="button" class="btn btn-white dropdown-toggle"-->
+                                                <!--data-toggle="">-->
+                                                <!--<i class="caret"></i>-->
+                                                <!--</button>-->
+                                                <button type="button" id="button"
+                                                    class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                    data-toggle="dropdown">
+                                                    <i class="fa fa-spinner loading-state"></i>
+                                                </button>
+                                            </div>
+                                            <div class="i-list-container">
+                                                <div class="i-list-wraper">
+                                                    <div class="i-list"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" id="deviceGroupList">
+                            <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                            <div class="col-sm-8 col-md-8 has-feedback fastClear">
+                                <input type="text" name="deviceGroupName" th:value="*{deviceGroupName}"
+                                    id="deviceGroupName" class="form-control groupCitySel readBack"
+                                    style="cursor: pointer;" autocomplete="off" />
+                                <span class="fa fa-chevron-down form-control-feedback groupCitySel"
+                                    style="top: 0; right: 18px!important;cursor:pointer;" aria-hidden="true"></span>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="deviceGroupDiv">
+                                </div>
+                                <input th:value="*{device_groupId}" id="deviceGroupId" class="editGroupId fakeHide"
+                                    name="deviceGroupId" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">通讯类型：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <!-- <input th:field="*{deviceType}" id="deviceType" type="text" class="form-control deviceList"
+                                       READONLY/> -->
+                                <select name="deviceType" id="deviceType" class="form-control deviceList" readonly>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="deviceTypeDiv">
+                                </div>
+                                <input type="text" th:value="*{deviceType}" id="firstDeviceType" hidden>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">终端厂商：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <!-- <input th:field="*{deviceType}" id="deviceType" type="text" class="form-control deviceList"
+                                       READONLY/> -->
+                                <select name="terminalManufacturer" placeholder="请选择终端厂商" id="terminalManufacturer"
+                                    th:field="*{terminalManufacturer}" class="form-control deviceList" readonly>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="terminalManufacturerDiv">
+                                </div>
+                                <input type="hidden" name="terminalManufacturerName" id="terminalManufacturerName"
+                                    th:field="*{terminalManufacturer}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">终端型号：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <div class="input-group">
+                                    <input th:value="*{terminalType}" type="text" placeholder="请选择终端型号" disabled
+                                        class="form-control" id="editTerminalType" autocomplete="off">
+                                    <div class="input-group-btn">
+                                        <button id="editTerminalButton" type="button"
+                                            class="btn btn-white dropdown-toggle" disabled>
+                                            <i class="caret"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                                        <input name="editTerminalType" th:value="*{terminalType}"
+                                            id="editTerminalTypeName" hidden>
+                                        <input name="editTerminalTypeId" id="editTerminalTypeId"
+                                            th:field="*{terminalTypeId}" hidden>
+                                    </div>
+                                </div>
+
+                                <!--
+                                <select name="editTerminalType" id="editTerminalType" placeholder="请选择终端型号"
+                                        th:value="*{terminalType}" class="form-control deviceList" readonly>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                     id="terminalTypeDiv">
+                                </div>
+                                <input type="hidden" name="editTerminalTypeId" id="editTerminalTypeId" th:field="*{terminalTypeId}">-->
+                            </div>
+                        </div>
+                        <div class="form-group  hidden">
+                            <label class="col-sm-3 col-md-3 control-label">制造商：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input th:field="*{manuFacturer}" id="manuFacturer" type="text" class="form-control"
+                                    READONLY />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 form-one">
+                    <label class="col-sm-12 col-md-12 titleCenter">终端手机号*</label>
+                    <div class="col-sm-12 col-md-12 object-area" style="overflow:visible !important">
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label" style="padding-top: 23px">终端手机号：</label>
+                            <div class="col-sm-8 col-md-8 form-group" style="margin:0px; padding-top: 15px">
+                                <div style="position:relative;">
+                                    <span style="overflow:hidden;">
+                                        <input type="hidden" id="simid" th:field="*{simID}" />
+                                    </span>
+                                    <div class="input-group i-dropdown-container" id="editSimsContainer">
+                                        <!--<input th:value="*{sims}" type="text" placeholder="" class="form-control"-->
+                                        <!--maxlength="20" id="editSims">-->
+
+                                        <!--<div class="input-group-btn">-->
+                                        <!--&lt;!&ndash; <input type="hidden" class="hidenSubmitControl"/> &ndash;&gt;-->
+                                        <!--<button type="button" id="button"-->
+                                        <!--class="btn btn-white dropdown-toggle disabled loading-state-button"-->
+                                        <!--data-toggle="dropdown">-->
+                                        <!--<i class="fa fa-spinner loading-state"></i>-->
+                                        <!--</button>-->
+                                        <!--<ul class="dropdown-menu dropdown-menu-right" role="menu"-->
+                                        <!--style="width:100%">-->
+                                        <!--</ul>-->
+                                        <!--</div>-->
+                                        <input name="editSims" th:value="*{sims}" type="text" placeholder=""
+                                            class="form-control i-input-field" maxlength="20" id="editSims"
+                                            autocomplete="off">
+                                        <div class="input-group-btn i-arrow">
+                                            <!--<button type="button"-->
+                                            <!--class="btn btn-white dropdown-toggle"-->
+                                            <!--data-toggle="">-->
+                                            <!--<i class="caret"></i>-->
+                                            <!--</button>-->
+                                            <button type="button" id="button"
+                                                class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                data-toggle="dropdown">
+                                                <i class="fa fa-spinner loading-state"></i>
+                                            </button>
+                                        </div>
+                                        <div class="i-list-container">
+                                            <div class="i-list-wraper">
+                                                <div class="i-list"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">ICCID：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input name="iccidSim" th:value="*{iccid_sim}" id="iccidSim" type="text"
+                                    class="form-control simsList" READONLY maxlength="20" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                            <div class="col-sm-8 col-md-8 has-feedback fastClear">
+                                <input name="simParentGroupName" th:value="*{simParentGroupname}"
+                                    id="simParentGroupName" type="text" class="form-control groupCitySel readBack"
+                                    style="cursor: pointer;" autocomplete="off" />
+                                <span class="fa fa-chevron-down form-control-feedback groupCitySel"
+                                    style="top: 0; right: 18px!important;cursor:pointer;" aria-hidden="true"></span>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="simGroupDiv">
+                                </div>
+                                <input th:value="*{simParentGroupid}" id="simParentGroupId" class="editGroupId fakeHide"
+                                    name="simParentGroupId" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">运营商：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <!-- <input th:field="*{operator}" id="operator" type="text" class="form-control simsList"
+                                       READONLY/> -->
+                                <select th:field="*{operator}" name="operator" id="operator"
+                                    class="form-control simsList" readonly>
+                                    <option selected="selected" value="中国移动">中国移动</option>
+                                    <option value="中国联通">中国联通</option>
+                                    <option value="中国电信">中国电信</option>
+                                </select>
+                                <div class="back-layer" style="position: absolute; width: 100%; height: 100%; top: 0px;
+		                            	left: 0px; background: rgba(0, 0, 0, 0); z-index: 999; display: block;"
+                                    id="operatorTypeDiv">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-sm-3 col-md-3 control-label">套餐流量：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input th:field="*{simFlow}" id="simFlow" type="text" class="form-control" READONLY />
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-sm-3 col-md-3 control-label">激活日期：</label>
+                            <div class="col-sm-8 col-md-8">
+                                <input th:field="*{openCardTime}" id="openCardTime" type="text" class="form-control"
+                                    READONLY />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 col-md-3 control-label">真实SIM卡号：</label>
+                            <div class="col-sm-8 col-md-8" id="realSim">
+                                <input name="realId" th:field="*{realId}" id="realSimCard" type="text"
+                                    class="form-control" maxlength="20" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 form-one">
+                    <label class="col-sm-12 col-md-12 titleCenter">服务期限</label>
+                    <div class="col-sm-12 col-md-12 object-area">
+                        <div class="form-group" style="padding-top:10px;">
+                            <input type="hidden" th:field="*{serviceLifecycleId}" />
+                            <label class="col-sm-3 col-md-3 control-label">计费日期：</label>
+                            <div class="col-sm-8 col-md-8 form-group assignment-div">
+                                <input id="editBillingDate" class="form-control layer-date laydate-icon"
+                                    th:field="*{billingDateStr}" style="background-color: #fafafa; cursor: pointer;"
+                                    placeholder="计费日期" name="billingDate" value="" readonly>
+                            </div>
+                            <label class="col-sm-3 col-md-3 control-label">到期日期：</label>
+                            <div class="col-sm-8 col-md-8 form-group assignment-div">
+                                <input id="editDueDate" class="form-control layer-date laydate-icon"
+                                    th:field="*{durDateStr}" style="background-color: #fafafa; cursor: pointer;"
+                                    placeholder="到期日期" name="durDate" value="" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 form-one hidden">
+                    <label class="col-sm-12 col-md-12">外设</label>
+                    <div class="col-sm-12 col-md-12 object-area select">
+                        <div class="object-area-select">
+                            <input type="text" name="peripheralsId" th:field="*{peripheralsId}" style="border: none;">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 monitoring-people" id="people-work-area">
+                    <label class="col-sm-12 col-md-12 titleCenter">从业人员</label>
+                    <div class="col-sm-12 col-md-12 object-area" id="people-object-area"
+                        style="overflow:visible;overflow-y:visible">
+                        <input type="hidden" id="peopleIds" th:field="*{professionalsID}" />
+                        <input type="hidden" id="peopleNames" th:field="*{professionals}" />
+                        <div class="form-group" style="padding-top:9px;">
+                            <div id="people-area">
+                                <label class="col-sm-4 col-md-3 control-label">从业人员：</label>
+                                <div class="col-sm-5 col-md-6">
+                                    <div style="position:relative;">
+                                        <!--<div class="input-group">
+                                            <input id="editProfessionals" name="professionalsId__" type="text"
+                                                   placeholder="" class="form-control peopleSelect" maxlength="20">
+                                            <div class="input-group-btn">
+                                                <button type="button" id="button"
+                                                        class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                        data-toggle="dropdown">
+                                                    <i class="fa fa-spinner loading-state"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-right" role="menu"
+                                                    style="width:100%">
+                                                </ul>
+                                            </div>
+                                        </div>-->
+                                        <div class="input-group i-dropdown-container" id="editProfessionalsContainer">
+                                            <input type="text" name="professionalsId__"
+                                                class="form-control i-input-field peopleSelect"
+                                                id="editProfessionals" autocomplete="off" />
+                                            <div class="input-group-btn i-arrow">
+                                                <button type="button" class="btn btn-white dropdown-toggle"
+                                                    data-toggle="">
+                                                    <i class="caret"></i>
+                                                </button>
+                                            </div>
+                                            <div class="i-list-container">
+                                                <div class="i-list-wraper">
+                                                    <div class="i-list"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="editpeople-add-btn" type="button" class="btn btn-primary btnPaddLeft">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div id="people-edit-list"></div>
+                        <div id="editpeople-add-area"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<div id="zTreeArea">
+    <div id="zTreeContent"
+        style="display: none; position: absolute; top: 35px; left: 15px; background-color: #fff; z-index: 9999999; overflow: auto; width: 220PX; height: 152PX; border: 1px solid #ccc;">
+        <ul id="ztreeDemo" class="ztree"></ul>
+    </div>
+</div>
+<label id="error_label" class='error' style='display: none;'></label>
+<div id="zTreeArea2">
+    <div id="groupTree"
+        style="display: none; position: absolute; top: 35px; left: 15px; background-color: #fff; z-index: 9999999; overflow: auto; width: 220PX; height: 152PX; border: 1px solid #ccc;">
+        <ul id="ztreeDemo2" class="ztree"></ul>
+    </div>
+</div>
+<style>
+    #zTreeContent {
+        height: 200px !important;
+    }
+</style>
+<script th:inline="javascript">
+    // var assignmentMaxCarNum = [[#{infoinput.assignment.maxCarNum}]];
+    var dueDateCompareBillingDate = [[#{ infoinput.processinput.dueDate.compareBillingDate }]];
+    var repeateChooseProfession = [[#{ infoinput.processinput.repeateChooseProfession }]];
+    var systemError = [[#{ system.error }]];
+    var repeateChooseAssignment = [[#{ infoinput.processinput.repeateChooseAssignment }]];
+    var personnelNumberError = [[#{ personnel.number.error }]];
+    var publicSize8Length = [[#{ public.size8.length }]];
+    var personnelNumberExists = [[#{ personnel.number.exists }]];
+    var groupNameNull = [[#{ group.name.null }]];
+    var phoneError = [[#{ phone.error }]];
+    var telPhoneError = [[#{ telPhone.error }]];
+    var vehicleTypeNull = [[#{ vehicle.type.null }]];
+    var deviceTypeNull = [[#{ device.deviceType.null }]];
+    var functionalTypeNull = [[#{ device.functional.null }]];
+    var publicSize50 = [[#{ public.size50.length }]];
+    var vehicleBrandNull = [[#{ vehicle.brand.null }]];
+    var vehicleBrandError = [[#{ vehicle.brand.error }]];
+    var vehicleBrandExists = [[#{ vehicle.brand.exists }]];
+    var deviceNumberSelect = [[#{ device.number.select }]];
+    var deviceNumberMaxlength = [[#{ device.number.maxlength }]];
+    var deviceNumberError = [[#{ device.number.error }]];
+    var deviceNumberExists = [[#{ device.number.exists }]];
+    var simNumberNull = [[#{ sim.number.null }]];
+    var simNumberError = [[#{ sim.number.error }]];
+    var simNumberExists = [[#{ sim.number.exists }]];
+    var simNumberMaxlength = [[#{ sim.number.maxlength }]];
+    var personnelNumberNull = [[#{ personnel.number.null }]];
+    var thingExists = [[#{ vehicle.thing.exists }]];
+    var publicMonitorNull = [[#{ public.monitor.null }]];
+    var vehiclePlateColorNull = [[#{ vehicle.select.plateColor }]];
+</script>
+<script src="/wro/infoinputEdit.js" th:src="@{/wro/infoinputEdit.js}"></script>

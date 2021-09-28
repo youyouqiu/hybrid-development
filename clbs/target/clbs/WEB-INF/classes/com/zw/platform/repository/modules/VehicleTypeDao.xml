@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.VehicleTypeDao">
+    <!-- 查询 flog为1的所有参数 -->
+    <!-- 参数类型，返回值类型 -->
+    <select id="find" parameterType="com.zw.platform.domain.basicinfo.query.VehicleTypeQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.* ,vc.vehicle_category category FROM zw_m_vehicle_type vt LEFT JOIN zw_m_vehicle_category vc on
+        vt.vehicle_category =vc.id and vc.flag=1
+        where vt.flag=1 AND ISNULL(vt.pid)
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and vt.vehicle_type LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY vt.code_num,create_data_time DESC
+    </select>
+    <!--查询所有的车辆类别为危险品运输车的车型-->
+    <select id="selectBycategory" resultType="string" parameterType="string">
+        select id from zw_m_vehicle_type zv where zv.flag = 1 and zv.vehicle_category in(select id from
+        zw_m_vehicle_category where flag = 1 and vehicle_category = '危险品运输车')
+        <if test="id!=null and id!=''">
+            and id = #{id}
+        </if>
+    </select>
+    <!-- 查询所有的车辆类型 -->
+    <select id="findByVehicleGenerateTemplate" parameterType="string" resultType="string">
+        SELECT DISTINCT VehicleType.vehicle_type FROM zw_m_vehicle_type VehicleType where flag=1 AND ISNULL(VehicleType.pid)
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 根据车辆类型查询类型ID -->
+    <select id="findByVehicleTypeId" parameterType="string" resultType="string">
+        SELECT VehicleType.id FROM zw_m_vehicle_type VehicleType where flag=1 AND ISNULL(VehicleType.pid) and vehicle_type = #{vehicleType}
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 根据ID查询车辆类型 -->
+    <select id="findByVehicleTypet" parameterType="string" resultType="string">
+        SELECT VehicleType.vehicle_type FROM zw_m_vehicle_type VehicleType where flag=1 AND ISNULL(VehicleType.pid) and id = #{ctype}
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        INSERT INTO zw_m_vehicle_type (
+        id, vehicle_category, vehicle_type, description, create_data_time, create_data_username, service_cycle
+        )
+        VALUES(
+         #{id}, #{vehicleCategory}, #{vehicleType}, #{description}, #{createDataTime},#{createDataUsername},#{serviceCycle}
+        )
+    </insert>
+    <!-- 根据id删除一个 ThingInfo -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_vehicle_type set flag=0 WHERE id = #{id}
+    </delete>
+    <!-- 通过id得到一个 User-->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT * FROM zw_m_vehicle_type WHERE id = #{id} and flag = 1
+    </select>
+    <!-- 修改 PER -->
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        UPDATE zw_m_vehicle_type SET
+        vehicle_category = #{vehicleCategory}, vehicle_type = #{vehicleType}, description = #{description},
+        service_cycle = #{serviceCycle},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+    <!-- 批量新增车辆 -->
+    <insert id="addVehicleTypeByBatch" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        INSERT INTO zw_m_vehicle_type (
+        id, vehicle_category, vehicle_type, description, flag, create_data_time,
+        create_data_username, service_cycle
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.vehicleCategory}, #{item.vehicleType}, #{item.description},
+            #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername}, #{item.serviceCycle})
+        </foreach>
+    </insert>
+    <!-- 去重 -->
+    <select id="findByVehicleType" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT * FROM zw_m_vehicle_type WHERE flag = 1 AND ISNULL(pid) and vehicle_type = #{vehicleType}
+    </select>
+    <select id="isExist" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT * FROM zw_m_vehicle_type WHERE flag = 1 AND ISNULL(pid) and vehicle_type = #{vehicleType} and id <![CDATA[ <> ]]> #{id}
+    </select>
+    <!-- 根据车辆类型查找 -->
+    <select id="findByVehicleTypeTwo" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vehicleType.* FROM zw_m_vehicle_type vehicleType
+        WHERE flag = 1 AND ISNULL(vehicleType.pid)
+        <if test="vehicleType != null and vehicleType != ''">
+            AND vehicle_type = #{vehicleType}
+        </if>
+    </select>
+    <select id="findVehicleType" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+		SELECT * from zw_m_vehicle_type where vehicle_category=#{vehicleCategory} AND flag=1 AND ISNULL(pid)
+	</select>
+    <!-- 查询车型是否已被绑定-->
+    <select id="getIsBand" resultType="boolean">
+		select count(*) from zw_m_vehicle_type vt
+		inner join zw_m_vehicle_info v on v.vehicle_type = vt.id and v.flag = 1
+		where vt.flag = 1 AND ISNULL(vt.pid) and vt.id = #{id}
+	</select>
+    <!-- 根据车辆类别和车辆类型查找关联信息 -->
+    <select id="findVehicleTypeId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.id,vc.standard,vt.code_num FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category vc ON vc.id=vt.vehicle_category AND vc.flag=1
+        WHERE vt.flag = 1 AND ISNULL(vt.pid) AND vt.vehicle_type = BINARY #{vehicleType} AND vc.vehicle_category = BINARY #{category}
+    </select>
+    <!-- 查找所有车辆类型关联信息 -->
+    <select id="findALLVehicleType" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.id id,vc.vehicle_category category,vt.vehicle_type vehicleType,vc.standard FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category vc ON vc.id=vt.vehicle_category AND vc.flag=1
+        WHERE vt.flag = 1 AND ISNULL(vt.pid)
+        <if test="typeId!=null and typeId!=''">
+            AND vt.id = #{typeId}
+        </if>
+    </select>
+    <!-- 判断车辆类别是否存在 -->
+    <select id="findCategory" parameterType="string" resultType="String">
+    	SELECT id FROM zw_m_vehicle_category WHERE vehicle_category= BINARY #{category} AND flag=1
+    </select>
+    <!--类型是否绑定了子类型-->
+    <select id="checkTypeIsBindingSubType" parameterType="string" resultType="boolean">
+      SELECT COUNT(*) FROM zw_m_vehicle_type WHERE flag = 1 AND pid = #{id}
+    </select>
+    <!--查询类型下的所有子类型-->
+    <select id="findTypeIsBindingSubType" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.form.VehicleSubTypeForm">
+        SELECT * FROM zw_m_vehicle_type WHERE flag = 1 AND pid = #{id} ORDER BY create_data_time DESC
+    </select>
+    <select id="findVehicleTypes" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.* ,vc.vehicle_category category FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category vc  on vt.vehicle_category =vc.id and vc.flag=1
+        where vt.flag=1 AND ISNULL(vt.pid) AND vc.standard = #{standardInt}
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="findVehicleTypesByCategoryIds" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.* FROM zw_m_vehicle_type vt
+        WHERE vt.flag=1 AND ISNULL(vt.pid) AND vt.vehicle_category in
+        <foreach item="item" collection="list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ORDER BY create_data_time DESC
+    </select>
+    <select id="queryVehicleTypeByIds" resultType="java.util.Map">
+        select vehicle_type, id from zw_m_vehicle_type where id in
+        <foreach collection="ids" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getVehicleTypeAndCateGory" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vt.*,vc.vehicle_category AS category,vc.standard
+        FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category  vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        WHERE vt.flag = 1 and vt.vehicle_type = #{vehicleType} AND ISNULL(vt.pid) AND vc.standard = 1
+    </select>
+    <select id="getTypeMaps" resultType="java.util.Map">
+        SELECT
+        vtype.id as id,
+        CONCAT(vtype.vehicle_type,'(',cat.vehicle_category,')')	 as type
+        FROM
+        zw_m_vehicle_category cat,
+        zw_m_vehicle_type vtype
+        WHERE
+        vtype.flag = 1 and cat.flag =1
+        and
+        vtype.vehicle_category = cat.id
+    </select>
+
+    <!-- 根据车辆类型id查询类别信息 -->
+    <select id="getVehicleCategoryInfo" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT
+            vc.*, vt.code_num
+        FROM
+            zw_m_vehicle_category vc
+        INNER JOIN zw_m_vehicle_type vt ON vt.vehicle_category = vc.id
+        AND vc.flag = 1
+        WHERE
+            vt.id = #{typeId}
+        AND vt.flag = 1
+    </select>
+    <select id="getVehTypes" resultType="java.util.Map">
+        SELECT DISTINCT
+	vtype.vehicle_type AS type,
+	id AS id
+    FROM
+	zw_m_vehicle_type vtype
+    WHERE
+	vtype.flag = 1
+
+    </select>
+
+    <select id="getVehicleTypeId" parameterType="string" resultType="string">
+        Select id from zw_m_vehicle_type vt where vt.vehicle_type = #{vehicleType} and flag = 1
+    </select>
+
+    <select id="getServiceCycle" parameterType="string" resultType="integer">
+        select service_cycle from zw_m_vehicle_type where id = #{typeId} and flag = 1
+    </select>
+
+    <select id="getByIds" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        select id, vehicle_category, vehicle_type, description, pid, ico_id, vehicle_subtypes, driving_way, code_num,
+        service_cycle
+        from zw_m_vehicle_type
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getByVehicleId" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        select zmvt.id,
+               zmvt.vehicle_category,
+               zmvt.vehicle_type,
+               zmvt.description,
+               zmvt.pid,
+               zmvt.ico_id,
+               zmvt.vehicle_subtypes,
+               zmvt.driving_way,
+               zmvt.code_num,
+               zmvt.service_cycle
+        from zw_m_vehicle_info zmvi
+                 inner join zw_m_vehicle_type zmvt on zmvt.id = zmvi.vehicle_type and zmvt.flag = 1
+        where zmvi.id = #{vehicleId}
+          and zmvi.flag = 1
+    </select>
+
+</mapper>

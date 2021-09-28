@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.IntercomPlatFormDao">
+    <select id="findList" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigQuery" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatForm">
+        SELECT t.id,t.platform_name,t.status,t.platform_ip,t.platform_port,t.description,t.create_data_time,t.create_data_username,
+         t.update_data_time,t.update_data_username FROM zw_m_intercom_platform t where flag=1 
+         <if test="simpleQueryParam != null and simpleQueryParam!=''">
+			AND t.platform_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+		</if>
+         ORDER BY t.create_data_time DESC
+    </select>
+
+    <select id="findById" parameterType="string" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatForm">
+        SELECT t.id,t.platform_name,t.status,t.platform_ip,t.platform_port,t.description,t.create_data_time,t.create_data_username,
+        t.update_data_time,t.update_data_username FROM zw_m_intercom_platform t where flag=1 AND t.id = #{id}
+    </select>
+
+
+    <insert id="add" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatForm">
+        INSERT INTO zw_m_intercom_platform(id,platform_name,status,platform_ip,platform_port,description,flag,
+          create_data_time,create_data_username) VALUES (#{id},#{platformName},#{status},#{platformIp},
+          #{platformPort},#{description},1,#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatForm">
+        UPDATE zw_m_intercom_platform SET platform_name=#{platformName},status = #{status},flag = 1,platform_ip=#{platformIp},platform_port=#{platformPort},description = #{description},update_data_time = #{updateDataTime},update_data_username=#{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById" parameterType="string">
+        UPDATE zw_m_intercom_platform SET flag = 0  WHERE id=#{id}
+    </update>
+
+    <select id="findConfigViewList" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigQuery" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigView" >
+        SELECT pc.id,p.description AS intercom_platform_description,p.id AS intercom_platform_id,c.id AS config_id ,p.platform_port AS intercom_platform_port,p.platform_ip AS intercom_platform_ip,v.brand,v.id AS vehicle_id,p.platform_name AS intercom_platform_name
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_intercom_platform_config pc ON c.id = pc.config_id AND pc.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1
+        INNER JOIN zw_m_intercom_platform p ON p.id = pc.intercom_platform_id AND p.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+			AND (v.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+				OR p.platform_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+				)
+		</if>
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConfigViewListByVehicleId" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigView">
+        SELECT pc.id,p.description AS intercom_platform_description,p.id AS intercom_platform_id,c.id AS config_id ,p.platform_port AS intercom_platform_port,p.platform_ip AS intercom_platform_ip,v.brand,v.id AS vehicle_id,p.platform_name AS intercom_platform_name
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_intercom_platform_config pc ON c.id = pc.config_id AND pc.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1 AND v.id = #{vehicleId}
+        INNER JOIN zw_m_intercom_platform p ON p.id = pc.intercom_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConfigViewByConfigId" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigView">
+        SELECT pc.id,p.description AS intercom_platform_description,p.id AS intercom_platform_id,c.id AS config_id ,p.platform_port AS intercom_platform_port,p.platform_ip AS intercom_platform_ip,v.brand,v.id AS vehicle_id,p.platform_name AS intercom_platform_name
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_intercom_platform_config pc ON c.id = pc.config_id AND pc.flag = 1 AND pc.id = #{platformId}
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1
+        INNER JOIN zw_m_intercom_platform p ON p.id = pc.intercom_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="addConfig">
+        INSERT INTO zw_m_intercom_platform_config(id,config_id,intercom_platform_id,flag,create_data_time,create_data_username)
+        VALUES (#{id},#{configId},#{intercomPlatformId},
+        1,#{createDataTime},#{createDataUsername})
+    </select>
+
+    <select id="updateConfigById">
+        UPDATE zw_m_intercom_platform_config SET config_id = #{configId},intercom_platform_id=#{intercomPlatformId},update_data_time=#{updateDataTime},flag = 1,
+        update_data_username=#{updateDataUsername} WHERE id = #{id}
+    </select>
+
+    <select id="deleteConfigById">
+        UPDATE zw_m_intercom_platform_config SET flag = 0  WHERE id = #{id}
+    </select>
+    <select id="findConfigById" resultType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfig">
+        SELECT id,config_id,intercom_platform_id,flag,create_data_time,create_data_username,update_data_time,update_data_username
+        FROM  zw_m_intercom_platform_config WHERE id = #{id}
+    </select>
+    <select id="findConfigViewListByIds" resultType="int">
+        SELECT COUNT(0)
+        zw_m_intercom_platform_config pc
+        INNER JOIN zw_m_config c ON c.id = pc.config_id AND pc.flag = 1 AND c.flag = 1 AND pc.id=#{1}
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1 AND v.id = #{0}
+        INNER JOIN zw_m_intercom_platform p ON p.id = pc.intercom_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConFigIdByVIds" resultType="string">
+        SELECT c.id FROM zw_m_config c WHERE c.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+
+    <select id="findConFigIdByPIds" resultType="string">
+        SELECT c.config_id FROM zw_m_intercom_platform_config c WHERE c.id IN
+        <foreach item="item" collection="PIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+    
+    <select id="findConFigIdByVId" resultType="string">
+        SELECT c.id FROM zw_m_config c WHERE c.vehicle_id =#{vehicleId}
+    </select>
+    
+    <!-- 根据分组ids查询车辆（已在config中绑定，未绑定平台） -->
+	<select id="findVehicleTreeByPlatform"
+		parameterType="list"
+		resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+		SELECT distinct v.*,av.assignment_id,d.device_number,tt.support_photo_flag as isVideo FROM zw_m_vehicle_info v
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+		INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+		INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+		WHERE v.flag = 1
+		<if test="assignmentIds != null">
+			AND av.assignment_id in 
+			<foreach item="item" collection="assignmentIds" separator=","
+				open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+		<if test="assignmentIds == null">
+			AND 1=0
+		</if>
+		and d.functional_type = 3
+		and c.id not in (
+			SELECT ip.config_id FROM zw_m_intercom_platform_config ip WHERE ip.flag = 1
+		)
+		ORDER BY v.create_data_time desc
+	</select>
+
+    <!-- 根据分组ids查询车辆（已在config中绑定，未绑定平台） -->
+    <select id="findVehicleTreeByThirdPlatform"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.*,av.assignment_id,d.device_number,tt.support_photo_flag as isVideo FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1 AND d.device_type = '1'
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+</mapper>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>转发平台连接</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/connectionparamsset.css">
+    <style>
+        label.control-label {
+            padding-right: 15px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">系统管理</li>
+                        <li class="active">809管理</li>
+                        <li class="active">转发平台连接</li>
+                    </ul>
+                    <h1 class="h1 ">转发平台连接</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">809连接参数设置</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label>
+                                                <input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                       id="simpleQueryParam" name="simpleQueryParam"
+                                                       placeholder="请输入平台名称">
+                                            </label>
+                                            <button type="button" id="search_button"
+                                                    class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" style="display:none"/>
+                                        </form>
+                                    </div>
+                                    <div th:if="${hasRole}" class="dropdown pull-left">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            操作菜单<span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a th:href="@{/m/connectionparamsset/add}" data-toggle="modal"
+                                                   data-target="#commonWin"><i
+                                                    class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+                                            <li><a href="javascript:void(0);" id="del_model"><i
+                                                    class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="columns btn-group pull-right roleManagementF">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                            title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <input th:value="${hasRole}" id="permission" type="hidden"/>
+                            <table id="dataTable"
+                                   class="table table-striped table-bordered table-hover checkTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="checkbox" id="checkAll"></th>
+                                        <th>操作设置</th>
+                                        <th>平台名称</th>
+                                        <th>协议类型</th>
+                                        <th>是否开启服务</th>
+                                        <th>无效定位过滤</th>
+                                        <th>主链路客户端</th>
+                                        <th>从链路服务端</th>
+                                        <th>主链路状态</th>
+                                        <th>从链路状态</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th></th>
+                                        <th>平台名称</th>
+                                        <th>协议类型</th>
+                                        <th>是否开启服务</th>
+                                        <th>无效定位过滤</th>
+                                        <th>主链路客户端</th>
+                                        <th>从链路服务端</th>
+                                        <th>主链路状态</th>
+                                        <th>从链路状态</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <!-- <tr>
+                                    <td>1</td>
+                                    <div th:if="${hasRole}">
+                                    <td><input type="checkbox"/></td>
+                                    <td>
+                                       <button th:href="@{/m/connectionparamsset/edit}" data-toggle="modal"
+                                               data-target="#commonWin" type="button" class="editBtn editBtn-info">
+                                           <i class="fa fa-pencil"></i>修改
+                                       </button>
+                                       <button onclick="connectHandle(1)" type="button"
+                                              class="editBtn editBtn-info default-icon"><i
+                                              class="fa fa-retweet"></i>开启服务
+                                      </button>
+                                      <button onclick="connectHandle(0)" type="button"
+                                              class="editBtn editBtn-info default-icon"><i
+                                              class="fa fa-retweet"></i>关闭服务
+                                      </button>
+                                      <button onclick="connectHandle(2)" type="button"
+                                              class="editBtn editBtn-info default-icon"><i
+                                              class="fa fa-retweet"></i>主链路连接
+                                      </button>
+                                      <button onclick="connectHandle(4)" type="button"
+                                              class="deleteButton editBtn disableClick default-icon"><i
+                                              class="fa fa-chain-broken"></i>主链路注销
+                                      </button>
+                                    </td>
+                                    </div>
+                                    <td><span id="serverStatus"></span></td>
+                                    <td><span id="mainClient"></span></td>
+                                    <td><span id="branchServer"></span></td>
+                                    <td><span id="mainStatus"></span></td>
+                                    <td><span id="branchStatus"></span></td>
+                                    <td><span th:text="${result.ip}"></span></td>
+                                </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${hasRole}" class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">申请交换指定车辆定位信息</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body">
+                            <form class="form-horizontal" action="#"
+                                  method="post" role="form">
+
+                                <div class="col-md-3">
+                                    <label class="col-md-4 control-label">平台名称：</label>
+                                    <div class="input-group">
+                                        <input name="ipAddress" onchange=""
+                                               type="text" maxlength="10" class="form-control"
+                                               style="cursor: pointer; background-color: #fafafa;"
+                                               id="applyPlatform" readonly placeholder="请选择平台名称">
+                                        <div class="input-group-btn">
+                                            <button type="button"
+                                                    class="btn btn-white dropdown-toggle"
+                                                    data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                role="menu">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <input id="applyPlatformId" type="hidden">
+                                    <input id="ip" type="hidden">
+                                    <input id="centerId" type="hidden">
+                                    <input id="platFormId" type="hidden">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label">车牌号：</label> <input
+                                        class="form-control hidden"/>
+                                    <div class="col-md-2 col-sm-8">
+                                        <input autocomplete="off" type="text" class="form-control" id="brand" placeholder="请输入车牌号"/>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                    <div class="col-md-4 col-sm-8 searchListSelect">
+                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                               class="form-control layer-date laydate-icon"
+                                               id="timeInterval" name="timeInterval" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <button type="button" onclick="vehicleHandle(1)" class="btn btn-primary">
+                                            申请交换指定车辆定位信息
+                                        </button>
+                                        <button type="button" onclick="vehicleHandle(2)" class="btn btn-primary">
+                                            取消交换指定车辆定位信息
+                                        </button>
+                                        <button type="button" onclick="vehicleHandle(3)" class="btn btn-primary">
+                                            补发车辆定位信息
+                                        </button>
+                                        <button type="button" onclick="vehicleHandle(8)" class="btn btn-primary">
+                                            补发终端位置信息
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">日志列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body">
+                            <div class="col-md-3 form-horizontal form-group">
+                                <label class="col-md-4 control-label">平台名称：</label>
+                                <div class="input-group">
+                                    <input name="ipAddress" onchange=""
+                                           type="text" maxlength="10" class="form-control"
+                                           style="cursor: pointer; background-color: #fafafa;"
+                                           id="logPlatform" readonly placeholder="请选择平台名称">
+                                    <div class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-white dropdown-toggle"
+                                                data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right"
+                                            role="menu">
+                                        </ul>
+                                    </div>
+                                </div>
+                                <input id="logPlatformIp" class="hidden">
+                            </div>
+                            <table id="journalListTable"
+                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>操作时间</th>
+                                    <th>消息ID</th>
+                                    <th>消息流水号</th>
+                                    <th>操作内容</th>
+                                    <th>备注</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="showPermissionDiv" tabindex="-1"
+                 role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div th:replace="core/uum/role/permission">list</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+    <!--<div id="goTrace9301" class="modal fade" aria-hidden="true" style="position: fixed; top: 0; bottom: 500px; left: 0; right: 0; z-index: 1050;" >-->
+    <!--<div class="modal-dialog" role="document">-->
+    <!--<div class="modal-content">-->
+
+    <!--<div class="modal-header">-->
+    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>-->
+    <!--<h4 class="modal-title" id="traceParameter"><span id="msgTitle9301"></span></h4>-->
+    <!--</div>-->
+    <!--<div class="modal-body">-->
+    <!--<div class="row">-->
+    <!--<div class="form-group">-->
+    <!--<label class="col-md-4 control-label"><span id="question9301"></span></label>-->
+    <!--<div class=" col-md-7">-->
+    <!--<input type="hidden" id="infoId9301">-->
+    <!--<input type="hidden" id="msgDataType9301">-->
+    <!--<input type="hidden" id="objectType9301">-->
+    <!--<input type="hidden" id="objectId9301">-->
+    <!--<input type="hidden" id="serverIp9301">-->
+    <!--<input type="text" class="form-control" id="answer9301" />-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="modal-footer">-->
+    <!--<button type="button" id="parameters" class="btn btn-primary" onclick="platformMsgAck(9301)">确定</button>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div id="goTrace9302" class="modal fade" aria-hidden="true" style="position: fixed; top: 250px; bottom: 0; left: 0; right: 0; z-index: 1050;">-->
+    <!--<div class="modal-dialog" role="document">-->
+    <!--<div class="modal-content">-->
+
+    <!--<div class="modal-header">-->
+    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>-->
+    <!--<h4 class="modal-title" id="traceParameter"><span id="msgTitle9302"></span></h4>-->
+    <!--</div>-->
+    <!--<div class="modal-body">-->
+    <!--<div class="row">-->
+    <!--<div class="form-group">-->
+    <!--<label class="col-md-4 control-label"><span id="question9302"></span></label>-->
+    <!--<div class=" col-md-7">-->
+    <!--<input type="hidden" id="infoId9302">-->
+    <!--<input type="hidden" id="msgDataType9302">-->
+    <!--<input type="hidden" id="objectType9302">-->
+    <!--<input type="hidden" id="objectId9302">-->
+    <!--<input type="hidden" id="serverIp9302">-->
+    <!--<input type="text" class="form-control" id="answer9302"/>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="modal-footer">-->
+    <!--<button type="button" id="parameters" class="btn btn-primary" onclick="platformMsgAck(9302)">确定</button>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <div class="modal fade" id="alarmSetmodal" aria-hidden="true" data-backdrop="static" role="dialog">
+        <div class="modal-dialog modal-lg" role="document" style="width: 60%;">
+            <div class="modal-content form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><span>修改报警设置</span></h4>
+                </div>
+                <form id="alarmSetForm">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-md-2 col-md-offset-1">
+                                <p id="alarmTypeTit">809报警类型</p>
+                                <p class="verticalBar">|</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>平台转发报警类型</p>
+                                <p class="verticalBar">|</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p style="overflow: visible;position: relative;">
+                                <span style="position: relative;padding: 0 20px">
+                                    <i style="margin-left:-1px;"
+                                       class="fa fa-question-circle fa-lg"
+                                       data-toggle="tooltip"
+                                       data-placement="left"
+                                       data-original-title="上报间隔时间，单位为秒，范围0-1800"></i>
+                                    上报间隔时间(s)
+                                </span>
+
+                                    <!--<div style="float: left;">-->
+                                    <!--<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围1-10，缺省值3"></i>-->
+                                    <!--</div>-->
+
+
+                                </p>
+
+                                <p class="verticalBar">|</p>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">主动安全报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value=""
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass" pos809="0x0001"
+                                       id="groupSelect" name="groupSelect1" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan"></span>
+                                <div id="menuContent" class="menuContent">
+                                    <ul id="treeTypeDemo" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime"
+                                       name="alarmTime"/>
+
+                            </div>
+                        </div>-->
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">超速报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value=""
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass" pos809="0x0001"
+                                       id="groupSelect1" name="groupSelect1" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan1"></span>
+                                <div id="menuContent1" class="menuContent">
+                                    <ul id="treeTypeDemo1" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime1"
+                                       name="alarmTime1"/>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">疲劳驾驶报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0002"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect2" name="groupSelect2" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan2"></span>
+                                <div id="menuContent2" class="menuContent">
+                                    <ul id="treeTypeDemo2" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime2"
+                                       name="alarmTime2"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">紧急报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0003"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect3" name="groupSelect3" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan3"></span>
+                                <div id="menuContent3" class="menuContent">
+                                    <ul id="treeTypeDemo3" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime3"
+                                       name="alarmTime3"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">进入指定区域报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0004"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect4" name="groupSelect4" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan4"></span>
+                                <div id="menuContent4" class="menuContent">
+                                    <ul id="treeTypeDemo4" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime4"
+                                       name="alarmTime4"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">离开指定区域报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0005"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect5" name="groupSelect5" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan5"></span>
+                                <div id="menuContent5" class="menuContent">
+                                    <ul id="treeTypeDemo5" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime5"
+                                       name="alarmTime5"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">路段堵塞报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0006"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect6" name="groupSelect6" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan6"></span>
+                                <div id="menuContent6" class="menuContent">
+                                    <ul id="treeTypeDemo6" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime6"
+                                       name="alarmTime6"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">危险路段报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0007"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect7" name="groupSelect7" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan7"></span>
+                                <div id="menuContent7" class="menuContent">
+                                    <ul id="treeTypeDemo7" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime7"
+                                       name="alarmTime7"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">越界报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0008"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect8" name="groupSelect8" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan8"></span>
+                                <div id="menuContent8" class="menuContent">
+                                    <ul id="treeTypeDemo8" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime8"
+                                       name="alarmTime8"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">盗警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0009"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect9" name="groupSelect9" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan9"></span>
+                                <div id="menuContent9" class="menuContent">
+                                    <ul id="treeTypeDemo9" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime9"
+                                       name="alarmTime9"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">劫警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x000A"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect10" name="groupSelect10" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan10"></span>
+                                <div id="menuContent10" class="menuContent">
+                                    <ul id="treeTypeDemo10" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime10"
+                                       name="alarmTime10"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">偏离路线报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x000B"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect11" name="groupSelect11" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan11"></span>
+                                <div id="menuContent11" class="menuContent">
+                                    <ul id="treeTypeDemo11" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime11"
+                                       name="alarmTime11"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">车辆移动报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x000C"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect12" name="groupSelect12" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan12"></span>
+                                <div id="menuContent12" class="menuContent">
+                                    <ul id="treeTypeDemo12" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime12"
+                                       name="alarmTime12"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">超时驾驶报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x000D"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect13" name="groupSelect13" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan13"></span>
+                                <div id="menuContent13" class="menuContent">
+                                    <ul id="treeTypeDemo13" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime13"
+                                       name="alarmTime13"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">其他报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x00FF"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect14" name="groupSelect14" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan14"></span>
+                                <div id="menuContent14" class="menuContent">
+                                    <ul id="treeTypeDemo14" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime14"
+                                       name="alarmTime14"/>
+                            </div>
+                        </div>
+                        <div class="form-group xzAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">视频行为报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0024_xz"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect15" name="groupSelect15" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan15"></span>
+                                <div id="menuContent15" class="menuContent">
+                                    <ul id="treeTypeDemo15" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime15"
+                                       name="alarmTime15"/>
+                            </div>
+                        </div>
+                        <div class="form-group xzAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">凌晨停运报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0026"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect16" name="groupSelect16" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan16"></span>
+                                <div id="menuContent16" class="menuContent">
+                                    <ul id="treeTypeDemo16" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime16"
+                                       name="alarmTime16"/>
+                            </div>
+                        </div>
+                        <div class="form-group xzAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">终端故障报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0028"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect17" name="groupSelect17" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan17"></span>
+                                <div id="menuContent17" class="menuContent">
+                                    <ul id="treeTypeDemo17" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime17"
+                                       name="alarmTime17"/>
+                            </div>
+                        </div>
+                        <div class="form-group sxAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">夜间超速报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0021"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect18" name="groupSelect18" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan18"></span>
+                                <div id="menuContent18" class="menuContent">
+                                    <ul id="treeTypeDemo18" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime18"
+                                       name="alarmTime18"/>
+                            </div>
+                        </div>
+                        <div class="form-group sxAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">夜间异动报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0022"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect19" name="groupSelect19" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan19"></span>
+                                <div id="menuContent19" class="menuContent">
+                                    <ul id="treeTypeDemo19" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime19"
+                                       name="alarmTime19"/>
+                            </div>
+                        </div>
+                        <div class="form-group sxAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">客车超员:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0023"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect20" name="groupSelect20" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan20"></span>
+                                <div id="menuContent20" class="menuContent">
+                                    <ul id="treeTypeDemo20" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime20"
+                                       name="alarmTime20"/>
+                            </div>
+                        </div>
+                        <div class="form-group sxAlarm">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">异常驾驶行为:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0024_sx"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect21" name="groupSelect21" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan21"></span>
+                                <div id="menuContent21" class="menuContent">
+                                    <ul id="treeTypeDemo21" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime21"
+                                       name="alarmTime21"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">视频信号丢失报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0101"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect22" name="groupSelect22" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan22"></span>
+                                <div id="menuContent22" class="menuContent">
+                                    <ul id="treeTypeDemo22" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime22"
+                                       name="alarmTime22"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">视频信号遮挡报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0102"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect23" name="groupSelect23" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan23"></span>
+                                <div id="menuContent23" class="menuContent">
+                                    <ul id="treeTypeDemo23" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime23"
+                                       name="alarmTime23"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">存储单元故障报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0103"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect24" name="groupSelect24" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan24"></span>
+                                <div id="menuContent24" class="menuContent">
+                                    <ul id="treeTypeDemo24" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime24"
+                                       name="alarmTime24"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">其他视频设备故障报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0104"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect25" name="groupSelect25" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan25"></span>
+                                <div id="menuContent25" class="menuContent">
+                                    <ul id="treeTypeDemo25" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime25"
+                                       name="alarmTime25"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">客车超员报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0105"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect26" name="groupSelect26" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan26"></span>
+                                <div id="menuContent26" class="menuContent">
+                                    <ul id="treeTypeDemo26" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime26"
+                                       name="alarmTime26"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">异常驾驶行为报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0106"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect27" name="groupSelect27" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan27"></span>
+                                <div id="menuContent27" class="menuContent">
+                                    <ul id="treeTypeDemo27" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime27"
+                                       name="alarmTime27"/>
+                            </div>
+                        </div>
+                        <div class="form-group Alarm-1078">
+                            <div class="col-md-3" style="text-align: right;">
+                                <label class="control-label">特殊报警录像达到存储阈值报警:</label>
+                            </div>
+                            <div class="col-md-4 has-feedback">
+                                <input style="cursor: pointer; background-color: #fafafa;" value="" pos809="0x0107"
+                                       placeholder="请选择报警类型" class="form-control groupSelectClass"
+                                       id="groupSelect28" name="groupSelect28" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan28"></span>
+                                <div id="menuContent28" class="menuContent">
+                                    <ul id="treeTypeDemo28" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input autocomplete="off" class="form-control" placeholder="请输入上报间隔时间" value="0" id="alarmTime28"
+                                       name="alarmTime28"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="doSubmit">保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <label id="error_label" class='error' style='display: none;'></label>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<script src="/wro/connectionparamsset.js" th:src="@{/wro/connectionparamsset.js}"></script>
+<script th:inline="javascript">
+    var publicDelete = [[#{public.delete}]];
+    var selectItem = [[#{select.item}]];
+</script>
+</body>
+</html>

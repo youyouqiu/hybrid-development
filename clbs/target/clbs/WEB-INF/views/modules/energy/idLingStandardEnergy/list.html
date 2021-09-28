@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>怠速能耗基准管理</title>
+<div th:replace="fragments/header">header</div>
+<link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}" />
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+    	<div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">能源管理</li>
+                        <li class="active">移动源基准管理</li>
+                        <li class="active">怠速能耗基准管理</li>
+                    </ul>
+                    <h1 class="h1 ">怠速能耗基准管理</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch2-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <div class="col-md-3">
+                                        <label class="col-md-3 control-label">组织：</label>
+                                        <div class="has-feedback fastClear col-md-9">
+                                            <input type="text" style="cursor: pointer; background-color: #fafafa;"  placeholder="请选择组织" class="form-control" id="groupSelect" autocomplete="off"/>
+                                            <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;" aria-hidden="true" id="groupSelectSpan"></span>
+                                            <div id="menuContent" class="menuContent">
+                                                <ul id="treeDemo" class="ztree"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 control-label searchListSelect">监控对象：</label>
+                                        <div class="col-md-9 searchListSelect">
+                                            <div style="position:relative;">
+                                                <div class="input-group">
+                                                    <input name="charSelect" style="padding: 0 6px" type="text" placeholder="已绑传感器的监控对象" class="form-control" maxlength="20" id="charSelect">
+                                                    <div class="input-group-btn">
+                                                        <button type="button" id="button" class="btn btn-white dropdown-toggle disabled loading-state-button" data-toggle="dropdown">
+                                                            <i class="fa fa-spinner loading-state"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="col-md-2 control-label searchListSelect">时间：</label>
+                                        <div class="col-md-10 searchListSelect">
+                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                   class="form-control layer-date laydate-icon"
+                                                   id="timeInterval" name="timeInterval" placeholder="请选择未开启空调的怠速时间段" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <button id="todayClick" type="button" class="btn btn-primary" name="0" onclick="idLingStandardEnergyList.inquireClick(0)">今天</button>
+                                        <button id="yesterdayClick" type="button"class="btn btn-primary" name="-1" onclick="idLingStandardEnergyList.inquireClick(-1)">前一天  </button>
+                                        <button id="nearlyThreeDays" type="button"class="btn btn-primary" name="-3" onclick="idLingStandardEnergyList.inquireClick(-3)">前三天  </button>
+                                        <button id="nearlySevenDays" type="button"class="btn btn-primary" name="-7" onclick="idLingStandardEnergyList.inquireClick(-7)">前七天 </button>
+                                        <button id="inquireClick" onclick="idLingStandardEnergyList.inquireClick(1)" type="button"
+                                                class="btn btn-primary search-btn"><i class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" id="graphArea">
+                        <div class="panel-heading" id="graphAreaHead" style="cursor: pointer;">
+                            <h3 class="panel-title fwb" style="position:relative;">怠速能耗图表
+                            	<div class="carName" id="echartsShow">
+		                            <i class="toopTip-btn-left" onclick="idLingStandardEnergyList.left_arrow()">
+		                            	<img data-toggle="tooltip" data-placement="left" title="上一辆" src="../../../../clbs/resources/img/car-left.svg" width="16px"/>
+		                            </i>&nbsp;&nbsp;&nbsp;
+		                            <span id="carName"></span>&nbsp;&nbsp;&nbsp;
+		                            <i class="toopTip-btn-right" onclick="idLingStandardEnergyList.right_arrow()">
+		                            <img data-toggle="tooltip" data-placement="right" title="下一辆" src="../../../../clbs/resources/img/car-right.svg" width="16px"/></i>
+	                            </div>
+                            </h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-up" id="showClick"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="graphShow" style="display: none;">
+                        	<div class="container-area">
+	                            <div id="sjcontainer" style="height: 600px;width:100%; margin: 0 auto">
+	                            </div>
+	                            <i class="left-btn" id="right-arrow"></i>
+	                            <i class="right-btn" id="left-arrow"></i>
+	                            <div class="form-horizontal table-top hidden" id="addCriterionTime">
+	                                <div class="form-group">
+	                                    <label class="col-md-2 col-sm-3 col-md-offset-1 control-label">基准开始时间：</label> 
+	                                    <div class="has-feedback col-md-2 col-sm-8">
+	                                        <input type="text" placeholder="" class="form-control" id="criterionStartTime" readonly />
+	                                    </div>
+	                                    <label class="col-md-2 col-sm-3 control-label">基准结束时间：</label> 
+	                                    <div class="has-feedback col-md-2 col-sm-8">
+	                                        <input type="text" placeholder="" class="form-control" id="criterionEndTime" readonly />
+	                                    </div>
+	                                    <div class="col-md-2">
+	                                        <button id="criterionDataAdd" type="button" class="btn btn-primary">添&nbsp;加</button>
+	                                    </div>
+	                                </div>
+	                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">数据列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body tableFEStyle" style="overflow:auto;" id="stretch-body">
+                        	<div class="col-md-12 form-horizontal hidden" id="dataStatistics">
+                            	<div class="form-group">
+                            		<label class="col-md-1 col-sm-3 control-label">总怠速时长：</label> 
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="allRunMileage" readonly />
+                                    </div>
+                            		<label class="col-md-2 col-sm-3 control-label">总怠速能耗量：</label>
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="allRunOil" readonly />
+                                    </div>
+                            		<label class="col-md-2 col-sm-3 control-label">怠速能耗基准：</label>
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="runOilCriterion" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group" style="clear: both;">
+                            		<label class="col-md-1 col-sm-3 control-label">慢速里程：</label> 
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="averageSpeed" readonly />
+                                    </div>
+                            		<label class="col-md-2 col-sm-3 control-label"> CO₂总排放量：</label>
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="coTotalCap" readonly />
+                                    </div>
+                                    <label class="col-md-2 col-sm-3 control-label">怠速 CO₂排放基准：</label>
+                                    <div class="has-feedback col-md-2 col-sm-8">
+                                        <input type="text" placeholder="" class="form-control" id="coBaseCap" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="criterionDataTable" class="table table-striped table-bordered table-hover btnTable" cellspacing="0"
+                                   width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>操作设置</th>
+                                    <th>监控对象</th>
+                                    <th>所属企业</th>
+                                    <th>车辆类型</th>
+                                    <th>燃料类别</th>
+                                    <th>基准开始时间</th>
+                                    <th>基准结束时间</th>
+                                    <th>怠速时长</th>
+                                    <th>慢速里程</th>
+                                    <th>怠速能耗量</th>
+                                    <th>怠速能耗基准</th>
+                                    <th>怠速 CO₂排放基准</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+	var endTimegtStarTime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+	var timeError = [[#{time.error}]];
+	var baseinfoEndtime = [[#{baseinfo.endtime}]];
+	var baseinfoStartime = [[#{baseinfo.startime}]];
+	var baseDataMax10 = [[#{base.data.max10}]];
+	var selectMonitoringObjec = [[#{select.monitoring.objec}]];
+	var maxSelectItem = [[#{max.select.item}]];
+	var timeScopeHour = [[#{time.scope.1hour}]];
+	var timeScopeDay = [[#{time.scope.7day}]];
+	var publicDelete = [[#{public.delete}]];
+</script>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+<script src="resources/js/dataTables/js/dataTablesBootstrap.js" th:src="@{/resources/js/dataTables/js/dataTablesBootstrap.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/resources/js/idLingStandardEnergyList.js" th:src="@{/resources/js/idLingStandardEnergyList.js}"></script>
+</html>

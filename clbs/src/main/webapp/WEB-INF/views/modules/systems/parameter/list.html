@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>参数下发</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section class="">
+    <input id = "vehicleList"  th:value="${vehicleList}" type="text" hidden="false" />
+    <div th:replace="fragments/nav">nav</div>
+    <div th:replace="fragments/menu">menu</div>
+    <section class="main-content-wrapper">
+        <section id="main-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--breadcrumbs start -->
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">系统管理</li>
+                        <li class="active">参数下发</li>
+                    </ul>
+                    <!--breadcrumbs end -->
+                    <h1 class="h1 ">参数下发</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i> <!-- <i class="fa fa-times"></i> -->
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                               <form  class="form-horizontal" action="#" method="post" role="form">
+                                    <div class="form-group" style="margin-bottom:0;">
+                                        <label class="col-md-3 control-label">组织：</label>
+                                        <input class="form-control hidden" id="groupId"/>
+                                        <div class="has-feedback col-md-3">
+
+                                            <input name="groupId" class="form-control" id="zTreeCitySel"
+                                            placeholder="请选择分组" readonly="readonly" style="background-color: #fafafa; cursor: pointer;"  type="text" onclick="showMenu(this);" />
+                                            <span class="fa fa-chevron-down form-control-feedback"
+                                            aria-hidden="true" onclick="showMenu(this);"></span>
+                                            <div class="ztreeModelBox" id="zTreeContent">
+                                                <ul id="ztreeDemo" class="ztree"></ul>
+                                            </div>
+                                            </div>
+                                            <label class="col-md-1 control-label">监控对象：</label>
+                                            <div class="col-md-3 ">
+                                                <div class="input-group">
+                                                   <input name="brands" type="text" class="form-control"
+                                                   id="brands">
+                                                   <div class="input-group-btn">
+                                                       <button type="button"
+                                                       class="btn btn-white dropdown-toggle"
+                                                       data-toggle="dropdown">
+                                                       <span class="caret"></span>
+                                                   </button>
+                                                   <ul class="dropdown-menu dropdown-menu-right"
+                                                   role="menu">
+                                               </ul>
+                                           </div>
+                                           <!-- /btn-group -->
+                                       </div>
+                                       <input id="monitoring" name="brandID" class="hidden">
+                                                <!-- <select name="gender" placeholder="请选择"
+                                                    class="form-control">
+                                                </select> -->
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">下发状态：</label>
+                                            <div class="col-md-3">
+                                                <select id = "status" name="gender" placeholder="请选择"
+                                                class="form-control">
+                                                <option value="">全部</option>
+                                                <option value=1>下发成功</option>
+                                                <option value=0>下发失败</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-md-1 control-label">参数类型：</label>
+                                        <div class="col-md-3 ">
+                                            <select id= "parameterType" name="gender" placeholder="请选择"
+                                            class="form-control">
+                                            <option value="">全部</option>
+                                            <option value="1">电子围栏</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">名称：</label>
+                                    <div class="col-md-3">
+                                        <input id= "name" name="engineNumber" placeholder="请输入名称"
+                                        type="text"
+                                        class="form-control"/>
+                                    </div>
+                                    <label class="col-md-1 control-label">终端手机号：</label>
+                                    <div class="col-md-3 ">
+                                        <input id = "simcard" name="engineNumber" placeholder="请输入终端手机号"
+                                        type="text"
+                                        class="form-control"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">终端号：</label>
+                                    <div class="col-md-3">
+                                        <input id = "device" name="engineNumber" placeholder="请输入终端号"
+                                        type="text"
+                                        class="form-control"/>
+                                    </div>
+                                    <div class="col-md-3 col-md-offset-1">
+                                        <button type="button" onclick="myTable.filter()" class="btn btn-primary">搜索</button>
+                                <button id = "resetBtn" type="button" class="btn btn-default">重置</button>
+                                    </div>
+                                </div>
+                                </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">下发列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i> <!-- <i class="fa fa-times"></i> -->
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                               <div class="fixed-table-body">
+                                    <div class="form-group" style="margin-bottom:10px;">
+                                        <button id = "sendParam" type="button" class="btn btn-primary nextBtnBrand">参数下发</button>
+                                        <button type="button" class="btn btn-primary">刷新</button>
+                                    </div>
+                                <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 1px; padding: 0"></th>
+                                            <th style="width: 30px; padding: 10px"><input type="checkbox" id="checkAll"></th>
+                                            <th>操作设置</th>
+                                            <th>监控对象</th>
+                                            <th>组织</th>
+                                            <th>终端号</th>
+                                            <!-- <th>设备状态</th> -->
+                                            <th>终端手机号</th>
+                                            <th>参数类型</th>
+                                            <th>名称</th>
+                                            <th>下发时间</th>
+                                            <th>下发状态</th>
+                                            <th>下发类型</th>
+                                           <!--  <th>备注</th>     -->
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+ </body>
+<script src="resources/js/webSocket.js"
+		th:src="@{/resources/js/webSocket.js}"></script>
+<script th:inline="javascript">
+//		 webSocket.init('/clbs/vehicle');
+		 var params = [];
+		 $.ajax({
+			    type: 'POST',
+			    url: '/clbs/m/basicinfo/monitoring/vehicle/subscribeVehicleList',
+			    dataType: 'json',
+			    async:false,
+			    success: function (data) {
+			       if (data != null && data.length >0){
+			    	   for (var i=1; i<data.length; i++) {
+			    		   var obj = new Object();
+				           obj.vehicleID = data[i].id;
+				           params.push(obj)
+			    	   }
+			       }
+			        //订阅所有车辆
+			        var requestStrS = {
+			            "desc": {
+			                "MsgId": 40964,
+			                "UserName": $("#userName").attr("value")
+			            },
+			            "data": params
+			        };
+			        	 // 订阅全部车辆
+			         //    webSocket.send("/app/vehicle/subscribecachestatus", requestStrS);
+			            // 接收到消息
+			      	 webSocket.subscribe('/topic/fencestatus', updataFenceData,"/app/vehicle/subscribecachestatus", requestStrS);
+			    },
+			    error: function () {
+			    	layer.msg([[#{system.error}]], {move: false});
+			    }
+			});
+
+		 function updataFenceData(msg){
+			  if (msg != null) {
+				  var result = $.parseJSON(msg.body);
+					 if (result != null) {
+						 myTable.refresh();
+					 }
+				 }
+		  }
+
+			//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+		 window.onbeforeunload = function ()
+		 {
+			 var cancelStrS = {
+		            "desc": {
+		                "MsgId": 40964,
+		                "UserName": $("#userName").text()
+		            },
+		            "data": params
+		        };
+			  webSocket.unsubscribealarm("/app/vehicle/unsubscribestatus", cancelStrS);
+		 }
+
+
+    // 车辆list
+    var vehicleList = JSON.parse($("#vehicleList").attr("value"));
+    //显示隐藏列
+    var menu_text = "";
+    var table = $("#dataTable tr th:gt(1)");
+    for(var i = 0; i < table.length; i++){
+        menu_text += "<li><label><input type=\"checkbox\" class=\"toggle-vis\" data-column=\"" + parseInt(i+2) +"\" />"+ table[i].innerHTML +"</label></li>"
+    };
+    $("#Ul-menu-text").html(menu_text);
+    /*<![CDATA[*/
+    //表格
+    var myTable;
+    //表格列定义
+    var columnDefs = [ {
+        //第一列，用来显示序号
+        "searchable" : false,
+        "orderable" : false,
+        "targets" : 0
+    } ];
+    var columns = [{
+        //第一列，用来显示序号
+        "data" : null,
+        "class" : "text-center"
+    }, {
+        //第一列，用来显示序号
+        "data" : null,
+        "class" : "text-center",
+        render: function (data, type, row, meta) {
+            var result = '';
+           // if (row.status == "0") {
+           	 	result += '<input  type="checkbox" name="subChk"  value="' + row.id + '" />';
+           //}
+            return result;
+            }
+    },
+        {
+            "data" : null,
+            "class" : "text-center", //最后一列，操作按钮
+            render : function(data, type, row, meta) {
+                var reLoadUrlPre = /*[[@{/m/systems/parameter/reload_{id}.gsp}]]*/'url';
+                var result = '';
+                //重新下发按钮
+               // if (row.status == "0") {
+                result += ' <button onclick="reload(\''+row.id+'\')" class="editBtn editBtn-info" type="button"><i class="fa fa-edit"></i>重新下发</button>&nbsp;'
+             //  }
+				return result;
+            }
+        }, {
+            "data" : "monitoring",
+            "class" : "text-center"
+        },  {
+            "data" : "groupName",
+            "class" : "text-center"
+        },{
+            "data" : "device",
+            "class" : "text-center"
+
+        },
+/*         {
+            "data" : "equipment",
+            "class" : "text-center"
+        }, */
+        {
+            "data" : "simcard",
+            "class" : "text-center"
+        },{
+            "data" : "parameterType",
+            "class" : "text-center",
+            render : function(data, type, row, meta) {
+                if (data == "1") {
+                    return '电子围栏';
+                }else{
+                    return "";
+                }
+            }
+        },{
+            "data" : "name",
+            "class" : "text-center"
+        },{
+            "data" : "downTime",
+            "class" : "text-center"
+        },{
+            "data" : "status",
+            "class" : "text-center",
+            render : function(data, type, row, meta) {
+            	 if (data == "0") {
+                     return '指令已生效';
+                 } else if (data == "1") {
+                 	return '指令未生效';
+                 } else if (data == "2") {
+                 	return "指令未生效";
+                 } else if (data == "3") {
+                 	return "指令未生效";
+                 } else if (data == "4") {
+                 	return "指令已发出";
+                 } else if  (data == "5") {
+                 	return "指令未生效（终端离线）";
+                 } else {
+                     return "";
+                 }
+            }
+        },{
+            "data" : "directiveName",
+            "class" : "text-center",
+            render : function(data, type, row, meta) {
+                if (data == "1") {
+                    return '绑定围栏';
+                } else if (data == "2") {
+                    return '解绑围栏';
+                }else{
+                    return "";
+                }
+            }
+        }
+/*         ,{
+            "data" : "remark",
+            "class" : "text-center"
+        } */
+        ];
+
+    var vList = [];
+    if (vehicleList != null && vehicleList.length > 0) {
+        for (var i=0; i< vehicleList.length; i++) {
+            vList.push(vehicleList[i].id);
+        }
+    }
+    //ajax参数
+    var ajaxDataParamFun = function(d) {
+        d.groupId = $('#groupId').val(); //模糊查询
+        d.monitoring = $('#monitoring').attr("value");
+        d.status = $('#status').val();
+        d.name = $('#name').val();
+        d.simcard = $('#simcard').val();
+        d.device = $('#device').val();
+        d.vehicleIds =  vList.toString();
+        d.parameterType = $('#parameterType').val();
+    };
+
+	// 重新下发
+	function reload(id) {
+	//	sendSubscribe();
+		 layer.load(2);
+		 $.ajax({
+             type: "POST",
+             url: "/clbs/m/systems/parameter/reload",
+             data: {
+                 "ids": id
+             },
+             dataType: "json",
+             success: function (data) {
+            	 layer.closeAll('loading');
+            	 layer.msg([[#{send.command.complete}]] ,{closeBtn: 0}, function(refresh){
+            		 myTable.refresh(); //执行的刷新语句
+            		 layer.close(refresh);
+            	 });
+             }
+		 })
+	}
+
+    //表格setting
+    var setting = {
+        listUrl:/*[[@{/m/systems/parameter/list}]]*/'url',
+//        listUrl : /*[[@{/c/user/list.gsp}]]*/'url',
+        editUrl : "/clbs/m/basicinfo/monitoring/ThingInfo/edit_",
+        deleteUrl :"/clbs/m/basicinfo/monitoring/ThingInfo/delete_",
+        deletemoreUrl: /*[[@{/m/basicinfo/monitoring/ThingInfo/deletemore}]]*/'url',
+        enableUrl : /*[[@{/c/user/enable_}]]*/'url',
+        disableUrl : /*[[@{/c/user/disable_}]]*/'url',
+        columnDefs : columnDefs, //表格列定义
+        columns : columns, //表格列
+        dataTableDiv : 'dataTable', //表格
+        ajaxDataParamFun : ajaxDataParamFun, //ajax参数
+        pageable : true, //是否分页
+        showIndexColumn : true, //是否显示第一列的索引列
+        enabledChange : true
+    };
+    //全选
+    $("#checkAll").click(function () {
+        $("input[name='subChk']").prop("checked",this.checked);
+    });
+    //单选
+    var subChk = $("input[name='subChk']");
+    subChk.click(function () {
+        $("#checkAll").prop("checked",subChk.length ==subChk.filter(":checked").length ? true:false );
+    });
+
+    //创建表格ter
+    myTable = new TG_Tabel.createNew(setting);
+    //批量删除
+    $("#sendParam").click(function () {
+        //判断是否至少选择一项
+        var chechedNum=$("input[name='subChk']:checked").length;
+        if(chechedNum==0){
+            layer.msg([[#{select.item}]]);
+            return false;
+        }
+        var checkedList = new Array();
+        sendFlag = true;
+        $("input[name='subChk']:checked").each(function () {
+            checkedList.push($(this).val());
+        });
+        // 参数下发
+        reload(checkedList.toString());
+    });
+
+    // 清空
+    $("#resetBtn").click(function () {
+    	$("#groupId").val("");
+    	$("#zTreeCitySel").val("");
+        $('#monitoring').attr("value","");
+        $("#brands").val("");
+        $("#status option").removeAttr("selected");
+        $("#parameterType option").removeAttr("selected");
+        $('#name').val('');
+        $('#simcard').val('');
+        $('#device').val('');
+        myTable.refresh();
+    });
+
+    // 树结构
+    var setting = {
+            async : {
+                url : "/clbs/m/basicinfo/enterprise/professionals/tree",
+                tyoe : "post",
+                enable : true,
+                autoParam : [ "id" ],
+                contentType : "application/json",
+                dataType : "json",
+            },
+            view : {
+                dblClickExpand : false
+            },
+            data : {
+                simpleData : {
+                    enable : true
+                }
+            },
+            callback : {
+                beforeClick : beforeClick,
+                onClick : onClick
+
+            }
+        };
+        function beforeClick(treeId, treeNode) {
+            var check = (treeNode);
+            return check;
+        }
+        function onClick(e, treeId, treeNode) {
+            var zTree = $.fn.zTree.getZTreeObj("ztreeDemo"), nodes = zTree
+                    .getSelectedNodes(), v = "";
+            n = "";
+            nodes.sort(function compare(a, b) {
+                return a.id - b.id;
+            });
+            for (var i = 0, l = nodes.length; i < l; i++) {
+                n += nodes[i].name;
+                v += nodes[i].id + ",";
+            }
+            if (v.length > 0)
+                v = v.substring(0, v.length - 1);
+            var cityObj = $("#zTreeCitySel");
+            $("#groupId").val(v);
+            cityObj.val(n);
+            $("#zTreeContent").hide();
+        }
+
+        function showMenu(e) {
+            if ($("#zTreeContent").is(":hidden")) {
+            	var width = $(e).parent().width();
+    			$("#zTreeContent").css("width",width + "px");
+            	$(window).resize(function() {
+                	var width = $(e).parent().width();
+        			$("#zTreeContent").css("width",width + "px");
+            	})
+                $("#zTreeContent").show();
+            } else {
+                $("#zTreeContent").hide();
+            }
+
+            $("body").bind("mousedown", onBodyDown);
+        }
+        function hideMenu() {
+            $("#zTreeContent").fadeOut("fast");
+            $("body").unbind("mousedown", onBodyDown);
+        }
+        function onBodyDown(event) {
+            if (!(event.target.id == "menuBtn" || event.target.id == "zTreeContent" || $(
+                    event.target).parents("#zTreeContent").length > 0)) {
+                hideMenu();
+            }
+        }
+
+    //加载完成后执行
+    $(function() {
+        // 初始化车辆数据
+        var dataList = {value: []};
+         if (vehicleList != null && vehicleList.length > 0) {
+                for (var i=0; i< vehicleList.length; i++) {
+                    var obj = {};
+                    obj.id = vehicleList[i].id;
+                    obj.name = vehicleList[i].brand;
+                    dataList.value.push(obj);
+                }
+            }
+         $("#brands").bsSuggest({
+             indexId: 1,  //data.value 的第几个数据，作为input输入框的内容
+             indexKey: 0, //data.value 的第几个数据，作为input输入框的内容
+             idField: "id",
+             keyField: "name",
+             effectiveFields: ["name"],
+             searchFields:["id"],
+             data: dataList
+         }).on('onDataRequestSuccess', function (e, result) {
+         }).on('onSetSelectValue', function (e, keyword, data) {
+             $("#monitoring").attr("value",keyword.id)
+         }).on('onUnsetSelectValue', function () {
+         });
+
+        //表格初始化
+        myTable.init();
+        $.fn.zTree.init($("#ztreeDemo"), setting, null);
+    });
+    /*]]>*/
+</script>
+</html>

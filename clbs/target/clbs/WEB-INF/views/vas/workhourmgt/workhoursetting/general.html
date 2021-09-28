@@ -1,0 +1,197 @@
+<form method="post" th:object="${result}" id="editReadConventionalForm" th:action="@{/v/workhourmgt/workhoursetting/updateSensorSetting}" role="form" class="form-horizontal">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel2">传感器常规参数</h4>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <label class="col-md-3 control-label">监控对象：</label>
+        <div class="col-md-3">
+            <input type="hidden" id="readConventionalVehicleId" th:field="*{vehicleId}" name="vehicleId"/>
+            <input type="hidden" id="sensorSequence" name="sensorType" th:field="*{sensorSequence}"/>
+            <input type="hidden" id="setting_id" name="id" th:field="*{id}"/>
+            <input type="hidden" id="cg_deal_type" name="deal_type" value="pt"/>
+            <input type="hidden" id="temp_send_vehicle_msg_id" value="0">
+            <input style="cursor:pointer" name="rcNumberPlate" th:field="*{plateNumber}" id="conventionalBrand" placeholder="" class="form-control" readonly/>
+            <input type="hidden" id="pdetectionMode" th:field="*{detectionMode}">
+        </div>
+        <label class="col-md-2 control-label">传感器型号：</label>
+        <div class="col-md-3">
+            <input style="cursor: pointer" id="rcSensorModel" th:field="*{sensorNumber}" name="" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-md-3 control-label"></label>
+        <div class="col-md-3">
+            <label class="control-label">传感器上报参数</label>
+        </div>
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-3">
+            <label class="control-label">平台设置参数</label>
+        </div>
+    </div>
+    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">传感器ID：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sid" name="" placeholder="" class="form-control" readonly/>
+        </div>
+        <label class="col-md-2 control-label">传感器ID：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pid"  th:field="*{sensorPeripheralID}" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">补偿使能：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="scompensation" name="" placeholder="" class="form-control" readonly/>
+        </div>
+        <label class="col-md-2 control-label">补偿使能：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pcompensation" th:field="*{compensateStr}"  name="compensationCanMakeStr" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">滤波系数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sfilteringFactor" name="" placeholder="" class="form-control" readonly/>
+        </div>
+        <label class="col-md-2 control-label">滤波系数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pfilteringFactor" th:field="*{filterFactorStr}" name="filteringFactorStr" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">检测方式：</label>
+        <div class="col-md-3">
+            <select readonly=""  id="sdetectionMode"  class="form-control " style="background-image:none;" th:field="*{detectionMode}">
+                <option value="0" selected></option>
+                <option value="1">电压比较式</option>
+                <option value="2">油耗阈值式</option>
+                <option value="3">油耗波动式</option>
+            </select>
+        </div>
+        <label class="col-md-2 control-label">检测方式：</label>
+        <div class="col-md-3">
+            <select readonly=""  id="pdetectionMode1"   class="form-control" style="background-image:none;" th:field="*{detectionMode}">
+                <option value="0" selected></option>
+                <option value="1">电压比较式</option>
+                <option value="2">油耗阈值式</option>
+                <option value="3">油耗波动式</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">持续时长：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="slastTime" name="" placeholder="" class="form-control" readonly/>
+        </div>
+        <label class="col-md-2 control-label">持续时长：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="plastTime" th:field="*{lastTime}" name="lastTime" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group hidden" id="thresholdVoltageGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 1}">工作阈值（V）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sthresholdVoltage" name="" placeholder="" class="form-control" readonly th:if="*{detectionMode == 1}"/>
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 1}">工作阈值（V）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pthresholdVoltage" th:field="*{thresholdVoltage}" name="sensorLength" placeholder="" class="form-control" readonly th:if="*{detectionMode == 1}"/>
+        </div>
+    </div>
+    <div class="form-group" id="thresholdGroup" th:if="*{detectionMode == 2}">
+        <label class="col-md-3 control-label">阈值：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="threshold" name="" placeholder="" class="form-control" readonly/>
+        </div>
+        <label class="col-md-2 control-label">阈值：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="thresholdTwo" th:field="*{threshold}" name="threshTwo" placeholder="" class="form-control" readonly/>
+        </div>
+    </div>
+    <div class="form-group hidden" id="smoothFactorGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 2||detectionMode == 3}">平滑系数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sthreshTwo" name="" placeholder="" class="form-control" readonly th:if="*{detectionMode == 2||detectionMode == 3}"/>
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 2||detectionMode == 3}">平滑系数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pthreshTwo" th:field="*{smoothingFactor}" name="threshTwo" placeholder="" class="form-control" readonly th:if="*{detectionMode == 2||detectionMode == 3}"/>
+        </div>
+    </div>
+
+    <div class="form-group hidden" id="baudRateCalculateNumberGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 波动计算个数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sBaudRateCalculateNumber" name="" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 波动计算个数：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pBaudRateCalculateNumber" th:field="*{baudRateCalculateNumber}" name="baudRateCalculateNumber" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+    </div>
+    <div class="form-group hidden" id="baudRateCalculateTimeScopeGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 波动计算时段（s）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="sBaudRateCalculateTimeScope" name="" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 波动计算时段（s）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pBaudRateCalculateTimeScope" th:field="*{baudRateCalculateTimeScope}" name="baudRateCalculateTimeScope" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+    </div>
+    <div class="form-group hidden" id="baudRateThresholdGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 3}"></label>
+        <div class="col-md-3">
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 波动阈值（L/h）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pBaudRateThreshold" th:field="*{baudRateThreshold}" name="baudRateThreshold" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+    </div>
+    <div class="form-group hidden" id="speedThresholdGroup">
+        <label class="col-md-3 control-label" th:if="*{detectionMode == 3}"></label>
+        <div class="col-md-3">
+        </div>
+        <label class="col-md-2 control-label" th:if="*{detectionMode == 3}"><label
+                class="text-danger">*</label> 速度阈值（km/h）：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" id="pSpeedThreshold" th:field="*{speedThreshold}" name="speedThreshold" placeholder="" class="form-control" readonly th:if="*{detectionMode == 3}"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-md-3 control-label"></label>
+        <div class="col-md-3">
+            <botton class="btn btn-primary btn-oc-width" disabled="disabled"  id="rclSubjectToTheSensor">以传感器为准</botton>
+        </div>
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-3">
+            <botton class="btn btn-primary btn-oc-width" disabled="disabled" id="rclSubjectToPlatformSettings">以平台设置为准</botton>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 control-label">下发状态：</label>
+        <div class="col-md-3">
+            <input style="cursor:pointer" name="" id="poilSendStatus" value="" class="form-control sendStatus" readonly/>
+        </div>
+        <label class="col-md-2 control-label"></label>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary refreshBtn"  id="readConventionalsRefresh">刷新</button>
+    <button type="button" class="btn btn-primary" id="readConventionalsSend">修正下发</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+</div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/workHourVehicleSettingGeneral.js" ></script>

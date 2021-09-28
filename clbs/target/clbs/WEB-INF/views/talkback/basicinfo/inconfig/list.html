@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>对讲信息列表</title>
+  <div th:replace="fragments/header">header</div>
+  <link rel="stylesheet" href="/clbs/resources/js/idropdown/dropdown.css" />
+  <style>
+    #entryContentBox {
+      margin-bottom: 0;
+    }
+
+    .modal-lg {
+      width: 80%;
+    }
+
+    #entryBox {
+      border-radius: 4px;
+      border: 1px solid #d4d4d4;
+    }
+
+    #entryBox > .wizard {
+      border: none;
+      border-bottom: 1px solid #d4d4d4;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .fuelux .form-group {
+      margin-bottom: 25px;
+    }
+
+    .fuelux label {
+      margin-bottom: 0;
+    }
+
+    #entryContentBox {
+      padding-top: 20px
+    }
+
+    #myWizard {
+      margin-top: -18px;
+    }
+
+    #quickEntryForm, #fastEntryForm {
+      min-height: 159px;
+      margin: 0 -15px;
+    }
+
+    /*#quickEntryForm div.col-md-4, #fastEntryForm div.col-md-4 {
+        margin-bottom: 32px;
+    }*/
+
+    #quickEntryForm .col-md-4.control-label, #fastEntryForm .col-md-4.control-label, #addScanCodeEntry .col-md-4.control-label {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* #addScanCodeEntry .form-group {
+         margin-bottom: 32px;
+     }*/
+
+    #quickEntryForm button, #fastEntryForm button {
+      margin-bottom: 0;
+    }
+
+    /*#quickEntryForm #error_label, #fastEntryForm #error_label {
+        position: absolute;
+        left: 0;
+        top: 36px;
+    }*/
+
+    #quickSubmits {
+      margin-right: 30px;
+    }
+
+    .lab-group {
+      height: 36px;
+    }
+
+    .step-content {
+      margin: 0;
+      padding: 0;
+      border: none;
+    }
+
+    #dataTable tr td {
+      transition: background-color .5s;
+      -moz-transition: background-color .5s; /* Firefox 4 */
+      -webkit-transition: background-color .5s; /* Safari 和 Chrome */
+      -o-transition: background-color .5s;
+    }
+
+    #dataTable .highTr td {
+      background-color: #fff8b0 !important;
+    }
+
+    .tooltip-inner {
+      white-space: pre-wrap;
+    }
+
+    .fakeHide {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: none;
+      outline: none;
+      opacity: 0;
+    }
+
+    .features {
+      vertical-align: middle;
+      height: 36px;
+    }
+
+    .features label {
+      width: 33%;
+      height: 36px;
+      display: table-cell;
+      vertical-align: middle;
+      font-weight: normal;
+    }
+
+    .features label input {
+      vertical-align: middle;
+      margin-top: -2px;
+    }
+
+    .mySwitch {
+      width: 70px;
+    }
+
+    .disabledRecord {
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+<section class="leftMenuBg">
+  <div th:replace="fragments/nav">nav</div>
+  <section class="main-content-wrapper">
+    <div th:replace="fragments/menu">menu</div>
+    <section id="main-content">
+      <div class="row eightIsZero">
+        <div class="col-md-12">
+          <ul class="breadcrumb">
+            <li><a th:href="@{/}">首页</a></li>
+            <li class="active">对讲管理</li>
+            <li class="active">对讲信息列表</li>
+          </ul>
+          <h1 class="h1">对讲信息列表</h1>
+        </div>
+      </div>
+      <div class="row">
+        <!--信息录入方式tab切换-->
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading" id="stretch">
+              <h3 class="panel-title fwb">信息录入</h3>
+              <div class="actions pull-right">
+                <i class="fa chevron-down" id="stretch-chevron"></i>
+              </div>
+            </div>
+            <div class="panel-body" id="stretch-body">
+              <section class="fuelux" id="entryBox">
+                <div class="wizard">
+                  <ul class="steps">
+                    <li class="fwb quickEntry">
+                      <div th:if="${hasRole}">
+                        <button type="button" id="quickEntryBtn" data-target="quickEntry" class="btn btn-primary entryBtn">快速录入</button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div id="entryContentBox" class="panel tab-content">
+                  <!--快速录入-->
+                  <div class="tab-pane active" id="quickEntry">
+                    <div class="panel-body">
+                      <form id="quickEntryForm" th:action="@{/talkback/inconfig/infoFastInput/submits}"
+                        method="post" class="form-horizontal clearfix">
+                        <input type="hidden" id="groupId" name="groupId" />
+                        <input type="hidden" id="groupName" name="groupName" />
+                        <div class="form-group oneGroupRow">
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 监控对象类型：
+                            </label>
+                            <div class="col-md-8 lab-group">
+                              <div class="col-sm-6 col-md-4 text-center">
+                                <input type="radio" name="monitorType" value="0" class="monitoringSelect chooseCar" />
+                                <label class="monitoringSelect selectCar chooseCarLab" data-toggle="tooltip" data-placement="top"
+                                  title="车"></label>
+                              </div>
+                              <div class="col-sm-6 col-md-4 text-center">
+                                <input type="radio" name="monitorType" checked="checked" value="1"
+                                  class="monitoringSelect choosePeople" />
+                                <label class="monitoringSelect selectPeople choosePeopleLab activeIcon"
+                                  data-toggle="tooltip" data-placement="top"
+                                  title="人"></label>
+                              </div>
+                              <div class="col-sm-6 col-md-4 text-center">
+                                <input type="radio" name="monitorType" value="2"
+                                  class="monitoringSelect chooseThing" />
+                                <label class="monitoringSelect selectThing chooseThingLab"
+                                  data-toggle="tooltip" data-placement="top"
+                                  title="物"></label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 终端手机号：
+                            </label>
+                            <div class="col-md-8">
+                              <div style="position:relative;">
+                                <div class="input-group i-dropdown-container" id="quickSimsContainer">
+                                  <input name="sims" type="text" maxlength="20"
+                                    placeholder="请新增或选择终端手机号"
+                                    class="form-control i-input-field"
+                                    id="quickSims" autocomplete="off">
+                                  <div class="input-group-btn i-arrow">
+                                    <button type="button"
+                                      class="btn btn-white dropdown-toggle"
+                                      data-toggle="">
+                                      <i class="caret"></i>
+                                    </button>
+                                  </div>
+                                  <div class="i-list-container">
+                                    <div class="i-list-wraper">
+                                      <div class="i-list"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <input id="quickSimVal" name="simID" class="hidden">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 对讲设备标识：
+                            </label>
+                            <div class="col-md-8">
+                              <input id="quickOriginalModelVal" name="originalModelId" class="hidden" />
+                              <div class="col-md-6" style="padding: 0">
+                                <div class="input-group">
+                                  <input name="modelId" type="text" maxlength="20"
+                                    placeholder="原始机型"
+                                      readonly
+                                    class="form-control brands" id="quickOriginalModel"
+                                    autocomplete="off"
+                                    style="background: #fafafa"
+                                  />
+                                  <div class="input-group-btn" style="right: -2px">
+                                    <button id="quickOriginalModelButton" type="button"
+                                      class="btn btn-white dropdown-toggle"
+                                      style="border-radius: 0;margin-left: -3px"
+                                      data-toggle=""><i class="caret"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-6" style="padding: 0;">
+                                <input type="text" class="form-control"
+                                  style="border-bottom-left-radius: 0;border-top-left-radius: 0"
+                                  autocomplete="off"
+                                  maxlength="7"
+                                  id="equipmentIdentity" name="devices"
+                                  placeholder="请输入设备标识">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group twoGroupRow">
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 设备密码：
+                            </label>
+                            <div class="col-md-8">
+                              <div style="position:relative;">
+                                <input name="devicePassword" type="text"
+                                  placeholder="请输入设备密码"
+                                  maxlength="8"
+                                  class="form-control brands" id="quickDevicePassword"
+                                  autocomplete="off">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 监控对象：
+                            </label>
+                            <div class="col-md-8">
+                              <div style="position:relative;">
+                                <div class="input-group">
+                                  <input name="brands" type="text" maxlength="20" placeholder="请新增或选择监控对象" class="form-control brands"
+                                    id="quickBrands" autocomplete="off">
+                                  <div class="input-group-btn">
+                                    <button id="quickObjButton" type="button" class="btn btn-white dropdown-toggle" data-toggle="">
+                                      <i class="caret"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                                  </div>
+                                </div>
+                                <input id="quickBrandVal" name="brandID" class="hidden">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4 oldGroupBox">
+                            <label class="col-md-4 control-label">
+                              <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                data-original-title="黄色图标表示企业，蓝色图标表示群组(可在群组管理中创建)"></i>
+                              <label class="text-danger">*</label> 群组：
+                            </label>
+                            <div class="col-md-8 has-feedback fastClear">
+                              <input class="form-control groupZtree" id="quickGroupId"
+                                name="assignmentName" type="text"
+                                style="background-color: #fafafa; cursor: pointer;"
+                                readonly
+                                autocomplete="off"
+                                value="" />
+                              <span class="fa fa-chevron-down form-control-feedback" aria-hidden="true" style="cursor: pointer;"></span>
+                              <div id="quickMenuContent" class="menuContent">
+                                <ul id="quickTreeDemo" class="ztree"></ul>
+                              </div>
+                              <input id="quickCitySelidVal" name="citySelID" class="form-control" type="hidden" />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group threeGroupRow">
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 优先级：
+                            </label>
+                            <div class="col-md-8">
+                              <select name="priority" id="quickPriority" class="form-control">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <label class="col-md-4 control-label">
+                              <label class="text-danger">*</label> 功能：
+                            </label>
+                            <div class="col-md-8">
+                              <div style="position:relative;">
+                                <div class="input-group features">
+                                  <label for="quickFeaturesTest">
+                                    <input type="checkbox" name="textEnable" id="quickFeaturesTest" checked="checked" value="1" />
+                                    文本信息
+                                  </label>
+                                  <label for="quickFeaturesPic">
+                                    <input type="checkbox" name="imageEnable" id="quickFeaturesPic" checked="checked" value="1" />
+                                    图片信息
+                                  </label>
+                                  <label for="quickFeaturesVoice">
+                                    <input type="checkbox" name="audioEnable" id="quickFeaturesVoice" checked="checked" value="1" />
+                                    离线语音信息
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+                            class="avoidRepeatSubmitToken" />
+                          <button type="button" id="quickSubmits"
+                            class="btn btn-primary nextBtn btnAlignment pull-right">
+                            提 交
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+        <!--信息列表-->
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading" id="stretch2">
+              <h3 class="panel-title fwb">对讲信息列表</h3>
+              <div class="actions pull-right">
+                <i class="fa chevron-down" id="stretch2-chevron"></i>
+              </div>
+            </div>
+            <div class="panel-body fixed-table-body" id="stretch2-body">
+              <div class="ToolPanel">
+                <div class="bars pull-left">
+                  <div class="btn-group pull-left barsMargin" role="group">
+                    <form role="form">
+                      <label>
+                        <input type="text" class="Inlinesearch form-control"
+                          id="simpleQueryParam" name="simpleQueryParam"
+                          placeholder="请输入 监控对象/对讲设备标识/终端手机号" autocomplete="off">
+                      </label>
+                      <button type="button" id="search_button" onclick="myTable.requestData()" class="btn btn-outline btn-default">搜索</button>
+                      <input id="hiddenText" type="text" style="display:none" />
+                    </form>
+                  </div>
+                  <div th:if="${hasRole}" class="dropdown pull-left">
+                    <button class="btn btn-default dropdown-toggle" type="button"
+                      id="dropdownMenu1"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      操作菜单<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                      <li>
+                        <a th:href="@{/talkback/inconfig/infoinput/import}" id="importId"
+                          data-toggle="modal" data-target="#commonSmWin">
+                          <i class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入
+                        </a>
+                      </li>
+                      <li>
+                        <a th:href="@{/talkback/inconfig/infoinput/export.gsp}" id="exportId">
+                          <i class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" id="generateId">
+                          <i class="glyphicon glyphicon-check"></i> 批量生成
+                        </a>
+                      </li>
+                      <li>
+                        <a href="javascript:void(0)" id="del_model">
+                          <i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量解绑
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="columns btn-group pull-right simCardManagement">
+                  <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                    title="刷新">
+                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                  </button>
+                  <div class="keep-open btn-group" title="定制显示列">
+                    <button id="customizeColumns" type="button"
+                      class="btn btn-default dropdown-toggle"
+                      data-toggle="dropdown">
+                      <i class="glyphicon glyphicon-th icon-th"></i> <span
+                      class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" id="Ul-menu-text"></ul>
+                  </div>
+                </div>
+              </div>
+              <div style="overflow:auto">
+                <table id="dataTable"
+                  class="table table-striped table-bordered table-hover checkTable"
+                  cellspacing="0" width="100%">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th><input type="checkbox" id="checkAll"></th>
+                    <th>操作设置</th>
+                    <th>监控对象</th>
+                    <th>监控对象类型</th>
+                    <th>生成状态</th>
+                    <th>所属企业</th>
+                    <th>群组</th>
+                    <th>终端手机号</th>
+                    <th>对讲设备标识</th>
+                    <th>原始机型</th>
+                    <th>对讲机型</th>
+                    <th>优先级</th>
+                    <th>客户代码</th>
+                    <th>个呼号码</th>
+                    <th>组数</th>
+                    <th>录音状态</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
+
+<!--极速录入未注册设备流程说明图-->
+<div id="fastInstructions">
+  <img src="/clbs/resources/img/quickness.png" />
+</div>
+
+<div th:replace="fragments/footer">footer</div>
+<div id="zTreeGroupArea">
+  <div id="menuContent" class="menuContent ">
+    <ul id="ztreeDemo" class="ztree"></ul>
+    <ul id="ztreeDemo1" class="ztree"></ul>
+  </div>
+</div>
+<div class="modal fade" id="detailShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document" style="width:20%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">详情</h4>
+      </div>
+      <div class="modal-body" id="detailContent"></div>
+    </div>
+  </div>
+</div>
+<label id="error_label" class="error" style="display: none;"></label>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+  // var assignmentMaxCarNum = [[#{infoinput.cluster.maxCarNum}]];
+  var systemErrorFlag = false;
+  var systemError = [[#{system.error}]];
+  var selectItem = [[#{select.item}]];
+
+  var vehicleBrandSelect = [[#{vehicle.brand.select}]];
+  var deviceNumberSelect = [[#{device.number.select}]];
+  var simNumberSelect = [[#{sim.number.select}]];
+
+  var simNumberChoose = [[#{sim.number.choose}]]; //请选择终端手机号
+  var deviceNumberChoose = '请选择已有的未注册设备';//请选择未注册设备
+  var vehicleNumberChoose = [[#{vehicle.number.choose}]];//请选择监控对象
+
+  var deviceDeviceTypeNull = [[#{device.deviceType.null}]];
+  var assignmentNameNull = [[#{assignment.name.null}]];
+  var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+  var thingExists = [[#{vehicle.thing.exists}]];
+  var deviceNumberExists = [[#{device.number.exists}]];
+  var simNumberExists = [[#{sim.number.exists}]];
+  var vehicleBrandError = [[#{vehicle.brand.error}]];
+  var vehicleBrandNull = [[#{vehicle.brand.null}]];
+  var vehicleBrandMaxlength = [[#{vehicle.brand.maxlength}]];
+
+  var personnelNumberNull = [[#{personnel.number.null}]];
+  var personnelNumberError = [[#{personnel.number.error}]];
+  var personnelNumberExists = [[#{personnel.number.exists}]];
+  var publicSize8Length = [[#{public.size8.length}]];
+
+  var simNumberNull = [[#{sim.newnumber.error}]];
+  var simNumberMaxlength = [[#{sim.number.maxlength}]];
+  var simNumberError = [[#{sim.number.not0}]];
+
+  var publicMonitorNull = [[#{public.monitor.null}]];
+
+  var vehicleTypeNull = [[#{vehicle.type.null}]];
+  var vehicleNumberMaxlength = [[#{vehicle.vehicleNumber.maxlength}]];
+  var vehicleOwnerNull = [[#{vehicle.vehicleOwner.null}]];
+  var vehicleOwnerMaxlength = [[#{vehicle.vehicleOwner.maxlength}]];
+  var vehicleAlisasMaxlength = [[#{vehicle.asiales.maxlength}]];
+  var vehiclChassisNumberNull = [[#{vehicle.chassisNumber.null}]];
+  var vehicleChassisMaxlength = [[#{vehicle.chassis.maxlength}]];
+  var vehicleEngineNumber = [[#{vehicle.engineNumber.null}]];
+  var vehicleEngineNumberMaxlength = [[#{vehicle.engineNumber.maxlength}]];
+  var vehiclePlateColorNull = [[#{vehicle.plateColor.null}]];
+  var vehicleAreaAttributeNull = [[#{vehicle.areaAttribute.null}]];
+  var vehicleCityNull = [[#{vehicle.city.null}]];
+  var vehicleProvinceNull = [[#{vehicle.province.null}]];
+  var vehicleFuelTypeNull = [[#{vehicle.fuelType.null}]];
+
+  var simOperatorNull = [[#{sim.operator.null}]];
+  var simOpenCardTimeNull = [[#{sim.openCardTime.null}]];
+  var simCapacityNull = [[#{sim.capacity.null}]];
+  var simCapacityMaxlength = [[#{sim.capacity.maxlength}]];
+  var simNetworkTypeNull = [[#{sim.networkType.null}]];
+  var simNetworkTypeMaxlength = [[#{sim.networkType.maxlength}]];
+  var simFlowNull = [[#{sim.simFlow.null}]];
+  var simFlowMaxlength = [[#{sim.simFlow.maxlength}]];
+  var simUseFlowNull = [[#{sim.useFlow.null}]];
+  var simUseFlowMaxlength = [[#{sim.useFlow.maxlength}]];
+  var simEndTimeNull = [[#{sim.endTime.null}]];
+  var simEndTimeCampareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+
+  var groupNameNull = [[#{group.name.null}]];
+  var phoneError = [[#{phone.error}]];
+  var telPhoneError = [[#{telPhone.error}]];
+  var emailError = [[#{email.error}]];
+
+  var publicSize20 = [[#{public.size20.length}]];
+
+  var originalModelNull = [[#{originalModel.null}]];
+  var equipmentIdentityNull = [[#{equipmentIdentity.null}]];
+  var equipmentIdentityLegality = [[#{equipmentIdentity.legality}]];
+  var quickDevicePasswordNull = [[#{quickDevicePassword.null}]];
+  var quickDevicePasswordLegality = [[#{quickDevicePassword.legality}]];
+</script>
+<script src="/clbs/resources/js/idropdown/dropdown.js"></script>
+<script src="/clbs/resources/js/inputGroupSelect.js"></script>
+<script src="/clbs/resources/js/infoPageListForDispatch.js"></script>
+</html>

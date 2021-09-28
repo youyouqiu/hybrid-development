@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            background-color: #0a0a0a;
+        }
+
+        .video-box {
+            border: 1px solid #eee;
+        }
+
+        .video-title {
+            height: 20px;
+            line-height: 20px;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        #tableList tr{
+            text-align: center;
+            width: 100%;
+            border: 0;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        #tableList{
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
+            margin-top:8px;
+        }
+        #tableList td{
+            padding: 0;
+            border-left: 1px solid #fff;
+            border-top: 1px solid #fff;
+            color:#fff;
+        }
+        #Channel ul{
+            list-style: none;
+        }
+        #Channel ul li{
+            float: left;
+            color: #fff;
+            margin-left: 5px;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+        }
+        #videoPlayer {
+            flex: 1;
+        }
+        #videoPlayer .video-box{
+            height:calc(100% - 20px);
+        }
+        #clickPlayback {
+            flex: 0 0 550px;
+        }
+        table td{
+            white-space:nowrap;
+            height: 25px;
+            line-height: 25px;
+            padding: 5px 10px;
+        }
+
+        .video-box video{
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 26%;
+        }
+    </style>
+</head>
+<body>
+<input id="videoType" type="hidden" th:value="${type}"/>
+<div id="videoPlayer">
+    <div class="video-box">
+        <p class="video-title" id="monitorName"></p>
+        <div style="height:calc(100% - 20px)">
+            <video muted="" autoplay="" width="100%" height="100%" id="v_0_Source">
+                <source src="" type="video/mp4">
+                您的浏览器不支持 video 标签。
+            </video>
+        </div>
+    </div>
+</div>
+<div id="clickPlayback">
+    <div style="margin-top:1px;">
+        <label for="time" style="color:#fff;">日期：</label>
+        <input type="text"  id="time" autocomplete="off">
+        <!--<span style="color:#fff; margin-left: 3px;">查询</span>-->
+        <button style="margin-left:3px;" id="queryClick">查询</button>
+    </div>
+    <div id="Channel">
+        <ul id="ChannelList" style="padding: 0; margin-top: 10px;">
+        </ul>
+        <div style="clear:both;height:0;overflow: hidden;"></div>
+    </div>
+    <div style="height: calc(100% - 80px); overflow: auto">
+        <table id="tableList">
+            <thead>
+            <tr>
+                <td>操作</td>
+                <td style="width: 60px">通道号</td>
+                <td>开始时间</td>
+                <td>结束时间</td>
+            </tr>
+            </thead>
+
+            <tbody id="tbodyList">
+            </tbody>
+        </table>
+        <template id="resourceRow">
+            <tr>
+                <td>
+                    <span class="videoPlayer" style="cursor: pointer">播放</span>
+                    <span style="margin:0 5px 0 5px;cursor: pointer">下载</span>
+                    <span style="cursor: pointer">快进</span>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </template>
+    </div>
+</div>
+</body>
+<script src="resources/js/jquery-1.10.2.min.js" th:src="@{/resources/js/jquery-1.10.2.min.js}"></script>
+<script src="resources/js/sockjs-1.1.1.min.js" th:src="@{/resources/js/sockjs-1.1.1.min.js}"></script>
+<script src="resources/js/stomp.min.js" th:src="@{/resources/js/stomp.min.js}"></script>
+<script src="resources/js/layui/layer/layer.js" th:src="@{/resources/js/layui/layer/layer.js}"></script>
+<script src="/clbs/resources/js/laydate/laydate.js"></script>
+<script src="/clbs/resources/js/media/three.min.js"></script>
+<script src="/clbs/resources/js/media/OrbitControls.js"></script>
+<script src="/wro/mediaController.js" th:src="@{/wro/mediaController.js}"></script>
+
+<script th:inline="javascript">
+    var videoRequestUrl = [[${videoUrl}]];
+    var audioRequestPort = [[${audioPort}]];
+    var videoRequestPort = [[${videoPort}]];
+    var videoResourcePort = [[${resourcePort}]];
+    var headers = {
+      "access_token": [[${ session.access_token }]],
+      "refresh_token": [[${ session.refresh_token }]],
+    };
+</script>
+<script src="/clbs/resources/js/forward/history.js"></script>
+</html>

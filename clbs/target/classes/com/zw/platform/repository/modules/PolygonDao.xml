@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.PolygonDao">
+    <select id="getPolygonById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.Polygon">
+        SELECT zmpc.*, zmft.color_code, zmft.transparency, zmp.name, zmp.description
+        FROM zw_m_polygon_content zmpc
+                 left join zw_m_polygon zmp on zmpc.polygon_id = zmp.id and zmp.flag = 1
+                 left join zw_m_fence_info zmfi on zmfi.shape = zmpc.polygon_id and zmfi.flag = 1
+                 left join zw_m_fence_type zmft on zmft.id = zmfi.fence_type_id and zmft.flag = 1
+        WHERE zmpc.flag = 1
+          AND zmpc.polygon_id = #{id}
+        ORDER BY zmpc.sort_order
+    </select>
+    <!-- 根据多边形id查询多边形主表信息 -->
+    <select id="findPolygonById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.Polygon">
+    	SELECT * FROM zw_m_polygon WHERE flag=1 and id = #{id} 
+    </select>
+    <!-- 新增多边形 -->
+    <insert id="addPolygons" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+        INSERT INTO zw_m_polygon (
+        id, name, description, type, group_id, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{name}, #{description}, #{type},  #{groupId},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 更新多边形区域 -->
+    <update id="updatePolygon" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+        UPDATE zw_m_polygon
+        SET
+	    	name = #{name},
+	    	description = #{description},
+	    	type = #{type},
+	    	update_data_time = #{updateDataTime},
+	    	update_data_username = #{updateDataUsername}
+	    WHERE id = #{polygonId}
+    </update>
+    <!-- 根据多边形id删除多边形点数据-修改多边形时先删点再加点信息 -->
+    <update id="deletePolygonContent" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+        update zw_m_polygon_content
+        set flag = 0
+        where polygon_id = #{fenceId}
+    </update>
+
+    <update id="deletePolygon">
+        update zw_m_polygon
+        set flag = 0
+        where id = #{fenceId}
+    </update>
+    <!-- 修改多边形的坐标点数据：删除后重新插入 -->
+    <insert id="updatePolygonContent" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+    	INSERT INTO zw_m_polygon_content (
+        	polygon_id, sort_order, longitude, latitude, flag, update_data_time, update_data_username
+        )
+        VALUES(
+        	#{polygonId}, #{pointSeq}, #{longitude}, #{latitude}, #{flag},#{updateDataTime},#{updateDataUsername}
+        )
+    </insert>
+    <!-- 新增线路点信息 -->
+    <insert id="addPolygonsContent" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+        INSERT INTO zw_m_polygon_content (
+        polygon_id, sort_order, longitude, latitude, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{pointSeq}, #{longitude}, #{latitude}, #{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 批量新增多边形线路坐标点 -->
+     <insert id="addMoreContent" parameterType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+        INSERT INTO zw_m_polygon_content (
+        polygon_id, sort_order, longitude, latitude, flag, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+			separator=",">
+		 (#{item.id}, #{item.pointSeq}, #{item.longitude}, #{item.latitude},
+		  #{item.flag},#{item.createDataTime},#{item.createDataUsername})	
+		</foreach>
+    </insert>  
+    <!-- 新增电子围栏总表 -->
+    <insert id="addFenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.ManageFenceFrom">
+        INSERT INTO zw_m_fence_info (id, type, shape, flag, create_data_time, create_data_username, fence_type_id, area)
+        VALUES (#{id}, #{type}, #{shape}, #{flag}, #{createDataTime}, #{createDataUsername}, #{typeId}, #{area})
+    </insert>
+    
+    <!-- 根据多边形id查询多边形主表信息 -->
+    <select id="findPolygonByIds" resultType="com.zw.platform.domain.functionconfig.Polygon">
+    	SELECT * FROM zw_m_polygon WHERE flag=1 and id in 
+    	<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+    </select>
+    
+    <!-- 根据终端id查询line点 -->
+	<select id="findPolygonContentsById" parameterType="string"
+		resultType="com.zw.platform.domain.functionconfig.PolygonContent">
+		SELECT p.* FROM zw_m_polygon_content p WHERE flag = 1 
+		<if test="id != null and id != ''">
+			AND polygon_id = #{id}
+		</if>
+		ORDER BY sort_order
+	</select>
+</mapper>

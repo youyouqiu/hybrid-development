@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.FenceDao">
+
+	<!-- 查询围栏 -->
+	<select id="findFence" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+		SELECT fenceInfo.* FROM
+		zw_m_fence_info fenceInfo
+		WHERE flag = 1
+		ORDER BY create_data_time DESC
+	</select>
+
+	<!-- 查询围栏类型 -->
+	<select id="findType" resultType="string">
+		SELECT DISTINCT fenceInfo.type
+		FROM zw_m_fence_info fenceInfo
+		WHERE flag = 1
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 根据类型查询围栏 -->
+	<select id="findFenceByType" parameterType="string" resultType="java.util.HashMap">
+		SELECT fenceInfo.*,t.* FROM zw_m_fence_info fenceInfo
+		INNER JOIN
+		${type} t ON fenceInfo.shape = t.id
+		WHERE t.flag = 1
+		AND fenceInfo.flag = 1
+		AND fenceInfo.type = #{type}
+		AND t.group_id IN 
+		<foreach item="item" collection="orgIds" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+		ORDER BY fenceInfo.create_data_time DESC
+	</select>
+
+	<!-- 根据type查询围栏及相应围栏的详情 -->
+	<select id="findFenceDetailByType" parameterType="string" resultType="java.util.HashMap">
+		SELECT t.*,fenceInfo.id zoneId, fenceInfo.type fenceType FROM zw_m_fence_info fenceInfo
+		INNER JOIN
+		${type} t ON fenceInfo.shape = t.id
+		WHERE t.flag = 1
+		AND fenceInfo.flag = 1
+		AND fenceInfo.type = #{type}
+		ORDER BY fenceInfo.create_data_time DESC
+	</select>
+	
+	<select id="findFenceInfoById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+		SELECT fenceInfo.*  FROM zw_m_fence_info fenceInfo
+		WHERE fenceInfo.flag = 1
+		AND fenceInfo.id = #{id}
+	</select>
+
+    <select id="checkBindByOrgId" resultType="java.lang.Integer">
+		 select count(*) from (SELECT a.id FROM zw_m_administration a WHERE a.flag = 1 and a.group_id = #{orgId}
+		 UNION ALL SELECT c.id FROM zw_m_circle c WHERE c.flag = 1 and c.group_id = #{orgId}
+		 UNION ALL SELECT l.id FROM zw_m_line l WHERE l.flag = 1 and l.group_id = #{orgId}
+		 UNION ALL SELECT m.id FROM zw_m_marker m WHERE m.flag = 1 and m.group_id = #{orgId}
+		 UNION ALL SELECT p.id FROM zw_m_polygon p WHERE p.flag = 1 and p.group_id = #{orgId}
+		 UNION ALL SELECT r.id FROM zw_m_rectangle r WHERE r.flag = 1 and r.group_id = #{orgId}
+		 UNION ALL SELECT t.id FROM zw_m_travel_line t WHERE t.flag = 1 and t.group_id = #{orgId}) t
+	</select>
+
+</mapper>

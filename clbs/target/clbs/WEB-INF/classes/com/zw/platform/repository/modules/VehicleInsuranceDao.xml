@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.modules.VehicleInsuranceDao">
+    <!--新增-->
+    <insert id="addVehicleInsurance" parameterType="com.zw.platform.domain.basicinfo.form.VehicleInsuranceForm">
+        insert into zw_m_vehicle_insurance (id, vehicle_id, insurance_id,
+        insurance_type, company, start_time,
+        end_time, pre_alert, amount_insured,
+        discount, actual_cost, agent,
+        phone, remark, flag,
+        create_data_time, create_data_username)
+        values (#{id}, #{vehicleId}, #{insuranceId},
+        #{insuranceType}, #{company}, #{startTime},
+        #{endTime}, #{preAlert}, #{amountInsured},
+        #{discount}, #{actualCost}, #{agent},
+        #{phone}, #{remark}, #{flag},
+        #{createDataTime}, #{createDataUsername})
+    </insert>
+    <!--批量新增-->
+    <insert id="addBatchVehicleInsurance" parameterType="com.zw.platform.domain.basicinfo.form.VehicleInsuranceForm">
+        insert into zw_m_vehicle_insurance (id, vehicle_id, insurance_id,
+        insurance_type, company, start_time,
+        end_time, pre_alert, amount_insured,
+        discount, actual_cost, agent,
+        phone, remark, flag,
+        create_data_time, create_data_username)
+        values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.vehicleId}, #{item.insuranceId},
+                #{item.insuranceType}, #{item.company}, #{item.startTime},
+                #{item.endTime}, #{item.preAlert}, #{item.amountInsured},
+                #{item.discount}, #{item.actualCost}, #{item.agent},
+                #{item.phone}, #{item.remark}, #{item.flag},
+                #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+    <!--修改-->
+    <update id="updateVehicleInsurance" parameterType="com.zw.platform.domain.basicinfo.form.VehicleInsuranceForm">
+        update zw_m_vehicle_insurance
+        set vehicle_id = #{vehicleId},
+        insurance_id = #{insuranceId},
+        insurance_type = #{insuranceType},
+        company = #{company},
+        start_time = #{startTime},
+        end_time = #{endTime},
+        pre_alert = #{preAlert},
+        amount_insured = #{amountInsured},
+        discount = #{discount},
+        actual_cost = #{actualCost},
+        agent = #{agent},
+        phone = #{phone},
+        remark = #{remark},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where id = #{id}
+    </update>
+    <!--删除-->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_vehicle_insurance SET flag = 0 WHERE id = #{id}
+     </delete>
+
+    <!--根据车辆保险id查询数据-->
+    <select id="getVehicleInsuranceById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInsuranceInfo">
+        SELECT vin.*,vi.brand FROM zw_m_vehicle_insurance vin
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = vin.vehicle_id AND vi.flag =1
+        WHERE vin.flag = 1 AND vin.id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="findVehicleInsuranceList" parameterType="com.zw.platform.domain.basicinfo.query.VehicleInsuranceQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInsuranceInfo">
+        SELECT vin.*,vi.brand AS brand,DATE_FORMAT(vin.start_time,'%Y-%m-%d') AS startTimeStr,
+        DATE_FORMAT(vin.end_time,'%Y-%m-%d') AS endTimeStr
+        FROM zw_m_vehicle_insurance vin
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = vin.vehicle_id AND vi.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle assv ON assv.vehicle_id = vi.id AND assv.flag = 1
+        LEFT JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+        LEFT JOIN zw_m_assignment_user au ON au.assignment_id = ass.id AND au.flag = 1
+        WHERE vin.flag = 1
+        <if test="insuranceList != null and insuranceList.size &gt; 0">
+            AND vin.id IN
+            <foreach collection="insuranceList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+        <!--<if test="groupList != null and groupList.size &gt; 0">
+            AND  vg.group_id IN
+            <foreach collection="groupList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>-->
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND(
+            vin.insurance_id LIKE BINARY CONCAT('%',#{simpleQueryParam},'%') OR vi.brand LIKE BINARY
+            CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        <if test="userUUID != null and userUUID != ''">
+            AND (au.user_id = #{userUUID}
+            OR (assv.id IS NULL AND vi.group_id IN
+            <foreach collection="groupList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+            )
+            )
+        </if>
+        GROUP BY vin.id
+        ORDER BY vin.create_data_time DESC
+    </select>
+    <!--根据保险单号查询数据-->
+    <select id="getVehicleInsuranceByInsuranceId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInsuranceInfo">
+        SELECT vin.* FROM zw_m_vehicle_insurance vin WHERE vin.flag = 1 AND vin.insurance_id = #{insuranceId}
+    </select>
+
+    <delete id="deleteByVehicleIds">
+        UPDATE zw_m_vehicle_insurance vin SET vin.flag = 0 WHERE vin.flag = 1
+        AND vin.vehicle_id IN
+        <foreach collection="array" item="vehicleId" open="(" separator="," close=")">
+            #{vehicleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByVehicleId" parameterType="string">
+        UPDATE zw_m_vehicle_insurance vin SET vin.flag = 0 WHERE vin.flag = 1
+        AND vin.vehicle_id =#{vehicleId}
+    </delete>
+    <!--查询出保险到期时间和提前提醒天数满足条件的保险单号数据,  当前时间大于保险单号过期结束时间不会查询出数据-->
+    <select id="findExpireVehicleInsurance" resultType="string">
+      SELECT vin.id FROM zw_m_vehicle_insurance vin
+      where vin.flag = 1 AND DATE_SUB(vin.end_time,INTERVAL vin.pre_alert DAY) &lt;= CURDATE() AND CURDATE() &lt;= vin.end_time
+    </select>
+    <!--查询出保险到期时间和提前提醒天数满足条件的车辆id,  当前时间大于保险单号过期结束时间不会查询出数据-->
+    <select id="findExpireVehicleInsuranceVehIds" resultType="map">
+      SELECT vin.vehicle_id as vehicleId,vin.id as id FROM zw_m_vehicle_insurance vin
+      where vin.flag = 1 AND DATE_SUB(vin.end_time,INTERVAL vin.pre_alert DAY) &lt;= CURDATE() AND CURDATE() &lt;= vin.end_time
+    </select>
+
+    <select id="findBindingInsuranceByVehicleId" parameterType="string" resultType="string">
+      SELECT GROUP_CONCAT(vin.insurance_id) FROM zw_m_vehicle_insurance vin WHERE vin.flag =1 AND vin.vehicle_id = #{vehicleId}
+    </select>
+
+</mapper>

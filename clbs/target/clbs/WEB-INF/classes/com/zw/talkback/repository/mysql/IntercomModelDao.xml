@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.IntercomModelDao">
+    <insert id="addIntercomModel">
+        insert into zw_m_intercom_model(id,name,original_model_id,create_data_time,create_data_username,flag)
+        values(#{form.id},#{form.name},#{form.originalModelId},#{form.createDataTime},#{form.createDataUsername},#{form.flag})
+    </insert>
+
+    <update id="updateIntercomModel">
+        update zw_m_intercom_model set
+        name=#{form.name},original_model_id=#{form.originalModelId},update_data_time=#{form.updateDataTime}        ,update_data_username=#{form.updateDataUsername} where flag =1 and id=#{form.id}
+    </update>
+
+    <insert id="addIntercomModels">
+        insert into zw_m_intercom_model(id,name,original_model_id,create_data_time,create_data_username,flag)
+        VALUES
+        <foreach collection="intercomModels" item="item" separator=",">
+            (#{item.id},#{item.name},#{item.originalModelId},#{item.createDataTime},#{item.createDataUsername},#{item.flag})
+        </foreach>
+    </insert>
+
+    <select id="getIntercomModels" resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        SELECT result.* from (SELECT model.name as intercomName,model.id,original.* from zw_m_intercom_model
+        model,zw_m_original_model original
+        where model.original_model_id=original.index AND model.flag =1 and original.flag =1 ORDER BY
+        model.create_data_time desc
+        )as result
+        where 1=1
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+            and ( result.intercomName like concat('%',#{query.simpleQueryParam},'%')
+            or result.model_id like concat('%',#{query.simpleQueryParam},'%'))
+        </if>
+
+    </select>
+
+    <update id="deleteIntercomModelById" parameterType="string">
+        UPDATE zw_m_intercom_model set flag = 0 where id = #{id} and flag =1
+    </update>
+
+    <update id="deleteIntercomModelByIds" parameterType="string">
+        UPDATE zw_m_intercom_model set flag = 0 where 1=0
+        <if test="ids != null and ids !=''">
+            OR ( id in
+            <foreach collection="ids.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and flag =1)
+        </if>
+
+    </update>
+
+    <select id="getBindIntercomModelByIds" resultType="string">
+        SELECT distinct
+        result.NAME from (
+        SELECT
+        model. NAME,
+        model.id
+        FROM
+        zw_m_intercom_info info,
+        zw_m_intercom_model model
+        WHERE
+        model.original_model_id = info.original_model_id
+        AND info.flag = 1
+        AND model.flag = 1
+        ) AS result where 1=0
+        <if test="ids != null and ids !=''">
+            or result.id in
+            <foreach collection="ids.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getModelNameByIdAndName" resultType="string">
+        SELECT name from zw_m_intercom_model where flag =1
+        <if test="id != null and id !=''">
+            and id !=#{id}
+        </if>
+        and name =#{name}
+
+    </select>
+
+    <select id="getIntercomModelById" resultType="com.zw.talkback.domain.intercom.info.IntercomModelInfo">
+        select original_model_id as originalModelId ,id ,name from zw_m_intercom_model where flag =1 and id=#{id}
+    </select>
+
+    <select id="getAllIntercomModeList" resultType="com.zw.talkback.domain.intercom.info.IntercomModelInfo">
+        SELECT zmim.id, zmim.name, zmim.original_model_id originalModelId FROM zw_m_intercom_model zmim
+        WHERE zmim.flag = 1
+    </select>
+    <select id="getNameByOriginalModelId" resultType="string">
+        SELECT DISTINCT name from zw_m_intercom_model where flag =1
+        <if test="id != null and id !=''">
+            and id !=#{id}
+        </if>
+        and original_model_id=#{originalModelId}
+    </select>
+</mapper>

@@ -1,0 +1,186 @@
+<form id="bindForm" th:action="@{/m/switching/signal/bind}" action="#"   role="form" method="post"  class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">I/O参数设置</h4>
+		<style>
+			label.control-label{
+				padding-right: 16px;
+			}
+		</style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">监控对象：</label>
+                    <div class="col-md-4">
+						<input type="hidden" id="referVehicleList" th:value="${referVehicleList}">
+						<input name="" type="text" class="form-control"  th:field="*{vehicle.brand}" readonly>
+						<input type="hidden"  th:field="*{signal.vehicleId}" name="vehicleId">
+						<input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken">
+                    </div>
+                    <label class="col-md-2 control-label">参考对象：</label>
+                    <div class="col-md-4">
+						<div class="input-group">
+							<input name="referBrands"  type="text" class="form-control" id="referBrands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+						</div>
+                    </div>
+                </div>
+				<hr/>
+                <div class="form-group">
+                	<label class="col-md-2 control-label">
+                		I/O 0：
+						<input name="signalZero" type="hidden" id="signalZero">
+                	</label>
+                	<div class="col-md-3">
+						<div class="input-group">
+							<input type="text"  placeholder="请选择检测功能类型！" class="form-control sensorType" id="sensorType0">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+						</div>
+                	</div>
+                	<div class="col-md-2">
+                		<select class="form-control" name="zeroType" id="zeroType" onchange="ioParSetting.IOTypeChangeFn(0)">
+
+							<option value="1" selected>常开</option>
+							<option value="2">常闭</option>
+							<option value="0">无</option>
+                		</select>
+                	</div>
+                	<div class="col-md-2 ioStateShow text-right">
+                		<div id="zeroTypeOrSwitch"></div>
+                	</div>
+                	<div class="col-md-2 text-right">
+                		<div class="ioStateShow"><span class="ioStateInfo" id="zeroTypeColor"></span></div>
+                	</div>
+                </div>
+                <div class="form-group">
+                	<label class="col-md-2 control-label">
+                		I/O 1：
+						<input name="signalOne" type="hidden" id="signalOne">
+                	</label>
+                	<div class="col-md-3">
+						<div class="input-group">
+							<input  type="text" placeholder="请选择检测功能类型！" class="form-control sensorType" id="sensorType1">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+                	</div>
+                	<div class="col-md-2">
+                		<select class="form-control" name="oneType" id="oneType" onchange="ioParSetting.IOTypeChangeFn(1)">
+
+							<option value="1" selected>常开</option>
+							<option value="2">常闭</option>
+							<option value="0">无</option>
+                		</select>
+                	</div>
+                	<div class="col-md-2 ioStateShow text-right">
+                		<div id="oneTypeOrSwitch"></div>
+                	</div>
+                	<div class="col-md-2 text-right">
+                		<div class="ioStateShow"><span class="ioStateInfo" id="oneTypeColor"></span></div>
+                	</div>
+                </div>
+                <div class="form-group">
+                	<label class="col-md-2 control-label">
+                		I/O 2：
+						<input name="signalTwo" type="hidden" id="signalTwo">
+                	</label>
+                	<div class="col-md-3">
+						<div class="input-group">
+							<input  type="text" placeholder="请选择检测功能类型！" class="form-control sensorType" id="sensorType2">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+                	</div>
+                	<div class="col-md-2">
+                		<select class="form-control" name="twoType" id="twoType" onchange="ioParSetting.IOTypeChangeFn(2)">
+
+							<option value="1" selected>常开</option>
+							<option value="2">常闭</option>
+							<option value="0">无</option>
+                		</select>
+                	</div>
+                	<div class="col-md-2 ioStateShow text-right">
+                		<div id="twoTypeOrSwitch"></div>
+                	</div>
+                	<div class="col-md-2 text-right">
+                		<div class="ioStateShow"><span class="ioStateInfo" id="twoTypeColor"></span></div>
+                	</div>
+                </div>
+                <div class="form-group">
+                	<label class="col-md-2 control-label">
+                		I/O 3：
+						<input name="signalThree" type="hidden" id="signalThree">
+                	</label>
+                	<div class="col-md-3">
+						<div class="input-group">
+							<input name="" type="text" placeholder="请选择检测功能类型！" class="form-control sensorType" id="sensorType3">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+                	</div>
+                	<div class="col-md-2">
+                		<select class="form-control" name="threeType" id="threeType" onchange="ioParSetting.IOTypeChangeFn(3)">
+							<option value="1" selected>常开</option>
+							<option value="2">常闭</option>
+							<option value="0">无</option>
+                		</select>
+                	</div>
+                	<div class="col-md-2 ioStateShow text-right">
+                		<div id="threeTypeOrSwitch"></div>
+                	</div>
+                	<div class="col-md-2 text-right">
+                		<div class="ioStateShow"><span class="ioStateInfo"  id="threeTypeColor"></span></div>
+                	</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="ioParSettingRefresh">
+            <strong>刷 新</strong>
+        </button>
+        <button class="btn btn-primary" type="button" id="doSubmits" style="margin: 0 0 3px 0;">
+            <strong>提 交</strong>
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+</script>
+<script src="/wro/switchingSignalBind.js" th:src="@{/wro/switchingSignalBind.js}"></script>

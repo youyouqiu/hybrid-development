@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>轨迹回放</title>
+    <meta charset="utf-8"/>
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10"/>-->
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="refresh" content="36000; url=/clbs/login?type=timeout"/>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" id="icoLink" name="favicon.ico" th:href="@{/resources/img/favicon.ico}"
+          type="image/x-icon"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" th:href="@{/resources/js/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}"/>
+    <link rel="stylesheet" href="/wro/animate.css" th:href="@{/wro/animate.css}"/>
+    <link rel="stylesheet" href="/wro/main.css" th:href="@{/wro/main.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/trackPlaybackNew.css"/>
+    <link rel="stylesheet" href="resources/js/zTree/css/zTreeStyle.css"
+          th:href="@{/resources/js/zTree/css/zTreeStyle.css}"/>
+    <link rel="stylesheet" href="/wro/wizard.css" th:href="@{/wro/wizard.css}"/>
+    <link rel="stylesheet" href="/wro/adaptiveStyle.css" th:href="@{/wro/adaptiveStyle.css}"/>
+    <link rel="stylesheet" href="/wro/clockPlugins.css" th:href="@{/wro/clockPlugins.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/twinkle.css"/>
+    <link rel="stylesheet" href="/clbs/resources/js/jQueryPowertip/justtool.css"/>
+    <link rel="stylesheet" href="/clbs/resources/js/itable/itable.css"/>
+    <script src="resources/js/modernizr-2.6.2.min.js" th:src="@{/resources/js/modernizr-2.6.2.min.js}"></script>
+    <script src="resources/js/jquery-1.10.2.min.js" th:src="@{/resources/js/jquery-1.10.2.min.js}"></script>
+    <link rel="stylesheet" href="resources/js/fullcalendar/css/common.css"
+          th:href="@{/resources/js/fullcalendar/css/common.css}"/>
+</head>
+<body>
+<section>
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper main-content-wrapper-white main-content-toggle-left">
+        <div th:replace="fragments/menu">menu</div>
+        <div class="content">
+            <div class="left-part" id="leftPart">
+                <div class="panel-heading page-heading">
+                    <h3 class="panel-title page-title">轨迹回放</h3>
+                    <a class="realtime-monitoring" data-toggle="tooltip"
+                       data-placement="left" title="实时监控" target="_blank"
+                       href="/clbs/v/monitoring/realTimeMonitoring"
+                    >
+                        <img src="/clbs/resources/img/shishijiankong.svg">
+                    </a>
+                </div>
+                <div class="calender-container">
+                    <div class="calendar calendar3"></div>
+                </div>
+                <div class="search-input-container">
+                    <div class="search-input-wraper">
+                        <input id="citySel" name="search" placeholder="监控对象" style="cursor:auto"
+                               type="text" class="form-control" autocomplete="off"/>
+                        <input id="savePid" th:value="${vid}" type="hidden"/>
+                    </div>
+                </div>
+                <div class="tree-container">
+                    <div id="treeLoad" style="width: 140px; margin: 20px auto 0 65px">
+                        <i class="fa fa-spinner loading-state"></i>
+                        <span>加载中，请稍候</span>
+                    </div>
+                    <ul id="treeDemoTrackPlayback" class="ztree ztreeLoadH"></ul>
+                </div>
+            </div>
+            <div class="right-part" id="rightPart">
+                <div class="top-part" id="topPart">
+                    <div class="map-part">
+                        <div class="map-container" id="mapContainer"></div>
+                        <div class="toggle-left-part" id="toggleLeftPart">
+                            <i class="fa fa-chevron-left"></i>
+                        </div>
+                        <!-- 围栏 -->
+                        <div id="fenceTool" class="btn-group">
+                            <button id="fenceToolBtn" style="top:-6px;padding: 8px 4px !important;" type="button"
+                                    class="btn btn-white dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <img src="/clbs/resources/img/FenceIco.svg"
+                                     style="width:18px;height:15.3px;"/><span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div id="vFenceMsg" class="col-md-12 text-center">请选择监控对象！</div>
+                                <div id="vSearchContent" class="hidden">
+                                    <input autocomplete="off" type="text" class="form-control" name="search"
+                                           id="vFenceSearch" placeholder="请输入关键字"/>
+                                </div>
+                                <ul id="vFenceTree" class="ztree hidden"></ul>
+                            </div>
+                        </div>
+                        <div id="realTimeCanArea">
+                            <div id="searchMain">
+                                <div class="form-group clearfix">
+                                    <div class="col-md-12 searchListSelect">
+                                        <label class="verticalLabel" style="margin-right: 15px">
+                                            <input type="checkbox" id="dataStatus0" value="0"
+                                                   name="dataStatus" checked/> 非补传
+                                        </label>
+                                        <label class="verticalLabel">
+                                            <input type="checkbox" id="dataStatus1" value="1"
+                                                   name="dataStatus" checked/> 补传
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <div class="col-md-12 searchListSelect">
+                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                               class="form-control layer-date laydate-icon"
+                                               id="timeInterval"
+                                               name="timeInterval" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <div class="col-md-12 control-label text-right">
+                                        <button type="button" class="btn btn-primary"
+                                                id="specialTimePlayBack">定时定区域查询
+                                        </button>
+                                        <button type="button" class="btn btn-primary"
+                                                id="trackPlayQuery">查询
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="areaTool"><i class="fa fa-search"></i><span>查<br/>询</span></div>
+                        </div>
+                        <!--定时定区域查询-->
+                        <div id="fixedTimeArea">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <form class="form-horizontal"
+                                          th:action="@{/m/functionconfig/fence/managefence/travelLine}"
+                                          id="timeAreaForm" role="form" action="#" method="post">
+                                        <div class="form-group">
+                                            <div class="has-feedback fastClear col-md-12">
+                                                <select name="queryType" id="queryType"
+                                                        class="Inlinesearch form-control treeSelect">
+                                                    <option value="vehicle">监控对象</option>
+                                                    <option value="group">企业</option>
+                                                    <option value="assignment">分组</option>
+                                                </select>
+                                                <input style="cursor: pointer; background-color: #fafafa;" type="text"
+                                                       id="groupSelect" name="groupSelect" autocomplete="off"
+                                                       placeholder="请选择" class="form-control moreQueryGroup">
+                                                <span class="fa fa-chevron-down form-control-feedback"
+                                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                      id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="areaTreeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10" style="padding-right:0;">
+                                                <input style="cursor: pointer; background-color: #fafafa;float:left;width:45.5%;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="searchTimeIntervalStart" readonly>
+                                                <span style="float: left;width:5%;text-align: center;margin-top:8px;">~</span>
+                                                <input style="cursor: pointer; background-color: #fafafa;float:left;width:45.5%;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="searchTimeIntervalEnd" readonly>
+                                                <input type="hidden" id="areaSearchTimeInterval" name="timeInterval">
+                                            </div>
+                                            <button id="addWayToPoint" type="button"
+                                                    class="btn btn-primary padBottom">
+                                                                        <span class="glyphicon glyphicon-plus"
+                                                                              aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <input type="text" class="form-control areaInput" name="area"
+                                                       placeholder="点击后在地图上选择区域" readonly>
+                                            </div>
+                                            <button id="addMapArea" type="button"
+                                                    class="btn btn-primary padBottom">
+                                                                        <span class="glyphicon glyphicon-plus"
+                                                                              aria-hidden="true"></span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button"
+                                            id="areaTimeSearch" class="btn btn-primary">
+                                        查询
+                                    </button>
+                                    <button type="button" id="fixAreaClose"
+                                            class="btn btn-default btn-off"
+                                            data-dismiss="modal">取消
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="realTimeBtn" class="trackPlay-group">
+                            <!--<input id="setMap" type="button" class="mapBtn" value="卫星" />-->
+                            <!--<input type="button" class="mapRC" id="realTimeRC" value="实时路况">-->
+
+                            <a class="fenceA" id="mapDropSetting"><i
+                                    class="map-drop-sett"></i><span>地图设置</span></a>
+                            <!-- 地图设置下拉 -->
+                            <div class="mapDropSettingMenu" id="mapDropSettingMenu"
+                                 style="right: 20px; left: 0; padding: 0; top: 50px">
+                                <p class="m-line">
+                                    <input type="checkbox"
+                                           id="realTimeRC"
+                                           class="monitoringSelect"/>
+                                    <label for="realTimeRC"
+                                           id="realTimeRCLab"
+                                           class="monitoringSelect">路况</label>
+                                </p>
+                                <hr>
+                                <p>
+                                    <input type="checkbox" id="setMap"
+                                           class="monitoringSelect"/>
+                                    <label for="setMap" id="defaultMapLab"
+                                           class="monitoringSelect">卫星地图</label>
+                                </p>
+                                <hr>
+                                <p>
+                                    <input type="checkbox" id="googleMap" class="monitoringSelect"/>
+                                    <label for="googleMap" id="googleMapLab"
+                                           class="monitoringSelect">谷歌地图</label>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="play-control-container" style="width: 609px">
+                            <div class="play-control">
+                                <div class="play-control-button-container">
+                                    <div class="play-control-button-wraper">
+                                        <div class="play-control-button prev" onclick="trackPlayback.map.prev()"></div>
+                                    </div>
+                                    <div class="play-control-button-wraper">
+                                        <div class="play-control-button play" id="playOrPause"
+                                             onclick="trackPlayback.playOrPause()"></div>
+                                    </div>
+                                    <div class="play-control-button-wraper">
+                                        <div class="play-control-button reset"
+                                             onclick="trackPlayback.map.reset()"></div>
+                                    </div>
+                                    <div class="play-control-button-wraper">
+                                        <div class="play-control-button next" onclick="trackPlayback.map.next()"></div>
+                                    </div>
+                                    <div class="play-control-button-wraper">
+                                        <div id="paly-more" class="play-control-button more"></div>
+                                    </div>
+                                </div>
+                                <div class="clearfix">
+                                    <div class="progress-line pull-left" id="progressLine">
+                                        <div class="progress-indicator" id="progressIndicator"></div>
+                                        <div class="progress-back" id="progressBack"></div>
+                                    </div>
+
+                                    <div class="speed-control">
+                                        <img width="14" height="15" src="/clbs/resources/img/speed.png" alt="">
+                                        <span>x</span>
+                                        <span id="speed-num" class="speed-num">1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox-control" style="width: 263px">
+                                <div class="box" style="width: 42%">
+                                    <section class="input-box">
+                                        <label class="input-label">
+                                            <input type="radio" name="videoSet" value="all" class="radio-input"
+                                                   id="allRadio" checked>
+                                            <span class="radio-active"></span>
+                                            <span>全部数据</span>
+                                        </label>
+                                    </section>
+                                    <section class="input-box">
+                                        <label class="input-label">
+                                            <input type="radio" name="videoSet" value="run" id="runRadio"
+                                                   class="radio-input">
+                                            <span class="radio-active"></span>
+                                            <span>行驶数据</span>
+                                        </label>
+                                    </section>
+                                </div>
+                                <div class="box" style="width: 48%; margin: 2px 0 2px 16px;">
+                                    <section class="input-box">
+                                        <label class="input-label">
+                                            <input type="checkbox" name="checkboxShowAlarm" id="checkboxShowAlarm"
+                                                   class="check-input">
+                                            <span class="check-active"></span>
+                                            <span>显示报警点</span>
+                                        </label>
+                                    </section>
+                                    <section class="input-box">
+                                        <label class="input-label">
+                                            <input type="checkbox" name="checkboxShowStop" id="checkboxShowStop"
+                                                   class="check-input">
+                                            <span class="check-active"></span>
+                                            <span>显示停止点</span>
+                                        </label>
+                                    </section>
+                                    <section class="input-box">
+                                        <label class="input-label">
+                                            <input type="checkbox" name="checkboxShowLocation" id="checkboxShowLocation"
+                                                   class="check-input">
+                                            <span class="check-active"></span>
+                                            <span>显示基站定位</span>
+                                        </label>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="toggle-chart-part">
+                            <span id="toggleChartText">曲<br/>线<br/>报<br/>表</span>
+                        </div>
+                    </div>
+                    <div class="chart-part">
+                        <div class="sensor-part">
+                            <div class="page-icon prev" id="prevPageIcon"></div>
+                            <div class="page-icon next" id="nextPageIcon"></div>
+                            <div class="sensor-container" id="sensorContainer">
+                                <div class="sensor-wraper" id="sensorWraper">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-wraper">
+                            <div class="chart-container" id="chartContainer">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottom-part" id="bottomPart">
+                    <div class="drag-bar" id="tableMapDrag"></div>
+                    <div class="table-area">
+                        <ul id="myTab" class="nav nav-tabs">
+                            <li id="allDataLi" class="active table-tab"><a href="#allDataWraper" id="allRunDataA"
+                                                                           data-toggle="tab">全部数据</a>
+                            </li>
+                            <li class="table-tab" id="obdDataLi"><a href="#obdDataWraper" data-toggle="tab">OBD数据</a>
+                            </li>
+                            <li class="table-tab" id="runDataLi"><a href="#runDataWraper" data-toggle="tab">行驶段数据</a>
+                            </li>
+                            <li class="table-tab" id="stopDataLi"><a href="#stopDataWraper" data-toggle="tab">停止段数据</a>
+                            </li>
+                            <li id="alarmDataLi" class="table-tab"><a href="#alarmDataWraper" data-toggle="tab">报警数据</a>
+                            </li>
+                            <div style="float:right;margin-top:9px;">
+                                <li style="display:inline-block;margin:0px 0px 0px 20px; color: #6dcff6;vertical-align: middle;">
+                                    <a href="/clbs/core/uum/custom/setting_TRACKPLAY" data-toggle="modal"
+                                       data-target="#commonSm2Win" id="customColumnA">
+                                        <i id="customColumnBtn" class="fa fa-cog"
+                                           style="color: #6dcff6;font-size: 16px"></i>
+                                    </a>
+                                </li>
+                                <li style="display:inline-block;margin:0px 0px 0px 20px; color: #6dcff6;vertical-align: middle;">
+                                    <span id="tableDataExport" class="glyphicon glyphicon-share"></span>
+                                </li>
+                                <li style="display:inline-block;margin:0px 20px 0px 15px;color: #6dcff6;"><i
+                                        id="scalingBtn" class="fa  fa-chevron-up" style="cursor: pointer"></i></li>
+                            </div>
+                        </ul>
+                        <div id="myTabContent" class="tab-content table-wraper">
+                            <div class="tab-pane fade in active trackPlaybackTable"
+                                 id="allDataWraper">
+                                <div id="allDataWraper-div">
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade in trackPlaybackTable"
+                                 id="obdDataWraper">
+                                <div id="obdDataWraper-div">
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade in trackPlaybackTable"
+                                 id="runDataWraper">
+                                <div id="runDataWraper-div">
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade in trackPlaybackTable"
+                                 id="stopDataWraper">
+                                <div id="stopDataWraper-div">
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade in trackPlaybackTable"
+                                 id="alarmDataWraper">
+                                <div id="alarmDataWraper-div">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 导出 modal -->
+    <div class="modal fade" id="exportModal" tabindex="10" aria-hidden="true" data-backdrop="static" role="dialog"
+         aria-labelledby="">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:500px;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="exportTitle">导出全部数据</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="modal-cell">
+                        <span>是否加载位置信息</span>
+                        <label class="input-label">
+                            <input type="radio" name="exportAddress" id="noExportPosition" value="0" class="radio-input"
+                                   checked>
+                            <span class="radio-active"></span>
+                            否
+                        </label>
+                        <label class="input-label">
+                            <input type="radio" name="exportAddress" id="yesExportPosition" value="1"
+                                   class="radio-input">
+                            <span class="radio-active"></span>
+                            是
+                        </label>
+                    </div>
+                    <div class="modal-tips" id="modalTips" style="display:none;">(加载位置信息过程较长, 需耐心等待)</div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="exportBtn" class="btn btn-primary">确定导出</button>
+                    <button type="button" id="cancelBtn" class="btn" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 区域查车 -->
+    <div class="modal fade" id="areaSearchCar" tabindex="-2" role="dialog" style="overflow-y:hidden"
+         data-backdrop="static" data-keyboard="false" aria-labelledby="alarmSettingInfo" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">定时定区域查询</h4>
+                </div>
+                <div class="modal-body" style="padding-bottom: 10px">
+                    <div class="row form-horizontal">
+                        <table id="dataTable"
+                               class="table table-striped table-bordered table-hover"
+                               cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>监控对象</th>
+                                <th>时段</th>
+                                <th>区域</th>
+                            </tr>
+                            </thead>
+                            <tbody class="monitoringObj"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="searchCarExport" type="button" class="btn btn-primary">导出</button>
+                    <button id="searchCarClose" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 将轨迹保存为围栏 -->
+    <div id="addFencePage" class="modal fade" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+         aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">轨迹</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/add}"
+                          id="addLineForm" role="form" action="#" method="post">
+                        <table id="table-lng-lat" class="table table-striped table-bordered table-hover table-lng-lat">
+                        </table>
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="hidden" id="addOrUpdateLineFlag" name="addOrUpdateLineFlag" value="0"/>
+                                <input type="hidden" id="lineId" name="lineId"/>
+                                <label class="col-md-3 control-label"><label class="text-danger">*</label> 路线名称：</label>
+                                <div class=" col-md-8">
+                                    <input type="text" placeholder="请输入路线名称" autocomplete="off" class="form-control" id="lineName1"
+                                           name="name"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">路线类型：</label>
+                                <div class=" col-md-8">
+                                    <select class="form-control" id="lineType1" name="type">
+                                        <option value="国道">国道</option>
+                                        <option value="省道">省道</option>
+                                        <option value="县道">县道</option>
+                                        <option value="高速">高速</option>
+                                        <option value="高架立交">高架立交</option>
+                                        <option value="其他小路">其他小路</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"><label class="text-danger">*</label>
+                                    偏移量(m)：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" placeholder="请输入数字" onkeyup="value=value.replace(/[^0-9]/g,'') "
+                                           class="form-control" id="lineWidth1" name="width"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">描述：</label>
+                                <div class=" col-md-8">
+                                    <textarea class="form-control" rows="3" id="lineDescription1"
+                                              name="description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" id="pointSeqs" name="pointSeqs"/>
+                            <input type="hidden" id="longitudes" name="longitudes"/>
+                            <input type="hidden" id="latitudes" name="latitudes"/>
+                            <button type="button" id="addFenceBtn" class="btn btn-primary">保存</button>
+                            <button type="button" class="btn btn-default btn-off cancle" id="hideDialog"
+                                    data-dismiss="modal">取消
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer_track_new">footer</div>
+    <!--/*******自定义列设置窗口，不使用公共窗口的原因是宽度刚好高不成低不就*******/-->
+    <div id="commonSm2Win" class="modal fade" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $(function () {
+                var windowId = 'commonSm2Win';
+                $("#" + windowId).on("hidden.bs.modal", function () {
+                    $(this).removeData("bs.modal");
+                });
+            });
+            /*]]>*/
+        </script>
+    </div>
+</section>
+<div class="" id="gjhfObdDiagnosticSupportStateClick" style="display: none; width: 788px;
+    height: 545px;
+    background: white;
+    border: 1px solid rgb(204,204,204);
+    border-radius: 6px;
+    /*overflow: auto;*/
+    position: fixed;
+    top: 169px;
+    left: 669px;
+    z-index: 1050;
+    outline: 0;
+    padding: 0 10px;">
+    <div style="height: 30px;
+    width: 18px;
+    cursor: pointer;
+    margin: 0px 0 0 758px;" onclick="trackPlayback.gjhfObdDiagnosticSupportStateOpen()">x</div>
+    <div style="overflow: auto; height: 488px;">
+        <table id="gjhfClmDataTable" class="table table-striped table-bordered table-hover checkTable"
+               cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th style="width: 49px">序号</th>
+                <th>名称</th>
+                <th style="width: 99px">状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr><td>1</td><td>Catalyst monitoring Status 催化转化器监控</td><td id="gjhfDiagnosticSupport-1">支持</td></tr>
+            <tr><td>2</td><td>Heated catalyst monitoring Status 加热催化转化器监控</td><td id="gjhfDiagnosticSupport-2">支持</td></tr>
+            <tr><td>3</td><td>Evaporative system monitoring Status 蒸发系统监控</td><td id="gjhfDiagnosticSupport-3">支持</td></tr>
+            <tr><td>4</td><td>Secondary air system monitoring Status 二次空气系统监控</td><td id="gjhfDiagnosticSupport-4">支持</td></tr>
+            <tr><td>5</td><td>A/C system refrigerant monitoring Status A/C系统制冷剂监控</td><td id="gjhfDiagnosticSupport-5">支持</td></tr>
+            <tr><td>6</td><td>Exhaust Gas Sensor monitoring Status 排气传感器加热器监控</td><td id="gjhfDiagnosticSupport-6">支持</td></tr>
+            <tr><td>7</td><td>Exhaust Gas Sensor heater monitoring Status 排气传感器加热器监控</td><td id="gjhfDiagnosticSupport-7">支持</td></tr>
+            <tr><td>8</td><td>EGR/VVT system monitoring EGR 系统和VVT监控</td><td id="gjhfDiagnosticSupport-8">支持</td></tr>
+            <tr><td>9</td><td>Cold start aid system monitoring Status 冷启动辅助系统监控</td><td id="gjhfDiagnosticSupport-9">支持</td></tr>
+            <tr><td>10</td><td>Boost pressure control system monitoring Status 增压压力控制系统</td><td id="gjhfDiagnosticSupport-10">支持</td></tr>
+            <tr><td>11</td><td>Diesel Particulate Filter（DPF）monitoring Status DPF监控</td><td id="gjhfDiagnosticSupport-11">支持</td></tr>
+            <tr><td>12</td><td>NOx converting catalyst and/or NOx adsorber monitoring Status 选择性催化还原系统（SCR）或NOx吸附器</td><td id="gjhfDiagnosticSupport-12">支持</td></tr>
+            <tr><td>13</td><td>NMHC converting catalyst monitoring Status NMHC 氧化催化器监控</td><td id="gjhfDiagnosticSupport-13">支持</td></tr>
+            <tr><td>14</td><td>Misfire monitoring support 失火监控</td><td id="gjhfDiagnosticSupport-14">支持</td></tr>
+            <tr><td>15</td><td>Fuel system monitoring support 燃油系统监控</td><td id="gjhfDiagnosticSupport-15">支持</td></tr>
+            <tr><td>16</td><td>Comprehensive component monitoring support 综合成分监控</td><td id="gjhfDiagnosticSupport-16">支持</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://webapi.amap.com/maps?v=2.0&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.AutoComplete,AMap.Geocoder,AMap.PlaceSearch,AMap.MoveAnimation,AMap.PolygonEditor,AMap.PolylineEditor,AMap.CircleEditor"></script>
+<script src="resources/js/sockjs-1.1.1.min.js" th:src="@{/resources/js/sockjs-1.1.1.min.js}"></script>
+<script src="resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script src="/clbs//resources/js/jQueryValidate.js"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/itable/itable.js" th:src="@{/resources/js/itable/itable.js}"></script>
+<script src="resources/js/d3.v5.min.js" th:src="@{/resources/js/d3.v5.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/track-playback-new.js" th:src="@{/wro/track-playback-new.js}"></script>
+
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+    var vehicleNumberChoose = [[#{vehicle.number.choose}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+
+    var trackLastPost = [[#{track.lastPost}]];
+    var trackFirstPost = [[#{track.firstPost}]];
+    var trackScrollBarMax = [[#{track.scrollBar.max}]];
+    var trackExportSuccess = [[#{track.export.success}]];
+    var trackDataNull = [[#{track.data.null}]];
+    var trackDateError = [[#{track.date.error}]];
+    var trackVehicleDateError = [[#{track.vehicleDate.error}]];
+    var trackPeopleDateError = [[#{track.peopleDate.error}]];
+    var trackFenceExists = [[#{track.fence.exists}]];
+    var trackHistoryDataNull = [[#{track.historyData.null}]];
+    var trackAreaMonitorNull = [[#{track.areaMonitor.null}]];
+    var trackDateNull = [[#{track.date.null}]];
+    var trackDataLoading = [[#{track.data.loading}]];
+
+    var publicSaveSuccess = [[#{public.save.success}]];
+    var publicSaveError = [[#{public.save.error}]];
+    var publicNull = [[#{public.null}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize100 = [[#{public.size100.length}]];
+    var publicExportError = [[#{public.export.error}]];
+    var publicExportSuccess = [[#{public.export.success}]];
+</script>
+</body>
+</html>

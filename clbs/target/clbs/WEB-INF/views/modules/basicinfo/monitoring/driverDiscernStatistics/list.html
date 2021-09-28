@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>终端驾驶员识别统计</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/activeSafety.css"/>
+    <link rel="stylesheet" href="/clbs/resources/css/driverStatistics.css">
+    <style>
+        #part2Body video{
+            width: 420px;
+            height: 270px;
+            display: block;
+            margin: 10px auto;
+        }
+        #part3Body img{
+            float: left;
+        }
+        #part3Body .dot {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            border: 1px solid;
+            border-radius: 50%;
+            font-size: 12px;
+            line-height: 16px;
+            cursor: pointer;
+            margin-right: 6px;
+        }
+        #part3Body .active {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            border: 1px solid #0a87fb;
+            border-radius: 50%;
+            font-size: 12px;
+            line-height: 16px;
+            color: #fff;
+            cursor: pointer;
+            background: #0a87fb;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">终端驾驶员识别统计</li>
+                    </ul>
+                    <h1 class="h1">终端驾驶员识别统计</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                        <select name="queryType" id="queryType"
+                                                class="Inlinesearch form-control treeSelect">
+                                            <option value="vehicle">监控对象</option>
+                                            <option value="group">企业</option>
+                                            <option value="assignment">分组</option>
+                                        </select>
+                                        <input type="text" autocomplete="off"
+                                               style="cursor: pointer; background-color: #fafafa;" placeholder="请选择"
+                                               name="groupSelect" class="form-control moreQueryGroup" id="groupSelect"/>
+                                        <span class="fa fa-chevron-down form-control-feedback"
+                                              style="top: 0; right: 15px;" aria-hidden="true"
+                                              id="groupSelectSpan"></span>
+                                        <div id="menuContent" class="menuContent">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                    <div class="col-md-4 col-sm-8 searchListSelect">
+                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                               class="form-control layer-date laydate-icon"
+                                               id="timeInterval" name="timeInterval" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label">比对结果：</label>
+                                    <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                        <select name="compareResult" id="compareResult"
+                                                class="form-control">
+                                            <option value="" selected>全部</option>
+                                            <option value="0">匹配成功</option>
+                                            <option value="1">匹配失败</option>
+                                            <option value="2">超时</option>
+                                            <option value="3">没有启用该功能</option>
+                                            <option value="4">连接异常</option>
+                                            <option value="5">无指定人脸图片</option>
+                                            <option value="6">无人脸库</option>
+                                            <option value="7">匹配失败,人证不符</option>
+                                            <option value="8">匹配失败,比对超时</option>
+                                            <option value="9">匹配失败,无指定人脸信息</option>
+                                            <option value="10">无驾驶员图片</option>
+                                            <option value="11">终端人脸库为空</option>
+                                        </select>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 col-md-offset-1 control-label">比对类型：</label>
+                                    <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                        <select name="compareType" id="compareType"
+                                                class="form-control">
+                                            <option value="" selected>全部</option>
+                                            <option value="0">插卡比对</option>
+                                            <option value="1">巡检比对</option>
+                                            <option value="2">点火比对</option>
+                                            <option value="3">离开返回比对</option>
+                                            <option value="4">动态比对</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 control-label">
+                                        <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                onclick="driverDiscernStatistics.inquireClick(0)">今天
+                                        </button>
+                                        <button id="yesterdayClick" type="button" class="btn btn-primary" name="-1"
+                                                onclick="driverDiscernStatistics.inquireClick(-1)">前一天
+                                        </button>
+                                        <button id="nearlyThreeDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="driverDiscernStatistics.inquireClick(-3)">前三天
+                                        </button>
+                                        <button id="nearlySevenDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="driverDiscernStatistics.inquireClick(-7)">前七天
+                                        </button>
+                                        <button id="inquireClick" type="button" class="btn btn-primary search-btn"
+                                                name="1" onclick="driverDiscernStatistics.inquireClick(1)"><i
+                                                class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                        <button id="exportRisk" disabled="disabled" type="button"
+                                                class="btn btn-purple export-btn"><i
+                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">数据列表</h3>
+                            <div class="actions pull-right listActions">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch2-body">
+                            <div class="ToolPanel" style="">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                          id="simpleQueryParam" name="simpleQueryParam"
+                                                          style="width:300px" placeholder="请输入车牌号"></label>
+                                            <button onclick="driverDiscernStatistics.searchTable()" type="button"
+                                                    id="search_button"
+                                                    class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" style="display:none"/>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="columns btn-group pull-right fuelConsumptionS">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                            title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns" type="button"
+                                                class="btn btn-default dropdown-toggle btn-border-radius"
+                                                data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable"
+                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>车牌号</th>
+                                    <th>所属企业</th>
+                                    <th>比对结果</th>
+                                    <th>比对相似度</th>
+                                    <th>比对相似度阈值</th>
+                                    <th>比对类型</th>
+                                    <th>比对人脸ID</th>
+                                    <th>比对驾驶员姓名</th>
+                                    <th>从业资格证号</th>
+                                    <th>比对时间</th>
+                                    <th>附件</th>
+                                    <th>位置</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<!--附件照片查看弹窗-->
+<div class="modal fade in" id="imgMediaModal" role="dialog" aria-labelledby="imgMediaModal"
+     aria-hidden="false">
+    <div class="modal-dialog modal-lg" role="document" style="width: 900px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="peopleMediaTitle"></h4>
+            </div>
+            <div class="modal-body clearfix">
+                <div id="part2" class="row">
+                    <div class="row" style="margin-bottom: 12px;">
+                        <button id="imgAttached" type="button" class="btn"  style="margin-left: 50px;background: #20b5f0;color:#fff">图片附件</button>
+                        <button id="vedioAttached" type="button" class="btn" style="margin-left: 10px;background: #6dcff6;color:#fff">视频附件</button>
+                    </div>
+                    <div id="imgSwiperWrapper" style="width: 880px"></div>
+                    <div id="vedioSwiperWrapper"  style="width: 880px;display: none"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="fragments/footer">footer</div>
+<div id="detail" class="right-panel" style="width: 1000px">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title fwb">驾驶员比对详情</h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close"
+                      onclick="driverDiscernStatistics.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table id="compareResultTable"
+                   class="table table-bordered"
+                   cellspacing="0" width="100%" style="margin-bottom: 20px;">
+                <caption align="top"><h4 class="tableHeader">驾驶员身份识别结果</h4></caption>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="col-md-7">
+                            <div class="leftDriverBox">
+                                <div class="driverPthotoBox">
+                                    <div class="imgBox">
+                                        <img class="driverPthoto" src="" alt="">
+                                        <div class="noDriverImg">暂无照片</div>
+                                    </div>
+                                    <p class="driverAddress">位置</p>
+                                </div>
+                                <div class="compareInfo">
+                                    <button type="button" class="btn btn-primary">比对抓拍照片</button>
+                                    <span class="compareType">点火比对</span>
+                                    <span class="compareTime">2020-09-22 10:10:55</span>
+                                </div>
+                                <div class="compareResultBox">
+                                    <div class="compareResultInfo">超时</div>
+                                    <div class="compareSimilarity">比对相似度: <span id="similarity">98%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="rightTopImg">
+                                <div class="rightImgBox">
+                                    <img class="comparePthoto" src="" alt="">
+                                    <div class="noCompareImg">暂无照片</div>
+                                </div>
+                                <button type="button" class="btn btn-primary">驾驶员库照片</button>
+                            </div>
+                            <table id="compareTable" class="table table-bordered"
+                                   cellspacing="0" width="100%">
+                                <tbody>
+                                <tr>
+                                    <th>人脸ID</th>
+                                    <td id="faceId"></td>
+                                </tr>
+                                <tr>
+                                    <th>姓名</th>
+                                    <td id="compareName"></td>
+                                </tr>
+                                <tr>
+                                    <th>资格证号</th>
+                                    <td id="qualificationCard"></td>
+                                </tr>
+                                <tr>
+                                    <th>车牌号</th>
+                                    <td id="compareMonitorName"></td>
+                                </tr>
+                                <tr>
+                                    <th>所属企业</th>
+                                    <td id="compareOrgNmae"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <table id="detailDataTable"
+                   class="table table-bordered table-hover noCheckTable"
+                   cellspacing="0" width="100%">
+                <caption align="top"><h4 class="tableHeader">最近五次识别记录</h4></caption>
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>上报时间</th>
+                    <th>匹配结果</th>
+                    <th>比对相似度</th>
+                    <th>比对类型</th>
+                    <th>驾驶员人脸ID</th>
+                    <th>车牌号</th>
+                </tr>
+                </thead>
+                <tbody id="detailTbody">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px"
+                    onclick="driverDiscernStatistics.closeDetail()">关 &nbsp;闭
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var vehicleSelectDriver = [[#{Vehicle.select.driver}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<!--<script type="text/javascript" src="/clbs/resources/js/jquery.slidereveal.js"></script>-->
+<script src="/clbs/resources/js/swiper.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/driverDiscernStatistics.js"></script>
+</html>

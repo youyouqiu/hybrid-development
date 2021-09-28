@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewVehicleCategoryDao">
+
+    <delete id="delete">
+        UPDATE zw_m_vehicle_category set flag=0 WHERE id = #{id}
+    </delete>
+
+    <select id="getByName" parameterType="string" resultType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        SELECT * from zw_m_vehicle_category
+        where flag = 1 and vehicle_category = #{name}
+        order by create_data_time desc limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        INSERT INTO zw_m_vehicle_category
+        (
+        id,
+        vehicle_category,
+        ico,
+        description,
+        flag,
+        create_data_time,
+        create_data_username,
+        update_data_time,
+        update_data_username,
+        standard
+        )
+        values (
+        #{id},
+        #{vehicleCategory},
+        #{ico},
+        #{description},
+        #{flag},
+        now(),
+        #{createDataUsername},
+        #{updateDataTime},
+        #{updateDataUsername},
+        #{standard}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        UPDATE zw_m_vehicle_category
+        <set>
+            <if test='null != vehicleCategory'>vehicle_category = #{vehicleCategory},</if>
+            <if test='null != ico'>ico = #{ico},</if>
+            <if test='null != description'>description = #{description},</if>
+            <if test='null != flag'>flag = #{flag},</if>
+            <if test='null != createDataTime'>create_data_time = #{createDataTime},</if>
+            <if test='null != createDataUsername'>create_data_username = #{createDataUsername},</if>
+            <if test='null != updateDataTime'>update_data_time = #{updateDataTime},</if>
+            <if test='null != updateDataUsername'>update_data_username = #{updateDataUsername},</if>
+            <if test='null != standard'>standard = #{standard},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getById" resultType="com.zw.platform.basic.dto.VehicleCategoryDTO">
+        SELECT vc.id,vc.vehicle_category category,vc.ico iconId,ic.ico_name iconName,vc.description,vc.standard FROM zw_m_vehicle_category vc
+		LEFT JOIN zw_c_ico_config  ic  on ic.id=vc.ico
+        where vc.flag=1
+        and  vc.id = #{id}
+    </select>
+
+    <select id="getByKeyword" resultType="com.zw.platform.basic.dto.VehicleCategoryDTO">
+        SELECT vc.id,vc.vehicle_category category,vc.ico iconId,ic.ico_name iconName,vc.description,vc.standard FROM
+        zw_m_vehicle_category vc
+        LEFT JOIN zw_c_ico_config ic on ic.id=vc.ico
+        where vc.flag=1
+        <if test="_parameter != null and _parameter != ''">
+            and BINARY vc.vehicle_category LIKE CONCAT('%',#{_parameter},'%')
+        </if>
+        order by vc.create_data_time desc
+    </select>
+
+    <select id="getByIds" resultType="com.zw.platform.basic.dto.VehicleCategoryDTO">
+        SELECT vc.id,vc.vehicle_category category,vc.ico iconId,ic.ico_name iconName,vc.description,vc.standard FROM
+        zw_m_vehicle_category vc
+        LEFT JOIN zw_c_ico_config ic on ic.id=vc.ico
+        where vc.flag=1
+        and vc.id in
+        <foreach item="id" collection="ids" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="deleteBatch">
+        update zw_m_vehicle_category set flag=0, update_data_time=now()
+        where flag=1 and id in
+        <foreach item="id" collection="ids" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getByIcon" resultType="com.zw.platform.basic.dto.VehicleCategoryDTO">
+     SELECT vc.id,vc.vehicle_category category,vc.ico iconId,ic.ico_name iconName,vc.description,vc.standard
+     FROM zw_m_vehicle_category vc
+     LEFT JOIN zw_c_ico_config ic on ic.id=vc.ico
+     where vc.flag=1
+     and vc.ico = #{iconId}
+    </select>
+
+    <select id="getByVehicleTypeId" resultType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        SELECT vc.*,
+               vt.code_num
+        FROM zw_m_vehicle_category vc
+                 INNER JOIN zw_m_vehicle_type vt ON vt.vehicle_category = vc.id
+            AND vc.flag = 1
+        WHERE vt.id = #{typeId}
+          AND vt.flag = 1
+    </select>
+
+    <select id="findByCategory" resultType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        SELECT id,
+               vehicle_category,
+               ico,
+               description,
+               create_data_time,
+               create_data_username,
+               update_data_time,
+               update_data_username,
+               standard
+        FROM zw_m_vehicle_category
+        WHERE binary vehicle_category = BINARY #{category}
+          AND flag = 1
+    </select>
+
+    <select id="getAll" resultType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        SELECT zmvc.id,
+               zmvc.vehicle_category,
+               zmvc.ico,
+               zcic.ico_name,
+               zmvc.description,
+               zmvc.create_data_time,
+               zmvc.create_data_username,
+               zmvc.update_data_time,
+               zmvc.update_data_username,
+               zmvc.standard
+        FROM zw_m_vehicle_category zmvc
+                 LEFT JOIN zw_c_ico_config zcic on zmvc.ico = zcic.id and zcic.flag = 1
+        where zmvc.flag = 1
+        ORDER BY zmvc.create_data_time DESC
+    </select>
+
+    <select id="findByStandard" resultType="com.zw.platform.basic.domain.VehicleCategoryDO">
+        SELECT zmvc.*
+        FROM zw_m_vehicle_category zmvc
+        WHERE zmvc.flag = 1
+          AND zmvc.standard = #{standard}
+        ORDER BY zmvc.create_data_time DESC
+    </select>
+</mapper>

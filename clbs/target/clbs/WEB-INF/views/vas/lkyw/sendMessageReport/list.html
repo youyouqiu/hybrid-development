@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>下发消息统计</title>
+    <link rel="stylesheet" href="/clbs/resources/css/detailDrawer/detailDrawer.css">
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <!--breadcrumb 当前页面所处位置-->
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">四川监管报表</li>
+                        <li class="active">下发消息统计</li>
+                    </ul>
+                    <h1 class="h1" style="float:none">下发消息统计</h1>
+                </div>
+            </div>
+            <!--页面主要内容-->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="user">
+                    <div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-12 col-sm-12"
+                                     style="padding-right: 0px; padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" id="messageTitle">
+                                            <h3 class="panel-title fwb">下发消息统计</h3>
+                                            <div class="actions pull-right listActions">
+                                                <i class="fa chevron-down" id="messageTitle-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <!--查询 列表数据-->
+                                        <div class="panel-body" id="messageTitle-body">
+                                            <div class="col-md-12 alarmSearchToolPanel">
+                                                <!--查询表单-->
+                                                <form id="zTreeForm" class="form-horizontal" action="#"
+                                                      method="post" role="form">
+                                                    <div class="form-group">
+                                                        <!--统计对象-->
+                                                        <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                                        <input class="form-control hidden" />
+                                                        <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                            <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                                <option value="vehicle" selected="">监控对象</option>
+                                                                <option value="group">企业</option>
+                                                                <option value="assignment">分组</option>
+                                                            </select>
+                                                            <!--groupSelect3-->
+                                                            <input
+                                                                    style="cursor: pointer; background-color: #fafafa;"
+                                                                    placeholder="请选择" class="form-control moreQueryGroup"
+                                                                    id="zTreeInput" name="zTreeInput" type="text" maxlength="30" autocomplete="off"/>
+                                                            <span
+                                                                    class="fa fa-chevron-down form-control-feedback"
+                                                                    style="top: 0; right: 15px; cursor: pointer;"
+                                                                    aria-hidden="true" id="groupSelectSpan3"></span>
+                                                            <div class="menuContent" id="menuContent">
+                                                                <!--treeDemo3 statisticsObject-->
+                                                                <!--统计对象组织树-->
+                                                                <ul id="statisticsObject" class="ztree"></ul>
+                                                            </div>
+                                                        </div>
+                                                        <!--时间-->
+                                                        <label
+                                                                class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                        <div class="col-md-4 col-sm-4 searchListSelect">
+                                                            <input
+                                                                    style="cursor: pointer; background-color: #fafafa;"
+                                                                    class="form-control layer-date laydate-icon"
+                                                                    id="timeInterval" name="timeInterval" readonly />
+                                                        </div>
+                                                    </div>
+                                                    <!--查询、导出按钮-->
+                                                    <div class="form-group">
+                                                        <div class="col-md-12 control-label" id="dateSearchData">
+                                                            <button id="todayClick" type="button"
+                                                                    class="btn btn-primary fixed-width"
+                                                                    onclick="messageCommon.inquireClick(0)">今天</button>
+                                                            <button id="yesterdayClick" type="button"
+                                                                    class="btn btn-primary fixed-width"
+                                                                    onclick="messageCommon.inquireClick(-1)">前一天
+                                                            </button>
+                                                            <button id="nearlyThreeDays" type="button"
+                                                                    class="btn btn-primary fixed-width"
+                                                                    onclick="messageCommon.inquireClick(-3)">前三天
+                                                            </button>
+                                                            <button id="nearlySevenDays" type="button"
+                                                                    class="btn btn-primary fixed-width"
+                                                                    onclick="messageCommon.inquireClick(-7)">前七天
+                                                            </button>
+                                                            <button id="inquireClick" type="button"
+                                                                    class="btn btn-primary search-btn fixed-width" name="1"
+                                                                    onclick="messageCommon.inquireClick(1)">
+                                                                <i class="glyphicon glyphicon-search"></i> 查询
+                                                            </button>
+                                                            <!--exportMileage3-->
+                                                            <button id="exportTableData" type="button"
+                                                                    class="btn btn-purple export-btn fixed-width" disabled>
+                                                                <i class="glyphicon glyphicon-log-out" ></i> 导出
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12"
+                                     style="padding-right: 0px; padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" id="3stretch">
+                                            <h3 class="panel-title fwb">数据列表</h3>
+                                            <div class="actions pull-right listActions">
+                                                <i class="fa chevron-down" id="3stretch-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body fixed-table-body" id="3stretch-body">
+                                            <div class="ToolPanel">
+                                                <div class="bars pull-left">
+                                                    <div class="btn-group pull-left barsMargin" role="group">
+                                                        <!--列表筛选搜索-->
+                                                        <form role="form">
+                                                            <!--simpleQueryParam3-->
+                                                            <label><input autocomplete="off" type="text"
+                                                                          class="Inlinesearch form-control"
+                                                                          id="queryPlateNumber" maxlength="30" name="queryPlateNumber"
+                                                                          style="width: 300px" placeholder="请输入车牌号"></label>
+                                                            <!--search_button3-->
+                                                            <button type="button" id="queryPlateBtn"
+                                                                    class="btn btn-outline btn-default">搜索</button>
+                                                            <input id="hiddenText" type="text" style="display: none" />
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <!--表格操作方法-->
+                                                <div class="columns btn-group pull-right fuelConsumptionS">
+                                                    <!--刷新表格-->
+                                                    <button id="refreshTableBtn" class="btn btn-default"
+                                                            type="button" name="refresh" title="刷新">
+                                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                    </button>
+                                                    <!--表格显示列设置菜单 keepOpen3-->
+                                                    <div class="keep-open btn-group" id="setting-column-container"
+                                                         title="定制显示列">
+                                                        <button id="customizeColumns" type="button"
+                                                                class="btn btn-default dropdown-toggle btn-border-radius"
+                                                                data-toggle="dropdown">
+                                                            <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                                class="caret"></span>
+                                                        </button>
+                                                        <!--Ul-menu-text3-->
+                                                        <ul class="dropdown-menu" role="menu" id="table-column-setting">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--下发消息统计 数据表格 dataTable3-->
+                                            <table id="sendMessageTable"
+                                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                                   cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center" rowspan="2">序号</th>
+                                                    <th class="text-center" data-index="2" rowspan="2">车牌号</th>
+                                                    <th class="text-center" data-index="3" rowspan="2">车牌颜色</th>
+                                                    <th class="text-center" data-index="4" rowspan="2">车辆类型</th>
+                                                    <th class="text-center" style="min-width: 220px;" data-index="5" rowspan="2">所属企业</th>
+                                                    <th class="text-center" data-index="6" rowspan="2">消息总条数</th>
+                                                    <th class="text-center" colspan="2">是否成功</th>
+                                                    <th class="text-center" colspan="4">下发方式</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-center" data-index="7">成功</th>
+                                                    <th class="text-center" data-index="8">失败</th>
+                                                    <th class="text-center" data-index="9">人工下发成功</th>
+                                                    <th class="text-center" data-index="10">人工下发失败</th>
+                                                    <th class="text-center" data-index="11">系统下发成功</th>
+                                                    <th class="text-center" data-index="12">系统下发失败</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="messageTbody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<div class="drawer-container" id="drawerBox">
+    <div class="panel panel-default alarmSearchToolPanel" style="height: calc(100%);">
+        <div class="panel-heading" >
+            <h3 class="panel-title fwb">消息明细</h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close" onclick="messageCommon.closeDrawer()"></span>
+            </div>
+        </div>
+        <div class="panel-body" style="height: calc(100% - 113px);">
+            <form id="searchDetailForm" role="form" action="#"
+                  method="post" class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group clearfix">
+                            <label class="col-md-1 control-label">消息内容：</label>
+                            <div class="col-md-2">
+                                <input autocomplete="off" name="messageInfo" placeholder="请输入消息内容" maxlength="79" type="text"
+                                       class="form-control"/>
+                                <input type="text" style="display:none" />
+                            </div>
+                            <label class="col-md-1 control-label">下发方式：</label>
+                            <div class="col-md-3">
+                                <select id="issueWay" name="issueWay"
+                                        placeholder="请选择下发方式"
+                                        class="form-control">
+                                    <option value='2'>全部</option>
+                                    <option value='0'>系统下发</option>
+                                    <option value='1'>人工下发</option>
+                                </select>
+                            </div>
+                            <label class="col-md-1 control-label">下发状态：</label>
+                            <div class="col-md-3">
+                                <select id="issueStatus" name="issueStatus"
+                                        placeholder="请选择下发状态"
+                                        class="form-control">
+                                    <option value='2'>全部</option>
+                                    <option value='0'>成功</option>
+                                    <option value='1'>失败</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 text-right">
+                                <button id="filterMsgDetail" type="button" class="btn btn-primary">查询</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="tableScrollBox" style="height: calc(100% - 60px);overflow: auto;position: relative;">
+                <table id="messageDetail" class="table table-striped table-bordered table-hover noCheckTable"
+                       cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th class="text-center">序号</th>
+                        <th class="text-center">车牌号</th>
+                        <th class="text-center">车牌颜色</th>
+                        <th class="text-center">车辆类型</th>
+                        <th class="text-center" style="min-width: 110px;">所属企业</th>
+                        <th class="text-center" style="min-width: 300px;">消息内容</th>
+                        <th class="text-center" style="min-width: 110px;">播放方式</th>
+                        <th class="text-center">下发方式</th>
+                        <th class="text-center">下发人</th>
+                        <th class="text-center">下发状态</th>
+                        <th class="text-center">下发时间</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <a id="detailExport"  type="button" class="btn btn-primary export-btn">
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </a>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px" onclick="messageCommon.closeDrawer()">关 &nbsp;闭</button>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var monitoringObjecNull = [[#{monitoring.objec.null}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+    var notDataExport = [[#{not.data.export}]];
+    var exportFail = [[#{export.fail}]];
+    var publicError = [[#{public.error}]];
+</script>
+
+<script src="resources/js/zTree/js/ztreeSearch.js"
+        th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/sendMessageReport/sendMessage.js"
+        th:src="@{/resources/js/sendMessageReport/sendMessage.js}"></script>
+</html>

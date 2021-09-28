@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.TaskManagementDao">
+    <resultMap id="taskInfo" type="com.zw.platform.domain.taskmanagement.TaskInfo">
+        <result property="id" column="id"/>
+        <result property="taskName" column="taskName"/>
+        <result property="remark" column="remark"/>
+        <result property="groupId" column="groupId"/>
+        <collection property="taskItems" column="taskId" ofType="com.zw.platform.domain.taskmanagement.TaskItem" javaType="ArrayList">
+            <result property="controlType" column="controlType"/>
+            <result property="fenceInfoId" column="fenceInfoId"/>
+            <result property="startTime" column="startTime"/>
+            <result property="endTime" column="endTime"/>
+            <result property="relationAlarm" column="relationAlarm"/>
+            <result property="taskId" column="taskId"/>
+            <result property="id" column="tid"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="designateInfo" type="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        <result property="id" column="id"/>
+        <result property="designateName" column="designateName"/>
+        <result property="startDate" column="startDate"/>
+        <result property="endDate" column="endDate"/>
+        <result property="dateDuplicateType" column="dateDuplicateType"/>
+        <result property="remark" column="remark"/>
+        <result property="groupId" column="groupId"/>
+        <result property="taskName" column="taskName"/>
+        <collection property="designatePeopleInfos" column="designateInfoId" ofType="com.zw.platform.domain.taskmanagement.DesignateMonitorInfo" javaType="ArrayList">
+            <result property="peopleId" column="peopleId"/>
+            <result property="peopleName" column="peopleName"/>
+            <result property="id" column="pdId"/>
+        </collection>
+    </resultMap>
+
+    <select id="getTaskList" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        select ti.id, ti.task_name taskName, ti.remark, ti.group_id, ti.create_data_time,
+        ti.create_data_username, group_concat(di.designate_name) as designateNames
+        from zw_m_task_info ti
+        left join zw_m_designate_info di on di.task_id = ti.id and di.flag = 1
+        where ti.flag = 1
+        and ti.group_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+            and ti.task_name like CONCAT('%',#{query.simpleQueryParam},'%')
+        </if>
+        group by ti.id
+        order by ti.create_data_time desc
+    </select>
+
+    <insert id="addTaskInfo" parameterType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        insert into zw_m_task_info
+        (id, task_name, remark, group_id, flag, create_data_time, create_data_username)
+        values
+        (#{id}, #{taskName}, #{remark}, #{groupId}, #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <insert id="addTaskItem" parameterType="com.zw.platform.domain.taskmanagement.TaskItem">
+        insert into zw_m_task_item_info
+        (id, task_id, control_type, fence_info_id, start_time, end_time, relation_alarm, flag)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.taskId}, #{item.controlType}, #{item.fenceInfoId}, #{item.startTime},
+            #{item.endTime}, #{item.relationAlarm}, #{item.flag})
+        </foreach>
+    </insert>
+
+    <select id="findTaskInfoById" parameterType="string" resultMap="taskInfo">
+        select ti.id, ti.task_name taskName, ti.remark, ti.group_id groupId, tii.control_type controlType,
+               tii.fence_info_id fenceInfoId,tii.start_time startTime, tii.end_time endTime, tii.relation_alarm relationAlarm,
+               tii.task_id taskId, tii.id as tid
+        from zw_m_task_info ti
+                 inner join zw_m_task_item_info tii on tii.task_id = ti.id
+        where tii.flag = 1
+          and ti.flag = 1
+          and ti.id = #{id}
+    </select>
+
+    <update id="editTask" parameterType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        update zw_m_task_info
+        set
+            task_name = #{taskName},
+            remark = #{remark},
+            update_data_username = #{updateDataUsername},
+            update_data_time = #{updateDataTime}
+        where id = #{id}
+    </update>
+
+    <update id="editDesignate" parameterType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        update zw_m_designate_info
+        set
+            designate_name = #{designateName},
+            remark = #{remark},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            date_duplicate_type = #{dateDuplicateType},
+            update_data_username = #{updateDataUsername},
+            update_data_time = #{updateDataTime},
+            task_id = #{taskId}
+        where id = #{id}
+    </update>
+
+    <update id="deleteDesignatePeople" parameterType="string">
+        update zw_m_monitor_designate_info
+        set flag = 0
+        where designate_info_id = #{id}
+    </update>
+
+    <update id="deleteTaskItem" parameterType="string">
+        update zw_m_task_item_info
+        set flag = 0
+        where task_id = #{id}
+    </update>
+
+    <update id="deleteTask" parameterType="string">
+        update zw_m_task_info ti,zw_m_task_item_info tii
+        set ti.flag = 0, tii.flag = 0
+        where tii.task_id = #{id}
+          and ti.id = #{id}
+    </update>
+
+    <update id="deleteDesignate" parameterType="string">
+        update zw_m_designate_info ti,zw_m_monitor_designate_info tii
+        set ti.flag = 0, tii.flag = 0
+        where tii.designate_info_id = #{id}
+          and ti.id = #{id}
+    </update>
+
+    <select id="getDesignateList" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        select di.id, di.designate_name, di.remark, di.group_id, di.start_date,di.create_data_username, di.create_data_time,
+        di.end_date, ti.task_name taskName, di.forced_end
+        from zw_m_designate_info di
+        left join zw_m_task_info ti on ti.id = di.task_id and ti.flag = 1
+        where di.flag = 1
+        and di.group_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+            and di.designate_name like CONCAT('%',#{query.simpleQueryParam},'%')
+        </if>
+        group by di.id
+        order by di.create_data_time desc
+    </select>
+
+    <insert id="addDesignateInfo" parameterType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        insert into zw_m_designate_info
+        (id, designate_name, remark, group_id, flag, create_data_time, create_data_username,
+         task_id, start_date, end_date, date_duplicate_type
+        )
+        values
+        (#{id}, #{designateName}, #{remark}, #{groupId}, #{flag}, #{createDataTime}, #{createDataUsername},
+         #{taskId}, #{startDate}, #{endDate}, #{dateDuplicateType})
+    </insert>
+
+    <insert id="addDesignatePeople" parameterType="com.zw.platform.domain.taskmanagement.DesignateMonitorInfo">
+        insert into zw_m_monitor_designate_info
+        (id, designate_info_id, monitor_id, start_date, end_date, date_duplicate_type, flag)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.designateInfoId}, #{item.peopleId}, #{item.startDate}, #{item.endDate},
+            #{item.dateDuplicateType}, #{item.flag})
+        </foreach>
+    </insert>
+
+    <select id="findDesignateInfoById" parameterType="string" resultMap="designateInfo">
+        select di.id, di.designate_name designateName, di.task_id taskId, di.remark, di.group_id groupId,
+               di.start_date startDate, di.end_date endDate, di.date_duplicate_type dateDuplicateType,
+               pd.monitor_id peopleId, pd.designate_info_id designateInfoId, pd.id pdId,ti.task_name taskName,
+               pi.people_number peopleName
+        from zw_m_designate_info di
+                 inner join zw_m_task_info ti on ti.id = di.task_id and ti.flag = 1
+                 left join zw_m_monitor_designate_info pd on pd.designate_info_id = di.id and pd.flag = 1
+                 left join
+             (select id,brand as people_number,0 as monitorType,create_data_time from zw_m_vehicle_info where flag = 1 union all
+              select id,people_number as people_number,1 as monitorType,create_data_time from zw_m_people_info where flag = 1 union all
+              select id,thing_number as people_number,2 as monitorType,create_data_time from zw_m_thing_info where flag = 1) pi on pi.id = pd.monitor_id
+        where di.flag = 1
+          and di.id = #{id}
+    </select>
+
+    <select id="checkTaskName" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        select id
+        from zw_m_task_info
+        where flag = 1
+        and task_name = #{name}
+        and group_id = #{gropId}
+    </select>
+
+    <select id="getTaskTree" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        select ti.id, ti.task_name taskName
+        from zw_m_task_info ti
+        where ti.flag = 1
+        and ti.group_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by ti.create_data_time desc
+    </select>
+
+    <select id="checkDesignateName" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        select id
+        from zw_m_designate_info
+        where flag = 1
+        and designate_name = #{name}
+        and group_id = #{gropId}
+    </select>
+
+    <select id="checkConflict" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        select pd.monitor_id as peopleId, pd.start_date, pd.end_date, pd.date_duplicate_type, ti.start_time, ti.end_time, t.task_name,
+        p.people_number, di.id, di.designate_name
+        from zw_m_monitor_designate_info pd
+        inner join zw_m_designate_info di on di.id = pd.designate_info_id and di.flag = 1
+        inner join zw_m_task_item_info ti on ti.task_id = di.task_id and ti.flag = 1
+        inner join zw_m_task_info t on t.id = ti.task_id and t.flag = 1
+        inner join
+        (select id,brand as people_number,0 as monitorType,create_data_time from zw_m_vehicle_info where flag = 1 union all
+        select id,people_number as people_number,1 as monitorType,create_data_time from zw_m_people_info where flag = 1 union all
+        select id,thing_number as people_number,2 as monitorType,create_data_time from zw_m_thing_info where flag = 1) p on p.id = pd.monitor_id
+        where pd.flag = 1
+        and di.group_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and pd.monitor_id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and di.end_date &gt; curdate()
+    </select>
+
+    <update id="updateForcedEnd" parameterType="string">
+        update zw_m_designate_info di,zw_m_monitor_designate_info ps
+        set di.end_date = curdate(),ps.end_date = curdate(),
+            di.forced_end = 1
+        where
+            di.id = ps.designate_info_id
+          and di.id = #{id}
+          and di.flag = 1
+          and ps.flag = 1
+    </update>
+
+    <select id="findDesignateByTaskId" parameterType="string" resultType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        select id
+        from zw_m_designate_info
+        where flag = 1
+          and task_id = #{id}
+    </select>
+</mapper>

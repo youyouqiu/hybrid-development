@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.webMaster.monitorInfo.AppMonitorDao">
+    <select id="getMonitorConfig" resultType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+        SELECT * FROM zw_app_monitor_show_config
+        WHERE group_id = #{groupId}
+        AND group_default = #{groupDefault}
+        AND type = #{type}
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+
+    <select id="getMonitorConfigByGroupId" resultType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+        SELECT * FROM zw_app_monitor_show_config
+        WHERE group_id = #{groupId}
+        AND group_default = #{groupDefault}
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+
+    <select id="getMonitorConfigByVersion" resultType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+        SELECT * FROM zw_app_monitor_show_config
+        WHERE group_id = #{groupId}
+        AND group_default = #{groupDefault}
+        AND type = #{type}
+        <if test="appVersion != null">
+            AND app_version <![CDATA[ <= ]]> #{appVersion}
+        </if>
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+    <select id="getGroupName" resultType="java.lang.String">
+		SELECT group_name FROM zw_app_monitor_show_config
+		WHERE group_id = #{groupId}
+		AND group_default = 0
+		AND type = #{type}
+		AND flag = 1
+		limit 1
+	</select>
+    <delete id="deleteGroupMonitorConfig" parameterType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+	delete from zw_app_monitor_show_config
+	WHERE group_id = #{groupId}
+	AND group_default = #{groupDefault}
+	</delete>
+    <insert id="addGroupMonitorConfig" parameterType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+        INSERT INTO zw_app_monitor_show_config
+        (id,group_id,group_name,group_default,category,`name`,`type`,app_version,flag,update_data_time,update_data_username,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.groupId},#{item.groupName},#{item.groupDefault},#{item.category},#{item.name},#{item.type},#{item.appVersion},#{item.flag},#{item.updateDataTime},#{item.updateDataUsername},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="getDefaultMonitorConfig" resultType="com.zw.app.domain.webMaster.monitorInfo.AppMonitorConfigInfo">
+        SELECT * FROM zw_app_monitor_show_config
+        WHERE group_id = #{groupId}
+        AND type = #{type}
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+
+</mapper>

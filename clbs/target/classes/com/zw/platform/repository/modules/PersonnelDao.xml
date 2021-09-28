@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.PersonnelDao">
+    <sql id="Example_Where_Clause" >
+        <trim prefix="where" prefixOverrides="and|or" >
+            <if test="condition.name != null" >
+                and name = #{condition.name}
+            </if>
+            <if test="condition.birthday != null" >
+                and birthday = #{condition.birthday}
+            </if>
+            <if test="condition.gender != null" >
+                and gender = #{condition.gender}
+            </if>
+            <if test="condition.identity != null" >
+                and identity = #{condition.identity}
+            </if>
+            <if test="condition.phone != null" >
+                and phone = #{condition.phone}
+            </if>
+            <if test="condition.address != null" >
+                and address = #{condition.address}
+            </if>
+            <if test="condition.email != null" >
+                and email = #{condition.email}
+            </if>
+            <if test="condition.flag != null" >
+                and flag = #{condition.flag}
+            </if>
+            <if test="condition.createDataTime != null" >
+                and create_data_time = #{condition.createDataTime}
+            </if>
+            <if test="condition.createDataUsername != null" >
+                and create_data_username = #{condition.createDataUsername}
+            </if>
+            <if test="condition.updateDataTime != null" >
+                and update_data_time = #{condition.updateDataTime}
+            </if>
+            <if test="condition.updateDataUsername != null" >
+                and update_data_username = #{condition.updateDataUsername}
+            </if>
+        </trim>
+    </sql>
+    <sql id="Base_Column_List" >
+        id, name, birthday, gender, identity, phone, address, email, flag, create_data_time,
+        create_data_username, update_data_time, update_data_username
+    </sql>
+    <!-- 查询  -->
+    <select id="find" parameterType="com.zw.platform.domain.basicinfo.query.PersonnelQuery" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT * FROM zw_m_people_info
+        WHERE flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and (name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            or phone LIKE CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 查询所有监控对象人（游离的+权限内分组下的人）  -->
+    <select id="findPeosonnelByGroup" parameterType="com.zw.platform.domain.basicinfo.query.PersonnelQuery" resultType="com.zw.platform.domain.basicinfo.Personnel">
+	SELECT t.*, device.device_number AS deviceNumber, sim.simcard_number AS simcardNumber, t.org_id AS groupId, GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assign
+	FROM
+	zw_m_people_info t
+	LEFT JOIN zw_m_config con ON t.id = con.vehicle_id AND con.flag = 1 AND con.monitor_type = '1'
+	LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+	LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+	LEFT JOIN zw_m_assignment_vehicle mav ON t.id = mav.vehicle_id AND mav.flag = 1
+	LEFT JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+	WHERE t.flag = 1
+	AND t.id IN
+		(SELECT p.id FROM zw_m_people_info p
+		INNER JOIN zw_m_assignment_vehicle av ON p.id = av.vehicle_id AND av.flag = 1 AND av.monitor_type = '1'
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+		INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+		WHERE p.flag = 1
+		AND  au.user_id =  #{userId} 
+        AND  ag.group_id IN
+		<foreach item="item" collection="groupList" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+		<if test="param != null">
+			<if test="param.groupId != null and param.groupId !=''">
+				AND  ag.group_id = #{param.groupId}
+			</if>
+		</if>
+		UNION
+		SELECT p1.id FROM zw_m_people_info p1
+		AND NOT EXISTS
+			(SELECT av1.id FROM zw_m_assignment_vehicle av1 WHERE p1.id = av1.vehicle_id AND av1.flag = 1)
+		AND p1.org_id IN
+		<foreach item="item" collection="groupList" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+		<if test="param != null">
+			<if test="param.groupId != null and param.groupId !=''">
+				AND  p1.org_id = #{param.groupId}
+			</if>
+		</if>
+		)
+	<if test="param != null">
+		<if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+			and ( t.name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+			OR t.people_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+			)
+		</if>
+	</if>
+	GROUP BY t.id,
+	device.id,
+	sim.id,cpg.id
+	ORDER BY t.create_data_time DESC 
+    </select>
+    
+    <!-- 查询所有监控对象人（所选分组下的人）  -->
+    <select id="findPeosonnelByAssign" parameterType="com.zw.platform.domain.basicinfo.query.PersonnelQuery" resultType="com.zw.platform.domain.basicinfo.Personnel">
+		SELECT t.*, device.device_number AS deviceNumber, sim.simcard_number AS simcardNumber, t.org_id AS groupId, GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assign
+		FROM
+		zw_m_people_info t
+		INNER JOIN zw_m_config con ON t.id = con.vehicle_id AND con.flag = 1 AND con.monitor_type = '1'
+		INNER JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+		INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+		INNER JOIN zw_m_assignment_vehicle mav ON t.id = mav.vehicle_id AND mav.flag = 1 AND mav.monitor_type = '1'
+		INNER JOIN zw_m_assignment_user au ON mav.assignment_id = au.assignment_id AND au.flag = 1
+		INNER JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = mav.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+		WHERE t.flag = 1
+		AND  au.user_id =  #{userId} 
+		<if test="param != null">
+			<if test="param.assignId != null and param.assignId !=''">
+				AND a.id = #{param.assignId}
+			</if>
+		</if>
+		<if test="param != null">
+			<if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+				and ( t.name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+				OR t.people_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+				)
+			</if>
+		</if>
+		GROUP BY t.id,
+		device.id,
+		sim.id,cpg.id
+		ORDER BY t.create_data_time DESC
+    </select>
+    
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.PersonnelForm">
+        INSERT INTO zw_m_people_info (
+        id, people_number, name, gender, identity, phone, email,remark,create_data_time,create_data_username
+        )
+        VALUES(
+         #{id}, #{peopleNumber}, #{name}, #{gender}, #{identity}, #{phone},
+         #{email},#{remark},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 根据id删除一个 Peopel -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_people_info set flag=0 WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ids删除多个 Peopel -->
+    <delete id="deleteMuch" parameterType="string">
+        UPDATE zw_m_people_info set flag=0 WHERE id IN 
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+    
+    <!-- 修改 PER -->
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.form.PersonnelForm">
+        UPDATE zw_m_people_info SET
+        <if test="peopleNumber != null and peopleNumber != ''">
+        	people_number=#{peopleNumber},
+        </if> 
+        name = #{name}, birthday = #{birthday}, identity = #{identity},
+        gender=#{gender},
+        phone = #{phone}, address = #{address}, email = #{email},remark=#{remark},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 通过id得到一个 User-->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT p.*,p.org_id groupId,c.id bindId FROM zw_m_people_info p
+		LEFT JOIN zw_m_config c ON c.vehicle_id = p.id AND c.flag = 1
+		WHERE 
+		p.flag = 1
+		AND p.id = #{id}
+    </select>
+
+    <!-- 通过id得到一个 User-->
+    <select id="getPeople" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT p.*,p.org_id groupId,c.id bindId FROM zw_m_people_info p
+        LEFT JOIN zw_m_config c ON c.vehicle_id = p.id AND c.flag = 1
+        WHERE
+        p.flag = 1
+        AND p.id IN
+        <foreach item="item" collection="peopleList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据身份证编号查询人员信息 -->
+    <select id="findByIdentity" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT personnel.* FROM zw_m_people_info personnel
+        WHERE flag = 1
+        <if test="identity != null and identity != ''">
+            AND identity = #{identity}
+        </if>
+    </select>
+    
+    <!-- 根据人员编号查询人员信息 -->
+    <select id="findByPeopleNumber" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT personnel.* FROM zw_m_people_info personnel
+        WHERE flag = 1
+        <if test="peopleNumber != null and peopleNumber != ''">
+            AND people_number= BINARY #{peopleNumber}
+        </if>
+    </select>
+
+    <!-- 批量新增 -->
+    <insert id="addByBatch" parameterType="com.zw.platform.domain.basicinfo.form.PersonnelForm">
+        INSERT INTO zw_m_people_info (
+        id, name, birthday, gender, identity, phone, address, email,create_data_time,create_data_username,people_number,remark
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.name}, #{item.birthday}, #{item.gender}, #{item.identity}, #{item.phone},
+            #{item.address}, #{item.email},#{item.createDataTime},#{item.createDataUsername},#{item.peopleNumber},#{item.remark})
+        </foreach>
+    </insert>
+    <!-- 去重 -->
+	<select id="findByPersonnel" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and identity = #{identity}
+    </select>
+	<select id="isExist" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and identity = #{identity} and id <![CDATA[ <> ]]> #{id}
+    </select>
+    
+    <!-- 编号不能重复 -->
+	<select id="findByNumber" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        <!-- SELECT * FROM zw_m_people_info WHERE flag = 1 and people_number = #{peopleNumber} -->
+        select pi.*,pi.org_id groupId from  zw_m_people_info pi where   pi.flag = 1 and  pi.people_number = BINARY #{peopleNumber}
+    </select>
+    
+    <!-- 出去当前用户，编号是否重复 -->
+    <select id="findByNumberId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and people_number = BINARY #{number} and id <![CDATA[ <> ]]> #{id}
+    </select>
+
+    <select id="findNumberByPid" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+		SELECT sim.simcard_number,device.device_number,device.device_type from zw_m_people_info  p
+		LEFT JOIN zw_m_config con  ON p.id = con.vehicle_id AND con.flag =1
+		LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+		LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+		where p.id=#{id} AND p.flag=1
+	</select>
+
+    <select id="findPeopleById" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT  * from  zw_m_people_info where flag=1 and id =#{id}
+    </select>
+
+
+    <select id="findPersonnelWithOutAuth" resultType="map">
+        SELECT
+        t.id,t.people_number AS peopleNumber,t.name,t .birthday, t.gender, t.identity,t.identity_card_photo AS identityCardPhoto,t.phone,t.address,t.email,t.flag, t.create_data_time AS 	createDataTime,DATE_FORMAT( t.create_data_time, '%Y-%m-%d') AS createDataTimeStr, t.update_data_time AS updateDataTime,
+        DATE_FORMAT(t.update_data_time,'%Y-%m-%d') AS updateDataTimeStr,device.device_number AS deviceNumber,sim.simcard_number AS simcardNumber,
+        t.org_id AS groupName,t.org_id  AS groupId, GROUP_CONCAT(ma.name SEPARATOR ',') AS assign, 	GROUP_CONCAT(DISTINCT 	mag.group_id SEPARATOR ',') AS assignGroup, GROUP_CONCAT(ma.id SEPARATOR ',') AS assignId, t.remark AS remark
+        FROM zw_m_people_info t
+        LEFT JOIN zw_m_config con ON con.vehicle_id=t.id AND con.flag =1 AND con.monitor_type = 1
+        LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+        LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle mav ON mav.vehicle_id= t.id AND mav.flag=1
+        LEFT JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+        LEFT JOIN zw_m_assignment_group mag ON ma.id = mag.assignment_id AND mag.flag = 1
+        WHERE t.flag = 1
+        AND t.id IN (
+        SELECT id FROM zw_m_people_info WHERE id IN (
+        SELECT av.vehicle_id FROM zw_m_assignment_vehicle av
+            INNER JOIN zw_m_assignment_user au ON au.assignment_id=av.assignment_id AND au.flag = 1
+            INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+            WHERE av.flag =1
+            ) OR id IN (
+            SELECT t1.id FROM zw_m_people_info t1
+            WHERE t1.flag = 1
+            AND NOT EXISTS (SELECT 1 FROM zw_m_assignment_vehicle av1 WHERE av1.vehicle_id=t1.people_id AND av1.flag = 1)
+            )
+          )
+        GROUP BY t.create_data_time DESC,t.id DESC
+    </select>
+
+    <select id="getLeaveJobPersonnelList" resultType="com.zw.talkback.domain.basicinfo.LeaveJobPersonnel">
+        SELECT zmlja.people_id AS peopleId, zmlja.assignment_id AS assignmentId,
+        zmpi.people_number AS peopleNumber,zma.name AS assignmentName
+        FROM zw_m_leave_job_assignment zmlja
+        INNER JOIN zw_m_people_info zmpi ON zmpi.id = zmlja.people_id AND zmpi.flag = 1
+        INNER JOIN zw_m_assignment zma ON zma.id = zmlja.assignment_id AND zma.flag = 1
+        WHERE zmlja.flag = 1
+        AND zmlja.assignment_id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getAlreadyExistPeopleNumberSet" resultType="java.lang.String">
+        SELECT people_number FROM zw_m_people_info
+        WHERE flag = 1
+        AND BINARY people_number IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getAlreadyExistIdentitySet" resultType="java.lang.String">
+        SELECT identity FROM zw_m_people_info
+        WHERE flag = 1
+        AND identity IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getPeopleInfoByIds" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT zmpi.*, zmpi.org_id groupId FROM zw_m_people_info zmpi
+        WHERE
+        zmpi.flag = 1
+        AND zmpi.id IN
+        <foreach item="item" collection="peopleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findAllPeopleConfig" resultType="com.zw.platform.domain.infoconfig.dto.ConfigMonitorDTO">
+        SELECT p.id as monitorId, p.people_number as monitorName,c.id AS configId,p.org_id groupId
+        FROM zw_m_people_info p
+         LEFT JOIN zw_m_config c on c.vehicle_id = p.id  and c.flag = 1
+        WHERE p.flag = 1
+    </select>
+
+    <update id="updatePersonIdentityCardInfo" parameterType="com.zw.app.entity.appOCR.PersonnelIdentityInfoUploadEntity">
+        UPDATE
+        zw_m_people_info
+        SET
+        name = #{name},
+        gender=#{gender},
+        birthday = #{birthday},
+        identity = #{identity},
+        identity_card_photo = #{identityCardPhoto},
+        nation = #{nation}, address = #{address},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{monitorId} AND flag = 1
+    </update>
+    <update id="updatePeopleNumber">
+        UPDATE
+            zw_m_people_info
+        SET
+            people_number = #{peopleNumber},
+            update_data_time = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+            WHERE id = #{id} AND flag = 1
+    </update>
+
+    <select id="findAllPeopleInfo" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        SELECT id, people_number FROM zw_m_people_info WHERE flag = 1
+    </select>
+
+    <select id="findIdAndPeopleNumbersByIds" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        select id, people_number from zw_m_people_info WHERE flag = 1
+        <if test="ids != null and ids.size > 0">
+            and id in
+            <foreach item="item" collection="ids" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="findIdAndNumbersByNumbers" resultType="com.zw.platform.domain.basicinfo.Personnel">
+        select id, people_number from zw_m_people_info WHERE flag = 1
+        <if test="numbers != null and numbers.size > 0">
+            and binary people_number in
+            <foreach item="item" collection="numbers" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <update id="updateOrgIdByIdIn">
+        UPDATE zw_m_people_info
+        SET org_id = #{orgId}, update_data_time=#{updateTime}, update_data_username=#{username}
+        WHERE id IN
+        <foreach item="id" collection="ids" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

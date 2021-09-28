@@ -1,0 +1,157 @@
+<form th:action="@{/m/cardreader/edit.gsp}" th:object="${result}" id="editForm" role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改读卡器信息</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" type="text" hidden="true" />
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 读卡器编号：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{cardReaderNumber}"  placeholder="请输入读卡器编号" type="text" class="form-control" />
+                        <input th:value="*{cardReaderNumber}" id="scn" type="hidden"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">读卡器厂商：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{manuFacturer}" placeholder="请输入读卡器厂商" type="text" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">读卡器类型：</label>
+                    <div class="col-md-7">
+                        <select th:field="*{cardReaderType}" placeholder="请选择读卡器类型" class="form-control">
+                            <option selected="selected" value="RFID读卡器">RFID读卡器</option>
+                            <option value="IC读卡器">IC读卡器</option>
+                            <option value="ID读卡器">ID读卡器</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">出厂时间：</label>
+                    <div class="col-md-7">
+                        <div class="has-feedback">
+                        	<input class="form-control layer-date laydate-icon"  readonly="readonly" style="background-color: #fafafa; cursor: pointer;" th:field="*{factoryDate}" placeholder="请选择出厂时间" onclick="laydate({format: 'YYYY-MM-DD'})">
+				      	</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">启停状态：</label>
+                    <div class="col-md-7">
+	                    <label style="margin-right: 20px"> 
+	                    	<input autocomplete="off" class="check_1" type="radio" checked="checked" name="isStart" th:field="*{isStart}" value="1">启用
+	                    </label>
+	                    <label> 
+	                    	<input autocomplete="off" class="check_1" type="radio" checked="checked" name="isStart" th:field="*{isStart}" value="2">停用
+	                    </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">描述：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{description}" rows="4" class="form-control" placeholder="请填写描述信息">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button" onclick = "doSubmits()">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+function validates() {
+	 return $("#editForm").validate({
+		 rules : {
+            	cardReaderNumber : {
+                    required : true,
+                    maxlength : 20,
+                    isRightfulString : true,
+                    remote: {
+    					type:"post",
+    					async:false,
+    					url:"/clbs/m/cardreader/repetition" ,
+    					dataType:"json",  
+                        data:{  
+                              username:function(){return $("#cardReaderNumber").val();}  
+                         },  
+                         dataFilter: function(data, type) { 
+                        	 var oldV = $("#scn").val();
+                  			var newV = $("#cardReaderNumber").val();
+                  			var data2 = data;
+                  			if (oldV == newV) {
+                  				return true;
+                  			} else {
+                  				if (data2 == "true"){
+                                		return true; 
+                                 } else {
+                                		return false;
+                                 } 
+                  			}
+                          }  
+                       }
+                },
+                manuFacturer : {
+                    required : false,
+                    maxlength : 20
+                },
+                factoryDate : {
+                    required : false
+                },
+                cardReaderType : {
+                    required : false
+                },
+                isStart : {
+                    required : true
+                },
+                description : {
+                	required : false, 
+                	maxlength : 100
+                }
+		 },
+		 messages : {
+        		cardReaderNumber : {
+           			required : "不能为空", 
+           			maxlength : "长度不超过20",
+           			isRightfulString : "请输入合法字符",
+           			remote: "该读卡器编号已存在" 
+           		},
+           		manuFacturer : {
+               		required : "不能为空",
+               		maxlength : "长度不超过20"
+               	},
+               	cardReaderType : {
+               		required : "不能为空"
+               	},
+               	factoryDate : {
+               		required : "不能为空"
+               	}, 
+               	isStart : {
+               		required : "不能为空"
+               	}, 
+               	description : {
+               		required : "不能为空",
+               		maxlength : "长度不超过100"
+                },
+	       } 
+      }).form();
+  }
+function doSubmits() {
+    if(validates()){
+        $("#editForm").ajaxSubmit(function() {
+        	 $("#commonSmWin").modal("hide");
+        	 /* 关闭弹窗 */
+        	  myTable.refresh()
+        	 
+   });
+  }
+}
+</script>

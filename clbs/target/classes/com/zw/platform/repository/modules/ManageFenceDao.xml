@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ManageFenceDao">
+    <!-- 查询围栏 -->
+    <select id="find" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.ManageFenceInfo">
+        select * from (
+        select m.id, m.name, fi.`type` shape,m.type, m.description, m.create_data_username, m.create_data_time from
+        (SELECT DISTINCT a.* FROM zw_m_fence_info a) fi left join zw_m_marker m on fi.shape = m.id WHERE m.flag=1
+        <if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+            AND ( m.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+        </if>
+        union
+        select l.id, l.name, fi.`type` shape,l.type, l.description, l.create_data_username, l.create_data_time from
+        (SELECT DISTINCT a.* FROM zw_m_fence_info a ) fi left join zw_m_line l on fi.shape = l.id WHERE l.flag=1
+        <if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+            AND ( l.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+        </if>
+        union
+        select p.id, p.name, fi.`type` shape,p.type, p.description, p.create_data_username, p.create_data_time from
+        (SELECT DISTINCT a.* FROM zw_m_fence_info a ) fi left join zw_m_polygon p on fi.shape = p.id WHERE p.flag=1
+        <if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+            AND ( p.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+        </if>
+        union
+        select r.id, r.name, fi.`type` shape,r.type, r.description, r.create_data_username, r.create_data_time from
+        (SELECT DISTINCT a.* FROM zw_m_fence_info a ) fi left join zw_m_rectangle r on fi.shape = r.id WHERE r.flag=1
+        <if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+            AND ( r.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+        </if>
+        union
+        select c.id, c.name, fi.`type` shape,c.type, c.description, c.create_data_username, c.create_data_time from
+        (SELECT DISTINCT a.* FROM zw_m_fence_info a ) fi left join zw_m_circle c on fi.shape = c.id WHERE c.flag=1
+        <if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+            AND ( c.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+        </if>
+        ) tempTable order by tempTable.create_data_time desc
+    </select>
+    <!-- <select id="find" parameterType="string"
+            resultTycom.zw.platform.domain.functionconfignfig.ManageFenceInfo">
+        select * from (
+		select m.id, m.name, fi.`type` shape,m.type, m.description, m.create_data_username, m.create_data_time from (SELECT DISTINCT a.* FROM zw_m_fence_info a WHERE a.id NOT IN (SELECT b.fence_id FROM zw_m_fence_config b)) fi left join zw_m_marker m on fi.shape = m.id WHERE m.flag=1
+		<if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+			AND ( m.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+		</if>
+		union
+		select l.id, l.name, fi.`type` shape,l.type, l.description, l.create_data_username, l.create_data_time from (SELECT DISTINCT a.* FROM zw_m_fence_info a WHERE a.id NOT IN (SELECT b.fence_id FROM zw_m_fence_config b)) fi left join zw_m_line l on fi.shape = l.id WHERE l.flag=1
+		<if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+			AND ( l.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+		</if>
+		union
+		select p.id, p.name, fi.`type` shape,p.type, p.description, p.create_data_username, p.create_data_time from (SELECT DISTINCT a.* FROM zw_m_fence_info a WHERE a.id NOT IN (SELECT b.fence_id FROM zw_m_fence_config b)) fi left join zw_m_polygon p on fi.shape = p.id WHERE p.flag=1
+		<if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+			AND ( p.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+		</if>
+		union
+		select r.id, r.name, fi.`type` shape,r.type, r.description, r.create_data_username, r.create_data_time from (SELECT DISTINCT a.* FROM zw_m_fence_info a WHERE a.id NOT IN (SELECT b.fence_id FROM zw_m_fence_config b)) fi left join zw_m_rectangle r on fi.shape = r.id WHERE r.flag=1
+		<if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+			AND ( r.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+		</if>
+		union
+		select c.id, c.name, fi.`type` shape,c.type, c.description, c.create_data_username, c.create_data_time from (SELECT DISTINCT a.* FROM zw_m_fence_info a WHERE a.id NOT IN (SELECT b.fence_id FROM zw_m_fence_config b)) fi left join zw_m_circle c on fi.shape = c.id WHERE c.flag=1
+		<if test="simpleQueryParam1 != null and simpleQueryParam1 != ''">
+			AND ( c.name LIKE CONCAT('%',#{simpleQueryParam1},'%'))
+		</if>
+		) tempTable order by tempTable.create_data_time desc
+    </select> -->
+    <!-- 删除围栏 -->
+    <update id="delete" parameterType="string">
+        UPDATE zw_m_fence_info a,${tableName} b set a.flag=0,b.flag=0 WHERE a.shape = #{id} and b.id = #{id}
+    </update>
+
+    <update id="deleteSpotbyline" parameterType="string">
+		UPDATE zw_m_line_spot a set a.flag=0 WHERE a.line_id = #{id}
+	</update>
+    <!-- 查询删除围栏表 -->
+    <select id="gettable" parameterType="string" resultType="com.zw.platform.domain.functionconfig.ManageFenceInfo">
+    SELECT c.type FROM zw_m_fence_info c WHERE c.shape=#{id} limit 1
+    </select>
+    <!-- 查询围栏是否绑定 -->
+    <select id="select" parameterType="string"
+            resultType="int">
+        SELECT count(*) from zw_m_fence_config fg WHERE
+        fg.fence_id = (
+        SELECT fi.id  FROM zw_m_fence_info fi WHERE
+        fi.flag=1
+        AND
+        fi.shape = #{id} limit 1) and fg.flag=1
+    </select>
+    <!-- 根据围栏id查询围栏类型 -->
+    <select id="findType" parameterType="string" resultType="string">
+    	SELECT distinct type FROM zw_m_fence_info WHERE shape=#{id}
+    </select>
+
+    <!-- 根据围栏id查询围栏具体类型id(shape) -->
+    <select id="findFenceTypeId" parameterType="string" resultType="string">
+    	SELECT shape FROM zw_m_fence_info WHERE id=#{fenceId} AND flag=1
+    </select>
+
+    <insert id="addSegment" parameterType="com.zw.platform.domain.functionconfig.form.LineSegmentForm">
+        insert into zw_m_line_segment (id, offset, overlength_threshold,
+        shortage_threshold,maximum_speed,overspeed_time,line_id,flag, create_data_time,
+        create_data_username,segment_sort
+        ,night_max_speed,night_limit_time)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.offset},
+            #{item.overlengthThreshold},
+            #{item.shortageThreshold},
+            #{item.maximumSpeed},
+            #{item.overspeedTime},
+            #{item.lineId},
+            #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername},
+            #{item.segmentSort}
+            ,#{item.nightMaxSpeed},#{item.nightLimitTime})
+        </foreach>
+    </insert>
+
+    <insert id="addSegmentContent" parameterType="com.zw.platform.domain.functionconfig.form.SegmentContentForm">
+        insert into zw_m_line_segment_content (line_segment_id, sort_order, longitude,
+        latitude,flag,create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.lineSegmentId}, #{item.sortOrder},
+            #{item.longitude},
+            #{item.latitude},
+            #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <update id="resetSegment" parameterType="string">
+		UPDATE zw_m_line_segment set flag=0 where line_id=#{id}
+	</update>
+
+    <!-- 根据标注名称查询标注实体 -->
+    <select id="findMarkByName" parameterType="string" resultType="com.zw.platform.domain.functionconfig.form.MarkForm">
+	  select * from zw_m_marker where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据id查询标注实体 -->
+    <select id="getMarkForm" parameterType="string" resultType="com.zw.platform.domain.functionconfig.form.MarkForm">
+	  select * from zw_m_marker where id=#{id} and flag=1
+	</select>
+
+    <!-- 根据线路名称查询线路实体 -->
+    <select id="findLineByName" parameterType="string" resultType="com.zw.platform.domain.functionconfig.form.LineForm">
+	  select * from zw_m_line where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据id查询线路实体-->
+    <select id="getLineForm" parameterType="string" resultType="com.zw.platform.domain.functionconfig.form.LineForm">
+	  select * from zw_m_line where id=#{id} and flag=1
+	</select>
+
+    <!-- 根据矩形名称查询矩形实体 -->
+    <select id="findRectangleByName" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.RectangleForm">
+	  select * from zw_m_rectangle where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据id查询矩形实体 -->
+    <select id="getRectangleForm" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.RectangleForm">
+	  select * from zw_m_rectangle where id=#{id} and flag=1
+	</select>
+
+    <!-- 根据圆形名称查询圆形实体 -->
+    <select id="findCircleByName" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.CircleForm">
+	  select * from zw_m_circle where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据id查询圆形实体 -->
+    <select id="getCircleForm" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.CircleForm">
+	  select * from zw_m_circle where id=#{id} and flag=1
+	</select>
+
+    <!-- 根据多边形名称查询多边形实体 -->
+    <select id="findPolygonByName" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+	  select * from zw_m_polygon where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据多边形名称查询多边形实体 -->
+    <select id="getPolygonForm" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.PolygonForm">
+	  select * from zw_m_polygon where id=#{id} and flag=1
+	</select>
+
+    <!-- 根据导航路线名称查询行驶线路实体 -->
+    <select id="findTravelLineByName" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+	  select * from zw_m_travel_line where name=#{name} and flag=1
+	</select>
+
+    <!-- 根据id查询导航路线实体-->
+    <select id="getTravelLineForm" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+	  select * from zw_m_travel_line where id=#{id} and flag=1
+	</select>
+    <select id="getAdministrationForm" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.form.AdministrationForm">
+		select * from zw_m_administration where id=#{id} and flag=1
+	</select>
+</mapper>

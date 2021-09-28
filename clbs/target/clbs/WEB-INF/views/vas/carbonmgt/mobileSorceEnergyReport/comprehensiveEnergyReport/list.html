@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>综合能耗报表</title>
+<div th:replace="fragments/header">header</div>
+<link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}" />
+</head>
+<body th:object="${result}">
+	<section class="leftMenuBg">
+		<div th:replace="fragments/nav">nav</div>
+		<section class="main-content-wrapper">
+			<div th:replace="fragments/menu">menu</div>
+			<section id="main-content">
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">碳排放监管</li>
+							<li class="active">移动源能耗报表</li>
+							<li class="active">综合能耗报表</li>
+						</ul>
+						<h1 class="h1 ">综合能耗报表</h1>
+					</div>
+				</div>
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading" >
+								<h3 class="panel-title fwb">查询</h3>
+								<div class="actions pull-right">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div class="ToolPanel clearfix ToolPanellable">								
+									<form id="queryForm" name="reg_testdate" th:action="@{/v/carbonmgt/mileage/list}" role="form" action="#" method="post" class="form-horizontal">
+										<div class="form-group">
+											<label class="col-md-1 col-sm-3 control-label searchListSelect">组织：</label><input
+												class="form-control hidden"/>
+											<div class="has-feedback col-md-2 col-sm-8 searchListSelect">
+												<input  style="cursor: pointer; background-color: #fafafa;" class="form-control" th:field="*{groupName}" name="groupName"/>
+												<span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;" aria-hidden="true"  id="arrowDown" ></span>
+												<div class="ztreeModelBox" id="zTreeContent">
+													<ul id="ztreeDemo" class="ztree">
+													</ul>
+												</div>
+											</div>	
+											<label class="col-md-1 col-sm-3 control-label searchListSelect">车牌号：</label><input
+												class="form-control hidden"/>
+											<div class="col-md-2 col-sm-8 searchListSelect">
+												<div style="position:relative;">
+													<div class="input-group">
+														<input name="charSelect" type="text" class="form-control" maxlength="20" id="brands">
+														<div class="input-group-btn">
+															<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+																<span class="caret"></span>
+															</button>
+															<ul class="dropdown-menu dropdown-menu-right" role="menu">
+															</ul>
+														</div>
+													</div>
+												</div>
+											</div>
+											<label class="col-md-1 col-sm-3 control-label searchListSelect">年份：</label>
+											<div class="col-md-2 col-sm-8 searchListSelect">
+												<select name="YYYY" id="year" class="form-control"
+													onChange="YYYYDD(this.value)">
+												</select>
+											</div>
+											<label class="col-md-1 col-sm-3 control-label searchListSelect">月份：</label>
+											<div class="col-md-2 col-sm-8 searchListSelect">
+												<select name="MM" id="month" class="form-control" onChange="MMDD(this.value)">
+													<option value=""></option>
+												</select> <select name="DD" style="display: none;"></select>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-md-12 col-sm-12 text-right compre-btn">
+												<input type="hidden" id="startDate" name="startDate" />
+												<input type="hidden" id="endDate" name="endDate" />
+												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												<button type="button" id="curMonthQuery" class="btn btn-primary">本&nbsp;&nbsp;月</button>
+												<button type="button" id="preMonthQuery" class="btn btn-primary">上&nbsp;&nbsp;月</button>
+												<button type="button" id="curYearQuery" class="btn btn-primary">本&nbsp;&nbsp;年</button>
+												<button type="button" id="preYearQuery" class="btn btn-primary">上&nbsp;&nbsp;年</button>
+												<button type="button" id="inquireClick" class="btn btn-primary search-btn">
+													<i class="glyphicon glyphicon-search" ></i> 查询
+												</button>
+											</div>
+										</div>	
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">图形展示</h3>
+								<div class="actions pull-right">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+							<div class="panel-body echartArea-panel">
+								<div class="dataTableBox container-area echartArea">
+									<div class="col-md-12 echart-title">
+		                                <h3 id="echart_title">2017年2月综合能耗图表</h3>
+		                            </div>
+									<div id="energyEcharts" style="width:100%; height:600px;">
+							     	</div>
+							     	<div id="emissionEcharts" style="width:100%; height:600px; margin-top:80px;">
+							     	</div>
+							     	<div>
+							     		<i class="left-btn echart-left-btn" id="right-arrow"></i>
+	                            		<i class="right-btn echart-right-btn" id="left-arrow"></i>
+	                            	</div>	
+	                            	<div class="col-md-12 item-title">
+		                                <ul>
+		                                    <li>当月节能：<span id="footer_1"></span> L</li>
+		                                    <li>节能率：<span id="footer_2"></span> %</li>
+		                                    <li>节省费用：<span id="footer_3"></span> 元</li>
+		                                    <li>减排量：CO₂：<span id="footer_4">0 </span> t;</li>
+		                                    <li>SO₂：<span id="footer_5">0 </span> kg;</li>
+		                                    <li>NOX：<span id="footer_6">0 </span> kg;</li>
+		                                    <li>HCX：<span id="footer_7">0 </span> kg</li>
+		                                </ul>
+		                            </div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</section>
+	</section>
+	<div th:replace="fragments/footer">footer</div>
+	<label id="error_label" class='error' style='display: none;'></label>
+</body>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+</script>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+<script src="resources/js/laydate/laydateselect.js" th:src="@{/resources/js/laydate/laydateselect.js}"></script>
+<script src="/wro/comprehensiveEnergyReport.js" th:src="@{/wro/comprehensiveEnergyReport.js}"></script>
+</html>

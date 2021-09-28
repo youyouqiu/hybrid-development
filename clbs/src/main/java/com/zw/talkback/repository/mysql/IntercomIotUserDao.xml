@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.IntercomIotUserDao">
+    <insert id="updateIntercomIotUsers">
+        insert into zw_m_intercom_iot_user(user_name,user_id,call_number,create_data_time,create_data_username,flag)
+        VALUES
+        <foreach collection="iotUserFormList" item="item" separator=",">
+            (#{item.userName},#{item.userId},#{item.callNumber},#{item.createDataTime},#{item.createDataUsername},#{item.flag})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        user_name = values(user_name), user_id = values(user_id), user_id = values(user_id), flag = values(flag)
+    </insert>
+
+    <insert id="updateIntercomIotUser">
+        insert into zw_m_intercom_iot_user(user_name,user_id,call_number,create_data_time,create_data_username,flag)
+        VALUES  (#{iotUserForm.userName},#{iotUserForm.userId},#{iotUserForm.callNumber},#{iotUserForm.createDataTime},#{iotUserForm.createDataUsername},       #{iotUserForm.flag}) ON DUPLICATE KEY UPDATE   user_name = values(user_name), user_id = values(user_id), user_id = values(user_id), flag = values(flag)
+    </insert>
+
+    <select id="getIntercomIotUsersByUserNames" resultType="com.zw.talkback.domain.intercom.form.IntercomIotUserForm">
+        select * from zw_m_intercom_iot_user where flag =1 and user_name in
+        <foreach collection="userNames" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getIntercomIotUsersByUserName" resultType="com.zw.talkback.domain.intercom.form.IntercomIotUserForm">
+        select * from zw_m_intercom_iot_user where flag =1 and user_name = #{userName}
+    </select>
+
+</mapper>

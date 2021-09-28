@@ -1,0 +1,200 @@
+<body th:fragment="loginPublish" id="loginPublish" th:backBg="${session.loginBackground}"
+      th:if="${session.loginBackground!='bg.jpg'}">
+<link rel="stylesheet" href="resources/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="resources/js/bootstrap/css/bootstrap.min.css"
+      th:href="@{/resources/js/bootstrap/css/bootstrap.min.css}"/>
+<link rel="stylesheet" href="resources/assets/css/login.css" th:href="@{/resources/css/login.css}"/>
+<input id="enableDecryption" type="hidden" th:value="${enableDecryption}"/>
+<input id="loginPersonalized" type="hidden" th:value="${session.loginPersonalized}"/>
+<section id="login-container">
+    <div class="row">
+        <div class="col-xs-12 login_logo">
+            <div class="loginImgBox">
+                <img id="loginLogo" th:name="${session.loginLogo}" src=""
+                     class="img-responsive center-block">
+            </div>
+        </div>
+        <noscript class="col-md-6 col-md-offset-5">您的浏览器不支持脚本运行！请开启您的脚本！</noscript>
+        <div class="col-md-12 col-sm-12 col-xs-12 loginWrapper" id="login-wrapper">
+            <div class="panel panel-primary animated flipInY">
+                <div class="panel-heading">
+                    <h3 class="panel-title"
+                        style="text-shadow: -1px 0 rgba(255,255,255,.5), 0 1px rgba(255,255,255,.5), 1px 0 rgba(255,255,255,.5), 0 -1px rgba(255,255,255,.5)">
+                        登录平台</h3>
+                </div>
+                <!--/*******错误信息*******/-->
+                <div id="failureInfo">
+                    <div class="login_msg"
+                         th:if="${#httpServletRequest.getAttribute('errorMsg') != null}">
+                        <font color="red"><span
+                                th:text="${#httpServletRequest.getAttribute('errorMsg')}">登录失败，请重新登录！</span></font>
+                        <font color="red">
+                            <!-- <span th:if="${session.SPRING_SECURITY_LAST_EXCEPTION != null}"	th:text="用户名或者密码错误！"></span> -->
+                        </font>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form" name='f' id="loginForm"
+                          action="/clbs/j_spring_security_check" method='POST'
+                          onsubmit="return JPlaceHolder.loginSubmit()">
+                        <div class="form-group">
+                            <div class="col-md-12 inputBg">
+                                <input type="text" class="form-control" id="email"
+                                       name='username' autocomplete="off" maxlength="25"
+                                       placeholder="用户名"> <i class="fa fa-user"><img
+                                    src="resources/img/user.png"
+                                    th:src="@{/resources/img/user.svg}"
+                                    width="20" height="40" style="margin:0px 0px 0px 5px"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="hidden" id="key" name="key" th:value="${key}"/>
+                                <input type="hidden" id="pwdSubmit" name="password"/>
+                                <input type="password" class="form-control" id="tg_password" autocomplete="off"
+                                       maxlength="25" placeholder="密码"/>
+                                <i class="fa fa-lock"><img src="resources/img/password.png"
+                                                           th:src="@{/resources/img/password.svg}" width="20"
+                                                           height="40" style="margin:0px 0px 0px 5px"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div id="slider">
+                                    <div id="slider_bg"></div>
+                                    <div id="label"></div>
+                                    <div id="labelTip" class="logintop">把我滑到右边试试?</div>
+                                </div>
+                                <input type="hidden" class="form-control inputW100"
+                                       id="captchaCode" name="captchaCode" autocomplete="off"
+                                       maxlength="5" value="" style="padding-left: 10px;">
+                                <input id="isAdmin" th:value="${session.isAdmin}" type="text" hidden="true"/>
+                            </div>
+                            <div class="validate_msg" id="validateMsg"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input class="btn btn-primary btn-block" id="login_ok" name="submit"
+                                       type="submit" value="登 &nbsp;录"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<div class="loginBottom"></div>-->
+</section>
+<div class="loginMark">
+    <i class='fa fa-spinner loading-state'></i>
+</div>
+<!--Global JS-->
+<footer class="footertc">
+    <div class="col-md-12 col-sm-12 col-xs-12" id="personalized"
+         style="text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;">
+        <span>版本：<label th:text="#{web.version}" style="font-weight:normal"></label></span>
+        <p><span id="copyRight" th:name="${session.copyright}"></span><a href="" id="website"
+                                                                         th:name="${session.websiteName}"
+                                                                         target="_blank"></a><br/><a
+                href="https://beian.miit.gov.cn/" style="color: #2d2d2d" id="record"
+                th:name="${session.recordNumber}"></a></p>
+    </div>
+</footer>
+<script th:src="@{/resources/js/crypto-js.js}" charset="UTF-8"></script>
+<script type="text/javascript">
+    (function ($, window) {
+        var loginPersonalized = null;
+        loginPages = {
+            init: function () {
+                var wh = $(window).height();
+                if (wh < 715) {
+                    $("#login-container").css("margin", "0px");
+                }
+                if (window != top) {
+                    top.location.href = location.href;
+                }
+
+                loginPersonalized = $('#loginPersonalized').val();
+                if (loginPersonalized) {
+                    loginPersonalized = JSON.parse(loginPersonalized);
+                    loginPages.btnAndFontColorRender();
+                    loginPages.setLogoAndInputPos();
+                }
+                var backBg = $("#loginPublish").attr('backBg');
+                var loginBg = "/clbs/resources/img/home/" + backBg;
+                $("#loginPublish").css('backgroundImage', 'url(' + loginBg + ')');
+
+                var name = $("#loginLogo").attr('name');
+                var webICo = $("#webIco").attr('name');
+                var loginLogo = "/clbs/resources/img/logo/" + name;
+                $("#loginLogo").attr('src', loginLogo);
+                var copyRight = $("#copyRight").attr('name');
+                var website = $("#website").attr('name');
+                var record = $("#record").attr('name');
+                $("#copyRight").html(copyRight);
+                $("#website").html(website);
+                $("#webIco").attr('href', "/clbs/resources/img/logo/" + webICo + "");
+                $("#website").attr('href', 'http://' + website);
+                $("#record").html(record);
+                var isAdmin = $("#isAdmin").val();
+                if (isAdmin != "") {
+                    $("#commonSmWin").hide();
+                    window.location.href = "/clbs/login?type=expired";
+                }
+                setTimeout(function () {
+                    $('.loginMark').hide();
+                }, 300);
+            },
+            // 渲染按钮及备案号颜色及阴影
+            btnAndFontColorRender: function () {
+                if (loginPersonalized) {
+                    $('#login_ok').css("backgroundColor", loginPersonalized.buttonColor);
+                    $('#personalized').css("color", loginPersonalized.recordNumberColor);
+                    $('#record').css("color", loginPersonalized.recordNumberColor);
+                    var color = loginPersonalized.recordNumberShadow;
+                    var shadowSolor = "-1px 0 color, 0 1px color, 1px 0 color, 0 -1px color";
+                    var newColor = shadowSolor.replace(/color/g, color);
+                    $('#personalized').css("textShadow", newColor);
+                }
+            },
+            setLogoAndInputPos: function () {
+                var inputPos = loginPersonalized.inputPosition;
+                var logoPos = loginPersonalized.logoPosition;
+                var loginWrapper = $('#login-wrapper');
+                var loginLogo = $('.login_logo');
+                if (inputPos == '1') {
+                    loginWrapper.addClass('loginWrapperLeft');
+                } else if (inputPos == '3') {
+                    loginWrapper.addClass('loginWrapperRight');
+                }
+
+                if (logoPos == '1') {
+                    loginLogo.addClass('logoLeftTop');
+                } else if (logoPos == '2') {
+                    loginLogo.addClass('logoRightTop');
+                } else {
+                    if (inputPos == '1') {
+                        loginLogo.addClass('logoLeft');
+                    } else if (inputPos == '3') {
+                        loginLogo.addClass('logoRight');
+                    }
+                }
+            },
+            loginOkClickFn: function () {
+                var userName = $("#email").val();
+                $.cookie('userName', userName, {expires: 7});
+                var ip = returnCitySN["cip"];
+                $.cookie('ip', ip, {expires: 7});
+            }
+        };
+        $(function () {
+            loginPages.init();
+            $("#login_ok").on("click", loginPages.loginOkClickFn);
+            $("#tg_password").click(function () {
+                $(this).select();
+            });
+        })
+    })($, window)
+</script>
+<script th:src="@{/resources/js/slideCode.js}" charset="utf-8"></script>
+</body>

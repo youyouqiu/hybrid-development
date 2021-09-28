@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.LoadVehicleSettingDao">
+    <insert id="addLoadSetting" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadVehicleSettingSensorForm">
+        INSERT INTO zw_m_sensor_vehicle (
+        id,
+        vehicle_id,
+        sensor_id,
+        flag,
+        create_data_time,
+        create_data_username,
+        sensor_sequence,
+        individuality_parameters,
+        sensor_out_id
+        )
+        VALUES
+        (#{id}, #{vehicleId}, #{sensorId},#{flag},#{createDataTime},
+        #{createDataUsername},#{sensorSequence},#{personLoadParamJSON},#{sensorOutId})
+	</insert>
+    <update id="updateLoadSetting" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadVehicleSettingSensorForm">
+        UPDATE zw_m_sensor_vehicle
+        SET
+        <if test="sensorId != null">
+           sensor_id =#{sensorId},
+        </if>
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        individuality_parameters = #{personLoadParamJSON},
+        sensor_out_id = #{sensorOutId}
+        WHERE id = #{id}
+    </update>
+    <update id="deleteLoadSetting">
+        UPDATE zw_m_sensor_vehicle SET flag = 0 WHERE id = #{id}
+    </update>
+    <update id="updateLoadSettingByID">
+        UPDATE zw_m_sensor_vehicle SET sensor_sequence = 0, sensor_out_id = 70 WHERE id = #{id}
+    </update>
+    <!-- 查询载重车辆关系 -->
+    <select id="findLoadVehicleList" resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        SELECT DISTINCT svi.*,vi.id AS vehicleId,vi.brand AS plateNumber,vi.group_id
+        FROM zw_m_vehicle_info vi
+        INNER JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_assignment_vehicle assv ON assv.vehicle_id = vi.id AND assv.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = ass.id AND au.flag = 1
+        LEFT JOIN (
+        SELECT sv.id,sv.vehicle_id AS sVehicleId,sv.sensor_id,sv.sensor_out_id,sv.last_time,sv.threshold_voltage,
+        sv.threshold_work_flow,sv.threshold_standby_alarm,sv.sensor_sequence,
+        si.baud_rate, si.odd_even_check, si.filter_factor,
+        si.compensate,si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_sensor_vehicle sv
+        LEFT JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE sv.flag = 1 AND si.sensor_type = 6
+        ) svi ON svi.sVehicleId = vi.id
+
+        WHERE vi.flag = 1
+        AND au.user_id = #{userId}
+        AND vi.brand NOT LIKE '扫%'
+        AND ass.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="query != null">
+            <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+                AND (vi.brand LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                OR si.sensor_number LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                )
+            </if>
+            <if test="query.groupId != null and query.groupId!=''">
+                AND ass.org_id = #{query.groupId}
+            </if>
+            <if test="query.assignmentId != null and query.assignmentId!=''">
+                AND ass.id = #{query.assignmentId}
+            </if>
+
+            <if test="query.protocol != null and query.protocol!=''">
+                AND di.device_type = #{query.protocol}
+            </if>
+
+            <if test="query.vehicleId != null and query.vehicleId!=''">
+                AND vi.id = #{query.vehicleId}
+            </if>
+
+        </if>
+        ORDER BY vi.create_data_time DESC
+    </select>
+    <select id="findVehicleByIds" resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        SELECT DISTINCT tsv.*, v.id AS vehicleId,v.brand AS plateNumber,v.monitorType,tsv.individuality_parameters as personLoadParamJSON,v.infoType as vehicleType
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '1' monitorType,car.create_data_time,car.vehicle_type as infoType FROM
+        zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'3' monitorType,peo.create_data_time,'3' as infoType FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time,'2' as infoType FROM zw_m_thing_info
+        th WHERE th.flag=1
+        ) v
+        LEFT JOIN
+        (
+        SELECT
+        sv.*,
+        sif.sensor_type,
+        sif.baud_rate,
+        sif.odd_even_check,
+        sif.filter_factor,
+        sif.compensate,
+        sif.detection_mode,
+        sif.sensor_number
+        FROM zw_m_sensor_vehicle sv,zw_m_sensor_info sif WHERE sif.id=sv.sensor_id AND sif.flag=1
+        AND sv.flag=1 AND sif.sensor_type=6
+        ) tsv ON tsv.vehicle_id = v.id
+        <if test="engineIds != null and engineIds.size() > 0">
+            AND tsv.id IN
+            <foreach collection="engineIds" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        WHERE 1 =1
+        <if test="vehicleIds != null and vehicleIds.size() > 0">
+            AND v.id IN
+            <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="findSensor" resultType="com.zw.platform.domain.vas.loadmgt.ZwMSensorInfo">
+        SELECT si.id,si.sensor_number,si.baud_rate,si.odd_even_check,si.compensate,si.filter_factor,si.detection_mode
+        FROM zw_m_sensor_info si
+        WHERE si.flag = 1
+        <if test="sensorType != null and sensorType != ''">
+            AND si.sensor_type = #{sensorType}
+        </if>
+    </select>
+    <select id="findVehicleLoadSettingByVid" parameterType="string"
+            resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+		 SELECT DISTINCT sv.*,sv.individuality_parameters as personLoadParamJSON,vi.id AS vehicleId,vi.brand AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_vehicle_info vi
+        INNER JOIN zw_m_sensor_vehicle sv ON sv.vehicle_id = vi.id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE vi.flag = 1 AND si.sensor_type = 6 AND vi.id = #{vehicleId}
+        ORDER BY sv.sensor_sequence ASC
+	</select>
+    <select id="findPeopleLoadSettingByVid" parameterType="string"
+            resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+		SELECT DISTINCT sv.*,sv.individuality_parameters as personLoadParamJSON,vi.id AS vehicleId,vi.people_number AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_people_info vi
+        INNER JOIN zw_m_sensor_vehicle sv ON sv.vehicle_id = vi.id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE vi.flag = 1 AND si.sensor_type = 6 AND vi.id = #{vehicleId}
+        ORDER BY sv.sensor_sequence ASC
+	</select>
+    <select id="findThingLoadSettingByVid" parameterType="string"
+            resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+		SELECT DISTINCT sv.*,sv.individuality_parameters as personLoadParamJSON,vi.id AS vehicleId,vi.thing_number AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_thing_info vi
+        INNER JOIN zw_m_sensor_vehicle sv ON sv.vehicle_id = vi.id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE vi.flag = 1 AND si.sensor_type = 6 AND vi.id = #{vehicleId}
+        ORDER BY sv.sensor_sequence ASC
+	</select>
+    <select id="findLoadSettingByMonitorVid" parameterType="string" resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        SELECT DISTINCT sv.*,vi.id AS vehicleId,vi.brand AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM (
+		SELECT id,brand AS brand,flag FROM zw_m_vehicle_info
+		UNION ALL
+		SELECT id,people_number AS brand,flag FROM zw_m_people_info
+		UNION ALL
+		SELECT id,thing_number AS brand,flag FROM zw_m_thing_info
+		)vi
+        INNER JOIN zw_m_sensor_vehicle sv ON sv.vehicle_id = vi.id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE vi.flag = 1 AND si.sensor_type = 6 AND vi.id = #{vehicleId}
+        ORDER BY sv.sensor_sequence ASC
+    </select>
+    <!--根据参数查询参考对象-->
+    <select id="findLoadVehicle" resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        select * from
+        (SELECT v.id AS vehicleId,v.brand AS plateNumber,sv.*,sv.individuality_parameters as personLoadParamJSON , si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_sensor_vehicle sv ON v.id = sv.vehicle_id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1 AND di.device_type = #{type}
+        WHERE v.flag = 1 AND si.sensor_type = 6
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY v.id
+        ORDER BY v.id) a
+        UNION
+        select * from
+        (SELECT v.id AS vehicleId,v.thing_number AS plateNumber,sv.*,sv.individuality_parameters as personLoadParamJSON, si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_thing_info v
+        INNER JOIN zw_m_sensor_vehicle sv ON v.id = sv.vehicle_id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1 AND di.device_type = #{type}
+        WHERE v.flag = 1 AND si.sensor_type = 6
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY v.id
+        ORDER BY v.id) b
+        UNION
+        select * from
+        (SELECT v.id AS vehicleId,v.people_number AS plateNumber,sv.*,sv.individuality_parameters as personLoadParamJSON, si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM zw_m_people_info v
+        INNER JOIN zw_m_sensor_vehicle sv ON v.id = sv.vehicle_id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1 AND di.device_type = #{type}
+        WHERE v.flag = 1 AND si.sensor_type = 6
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY v.id
+        ORDER BY v.id) b
+    </select>
+    <select id="findSensorVehicleByBindId" parameterType="string" resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        SELECT DISTINCT sv.*,vi.id AS vehicleId,vi.brand AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,sv.individuality_parameters as personLoadParamJSON,  si.sensor_number
+        FROM zw_m_sensor_vehicle sv
+        INNER JOIN zw_m_sensor_info si ON si.id= sv.sensor_id AND si.flag =1
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = sv.vehicle_id AND vi.flag = 1
+        WHERE sv.flag = 1 AND si.sensor_type = 6 AND sv.id = #{id}
+        UNION all
+        SELECT DISTINCT sv.*,vi.id AS vehicleId,vi.people_number AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,sv.individuality_parameters as personLoadParamJSON, si.sensor_number
+        FROM zw_m_sensor_vehicle sv
+        INNER JOIN zw_m_sensor_info si ON si.id= sv.sensor_id AND si.flag =1
+        INNER JOIN zw_m_people_info vi ON vi.id = sv.vehicle_id AND vi.flag = 1
+        WHERE sv.flag = 1 AND si.sensor_type = 6 AND sv.id = #{id}
+        UNION all
+        SELECT DISTINCT sv.*,vi.id AS vehicleId,vi.thing_number AS plateNumber,
+        si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,sv.individuality_parameters as personLoadParamJSON, si.sensor_number
+        FROM zw_m_sensor_vehicle sv
+        INNER JOIN zw_m_sensor_info si ON si.id= sv.sensor_id AND si.flag =1
+        INNER JOIN zw_m_thing_info vi ON vi.id = sv.vehicle_id AND vi.flag = 1
+        WHERE sv.flag = 1 AND si.sensor_type = 6 AND sv.id = #{id}
+    </select>
+    <select id="findLoadVehicleByProtocols"
+            resultType="com.zw.platform.domain.vas.loadmgt.LoadVehicleSettingInfo">
+        SELECT v.id AS vehicleId,v.brand AS plateNumber,sv.*, si.baud_rate, si.odd_even_check, si.filter_factor, si.compensate,
+        si.sensor_type,si.detection_mode,si.sensor_number
+        FROM (
+        SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id, th.thing_number brand FROM zw_m_thing_info th WHERE th.flag=1
+        ) v
+        INNER JOIN zw_m_sensor_vehicle sv ON v.id = sv.vehicle_id AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        WHERE si.sensor_type = 6
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and di.device_type IN
+        <foreach collection="protocols" item="protocol" open="(" separator="," close=")">
+            #{protocol}
+        </foreach>
+        GROUP BY v.id
+    </select>
+</mapper>

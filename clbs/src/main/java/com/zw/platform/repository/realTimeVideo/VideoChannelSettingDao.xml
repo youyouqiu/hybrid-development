@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoChannelSettingDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoChannelSetting" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="physics_channel" property="physicsChannel" jdbcType="INTEGER" />
+    <result column="logic_channel" property="logicChannel" jdbcType="INTEGER" />
+    <result column="channel_type" property="channelType" jdbcType="INTEGER" />
+    <result column="connection_flag" property="connectionFlag" jdbcType="INTEGER" />
+    <result column="panoramic" property="panoramic" jdbcType="TINYINT" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="flag" property="flag" jdbcType="SMALLINT" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    cs.id, cs.vehicle_id, cs.physics_channel, cs.logic_channel, cs.channel_type, cs.connection_flag, cs.panoramic, cs.sort, cs.stream_type,
+    cs.flag, cs.create_data_time, cs.create_data_username, cs.update_data_time, cs.update_data_username, cs.stream_type
+  </sql>
+  
+  <!-- 根据车辆id查询视频通道列表 -->
+  <select id="getVideoChannelByVehicleId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    ci.simcard_number mobile,
+    <include refid="Base_Column_List" />
+    from zw_m_video_channel_setting cs
+    inner join zw_m_config c on c.vehicle_id = cs.vehicle_id and c.flag = 1
+    inner join zw_m_sim_card_info ci on ci.id = c.sim_card_id and ci.flag = 1
+    where cs.vehicle_id = #{vehicleId,jdbcType=VARCHAR} ORDER BY cs.sort
+  </select>
+
+  <!-- 根据车辆id查询视频通道列表 -->
+  <select id="getAppVideoChannel" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    ci.simcard_number mobile,
+    <include refid="Base_Column_List" />
+    from zw_m_video_channel_setting cs
+    inner join zw_m_config c on c.vehicle_id = cs.vehicle_id and c.flag = 1
+    inner join zw_m_sim_card_info ci on ci.id = c.sim_card_id and ci.flag = 1
+    where cs.vehicle_id = #{vehicleId,jdbcType=VARCHAR}  and cs.channel_type <![CDATA[!= ]]> 1
+    ORDER BY cs.sort
+  </select>
+  
+  <!-- 根据车辆id集合查询视频通道列表 -->
+  <select id="getVideoChannelByVehicleIds" resultMap="BaseResultMap">
+    select
+    ci.simcard_number mobile,
+    <include refid="Base_Column_List" />
+    from zw_m_video_channel_setting cs
+    inner join zw_m_config c on c.vehicle_id = cs.vehicle_id and c.flag = 1
+    inner join zw_m_sim_card_info ci on ci.id = c.sim_card_id and ci.flag = 1
+    where cs.vehicle_id in
+    <foreach collection="list" item="vehicleId" index="index" open="(" close=")" separator=",">
+    	#{vehicleId}
+    </foreach>
+    order by cs.vehicle_id,cs.sort
+  </select>
+  
+  <!-- 根据车辆id和通道号查询视频通道 -->
+  <select id="getVideoChannelByVehicleIdAndChannelNo" resultMap="BaseResultMap"> 
+    select
+    ci.simcard_number mobile,
+    <include refid="Base_Column_List" />
+    from zw_m_video_channel_setting cs
+    inner join zw_m_config c on c.vehicle_id = cs.vehicle_id and c.flag = 1
+    inner join zw_m_sim_card_info ci on ci.id = c.sim_card_id and ci.flag = 1
+    where cs.vehicle_id = #{vehicleId,jdbcType=VARCHAR} and cs.physics_channel = #{channelNo,jdbcType=INTEGER}
+  </select>
+
+  <select id="getVideoChannelByVehicleIdAndLogicChannel"
+          resultType="com.zw.platform.domain.realTimeVideo.VideoChannelSetting">
+    select
+    ci.simcard_number mobile,
+    <include refid="Base_Column_List"/>
+    from zw_m_video_channel_setting cs
+    inner join zw_m_config c on c.vehicle_id = cs.vehicle_id and c.flag = 1
+    inner join zw_m_sim_card_info ci on ci.id = c.sim_card_id and ci.flag = 1
+    where cs.vehicle_id = #{vehicleId} and cs.logic_channel = #{logicChannel}
+  </select>
+
+  <!-- 修改视频通道 -->
+  <update id="updateVideoChannel" parameterType="com.zw.platform.domain.realTimeVideo.VideoChannelSetting" >
+    update zw_m_video_channel_setting
+    <set >
+      <if test="vehicleId != null" >
+        vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+      </if>
+      <if test="physicsChannel != null" >
+        physics_channel = #{physicsChannel,jdbcType=INTEGER},
+      </if>
+      <if test="logicChannel != null" >
+        logic_channel = #{logicChannel,jdbcType=INTEGER},
+      </if>
+      <if test="channelType != null" >
+        channel_type = #{channelType,jdbcType=INTEGER},
+      </if>
+      <if test="connectionFlag != null" >
+        connection_flag = #{connectionFlag,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="flag != null" >
+        flag = #{flag,jdbcType=SMALLINT},
+      </if>
+      <if test="createDataTime != null" >
+        create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDataUsername != null" >
+        create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDataTime != null" >
+        update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDataUsername != null" >
+        update_data_username = #{updateDataUsername,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update> 
+  
+  <!-- 根据车辆id和物理通道号删除音视频通道 -->
+  <delete id="deleteVideoChannelSetting">
+    DELETE from zw_m_video_channel_setting WHERE vehicle_id=#{vehicleId,jdbcType=VARCHAR} AND physics_channel=#{physicsChannel,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 根据车辆id和物理通道号删除音视频通道 -->
+  <delete id="deleteVideoChannelSettingByLogicChannel">
+    DELETE from zw_m_video_channel_setting WHERE vehicle_id=#{vehicleId,jdbcType=VARCHAR} AND logic_channel=#{logicChannel,jdbcType=INTEGER}
+  </delete>
+  
+  
+  <!-- 根据车辆id删除音视频通道 -->
+  <delete id="delete">
+    DELETE from zw_m_video_channel_setting WHERE vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+  </delete>
+
+  <delete id="deleteBatch">
+    DELETE from zw_m_video_channel_setting WHERE vehicle_id in
+    <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+      #{monitorId}
+    </foreach>
+  </delete>
+  <delete id="deleteMoreByMonitorIds">
+    DELETE from zw_m_video_channel_setting
+    where vehicle_id in
+    <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+      #{monitorId}
+    </foreach>
+  </delete>
+
+  <insert id="addVideoChannels" parameterType="com.zw.platform.domain.realTimeVideo.VideoChannelSetting">
+    insert into zw_m_video_channel_setting (id, vehicle_id, physics_channel,
+    logic_channel, channel_type, connection_flag, panoramic,
+    sort, flag, create_data_time,
+    create_data_username, update_data_time, update_data_username, stream_type
+    )
+    values
+    <foreach collection="videoChannelSettingList" item="channel" separator=",">
+      (
+      #{channel.id}, #{channel.vehicleId}, #{channel.physicsChannel}, #{channel.logicChannel}, #{channel.channelType},
+      #{channel.connectionFlag}, #{channel.panoramic},
+      #{channel.sort}, #{channel.flag}, #{channel.createDataTime}, #{channel.createDataUsername},
+      #{channel.updateDataTime}, #{channel.updateDataUsername},
+      #{channel.streamType}
+      )
+    </foreach>
+  </insert>
+
+  <select id="getVehicleInfoAndPhysicsChannel" resultType="com.zw.lkyw.domain.VideoInspectionData">
+    select v.id monitorId, v.brand monitorName,v.plate_color,cs.physics_channel as channelNum, vt.vehicle_type objectType,
+           v.group_id
+    from zw_m_vehicle_info v
+    inner join zw_m_video_channel_setting cs on cs.vehicle_id = v.id and cs.flag = 1
+    left join zw_m_vehicle_type vt on vt.id = v.vehicle_type and vt.flag = 1
+    where v.id = #{vid}
+    and v.flag = 1
+    and cs.logic_channel = #{logicChannel}
+  </select>
+</mapper>

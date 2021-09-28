@@ -1,0 +1,246 @@
+<header id="header">
+    <!--logo start-->
+    <div><a class="brand" href="/clbs/home"></a></div>
+    <!--logo end-->
+    <div class="toggle-navigation toggle-left" id="toggle-left">
+        <button style="margin-top:-14px;" type="button" class="btn btn-default" id="toggle-left-button">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="tooltip fade right" id="toggle-left-tooltip">
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-inner">显示隐藏导航</div>
+        </div>
+    </div>
+    <div class="toggle-left-h2">
+        <h2 class="h2" id="personalizedTitle"><span>中位</span></h2>
+    </div>
+    <div class="user-nav">
+        <ul>
+            <li id="noticeBox" class="topNotice dropdown">
+                <button id="noticeBtn"  type="button"
+                        class="btn btn-default dropdown-toggle" data-toggle="dropdown" onclick="pagesNav.openChat()">
+                    <img src="/clbs/resources/img/msg.svg" style="width:15px;margin-top:-3px;"/>
+                </button>
+            </li>
+            <li id="noticeBox1" class="topNotice dropdown settings">
+                <!--<span id="noticeNum1">0</span>-->
+                <i id="noticeRedIcon" class="redIcon"></i>
+                <button id="noticeBtn1"
+                        class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                    <img src="/clbs/resources/img/notice2.svg" style="width:14px;margin-top:-4px;margin-right: -1px"/>
+                </button>
+                <ul id="menu2" class="dropdown-menu animated fadeInDown">
+                    <!--<li class="jttNum">
+                        <a href="#">
+                            &lt;!&ndash;<i class="fa fa-paper-plane"></i>&ndash;&gt;
+                            <i class="fa fa-file-text-o"></i>
+                            有 <span id="jttNum">0</span> 个JTT平台查岗信息
+                        </a>
+                    </li>
+                    <li class="xzNum">
+                        <a href="#">
+                            <i class="fa fa-file-text-o" style="vertical-align: 1px;margin-right: 2px"></i>
+                            有 <span id="xzNum">0</span> 个西藏平台查岗信息
+                        </a>
+                    </li>
+                    <li class="jttAlarmNum">
+                        <a href="#">
+                            <i class="fa fa-file-text-o" style="vertical-align: 1px;margin-right: 2px"></i>
+                            有 <span id="jttAlarmNum">0</span> 个JTT报警督办信息
+                        </a>
+                    </li>
+                    <li class="xzAlarmNum">
+                        <a href="#">
+                            <i class="fa fa-file-text-o" style="vertical-align: 1px;margin-right: 2px"></i>
+                            有 <span id="xzAlarmNum">0</span> 个西藏报警督办信息
+                        </a>
+                    </li>-->
+                    <li class="bxNum">
+                        <a href="#" onclick="pagesNav.goBxUrl()">
+                            <i class="fa fa-file-text-o"></i>
+                            有 <span id="bxNum">0</span> 个车辆保险即将到期
+                        </a>
+                    </li>
+                    <li class="yszNum">
+                        <a href="#" onclick="pagesNav.goAlarmUrl(2)">
+                            <i class="fa fa-file-text-o" style="vertical-align: 1px;margin-right: 2px"></i>
+                            有 <span id="yszNum">0</span> 个车辆运输证即将到期
+                        </a>
+                    </li>
+                    <li class="xszNum">
+                        <a href="#" onclick="pagesNav.goAlarmUrl(1)">
+                            <i class="fa fa-file-text-o" style="vertical-align: 1px;margin-right: 2px"></i>
+                            有 <span id="xszNum">0</span> 个车辆行驶证即将到期
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li id="alarmIcoHide" class="topNotice">
+                <span id="alarmno">0</span>
+                <div style="visibility:hidden;" class="waves"></div>
+                <button onclick="pagesNav.alarmDeal()" style="margin-top: -25px;" id="alarmIcoHide"
+                        class="btn btn-default" type="button">
+                    <img src="/clbs/resources/img/allcall.svg" style="width:18px;height:18px;margin-top:-6px;"/>
+                </button>
+            </li>
+            <li class="profile-photo">
+                <button type="button" class="btn btn-default dropdown-toggle options">
+                    <i class="fa fa-user"></i>
+                </button>
+            </li>
+            <li class="dropdown settings">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <span id="userName" th:text="${session.userName}"></span>
+                    <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="dropdown-menu animated fadeInDown">
+                    <li><a th:href="@{/c/user/profile}"><i class="fa fa-user"></i>&nbsp;&nbsp;用户个人信息</a></li>
+                    <li id="editPwd"><a th:href="@{/c/user/changePwd}"><i class="fa fa-pencil-square-o"></i> 修改密码</a>
+                    </li>
+                    <li><a href="javascript:void(0);" id="updateFontSize"><i class="fa fa-font"></i> 修改字体大小</a></li>
+                    <li><a id="logOut" href="javascript:void(0);" onclick="pagesNav.logout()"><i class="fa fa-power-off"></i> 退出</a>
+                    </li>
+                </ul>
+            </li>
+            <!--dataClock start-->
+            <li class="data-time">
+                <div class="dataClock clearfix">
+                    <div id="monthsDay"><p></p>
+                        <h1></h1><span></span></div>
+                    <div id="clockBox"><p id="clockAP"></p>
+                        <p id="clock"></p></div>
+                </div>
+            </li>
+        </ul>
+        <!-- 用户所属组织id -->
+        <input id="userGroupId" th:value="${session.groupId}" type="text" hidden="true"/>
+        <!-- 用户所属组织name -->
+        <input id="userGroupName" th:value="${session.groupName}" type="text" hidden="true"/>
+        <!-- 用户是否为admin -->
+        <input id="isAdmin" th:value="${session.isAdmin}" type="text" hidden="true"/>
+        <!-- 用户授权截止日期 -->
+        <input id="userAuthorizationDate" th:value="${session.userAuthorizationDate}" type="text" hidden="true"/>
+        <!-- 用户被分配的角色 -->
+        <input id="allUserRole" th:value="${session.userRole}" type="text" hidden="true"/>
+        <!-- 用户菜单权限的url -->
+        <input id="permissionUrls" th:value="${session.permissionUrls}" type="text" hidden="true"/>
+        <!-- help -->
+        <div class="modal fade bs-example-modal-md" id="helpCenterModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-md" style="margin:10% auto;">
+                <div class="modal-content">
+                    <div class="modal-header" style="border-bottom: none;">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                                class="sr-only">Close</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Windows系统：</strong></p>
+                        <p>1. 按住ctrl键，使用鼠标滚轮滑动进行调整，调整后点击浏览器刷新按钮生效。</p>
+                        <p>2. 按住ctrl键，点击加号（+）是放大，减号（-）是缩小，数字0是恢复默认，调整后点击浏览器刷新按钮生效。</p>
+                        <p><strong>Mac系统：</strong></p>
+                        <p>1. 按住command键，使用鼠标滚轮滑动进行调整，调整后点击浏览器刷新按钮生效。
+                        <p>2. 按住command键，点击加号（+）是放大，减号（-）是缩小，数字0是恢复默认，调整后点击浏览器刷新按钮生效。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div id="goTrace9301" class="modal fade" aria-hidden="true"
+     style=" top: 0;  left: 0; right: 0;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameter"><span id="msgTitle9301"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question9301"></span></label>
+                        <div class=" col-md-7">
+                            <input type="hidden" id="infoId9301">
+                            <input type="hidden" id="msgDataType9301">
+                            <input type="hidden" id="objectType9301">
+                            <input type="hidden" id="objectId9301">
+                            <input type="hidden" id="serverIp9301">
+                            <input type="hidden" id="groupId9301">
+                            <input type="hidden" id="msgGNSSCenterId9301">
+                            <input type="text" class="form-control" id="answer9301"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="parameters1" class="btn btn-primary" onclick="pagesNav.platformMsgAck(9301)">确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="goTrace9302" class="modal fade" aria-hidden="true"
+     style="position: fixed; top: 250px; left: 0; right: 0; z-index: 1050;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameter"><span id="msgTitle9302"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question9302"></span></label>
+                        <div class=" col-md-7">
+                            <input type="hidden" id="infoId9302">
+                            <input type="hidden" id="msgDataType9302">
+                            <input type="hidden" id="objectType9302">
+                            <input type="hidden" id="objectId9302">
+                            <input type="hidden" id="serverIp9302">
+                            <input type="hidden" id="groupId9302">
+                            <input type="hidden" id="msgGNSSCenterId9302">
+                            <input type="text" class="form-control" id="answer9302"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="parameters1" class="btn btn-primary" onclick="pagesNav.platformMsgAck(9302)">确定
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="goTrace_alarm" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameter_alarm"><span id="msgTitle_alarm"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question_alarm"></span></label>
+                        <div class=" col-md-7">
+                            <select id="alarm_handle">
+                                <option value="0">处理中</option>
+                                <option value="1">已处理完毕</option>
+                                <option value="2">不做处理</option>
+                                <option value="3">将来处理</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <input type="hidden" id="alarm_brand"/>
+                <input type="hidden" id="supervisionId9041"/>
+                 <input type="hidden" id="msgGNSSCenterId9041">
+                  <input type="hidden" id="serverIp9041">
+                   <input type="hidden" id="objectType9041">
+                <button type="button" id="parameters_alarm" class="btn btn-primary" onclick="pagesNav.platformAlarmAck()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>

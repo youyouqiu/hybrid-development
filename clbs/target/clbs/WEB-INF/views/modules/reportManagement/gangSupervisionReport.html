@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>809查岗督办处理</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">系统管理</li>
+                        <li class="active">809管理</li>
+                        <li class="active">809查岗督办处理</li>
+                    </ul>
+                    <h1 class="h1 ">809查岗督办处理</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="speedlist" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label">业务类型：</label>
+                                            <div class="col-md-2 col-sm-8">
+                                                <select name="businessType" id="businessType" class="form-control">
+                                                    <option value="0">全部</option>
+                                                    <option value="11">JTT平台查岗</option>
+                                                    <option value="21">JTT报警督办</option>
+                                                    <option value="12">西藏企业查岗</option>
+                                                    <option value="22">西藏企业督办</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label">处理状态：</label>
+                                            <div class="col-md-2 col-sm-8">
+                                                <select name="status" id="status" class="form-control">
+                                                    <option value="0">全部</option>
+                                                    <option value="1">未处理</option>
+                                                    <option value="2">已处理</option>
+                                                    <option value="3">已过期</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                            <div class="col-md-4 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="timeInterval" name="timeInterval" readonly/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 control-label" id="dateSearchData">
+                                                <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                        onclick="gangSupervision.inquireClick(0)">今天
+                                                </button>
+                                                <button id="yesterdayClick" type="button" class="btn btn-primary"
+                                                        name="-1" onclick="gangSupervision.inquireClick(-1)">前一天
+                                                </button>
+                                                <button id="nearlyThreeDays" type="button" class="btn btn-primary"
+                                                        name="-3" onclick="gangSupervision.inquireClick(-3)">前三天
+                                                </button>
+                                                <button id="nearlySevenDays" type="button" class="btn btn-primary"
+                                                        name="-7" onclick="gangSupervision.inquireClick(-7)">前七天
+                                                </button>
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="gangSupervision.inquireClick(1)"><i
+                                                        class="glyphicon glyphicon-search"></i> 查询
+                                                </button>
+                                                <!--<button disabled id="exportAlarm" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出
+                                                </button>-->
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">数据列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <!--<div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              placeholder="请输入监控对象"></label>
+                                                <button type="button" id="search_button"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none">
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right personnelInformation">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text"></ul>
+                                        </div>
+                                    </div>
+                                </div>-->
+                                <table id="dataTable"
+                                       class="table table-striped table-bordered table-hover noCheckTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">序号</th>
+                                        <th class="text-center">操作设置</th>
+                                        <th class="text-center">业务类型</th>
+                                        <th class="text-center">时间</th>
+                                        <th class="text-center">内容</th>
+                                        <th class="text-center">应答时间</th>
+                                        <th class="text-center">应答人</th>
+                                        <th class="text-center">应答内容</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+
+<!-- 平台查岗 -->
+<div class="modal fade" id="queryPost" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <form action="" class="form-horizontal" id="queryForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="traceParameterResponse"><span id="postTitle"></span></h4>
+                </div>
+                <div class="modal-body" style="padding-right: 60px">
+                    <div class="row">
+                        <div class="xzInfo">
+                            <div class="form-group clearfix">
+                                <label class="col-md-4 control-label">运输企业名称：</label>
+                                <div class=" col-md-7">
+                                    <input type="text" class="form-control" id="xzGroupName" readonly/>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-md-4 control-label">对企业查岗用户：</label>
+                                <div class=" col-md-7">
+                                    <input type="text" class="form-control" id="xzUserName" name="interval" readonly/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix" id='superiorPlatform'>
+                            <label class="col-md-4 control-label text-right">上级平台：</label>
+                            <div class=" col-md-7" style="line-height:33px" id='platformName2'></div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-md-4 control-label">查岗内容：</label>
+                            <div class="col-md-7">
+                                <input type="text" class="form-control" name="infoContent"
+                                       id="infoContent1" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-md-4 control-label">
+                                <label class="text-danger">*</label>应答内容：
+                            </label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入应答内容" maxlength="20" class="form-control" name="answer"
+                                       id="answer1"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveQueryPost" class="btn btn-primary">提交</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!--报警督办-->
+<div class="modal fade" id="alarmSupervise" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="supervisoryForm" role="form" action=""
+                  method="post"
+                  class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+                <div class="modal-header">
+                    <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">×
+                    </button>
+                    <h4 class="modal-title" id="alarmSuperviseTit">处理报警督办</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="normalType">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">车牌号：</label>
+                                    <div class="col-md-4">
+                                        <input name="brand" type="text" id="brand"
+                                               class="form-control" readonly>
+                                    </div>
+                                    <label class="col-md-2 control-label">车牌颜色：</label>
+                                    <div class="col-md-4">
+                                        <input name="brandColor" type="text" id="brandColor"
+                                               class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">报警类型：</label>
+                                    <div class="col-md-4">
+                                        <input name="alarmType" type="text" id="gangAlarmType"
+                                               class="form-control" readonly>
+                                    </div>
+                                    <label class="col-md-2 control-label">报警时间：</label>
+                                    <div class="col-md-4">
+                                        <input name="alarmTime1" type="text" id="alarmTime1"
+                                               class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label normalName">报警信息来源：</label>
+                                <label class="col-md-2 control-label xzName" style="display: none">运输企业名称：</label>
+                                <div class="col-md-4">
+                                    <input name="alarmInfoSourve" type="text" id="alarmInfoSourve"
+                                           class="form-control" readonly>
+                                </div>
+                                <label class="col-md-2 control-label">督办级别：</label>
+                                <div class="col-md-4">
+                                    <input name="supervisoryLevel" type="text" id="supervisoryLevel"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">督办截止时间：</label>
+                                <div class="col-md-4">
+                                    <input name="supervisoryEndTime" type="text" id="supervisoryEndTime"
+                                           class="form-control" readonly>
+                                </div>
+                                <label class="col-md-2 control-label">督办人：</label>
+                                <div class="col-md-4">
+                                    <input name="supervisoryPeople" type="text" id="supervisoryPeople"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">督办联系电话：</label>
+                                <div class="col-md-4">
+                                    <input name="supervisoryPhone" type="text" id="supervisoryPhone"
+                                           class="form-control" readonly>
+                                </div>
+                                <label class="col-md-2 control-label">督办联系邮件：</label>
+                                <div class="col-md-4">
+                                    <input name="supervisoryEmail" type="text" id="supervisoryEmail"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label xzInfo">督办内容：</label>
+                                <div class="col-md-4 xzInfo">
+                                    <input name="supervisoryEmail" type="text" id="supervisoryCont"
+                                           class="form-control" readonly>
+                                </div>
+                                <!--<label class="col-md-2 control-label">报警处理结果：</label>
+                                <div class="col-md-4">
+                                    <select name="alarmResult" id="alarmResult" class="form-control">
+                                        <option value="-1">- 请选择处理结果 -</option>
+                                        <option value="0x00">处理中</option>
+                                        <option value="0x01">已处理</option>
+                                        <option value="0x02">不作处理</option>
+                                        <option value="0x03">将来处理</option>
+                                    </select>
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="gangSupervision.saveSupervisory(0)">处理中</button>
+                    <button type="button" class="btn btn-primary" onclick="gangSupervision.saveSupervisory(1)">已处理</button>
+                    <button type="button" class="btn btn-primary" onclick="gangSupervision.saveSupervisory(2)">不做处理</button>
+                    <button type="button" class="btn btn-primary" onclick="gangSupervision.saveSupervisory(3)">将来处理</button>
+
+                    <!--<button class="btn btn-primary" type="button" id="saveSupervisory">
+                        <strong>提 交</strong>
+                    </button>
+
+                    <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+                        <strong>关 闭</strong>
+                    </button>-->
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{export.fail}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="/clbs/resources/js/gangSupervisionReport.js"></script>
+</html>

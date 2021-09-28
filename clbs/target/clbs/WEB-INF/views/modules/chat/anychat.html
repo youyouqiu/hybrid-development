@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>嵌入聊天</title>
+
+    <link href='/clbs/resources/js/anychat/anychat/css/changed.css' rel='stylesheet' type='text/css'/>
+    <link href='/clbs/resources/js/anychat/lib/jquery.mCustomScrollbar.min.css' rel='stylesheet' type='text/css'/>
+    <link href='/clbs/resources/js/anychat/jQueryPowertip/justtool.css' rel='stylesheet' type='text/css'/>
+
+    
+    <script src="/clbs/resources/js/anychat/lib/juggle-all.js" type="text/javascript"></script>
+    <script src="/clbs/resources/js/anychat/lib/jquery.min.js" type="text/javascript"></script>
+    <script src="/clbs/resources/js/anychat/lib/jquery.mCustomScrollbar.concat.min.js" type="text/javascript"></script>
+    <script src="/clbs/resources/js/anychat/jQueryPowertip/justtool.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var BASE_PATH = '/clbs/resources/js/anychat/';
+        var chatUrl =  '[[${chatUrl}]]';
+        //var chatUrl = '192.168.24.34:8080';
+        window.onload = function () {
+            var protocol = "ws://";
+            if (document.location.protocol === 'https:') {
+                protocol = "wss://";
+            }
+            anychat.loginChatProxy.url = protocol + chatUrl +"/AnyChatServer/ws"
+            var talkMediator = new anychat.TalkMediator();
+            talkMediator.initView();
+        }
+    </script>
+
+    <script src="/clbs/resources/js/anychat/anychat/dist/anychat.min.js" type="text/javascript"></script>
+
+</head>
+
+
+<body>
+    <div class="window_P">
+        <div class="bar">
+            <i class="close-window"></i>
+        </div>
+        <dl class="windowL_P fl">
+            <dt>
+                <span style="font-weight:bold">讨论组</span>
+            </dt>
+            <dd>
+                <ul id="talkList">
+
+
+                </ul>
+            </dd>
+        </dl>
+        <dl class="windowR_P fl ">
+            <dt class="chat-title">
+                <span class="title_P" id="toTypeName">无</span>
+                <span class="number" id="chatMemberNumber">(0)</span>
+            </dt>
+            <dd class="talkCon_P" id="chatList">
+
+            </dd>
+            <dd class="funList_PJY">
+                <div class="pr">
+                    <a href="javascript:;" class="face_P"></a>
+                    <a href="javascript:;" class="history_P"></a>
+                    <a href="javascript:;" class="tips_P" id="tips"></a>
+                </div>
+            </dd>
+            <dd class="textWin_P">
+                <div id="sendChatContentWraper" class="textarea-wrapper">
+                    <textarea class="mytext_P" id="sendChatContent" cols="10" rows="5"></textarea>
+                    <div class="textarea-clone"></div>
+                </div>
+            </dd>
+            <dd class="btnList_P">
+                <a href="javascript:;" class="send_P close" id="closeChat">关闭</a>
+                <a href="javascript:;" class="send_P" id="sendChat">发送</a>
+            </dd>
+
+        </dl>
+        <dl class="windowR_P left2_P fl">
+            <dt class="chat-title">
+                <span class="title_P" id="returnChat">
+                    <i class="return_P" ></i>消息记录
+                    <span class="number">(
+                        <span id="toTypeName2"></span>)</span>
+                </span>
+            </dt>
+            <dd class="hisList_P">
+                <div id="histortChat">
+
+                </div>
+            </dd>
+            <dd class="hisFoot_P">
+                <div class="pageList_P">
+                    <a href="javascript:;" class="first_P" id="firstPage"></a>
+                    <a href="javascript:;" class="prev_P" id="prePage"></a>
+                    <a href="javascript:;" class="next_P" id="nextPage"></a>
+                    <a href="javascript:;" class="last_P" id="lastPage"></a>
+                </div>
+                <div class="timeBox_P">
+                    <a href="javascript:;" id="historyTime"></a>
+                    <input type="text" class="hide" id="d1" />
+                </div>
+                <div class="clear"></div>
+            </dd>
+
+        </dl>
+        <dl class="windowL_P fl left-border">
+            <dt>
+                <p class="group-user">讨论组成员
+                    <span class="cur_P" id="currentOnlineGroup">0</span>/<span class="all_P" id="allGroupUser">0</span>
+                </p>
+            </dt>
+            <dd id="groupUserDD">
+                <ul id="groupList">
+
+                    <li class="group">
+
+                        <ul id="talkUserList">
+
+                        </ul>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <div class="clear"></div>
+    </div>
+    
+    <div class="hidden" id="faceContent">
+    <div class="face-container">
+        <div class="tab">
+            <div class="emoji-container tab-content active" id="emoji">
+                <div class="emoji_face">
+                        
+                </div>
+            </div>
+            <div class="custom-face-container tab-content" id="custom">
+                <div class="favor-container">
+                    
+                </div>
+            </div>
+        </div>
+        <div class="tab-head">
+            <span class="tab-icon tab-icon-emoji active" data-target="#emoji" title="emoji表情"></span>
+            <span class="tab-icon tab-icon-custom" data-target="#custom" title="动态表情"></span>
+        </div>
+    </div>
+</div>
+<script type="text/template" id="tipContent">
+    <div>
+            <h3 style="margin-left:10px">小提示：</h3>
+            <ul style="margin:0px 5px 5px 22px;padding:0px 5px 5px 5px;line-height:18px;">
+                <li style="list-style:disc;margin:4px 0px">本软件提供同一套平台间用户进行实时通讯的聊天功能；</li>
+                <li style="list-style:disc;margin:4px 0px">必须提前建好讨论组，讨论组内成员可以相互沟通交流；</li>
+                <li style="list-style:disc;margin:4px 0px">可以上级企业与下级或平级企业之间建讨论组进行聊天；</li>
+                <li style="list-style:disc;margin:4px 0px">建讨论需要有权限，在企业管理中的聊天讨论组里创建。</li>
+            </ul>
+    </div>
+</script>
+</body>
+
+</html>

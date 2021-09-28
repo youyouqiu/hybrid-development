@@ -1,0 +1,211 @@
+<style>
+  #modal-body {
+    max-height: 898px;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  .schedule-list {
+    border: 1px solid #eee;
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .zw-title {
+    background: #eee;
+    padding: 5px;
+    height: 38px;
+    margin-top: 20px;
+  }
+
+  .zw-title .btn {
+    padding: 4px 8px;
+    margin-bottom: 0;
+  }
+
+  .zw-title .btn-danger {
+    margin-right: 10px;
+  }
+
+  .zw-title .control-label {
+    padding-top: 0;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .stayMinute {
+    width: 40px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .del-hide .del-btn, .add-hide .add-btn {
+    display: none;
+  }
+
+  .person-mark {
+    height: 36px;
+    line-height: 36px;
+  }
+
+  #peopleIds {
+    position: absolute;
+    height: 0;
+    padding: 0;
+    z-index: -1;
+  }
+</style>
+<form th:object="${taskInfo}" id="editForm"
+  role="form"
+  class="form-horizontal">
+  <div class="modal-header">
+    <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">修改任务</h4>
+  </div>
+
+  <div id="modal-body" class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <input id="taskId" type="hidden" th:value="*{id}" /><!--任务id-->
+        <div class="form-group">
+          <label class="col-md-2 control-label">
+            <label class="text-danger">*</label> 任务名称：
+          </label>
+          <div class="col-md-4">
+            <input th:value="*{taskName}" name="name" maxlength="20" type="text" class="form-control readonly" id="taskName" placeholder="请输入任务名称" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label"> 备注： </label>
+          <div class="col-md-10">
+            <input th:value="*{remark}" name="remark" maxlength="100" type="text" class="form-control readonly" id="remarks" />
+          </div>
+        </div>
+
+        <ul id="schedule-list" class="schedule-list">
+          <li class="item" th:each="itemInfo:*{taskItems}">
+
+            <input class="itemId" type="hidden" th:value="${itemInfo.taskId}"><!--任务项id-->
+            <div class="zw-title clearfix">
+              <label class="control-label pull-left"><label class="text-danger">*</label> 任务项 </label>
+              <button type="button" class="btn btn-primary pull-right add-btn">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="btn btn-danger pull-right del-btn">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-2 control-label"><label class="text-danger">*</label> 控制类型： </label>
+              <div class="col-md-10">
+                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="1" checked>围栏</label>
+                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="2" disabled>RFID</label>
+                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="3" disabled>NFC</label>
+                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="4" disabled>二维码</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-2 control-label"><label class="text-danger">*</label> 围栏： </label>
+              <div class="col-md-4 has-feedback">
+                <!--组织树复选框-->
+                <input
+                  style="cursor: pointer; background-color: #fafafa;"
+                  placeholder="请选择任务围栏"
+                  class="form-control fenceGroupSelect readonly"
+                  th:id="${'groupSelect' + itemInfoStat.index}"
+                  th:value="${itemInfo.fenceName}"
+                  name="fenceInfoId"
+                  autocomplete="off"
+                  th:data-id="${itemInfo.fenceInfoId}" />
+                <span class="fa fa-chevron-down form-control-feedback"
+                  style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                  th:id="${'groupSelectSpan' + itemInfoStat.index}"></span>
+                <div th:id="${'menuContent' + itemInfoStat.index}" class="menuContent">
+                  <ul th:id="${'treeTypeDemo' + itemInfoStat.index}" th:data-value="${itemInfo.fenceInfoId}" class="ztree"></ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-2 control-label"><label class="text-danger">*</label> 开始时间： </label>
+              <div class="col-md-4">
+                <input
+                  th:value="${itemInfo.startTime}"
+                  th:id="${'startTime' + itemInfoStat.index}"
+                  readonly="readonly" name="startDate"
+                  placeholder="请选择任务开始时间" type="text"
+                  class="form-control layer-date laydate-icon startTime"
+                  autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);"
+                />
+              </div>
+              <label class="col-md-2 control-label"><label class="text-danger">*</label> 结束时间： </label>
+              <div class="col-md-4">
+                <input
+                  th:value="${itemInfo.endTime}"
+                  th:id="${'endTime' + itemInfoStat.index}"
+                  readonly="readonly"
+                  name="endDate"
+                  placeholder="请选择任务结束时间"
+                  type="text" class="form-control layer-date laydate-icon endTime"
+                  autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-2 control-label"> 关联报警： </label>
+              <div class="col-md-10">
+                <label class="checkbox-inline">
+                  <input
+                    class="relationAlarm readonly"
+                    th:name="${'relationAlarm' + itemInfoStat.index}"
+                    value="1" type="checkbox"
+                    th:checked="${itemInfo.relationAlarm.indexOf('1')!=-1}"
+                  /> 任务未到岗
+                </label>
+                <label class="checkbox-inline">
+                  <input
+                    class="relationAlarm readonly"
+                    th:name="${'relationAlarm' + itemInfoStat.index}"
+                    value="2" type="checkbox"
+                    th:checked="${itemInfo.relationAlarm.indexOf('2')!=-1}"
+                    checked
+                  /> 任务离岗
+                </label>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" id="doSubmits">
+      <strong>提 交</strong>
+    </button>
+    <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script th:inline="javascript">
+  var simCompareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+  var nameNull = [[#{taskManage.name.null}]];
+  var peopleIdsNull = [[#{taskManage.peopleIds.null}]];
+  var startDateStrNull = [[#{taskManage.startDateStr.null}]];
+  var endDateStrNull = [[#{taskManage.endDateStr.null}]];
+  var fenceInfoIdNull = [[#{taskManage.fenceInfoId.null}]];
+  var startDateNull = [[#{taskManage.startDate.null}]];
+  var endDateNull = [[#{taskManage.endDate.null}]];
+  var residenceTimeNull = [[#{taskManage.residenceTime.null}]];
+  var nameExists = [[#{taskManage.name.exists}]];
+  var nameError = [[#{taskManage.name.error}]];
+  var endDateError = [[#{taskManage.endDate.error}]];
+  var timeExists = [[#{taskManage.time.exists}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/taskEdit.js"></script>

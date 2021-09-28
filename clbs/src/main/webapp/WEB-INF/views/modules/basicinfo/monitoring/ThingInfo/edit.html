@@ -1,0 +1,150 @@
+<form th:action="@{/m/basicinfo/monitoring/ThingInfo/edit.gsp}" th:object="${result}" id="editForm" role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改物品信息</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" name="id" type="text" hidden="true" />
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 物品编号：</label>
+                    <div class="col-md-4">
+                        <input name="thingNumber" th:field="*{thingNumber}" placeholder="请输入物品编号" type="text" class="form-control" th:readonly="${bandState}"/>
+                    </div>
+                    <label class="col-md-2 control-label">物品名称：</label>
+                    <div class="col-md-4">
+                        <input name="name"  th:field="*{name}" placeholder="请输入物品名称" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input th:value="${groupName}" name="groupName" style="background-color: #fafafa; cursor: pointer;"
+                               class="form-control" id="zTreeCitySel" placeholder="请选择所属企业"
+                               type="text" value="" autocomplete="off"/>
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback" aria-hidden="true"></span>
+                        <input class="form-control hidden" name="groupId" id="groupId" th:field="*{groupId}" />
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                    </div>
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 物品类别：</label>
+                    <div class="col-md-4">
+                        <select name="category" placeholder="请选择物品类别" class="form-control">
+                            <option th:each="c : ${session.thingCategoryList}" th:value="${c.code}" th:text="${c.value}" th:selected="${c.code == result.category}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 物品类型：</label>
+                    <div class="col-md-4">
+                        <select name="type" placeholder="请选择物品类型" class="form-control">
+                            <option th:each="c : ${session.thingTypeList}" th:value="${c.code}" th:text="${c.value}" th:selected="${c.code == result.type}"></option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">品牌：</label>
+                    <div class="col-md-4">
+                        <input name="label"  th:field="*{label}" type="text" class="form-control" placeholder="请输入品牌">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">型号：</label>
+                    <div class="col-md-4">
+                        <input name="model"  th:field="*{model}" type="text" class="form-control" placeholder="请输入型号">
+                    </div>
+                    <label class="col-md-2 control-label">主要材料：</label>
+                    <div class="col-md-4">
+                        <input name="material"  th:field="*{material}" type="text" class="form-control" placeholder="请输入主要材料">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">物品重量(kg)：</label>
+                    <div class="col-md-4">
+                        <input name="weight"  th:field="*{weight}" type="text" class="form-control" placeholder="请输入物品重量">
+                    </div>
+                    <label class="col-md-2 control-label">规格：</label>
+                    <div class="col-md-4">
+                        <input name="spec"  th:field="*{spec}" type="text" class="form-control" placeholder="请输入物品规格">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">制造商：</label>
+                    <div class="col-md-4">
+                        <input name="manufacture"  th:field="*{manufacture}" type="text" class="form-control" placeholder="请输入物品制造商">
+                    </div>
+                    <label class="col-md-2 control-label">经销商：</label>
+                    <div class="col-md-4">
+                        <input name="dealer"  th:field="*{dealer}" type="text" class="form-control" placeholder="请输入物品经销商">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">产地：</label>
+                    <div class="col-md-4">
+                        <input name="place"  th:field="*{place}" type="text" class="form-control" placeholder="请输入物品产地">
+                    </div>
+                    <label class="col-md-2 control-label">生产日期：</label>
+                    <div class="col-md-4">
+                        <input name="productDate"  th:value="${result.productDate}" autocomplete="off" id="productDate" type="text" style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择生产日期">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input name="remark"  th:field="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+                    </div>
+                    <label class="col-md-2 control-label">物品图片：</label>
+                    <div class="col-md-4">
+                        <table width="50%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                            <tr>
+                                <td align="left">
+                                    <div id="localImag">
+                                        <img id="preview" th:if="${result.thingPhoto != null && result.thingPhoto != ''}" th:src="${result.thingPhoto}" style="width: 200px;height: 200px">
+                                        <img id="preview" th:if="${result.thingPhoto == null || result.thingPhoto == ''}" src="" style="display: none;">
+                                    </div>
+                                    <input id="thingPhoto" th:value="${result.thingPhoto}" name="thingPhoto" type="hidden"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="inpFilePhoto" style="margin-top: 10px">
+                                        <input type="file" accept="image/gif,image/jpeg,image/jpg,image/png" name="file" id="doc" style="width:202px;" onchange="editItemInformation.setImagePreview();">
+                                        <label class="changeFile" for="doc">载入物品照片</label>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id = "bindMsg"  th:hidden="${!bandState}" style="text-align:left;color:red;">
+            <p> 注 ： 该物品绑定终端和终端手机号，物品编号不允许修改，如需修改请先解除绑定！</p>
+        </div>
+        <button class="btn btn-primary" type="button" id="doSubmitsEdit">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var publicSize10=[[#{public.size10.length}]];
+    var publicSize20=[[#{public.size20.length}]];
+    var phoneError = [[#{phone.error}]];
+    var publicNull = [[#{public.null}]];
+    var thingInfoNumberExists = [[#{thingInfo.number.exists}]];
+    var thingInfoNumberFloat = [[#{thingInfo.number.float}]];
+    var thingInfoNumberInt = [[#{thingInfo.number.int}]];
+    var publicpositive = [[#{public.number.positive}]];
+    var publicSize50 = [[#{public.size50.length}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="/wro/thingInfoEdit.js" th:src="@{/wro/thingInfoEdit.js}"></script>

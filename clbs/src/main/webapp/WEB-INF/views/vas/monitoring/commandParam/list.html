@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>指令参数</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">监控管理</li>
+                        <li class="active">指令参数</li>
+                    </ul>
+                    <h1 class="h1 ">指令参数</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox fuelConsumption">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">指令列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-9">
+                                        <input id="search_condition" name="search" onkeyup="commandParam.searchTree(this)" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" autocomplete="off" placeholder="请输入指令名称"/>
+                                    </div>
+                                    <div class="col-md-3 btnPadding">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group">
+                                                <button id="customizeColumns" style="padding-top:8px" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu alarmSettingDropdown" role="menu" id="Ul-menu-text-v">
+                                                    <label class="radio-inline" style="margin-left:10px;">
+                                                        <input name="deviceCheck" value="1" type="radio" class="deviceCheck"> 交通部JT/T808-2013
+                                                    </label>
+                                                    <label class="radio-inline" style="margin-left:10px;">
+                                                        <input name="deviceCheck" value="11" type="radio" class="deviceCheck" checked> 交通部JT/T808-2019
+                                                    </label>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px; height:630px!important;">
+                                    <ul id="treeDemo" class="ztreee" style="height:615px!important;overflow:auto;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">指令参数设置列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form" class="syntheticBox">
+                                                <select name="queryType" id="queryType"
+                                                        class="Inlinesearch form-control" style="width: 125px">
+                                                    <option value="0" selected>监控对象</option>
+                                                    <option value="1">企业</option>
+                                                    <option value="2">分组</option>
+                                                </select>
+                                                <label>
+                                                    <input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                           id="simpleQueryParam" name="simpleQueryParam"
+                                                           style="width: 300px" placeholder="请输入关键字">
+                                                </label>
+                                                <button type="button" id="search_button" onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display: none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <li><a th:href="@{/v/monitoring/commandParam/settingMore___.gsp}" id="settingMoreBtn"
+                                                       data-toggle="modal" data-target="#commonWin">
+                                                    <i class="glyphicon glyphicon-wrench icoPaddingLeft"></i><span>批量设置</span></a>
+                                                </li>
+                                                <li><a href="javascript:void(0);" id="send_model"><i
+                                                        class="glyphicon glyphicon-circle-arrow-down icoPaddingLeft"></i>批量下发</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumnsTwo" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTable"
+                                       class="table table-striped table-bordered table-hover checkTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th><input
+                                                type="checkbox" id="checkAll"></th>
+                                        <th>操作设置</th>
+                                        <th>下发状态</th>
+                                        <th>指令类型</th>
+                                        <th>监控对象</th>
+                                        <th>所属企业</th>
+                                        <th>分组</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+
+
+<!-- 添加/修改升级包 -->
+<div class="modal fade" id="addUpgradePackage" style="z-index: 99999" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/commandParam/saveDeviceUpgrade}" id="addUpgradeForm" role="form" action="#" method="post"
+                  class="form-horizontal" enctype="multipart/form-data" onkeydown="if(event.keyCode==13)return false;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="upgradePackageName">添加升级包</h4>
+                    <input class="hidden" id="edit_upgradeFileId" name="upgradeFileId" value="">
+                    <input class="hidden" id="edit_url" name="url">
+                </div>
+                <div class="modal-body" style="overflow: visible;padding-right: 80px">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">
+                                    <i class="fa fa-question-circle fa-lg" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="终端升级文件命名规则：设备类型_厂家编号_设备型号_依赖软件版本号_软件版本号.后缀名">
+                                    </i>
+                                    升级文件：
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" id="edit_fileName" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-3 noPadding">
+                                    <div id="addInpFile" class="inpFilePhoto">
+                                        <input type="file" id="addExcelPath" name="file">
+                                        <label class="changeFile" for="addExcelPath" title="未选择文件。">浏览...</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">升级类型：</label>
+                                <div class="col-md-3">
+                                    <select name="upgradeType" id="edit_upgradeType" class="form-control">
+                                        <option value="0x00">终端</option>
+                                        <option value="0x0c">道路运输终证IC卡读卡器</option>
+                                        <option value="0x34">北斗定位模块</option>
+                                        <option value="0x64">驾驶辅助功能模块</option>
+                                        <option value="0x65">驾驶行为监测模块</option>
+                                        <option value="0x66">胎压监测模块</option>
+                                        <option value="0x67">盲区监测模块</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">制造商ID：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="manufacturerId" id="edit_manufacturerId" class="form-control" autocomplete="off" maxlength="11">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">设备型号：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="equipmentModel" id="edit_equipmentModel" class="form-control" autocomplete="off" readonly>
+                                </div>
+                                <label class="col-md-3 control-label">厂家编号：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="factoryNumber" id="edit_factoryNumber" class="form-control" autocomplete="off" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">依赖软件版本：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="dependSoftVersion" id="edit_dependSoftVersion" class="form-control" autocomplete="off" readonly>
+                                </div>
+                                <label class="col-md-3 control-label">软件版本：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="softVersion" id="edit_softVersion" class="form-control" autocomplete="off" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="addUpgradeButton" class="btn btn-primary">提交</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="/wro/orderParam.js" th:src="@{/wro/orderParam.js}"></script>
+<script th:inline="javascript">
+    var treeMaxLength5000 = [[#{tree.maxLength5000}]];
+
+    var publicIssuedSuccess = [[#{public.Issued.success}]];
+
+    var commandIncidentIdNull = [[#{command.incident.id.null}]];
+    var commandIncidentDataNull = [[#{command.incident.data.null}]];
+    var commandContactIdNull = [[#{command.contact.id.null}]];
+    var commandContactNameNull = [[#{command.contact.name.null}]];
+    var commandContactPhoneNull = [[#{command.contact.phone.null}]];
+    var commandMessageIdNull = [[#{command.message.id.null}]];
+    var commandMessageNameNull = [[#{command.message.name.null}]];
+    var commandIntervalNull = [[#{command.interval.null}]];
+    var commandDistanceNull = [[#{command.distance.null}]];
+    var commandVehicleNull = [[#{command.vehicle.null}]];
+    var commandSettingValueNull = [[#{command.settingValue.null}]];
+    var commandDeviceNull = [[#{command.device.null}]];
+    var commandSelectNull = [[#{command.select.null}]];
+    var commandDesignatedTimeError = [[#{command.designatedTime.error}]];
+    var selectItem = [[#{select.item}]];
+    var sendCommandComplete = [[#{send.command.complete}]];
+</script>
+</html>

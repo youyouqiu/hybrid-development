@@ -1,0 +1,206 @@
+<form th:action="@{/v/workhourmgt/vbbind/bind.gsp}"
+ id="bindForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">工时管理设置</h4>
+	</div>
+      <div class="modal-body">
+      	<div class="row">
+			<div class="col-md-12">
+				<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+				<input id = "vibrationSensorList"  th:value="${vibrationSensorList}" type="hidden"/>
+				<input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken">
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer"  th:value="${vehicle.brand}" name = "vehicleBrand" placeholder="请输入监控对象" class="form-control" readonly />
+						<input th:value="${vehicle.id}" id="vehicleId" name = "vehicleId" type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label"> 参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group">
+							<input name="brands" type="text" class="form-control" id="brands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr/>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+					传感器基本参数
+					</label>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 振动传感器型号：
+					</label>
+					<div class="col-md-4">
+						<div class="input-group">
+							<input type="hidden" name="shockSensorId" id="formVibrationSensor" />
+							<input  type="text" placeholder="请选择振动传感器型" value=" " class="form-control" id="vibrationSensor" name="vibrationSensor">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+						</div>
+					</div>
+					<label class="col-md-2 control-label"> 传感器厂商：</label>
+					<div class="col-md-4">
+						<input disabled id = "manufacturers" name = "manufacturers" placeholder="请输入传感器厂商" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> 奇偶校验：</label>
+					<div class="col-md-4">
+						<select id = "parity" name="parity" placeholder="请选择奇偶校验"
+							class="form-control" disabled>
+							<option selected="selected" value="0"></option>
+							<option value="3">无校验</option>
+							<option value="1">奇校验</option>
+							<option value="2">偶校验</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label"> 滤波系数：</label>
+					<div class="col-md-4">
+						<select id = "filterFactor" name="filterFactor" placeholder="请选择滤波系数"
+							class="form-control" disabled>
+							<option selected="selected" value="0"></option>
+							<option value="1">实时</option>
+							<option value="2">平滑</option>
+							<option value="3">平稳</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group" style="padding-bottom:20px;">
+					<label class="col-md-2 control-label"> 波特率：</label>
+					<div class="col-md-4">
+						<select id = "baudRate" name="baudRate" placeholder="请选择波特率" disabled
+							class="form-control">
+							<option selected="selected" value="0"></option>
+							<option value="1">2400</option>
+							<option value="2">4800</option>
+							<option value="3">9600</option>
+							<option value="4">19200</option>
+							<option value="5">38400</option>
+							<option value="6">57600</option>
+							<option value="7">115200</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label"> 补偿使能：</label>
+					<div class="col-md-4">
+						<select id = "inertiaCompEn" name="inertiaCompEn" placeholder="请选择补偿使能" disabled
+							class="form-control">
+							<option selected="selected" value="0"></option>
+							<option value="2">禁用</option>
+							<option value="1">使能</option>
+						</select>
+						
+					</div>
+				</div>
+				<hr/>
+				<div class="form-group">
+					<label class="col-sm-3 control-label">
+					个性参数
+					</label>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> 自动上传时间(s)：</label>
+					<div class="col-md-4">
+						<select id = "uploadTime" name="uploadTime" placeholder="请选择自动上传时间" 
+							class="form-control">
+							<option selected="selected" value="01">被动</option>
+							<option value="02">10</option>
+							<option value="03">20</option>
+							<option value="04">30</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> 单次采集时长(s)：</label>
+					<div class="col-md-4">
+						<input id = "collectNumber" type="text" name = "collectNumber" placeholder="请输入单次采集时长" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label"> 上传组数：</label>
+					<div class="col-md-4">
+						<input id = "uploadNumber" type="text" name = "uploadNumber" placeholder="请输入上传组数" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">输出修正系数K：</label>
+					<div class="col-md-4">
+						<input id = "outputCorrectionK" type="text" name = "outputCorrectionK" value = "100"  placeholder="请输入修正系数K" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">输出修正系数B：</label>
+					<div class="col-md-4">
+						<input id = "outputCorrectionB" type="text" name = "outputCorrectionB" value = "100"  placeholder="请输入修正系数B" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">停机频率阈值(Hz)：</label>
+					<div class="col-md-4">
+						<input id = "outageFrequencyThreshold" type="text" name = "outageFrequencyThreshold"  placeholder="请输入停机频率阈值" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">持续停机时间阈值(s)：</label>
+					<div class="col-md-4">
+						<input id = "continueOutageTimeThreshold" type="text" name = "continueOutageTimeThreshold"  placeholder="请输入持续停机时间阈值" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">怠速频率阈值(Hz)：</label>
+					<div class="col-md-4">
+						<input id = "idleFrequencyThreshold" type="text" name = "idleFrequencyThreshold"  placeholder="请输入怠速频率阈值" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">持续怠速时间阈值(s)：</label>
+					<div class="col-md-4">
+						<input id = "continueIdleTimeThreshold" type="text" name = "continueIdleTimeThreshold" placeholder="请输入持续怠速时间阈值" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">工作频率阈值(Hz)：</label>
+					<div class="col-md-4">
+						<input id = "workFrequencyThreshold" type="text" name = "workFrequencyThreshold" placeholder="请输入工作频率阈值" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">持续工作时间阈值(s)：</label>
+					<div class="col-md-4">
+						<input type="text" id = "continueWorkTimeThreshold" name = "continueWorkTimeThreshold" placeholder="请输入持续工作时间阈值" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">报警频率阈值(Hz)：</label>
+					<div class="col-md-4">
+						<input id = "alarmFrequencyThreshold" type="text" name = "alarmFrequencyThreshold"  placeholder="请输入报警频率阈值" class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">持续报警时间阈值(s)：</label>
+					<div class="col-md-4">
+						<input id = "continueAlarmTimeThreshold" type="text" name = "continueAlarmTimeThreshold" placeholder="请输入持续报警时间阈值" class="form-control" />
+					</div>
+				</div>
+			</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="/wro/vibrationsensorbindBind.js" th:src="@{/wro/vibrationsensorbindBind.js}"></script>

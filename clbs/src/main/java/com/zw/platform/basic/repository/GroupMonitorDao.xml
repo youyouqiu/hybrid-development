@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.GroupMonitorDao">
+
+    <insert id="batchAdd">
+
+        insert into zw_m_assignment_vehicle (id, assignment_id, vehicle_id, monitor_type,knob_no, flag,
+        create_data_time,
+        create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.groupId}, #{item.vehicleId}, #{item.monitorType},
+            #{item.knobNo},#{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+
+    </insert>
+
+    <select id="judgeGroupsHaveMonitor" resultType="java.lang.String">
+        select assignment_id from zw_m_assignment_vehicle where flag = 1 and assignment_id in
+        <foreach collection="groupIds" separator="," close=")" open="(" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="deleteByGroupIdAndMonitorId">
+        update zw_m_assignment_vehicle
+        set flag = 0
+        where
+            assignment_id = #{groupId}
+          and vehicle_id = #{monitorId}
+          and flag = 1
+    </delete>
+
+    <select id="getMonitorByGroupId" resultType="com.zw.platform.basic.dto.GroupMonitorDTO">
+        SELECT t.id as monitorId, t.brand, c.monitor_type, av.assignment_id as groupId FROM zw_m_assignment_vehicle av
+        INNER JOIN (
+        <!-- 这里因为av表至多命中100条数据，所以可以大大减少人车物查询条数，loosescan策略 -->
+        SELECT car.id id, car.brand brand, car.create_data_time createDataTime FROM zw_m_vehicle_info car
+        WHERE car.flag=1 AND car.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND
+        av.assignment_id = #{assignmentId})
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,peo.create_data_time createDataTime FROM zw_m_people_info peo
+        WHERE peo.flag=1 AND peo.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND
+        av.assignment_id = #{assignmentId})
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,th.create_data_time createDataTime FROM zw_m_thing_info th
+        WHERE th.flag=1 AND th.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND
+        av.assignment_id = #{assignmentId})
+        ) t ON t.id = av.vehicle_id
+        INNER JOIN zw_m_config c ON av.vehicle_id = c.vehicle_id and c.flag = 1
+        WHERE av.flag = 1 AND av.assignment_id = #{assignmentId} ORDER BY t.createDataTime DESC
+    </select>
+
+    <select id="getListByMonitorIds" resultType="com.zw.platform.basic.dto.GroupMonitorDTO">
+        select av.id,av.assignment_id as groupId,av.vehicle_id as monitorId,a.name as
+        groupName,a.intercom_group_id,av.knob_no
+        from zw_m_assignment_vehicle av
+        inner join zw_m_assignment a on a.id = av.assignment_id
+        where
+        av.flag = 1 and a.flag = 1
+        and av.vehicle_id in
+        <foreach item="monitorId" collection="monitorIdSet" separator=","
+                 open="(" close=")">
+            #{monitorId}
+        </foreach>
+    </select>
+
+    <select id="getByGroupIds" resultType="com.zw.platform.basic.dto.GroupMonitorDTO">
+        SELECT vehicle_id monitorId,assignment_id groupId
+        from zw_m_assignment_vehicle
+        where flag = 1
+        and assignment_id in
+        <foreach collection="groupIds" close=")" open="(" separator="," item="groupId">
+            #{groupId}
+        </foreach>
+
+    </select>
+
+    <select id="getAll" resultType="com.zw.platform.basic.domain.GroupMonitorDO">
+       select assignment_id as groupId, vehicle_id from zw_m_assignment_vehicle where flag =1
+    </select>
+
+    <select id="getCountListByGroupId" resultType="com.zw.platform.basic.dto.CountDTO">
+        select assignment_id as id,count(*) as count from zw_m_assignment_vehicle where assignment_id in
+        <foreach collection="ids" item="id" close=")" open="(" separator=",">
+            #{id}
+        </foreach>
+          and flag =1 group by assignment_id
+    </select>
+
+    <select id="getMonitorByGroupIds" resultType="com.zw.platform.basic.dto.GroupMonitorDTO">
+        select t2.*,t1.assignment_id as groupId
+        from zw_m_assignment_vehicle t1
+        INNER JOIN (
+        select c.vehicle_id as monitorId,
+        c.monitor_type,
+        case c.monitor_type
+        when '0' then vi.brand
+        when '1' then pi.people_number
+        else ti.thing_number end as brand
+        from zw_m_config c
+        left JOIN zw_m_vehicle_info vi on c.vehicle_id = vi.id and vi.flag = 1
+        left JOIN zw_m_people_info pi on c.vehicle_id = pi.id and pi.flag = 1
+        left JOIN zw_m_thing_info ti on c.vehicle_id = ti.id and ti.flag = 1
+        where c.flag = 1
+        ) t2
+        where t1.flag = 1
+        and t1.vehicle_id = t2.monitorId
+        <if test="groupIds != null and groupIds.size() > 0">
+            and t1.assignment_id IN
+            <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="keyword != null and keyword != '' ">
+            AND t2.brand LIKE CONCAT('%',#{keyword},'%')
+        </if>
+    </select>
+
+
+    <delete id="deleteByMonitorIds">
+        update zw_m_assignment_vehicle
+        set flag = 0
+        where flag = 1
+        and vehicle_id IN
+        <foreach collection="monitorIds" item="monitorId" open="(" close=")" separator=",">
+            #{monitorId}
+        </foreach>
+    </delete>
+
+    <update id="clearKnobNo">
+        update zw_m_assignment_vehicle
+        set knob_no = null
+        where vehicle_id in
+        <foreach item="item" collection="monitorIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateKnobNo" parameterType="com.zw.platform.basic.domain.GroupMonitorDO">
+        update zw_m_assignment_vehicle
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="knob_no =case" suffix="end,">
+                <foreach collection="groupMonitorList" item="item" index="index">
+                    when id=#{item.id} then #{item.knobNo}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="groupMonitorList" index="index" item="item" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <select id="getCountByGroupId" resultType="int">
+        SELECT count(1)
+        from zw_m_assignment_vehicle ass
+        INNER JOIN zw_m_config c on ass.vehicle_id=c.vehicle_id and c.flag = 1
+        where ass.flag = 1
+        and ass.assignment_id = #{groupId}
+    </select>
+
+    <select id="getGroupMonitorCountList" resultType="com.zw.platform.basic.domain.GroupMonitorCountDo">
+        SELECT zma.id, zma.name, zma.description, zma.contacts, zma.telephone, zma.sound_recording,
+        zma.intercom_group_id, zma.group_call_number, zma.types, zma.org_id,
+        (
+        SELECT count(1) FROM zw_m_assignment_vehicle zmav
+        INNER JOIN zw_m_config zmc ON zmav.vehicle_id = zmc.vehicle_id AND zmc.flag = 1
+        WHERE zmav.`assignment_id` = zma.`id` AND zmav.`flag` = 1
+        <if test="monitorType != null and monitorType != ''">
+            AND zmc.monitor_type = #{monitorType}
+        </if>
+        ) monitorCount
+        FROM zw_m_assignment zma
+        WHERE zma.`flag` = 1
+        AND zma.id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by zma.create_data_time desc
+    </select>
+
+    <select id="getGroupMonitorBindInfoListByIds" resultType="com.zw.platform.basic.domain.GroupMonitorBindDO">
+        SELECT zma.id groupId, zma.name groupName, zma.org_id, monitor.*, zmdi.id deviceId, zmdi.device_number,
+        zmdi.device_type, zmsci.id simCardId, zmsci.simcard_number simCardNumber FROM
+        (
+        SELECT vehicle.id moId, vehicle.brand moName, '0' monitorType, vehicle.aliases aliases, vehicle.plate_color FROM
+        zw_m_vehicle_info vehicle WHERE vehicle.flag = 1
+        UNION ALL
+        SELECT people.id moId, people.people_number moName, '1' monitorType, people.name aliases, null plate_color FROM
+        zw_m_people_info people WHERE people.flag = 1
+        UNION ALL
+        SELECT thing.id moId, thing.thing_number moName, '2' monitorType, thing.name aliases, null plate_color FROM
+        zw_m_thing_info thing WHERE thing.flag = 1
+        ) monitor
+        INNER JOIN zw_m_assignment_vehicle zmav ON monitor.moId = zmav.vehicle_id AND zmav.flag = 1
+        INNER JOIN zw_m_config zmc ON zmc.vehicle_id = zmav.vehicle_id AND zmc.flag = 1
+        INNER JOIN zw_m_device_info zmdi ON zmdi.id = zmc.device_id AND zmdi.flag = 1
+        INNER JOIN zw_m_sim_card_info zmsci ON zmsci.id = zmc.sim_card_id AND zmsci.flag = 1
+        INNER JOIN zw_m_assignment zma ON zma.id = zmav.assignment_id AND zma.flag = 1
+        WHERE
+        <if test="monitorType != null and monitorType != ''">
+            monitor.monitorType = #{monitorType} AND
+        </if>
+        zmav.assignment_id in
+        <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getGroupIdIdByMonitorId" resultType="string">
+        SELECT av.assignment_id FROM zw_m_assignment_vehicle av
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment a on a.id = av.assignment_id and a.flag = 1
+        WHERE au.user_id = #{userId}
+        AND av.vehicle_id = #{monitorId}
+        AND av.flag = 1
+        ORDER BY a.create_data_time DESC,a.name
+    </select>
+</mapper>

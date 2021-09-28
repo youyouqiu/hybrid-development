@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.SensorPollingDao">
+
+    <!-- 根据监控对象获取轮询设置 -->
+    <select id="findByVehicleId" parameterType="string" resultType="com.zw.platform.domain.vas.f3.SensorPolling">
+        SELECT sp.*,mp.name as pollingName,mp.ident_id as identId, c.vehicle_id vehicleId FROM `zw_m_sensor_polling` sp
+        LEFT JOIN zw_m_sensor_config c on sp.config_id=c.id and c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type  AND mp.flag = 1
+        where sp.flag=1
+        <if test="vehicleId != null and vehicleId != ''">
+           and c.vehicle_id=#{vehicleId}
+        </if>
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <select id="findByVehicleIds" resultType="com.zw.platform.domain.vas.f3.SensorPolling">
+        SELECT sp.*, mp.name as pollingName, mp.ident_id as identId, c.vehicle_id vehicleId
+        FROM `zw_m_sensor_polling` sp
+        LEFT JOIN zw_m_sensor_config c on sp.config_id = c.id and c.flag = 1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type AND mp.flag = 1
+        where sp.flag = 1
+        and c.vehicle_id in
+        <foreach collection="vehicleIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY sp.create_data_time DESC, mp.name
+    </select>
+
+    <select id="findAllSensorPoll"  resultType="map">
+        SELECT c.vehicle_id, GROUP_CONCAT(DISTINCT mp.name SEPARATOR ',') as pollingName FROM zw_m_sensor_polling sp
+        INNER JOIN zw_m_sensor_config c on sp.config_id=c.id and c.flag=1
+        INNER JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type  AND mp.flag = 1
+        WHERE sp.flag=1 GROUP BY  c.vehicle_id
+    </select>
+
+    <!-- 根据监控对象获取轮询设置 -->
+    <select id="findByConfigid" parameterType="string" resultType="com.zw.platform.domain.vas.f3.SensorPolling">
+        SELECT sp.*,mp.name as pollingName FROM `zw_m_sensor_polling` sp
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type  AND mp.flag = 1
+        where sp.flag=1
+        <if test="configid != null and configid != ''">
+            and sp.config_id=#{configid}
+        </if>
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <!-- 根据主键ID查询轮询数据信息 -->
+    <select id="findByid" parameterType="string" resultType="com.zw.platform.domain.vas.f3.SensorPolling">
+        SELECT * FROM `zw_m_sensor_polling` sp
+        WHERE flag = 1
+        <if test="id != null and id != ''">
+          and id=#{id}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+
+    <!-- 新增轮询数据-->
+    <insert id="addSensorPolling" parameterType="com.zw.platform.domain.vas.f3.SensorPolling">
+        insert into zw_m_sensor_polling (id, sensor_type, polling_time, flag,config_id, create_data_time,create_data_username)
+        values (#{id}, #{sensorType}, #{pollingTime}, #{flag},#{item.configId}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <!-- 批量新增轮询数据 -->
+    <insert id="addByBatch" parameterType="java.util.List">
+        insert into zw_m_sensor_polling (id, sensor_type, polling_time, flag,config_id,create_data_time,create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.sensorType}, #{item.pollingTime},#{item.flag},#{item.configId},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 根据id删除一个 zw_m_sensor_config -->
+    <update id="delete" parameterType="string">
+        UPDATE zw_m_sensor_polling set flag=0 WHERE id = #{id}
+    </update>
+
+
+    <!-- 根据车辆id删除轮询数据 -->
+    <update id="deleteByConfigId" parameterType="string">
+        UPDATE zw_m_sensor_polling sp set sp.flag=0
+        WHERE sp.config_id =#{configId} and sp.flag=1
+    </update>
+    <!-- -->
+    <select id="findStatus" resultType="string">
+      SELECT d.status FROM zw_m_sensor_config sc
+        INNER JOIN zw_m_sensor_polling sp ON sc.id = sp.config_id AND sp.flag = 1
+        INNER JOIN zw_m_peripherals p ON p.id = sp.sensor_type AND p.flag = 1
+        AND p.ident_id = '0x90'
+        INNER JOIN zw_m_directive d ON d.parameter_name = sc.id AND d.flag = 1 AND d.monitor_object_id = sc.vehicle_id
+        WHERE sc.vehicle_id = #{vehicleId}
+        AND sc.flag = 1
+    </select>
+    <!-- 根据监控对象获取轮询设置 -->
+    <select id="findConfigId" parameterType="string" resultType="string">
+        SELECT distinct sp.config_id FROM `zw_m_sensor_polling` sp
+        LEFT JOIN zw_m_sensor_config c on sp.config_id=c.id and c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type  AND mp.flag = 1
+        LEFT JOIN zw_m_directive md on md.monitor_object_id = c.vehicle_id and md.flag = 1
+        where sp.flag=1 and mp.ident_id = "0x53" and md.`status` = "0"
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <!-- 根据传感器id查询设置了相应轮询传感器的监控对象 -->
+    <select id = "getSensorPollMonitorBySensorType" parameterType="string" resultType="string">
+          SELECT distinct c.vehicle_id FROM zw_m_sensor_polling sp
+        LEFT JOIN zw_m_sensor_config c ON sp.config_id=c.id AND c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type AND mp.flag = 1
+        LEFT JOIN zw_m_directive md ON md.monitor_object_id = c.vehicle_id AND md.flag = 1
+        WHERE sp.flag=1 AND mp.ident_id = #{sensorType} AND md.status = "0"
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <!-- 查询车id和传感器id查询设置了相应轮询传感器的监控对象 -->
+    <select id="getBindSensorMonitorBySensorId" resultType="string" parameterType="string">
+        SELECT distinct c.vehicle_id FROM zw_m_sensor_polling sp
+        INNER JOIN zw_m_sensor_config c ON sp.config_id=c.id AND c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type AND mp.flag = 1
+        WHERE mp.ident_id = #{sensorId} ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <select id="getAllBindSensorMonitor" resultType="string">
+        SELECT distinct c.vehicle_id FROM zw_m_sensor_polling sp
+        INNER JOIN zw_m_sensor_config c ON sp.config_id=c.id AND c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type AND mp.flag = 1
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+
+    <update id="deleteBatchByConfigId">
+        UPDATE zw_m_sensor_polling sp set sp.flag=0
+        WHERE sp.config_id in
+        <foreach collection="sensorConfigIdList" item="sensorConfigId" open="(" separator="," close=")">
+            #{sensorConfigId}
+        </foreach>
+        and sp.flag=1
+    </update>
+
+    <update id="batchDeleteByIds">
+        UPDATE zw_m_sensor_polling
+        set flag = 0
+        where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id = "getSensorPollingListByMonitorId" parameterType="string" resultType="string">
+        SELECT mp.ident_id FROM zw_m_sensor_polling sp
+        LEFT JOIN zw_m_sensor_config c on sp.config_id=c.id and c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type  AND mp.flag = 1
+        where sp.flag=1
+        and c.vehicle_id= #{monitorId}
+        ORDER BY sp.create_data_time DESC,mp.name
+    </select>
+    <select id="getPollMonitorIdListBySensorIdAndOwnMonitor" resultType="java.lang.String">
+        SELECT distinct c.vehicle_id FROM zw_m_sensor_polling sp
+        INNER JOIN zw_m_sensor_config c ON sp.config_id=c.id AND c.flag=1
+        LEFT JOIN zw_m_peripherals mp ON mp.id = sp.sensor_type AND mp.flag = 1
+        WHERE sp.flag = 1
+        <if test="sensorIdList != null and sensorIdList.size() > 0">
+            AND mp.ident_id IN
+            <foreach collection="sensorIdList" item="sensorId" open="(" separator="," close=")">
+                #{sensorId}
+            </foreach>
+        </if>
+        <if test="ownMonitorIdList != null and ownMonitorIdList.size() > 0">
+            AND c.vehicle_id IN
+            <foreach collection="ownMonitorIdList" item="monitorId" open="(" separator="," close=")">
+                #{monitorId}
+            </foreach>
+        </if>
+    </select>
+</mapper>

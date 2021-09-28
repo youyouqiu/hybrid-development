@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.FastNavConfigDao">
+
+	<!--获取当前用户的首页定制信息-->
+	<select id="getList" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		SELECT f.id as id,f.user_id,f.`order`,f.url_id,f.description,r.resource_name as urlName,r.perm_value as url,
+		f.nav_type as navType
+		FROM zw_c_fast_nav_config f
+		inner join zw_c_resource r on f.url_id = r.id and r.flag = 1
+		where f.user_id = #{userId}
+		and f.flag = 1
+	</select>
+
+	<select id="getOutSideNav" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		SELECT  id ,user_id,`order`,url_id as url,description,nav_type as navType
+		from zw_c_fast_nav_config
+		where user_id = #{userId}
+		and nav_type = 1
+		and flag = 1
+	</select>
+
+	<!--删除用户在当前位置的首页定制信息-->
+	<update id="delete" parameterType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		update zw_c_fast_nav_config
+		set
+	    flag = 0
+		where
+		user_id = #{userId} and `order` = #{order}
+		and flag = 1
+	</update>
+
+	<!--新增用户在当前位置的首页定制信息-->
+	<insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		insert into
+		zw_c_fast_nav_config
+		(id,user_id,`order`,url_id,description,flag,create_data_time,create_data_username,nav_type)
+		values
+		(#{id},#{userId},#{order},#{urlId},#{description},#{flag},#{createDataTime},#{createDataUsername},#{navType})
+	</insert>
+
+	<!--根据序号查询信息-->
+	<select id="findBySort" resultType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm" >
+		SELECT f.id as id,f.user_id,f.order,f.url_id,f.description,r.resource_name as urlName,f.nav_type as navType
+		FROM zw_c_fast_nav_config f
+		inner join zw_c_resource r on f.url_id = r.id and r.flag = 1
+		where f.user_id = #{userId}
+		and f.order = #{order}
+		and f.flag = 1
+	</select>
+
+	<!-- 根据用户id和导航ID查询导航信息 -->
+	<select id="findNavById" resultType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm" >
+		SELECT f.id as id,f.user_id,f.order,f.url_id,f.description,f.nav_type as navType
+		FROM zw_c_fast_nav_config f
+		where f.id = #{id}
+		and f.flag = 1
+	</select>
+
+	<insert id="addNavs" parameterType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		INSERT INTO zw_c_fast_nav_config
+		(id,user_id,`order`,url_id,description,flag,create_data_time,create_data_username, nav_type)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id},#{item.userId},#{item.order},#{item.urlId},#{item.description},#{item.flag},
+			#{item.createDataTime},#{item.createDataUsername},#{item.navType})
+		</foreach>
+	</insert>
+
+	<update id="deleteNavs" parameterType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		UPDATE zw_c_fast_nav_config SET flag = 0 WHERE flag = 1 AND id IN
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.id}
+		</foreach>
+	</update>
+
+	<!--删除用户在当前位置的首页定制信息-->
+	<update id="deleteNavById" parameterType="string">
+		UPDATE zw_c_fast_nav_config SET flag = 0
+		WHERE id = #{id}
+ 		and flag = 1
+	</update>
+
+	<!-- 	修改导航顺序	-->
+	<update id="updateNavOrderByForm" parameterType="com.zw.platform.domain.basicinfo.form.FastNavConfigForm">
+		update  zw_c_fast_nav_config
+		SET
+		`order` = #{order},
+		update_data_time = #{updateDataTime},
+		update_data_username = #{updateDataUsername}
+		where id = #{id}
+		and flag = 1
+	</update>
+
+
+</mapper>

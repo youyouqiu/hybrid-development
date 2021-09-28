@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.RiskEventDao">
+    <!-- 新增 -->
+    <insert id="add"
+            parameterType="com.zw.platform.domain.riskManagement.form.RiskEventForm">
+		INSERT INTO zw_m_risk_event (
+		id, risk_Type,
+		risk_event,description, function_id,
+		create_data_time,create_data_username,flag)
+		VALUES(
+		#{id},#{riskType},
+		#{riskEvent},#{description},
+		#{functionId},#{createDataTime},#{createDataUsername},#{flag})
+	</insert>
+    <!-- 批量新增 -->
+    <insert id="addByBatch"
+            parameterType="com.zw.platform.domain.riskManagement.form.RiskEventForm">
+        INSERT INTO zw_m_risk_event (
+        id, risk_Type,
+        risk_event, description,
+        function_id,
+        create_data_time,create_data_username,flag)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},#{item.riskType}, #{item.riskEvent},
+            #{item.description}, #{item.functionId},
+            #{item.createDataTime},
+            #{item.createDataUsername},
+            #{item.flag})
+        </foreach>
+    </insert>
+    <!-- 跟新风向任务 -->
+    <update id="update"
+            parameterType="com.zw.platform.domain.riskManagement.form.RiskEventForm">
+		Update zw_m_risk_event set
+		risk_Type=#{riskType},risk_event=#{riskEvent},
+		description=#{description},function_id=#{functionId},update_data_time=#{updateDataTime},update_data_username
+		= #{updateDataUsername} where id=#{id}
+	</update>
+    <!-- 查询 -->
+    <select id="find"
+            parameterType="com.zw.platform.domain.riskManagement.query.RiskEventQuery"
+            resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT * FROM zw_m_risk_event
+        WHERE flag=1
+
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND risk_event LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY risk_type,create_data_time DESC
+    </select>
+
+    <!-- 查询 -->
+    <select id="findAllow" resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+		SELECT * FROM zw_m_risk_event
+		WHERE flag=1
+		ORDER BY risk_type,create_data_time desc,id DESC
+	</select>
+
+    <select id="get" parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+		SELECT * FROM zw_m_risk_event WHERE id = #{id} and flag = 1
+	</select>
+
+    <!-- 根据查询 -->
+    <select id="findByRiskEvent" parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT A.* FROM zw_m_risk_event A
+        WHERE flag = 1
+        <if test="riskEvent != null and riskEvent != ''">
+            AND risk_event = #{riskEvent}
+        </if>
+    </select>
+    <!-- 根据id查询风险事件信息 -->
+    <select id="findById" parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+		SELECT A.* FROM zw_m_risk_event A
+		WHERE flag = 1
+		AND A.id =
+		#{id}
+	</select>
+
+    <!-- <select id="findByTypeAndEvent" parameterType="string" resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT * FROM zw_m_risk_event WHERE flag = 1 and risk_type = #{riskType}
+        and risk_event = #{riskEvent} </select> -->
+    <delete id="delete" parameterType="string">
+		UPDATE zw_m_risk_event set
+		flag=0 WHERE id = #{id}
+	</delete>
+    <select id="isExist" parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT * FROM zw_m_risk_event WHERE flag = 1 and
+        risk_type = #{0} and
+        risk_event = #{1}
+        <!-- and id <![CDATA[ <> ]]> #{id} -->
+    </select>
+    <select id="isRepeate"
+            parameterType="com.zw.platform.domain.riskManagement.form.RiskEventForm"
+            resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM zw_m_risk_event WHERE flag = 1 AND id
+		!= #{id} AND
+		risk_type = #{riskType} and risk_event = #{riskEvent}
+	</select>
+
+    <select id="getDocRiskEventMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,CONCAT(risk_event,'(',SUBSTR(risk_type,1,2),')')as riskType from zw_m_risk_event
+	</select>
+
+    <select id="getRiskEventMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,risk_event as riskEvent ,risk_type as riskType from zw_m_risk_event
+	</select>
+
+    <select id="getRiskTypeMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,risk_type as riskType from zw_m_risk_event
+	</select>
+    <select id="getWarnTypeBy808pos" resultType="string">
+        SELECT
+        m.809_pos
+        FROM zw_m_808_809_mapping m
+        where m.808_pos =#{alarmType} and m.flag =1
+    </select>
+
+    <select id="getRiskEventByFunctionId" resultType="com.zw.platform.domain.riskManagement.RiskEvent" >
+        SELECT
+        risk_type as riskType,
+        risk_event as riskEvent
+        FROM zw_m_risk_event
+        WHERE function_id = #{functionId}
+    </select>
+
+    <select id="findAllEventTypeMap" resultType="java.util.Map">
+       SELECT CONCAT(function_id,"") as id ,CONCAT(risk_event,'(',risk_type,')') as event from zw_m_risk_event
+    </select>
+
+    <select id="getNameAndFunctionIds" resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT
+        risk_type as riskType,risk_type_num as riskTypeNum,event_common_name as eventCommonName,GROUP_CONCAT(function_id,""
+        ) as functionIds FROM zw_m_risk_event  where event_common_name is not null
+        GROUP BY event_common_name
+    </select>
+
+    <select id="findAllEventAndEventCommonFiled" resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT event_common_field as eventCommonFiled,GROUP_CONCAT(function_id,"") as functionIds , event_common_name,risk_type
+        FROM zw_m_risk_event
+        where event_common_field is not null and LENGTH(trim(event_common_name))>0
+        GROUP BY event_common_field
+    </select>
+</mapper>

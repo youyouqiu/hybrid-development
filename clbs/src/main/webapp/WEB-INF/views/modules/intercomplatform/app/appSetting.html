@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>APP信息配置</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #stretch4,#stretch5,#stretch6 {
+            cursor: pointer
+        }
+
+        #editAlarmSetting .modal-body,#editStatistics .modal-body {
+            padding-right: 45px;
+        }
+
+        .mult-check-ul li {
+            padding: 5px
+        }
+
+        #editAlarmSetting .mult-check-ul li:hover,#editStatistics .mult-check-ul li:hover {
+            cursor: pointer;
+            background-color: #f7f7f7;
+        }
+
+        #editAlarmSetting .mult-check-ul li.title:hover {
+            cursor: default;
+            background-color: #eee;
+        }
+
+        .mult-check-ul li input {
+            float: right;
+            vertical-align: -2px;
+            cursor: pointer
+        }
+
+        .mult-check-ul li.title {
+            background-color: #eee
+        }
+
+        #localImag img, #userImgPreview {
+            width:50%;
+            margin-bottom: 10px
+        }
+        #userImgPreview{
+            width:25%;
+        }
+        label.error{margin-top: -5px}
+        .adasFlag{vertical-align: -2px}
+        table td label{
+            margin-bottom: 0!important;
+        }
+        .nav-tabBox .tableBox{
+            display: none;
+        }
+        .nav-tabBox .tableBox.active{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content" class="appSetting">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">APP管理</li>
+                        <li class="active">APP信息配置</li>
+                    </ul>
+                    <h1 class="h1 ">APP信息配置</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">登录设置</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch-body">
+                            <table id="logoSetting" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editLoginLogo" id="updateLogin"
+                                                    data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefLoginLogo" type="button" class="editBtn editBtn-info">
+                                                    <i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultLoginLogo" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">登录页Logo</td>
+                                    <td class="text-center"><a
+                                            href="javascript:appSetting.logoPagesPhotoShow()">查看照片</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editIndexTitle"
+                                                    data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefIndexTitle" type="button"
+                                                        class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultIndexTitle" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">登录页标题</td>
+                                    <td class="text-center" id="topTitleMsg"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editPlatformSite"
+                                                    data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefBottomTitle" type="button"
+                                                        class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultBottomTitle" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台网址</td>
+                                    <td class="text-center" id="bottomTitleMsg"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editLoginMsg"
+                                                    data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefResourceName" type="button"
+                                                        class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultResourceName" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">关于登录提示</td>
+                                    <td class="text-center" id="frontPageMsg"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editForgetMsg"
+                                                    data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefForgetMsg" type="button" class="editBtn editBtn-info">
+                                                    <i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultForgetMsg" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">忘记密码提示</td>
+                                    <td class="text-center" id="forgetMsg"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">个人中心</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch2-body">
+                            <table id="dataTables" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editUserGroupImg"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefUserGroupImg" type="button"
+                                                        class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultUserGroupImg" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">用户组织头像</td>
+                                    <td class="text-center" id="userGroupImg">
+                                        <a href="javascript:appSetting.userGroupPhotoShow()">查看头像</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editAboutMe"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefAboutMe" type="button" class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultAboutMe" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">关于我们显示内容(个人中心)</td>
+                                    <td class="text-center" id="aboutMe"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch3">
+                            <h3 class="panel-title fwb">性能</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch3-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch3-body">
+                            <table id="dataTables1" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editAggregation"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefAggregation" type="button"
+                                                        class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultAggregation" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">开始聚合对象数量(手机地图)</td>
+                                    <td class="text-center" id="aggregationNum"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editHistoryTimeRange"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefHistoryTimeRange" type="button"
+                                                        class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultHistoryTimeRange" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">最多查询时间范围(历史数据)</td>
+                                    <td class="text-center" id="historyTimeRange"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editAlarmTimeRange"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefAlarmTimeRange" type="button"
+                                                        class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultAlarmTimeRange" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">最多查询时间范围(报警查询)</td>
+                                    <td class="text-center" id="alarmTimeRange"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editSelectObjNum"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefSelectObjNum" type="button"
+                                                        class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultSelectObjNum" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">最多选择对象数量(综合统计)</td>
+                                    <td class="text-center" id="selectObjNum"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch4">
+                            <h3 class="panel-title fwb">报警类型</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch4-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch4-body">
+                            <table id="dataTables2" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editAlarmSetting"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefAlarmType" type="button" class="editBtn editBtn-info">
+                                                    <i
+                                                            class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultAlarmType" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">报警类型</td>
+                                    <td class="text-center" id="alarmType">
+                                        <a data-target="#alarmSettingDetail" href="javascript:appSetting.init()"
+                                           data-toggle="modal">查看配置</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch5">
+                            <h3 class="panel-title fwb">综合统计</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch5-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch5-body">
+                            <table id="dataTables5" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editStatistics"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefStatistics" type="button" class="editBtn editBtn-info">
+                                                    <i class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultStatistics" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">综合统计功能内容</td>
+                                    <td class="text-center" id="statistics">
+                                        <a data-target="#statisticsSettingDetail" href="javascript:appSetting.init()"
+                                           data-toggle="modal">查看配置</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch6">
+                            <h3 class="panel-title fwb">主动安全</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch6-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch6-body">
+                            <table id="dataTables6" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editActiveSafety"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefActiveSafety" type="button" class="editBtn editBtn-info"><i
+                                                        class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultActiveSafety" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">是否开启主动安全功能</td>
+                                    <td class="text-center" id="activeSafety"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch7">
+                            <h3 class="panel-title fwb">对象详情</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch7-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch7-body">
+                            <table id="dataTables7" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editDetailSetting"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <label>
+                                                <button id="setDefDetail" type="button" class="editBtn editBtn-info">
+                                                    <i
+                                                            class="fa fa-pencil"></i>设为默认
+                                                </button>
+                                            </label>
+                                            <button id="defaultDetail" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">对象详情主页展示内容</td>
+                                    <td class="text-center" id="alarmType7">
+                                        <a data-target="#detailSetting" href="javascript:appSetting.init()"
+                                           data-toggle="modal">查看配置</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--登录页logo修改-->
+            <div class="modal fade" id="editLoginLogo" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">登录页Logo修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="登录页logo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-8">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="localImag"><img id="preview" src=""></div>
+                                                    <input id="photograph" name="photograph" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file" accept="image/png, image/jpeg" name="file"
+                                                               id="doc"
+                                                               style="width:202px;"
+                                                               onchange="appSetting.setImagePreview();">
+                                                        <label class="changeFile" for="doc">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-top: 20px">
+                                    <label class="col-md-3 control-label">
+                                        <label class="text-danger">*</label> 注：
+                                    </label>
+                                    <div class="col-md-8">
+                                        <p style="margin: 0">1.请上传小于400kb的png或jpg格式图片;</p>
+                                        <p style="margin: 0">2.为了保证您的显示效果：建议像素750*250(比例3:1)；</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="updateLoginLogo">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--登录页logo图片显示-->
+            <div class="modal fade" id="logoPhotoShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">登录页Logo</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row text-center">
+                                <img id="loginLogo" src="" class="img-thumbnail"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--用户组织头像修改-->
+            <div class="modal fade" id="editUserGroupImg" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">修改头像</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="用户组织头像">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-8">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="userPhoto"><img id="userImgPreview" src=""></div>
+                                                    <input id="userPhotograph" name="userPhotograph" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file" accept="image/png, image/jpeg" name="file"
+                                                               id="userDoc"
+                                                               style="width:202px;"
+                                                               onchange="appSetting.setImagePreviewUserImg();">
+                                                        <label class="changeFile" for="userDoc">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-top: 20px">
+                                    <label class="col-md-3 control-label">
+                                        <label class="text-danger">*</label> 注：
+                                    </label>
+                                    <div class="col-md-8">
+                                        <p style="margin: 0">1.请上传小于200kb的png或jpg格式图片;</p>
+                                        <p style="margin: 0">2.为了保证您的显示效果，建议图片比例为1:1，上传尺寸请小于250*250；</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="saveUserGroupImg">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--用户组织头像显示-->
+            <div class="modal fade" id="userPhotoShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">用户组织头像</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row text-center">
+                                <img id="userGroupPhoto" src="" class="img-thumbnail"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--登录页标题修改-->
+            <div class="modal fade" id="editIndexTitle" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">登录页标题修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="登录页标题">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" id="indexTitle" maxlength="12" placeholder="请输入登录页标题" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="topTitle" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--平台网址修改-->
+            <div class="modal fade" id="editPlatformSite" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台网址修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台网址">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" maxlength="24" id="platformSite" placeholder="请输入平台网址" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="savePlatformSite" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--关于登录提示修改-->
+            <div class="modal fade" id="editLoginMsg" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">关于登录提示修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="关于登录提示">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-8">
+                                        <textarea id="loginMsg" rows="5" class="form-control"
+                                                  placeholder="请输入关于登录提示,支持换行"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveLoginMsg" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--忘记密码提示修改-->
+            <div class="modal fade" id="editForgetMsg" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">忘记密码提示修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="忘记密码提示">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-8">
+                                        <textarea id="forgetVal" rows="5" class="form-control"
+                                                  placeholder="请输入忘记密码提示,支持换行"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveForget" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--开始聚合对象数量修改-->
+            <div class="modal fade" id="editAggregation" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">开始聚合对象数量修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="aggForm" class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="开始聚合对象数量(手机地图)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" id="setAggregationNum" name="setAggregationNum"
+                                               placeholder="请输入开始聚合对象数量" type="text">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveAggregationNum" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--最多查询时间范围(历史数据)修改-->
+            <div class="modal fade" id="editHistoryTimeRange" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">最多查询时间范围(历史数据)修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="最多查询时间范围(历史数据)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <select id="setHistoryTimeRange" class="form-control">
+                                            <option value="3">3天</option>
+                                            <option value="7">7天</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveHistoryTimeRange" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--最多查询时间范围(报警查询)修改-->
+            <div class="modal fade" id="editAlarmTimeRange" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">最多查询时间范围(报警查询)修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="最多查询时间范围(报警查询)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <select id="setAlarmTimeRange" class="form-control">
+                                            <option value="7">7天</option>
+                                            <option value="30">30天</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveAlarmTimeRange" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--最多选择对象数量修改-->
+            <div class="modal fade" id="editSelectObjNum" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">最多选择对象数量修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="selectObjForm" class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="最多选择对象数量(综合统计)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" id="setSelectObjNum" name="setSelectObjNum"
+                                               placeholder="请输入最多选择对象数量" type="text">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveSelectObjNum" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--关于我们显示内容(个人中心)修改-->
+            <div class="modal fade" id="editAboutMe" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">关于我们显示内容修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="关于我们显示内容(个人中心)">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <textarea id="setAboutMe" rows="5" class="form-control"
+                                                  placeholder="请输入关于我们显示内容,支持换行"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveAboutMe" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 修改配置 -->
+            <div class="modal fade" id="editAlarmSetting" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">修改配置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" action="#" method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                    <label class="col-md-2 control-label searchListSelect">参考组织：</label>
+                                    <div class="col-md-4">
+                                        <select id="organization" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <ul class="mult-check-ul" id="alarmTypeUl">
+
+                                    <!--↓以下报警如有增加或减少需要去application.properties修改alarm.number的数量-->
+
+                                    <li class="title">驾驶员引起报警</li>
+                                    <li><span>紧急报警</span><input type="checkbox" value="0" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>超速报警</span><input type="checkbox" value="1" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>疲劳驾驶</span><input type="checkbox" value="2" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>当天累积驾驶超时</span><input type="checkbox" value="18" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>超时停车</span><input type="checkbox" value="19" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进区域</span><input type="checkbox" value="2011" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>出区域</span><input type="checkbox" value="2012" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进出区域</span><input type="checkbox" value="20" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进线路</span><input type="checkbox" value="2111" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>出线路</span><input type="checkbox" value="2112" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进出线路</span><input type="checkbox" value="21" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>路段行驶时间不足</span><input type="checkbox" value="2211"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion">
+                                    </li>
+                                    <li><span>路段行驶时间过长</span><input type="checkbox" value="2212"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion">
+                                    </li>
+                                    <li><span>路段行驶时间不足/过长</span><input type="checkbox" value="22"
+                                                                       class="alarmCheck"><input type="hidden"
+                                                                                                 value=10200
+                                                                                                 class="appVersion">
+                                    </li>
+                                    <li><span>路线偏离报警</span><input type="checkbox" value="23" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+
+                                    <li class="title">车辆报警</li>
+                                    <li><span>车辆被盗</span><input type="checkbox" value="26" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>车辆非法点火</span><input type="checkbox" value="27" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>车辆非法位移</span><input type="checkbox" value="28" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>非法开门报警</span><input type="checkbox" value="31" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+
+                                    <li class="title">F3传感器报警</li>
+                                    <li><span>温度传感器高温报警</span><input type="checkbox" value="651"
+                                                                     class="alarmCheck"><input type="hidden" value=10200
+                                                                                               class="appVersion">
+                                    </li>
+                                    <li><span>温度传感器低温报警</span><input type="checkbox" value="652"
+                                                                     class="alarmCheck"><input type="hidden" value=10200
+                                                                                               class="appVersion">
+                                    </li>
+                                    <li><span>湿度传感器高湿度报警</span><input type="checkbox" value="661"
+                                                                      class="alarmCheck"><input type="hidden"
+                                                                                                value=10200
+                                                                                                class="appVersion">
+                                    </li>
+                                    <li><span>湿度传感器低湿度报警</span><input type="checkbox" value="662"
+                                                                      class="alarmCheck"><input type="hidden"
+                                                                                                value=10200
+                                                                                                class="appVersion">
+                                    </li>
+                                    <li><span>超速报警(F3)</span><input type="checkbox" value="67" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>胎压报警</span><input type="checkbox" value="143" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>载重报警</span><input type="checkbox" value="70" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>反转报警</span><input type="checkbox" value="124" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>主油箱加油报警</span><input type="checkbox" value="6811"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>主油箱漏油报警</span><input type="checkbox" value="6812"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>副油箱加油报警</span><input type="checkbox" value="6821"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>副油箱漏油报警</span><input type="checkbox" value="6822"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <!--<li><span>门磁行驶门开报警</span><input type="checkbox" value="7111" class="alarmCheck">
+                                    </li>
+                                    <li><span>门磁未到门开报警</span><input type="checkbox" value="7112" class="alarmCheck">
+                                    </li>
+                                    <li><span>门磁超时门开报警</span><input type="checkbox" value="7113" class="alarmCheck">
+                                    </li>-->
+
+                                    <li class="title">平台报警</li>
+                                    <li><span>异动报警</span><input type="checkbox" value="77" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>车机疑似屏蔽报警</span><input type="checkbox" value="78" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>围栏内超速报警</span><input type="checkbox" value="74" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>路线偏离报警</span><input type="checkbox" value="75" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>超速报警</span><input type="checkbox" value="76" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进区域</span><input type="checkbox" value="7211" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>出区域</span><input type="checkbox" value="7212" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>进线路</span><input type="checkbox" value="7311" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>出线路</span><input type="checkbox" value="7312" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>到达关键点报警</span><input type="checkbox" value="11911"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion">
+                                    </li>
+                                    <li><span>未到达关键点报警</span><input type="checkbox" value="11912"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion">
+                                    </li>
+                                    <li><span>24H累计疲劳驾驶</span><input type="checkbox" value="203" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>长时间下线</span><input type="checkbox" value="82" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>异动报警(客运)</span><input type="checkbox" value="7702"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion">
+                                    </li>
+                                    <li><span>异动报警(山路)</span><input type="checkbox" value="7703" class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion">
+                                    </li>
+                                    <li><span>疲劳驾驶</span><input type="checkbox" value="79" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>违章报警</span><input type="checkbox" value="80" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>预警报警</span><input type="checkbox" value="81" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+
+                                    <li class="title">视频报警</li>
+                                    <li><span>视频信号丢失</span><input type="checkbox" value="125" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>视频信号遮挡</span><input type="checkbox" value="126" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>主存储器故障</span><input type="checkbox" value="1271" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>灾备存储器故障</span><input type="checkbox" value="1272"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>异常驾驶行为</span><input type="checkbox" value="130" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>其他视频设备故障</span><input type="checkbox" value="128"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion"></li>
+                                    <li><span>报警存储超限</span><input type="checkbox" value="131" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+                                    <li><span>客车超员</span><input type="checkbox" value="129" class="alarmCheck"><input
+                                            type="hidden" value=10200 class="appVersion"></li>
+
+                                    <li class="title">I/O报警</li>
+                                    <li><span>终端I/O异常</span><input type="checkbox" value="14004"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>I/O采集1异常</span><input type="checkbox" value="141000"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion"></li>
+                                    <li><span>I/O采集2异常 </span><input type="checkbox" value="142000"
+                                                                     class="alarmCheck"><input type="hidden" value=10200
+                                                                                               class="appVersion"></li>
+
+                                    <li class="title">F3高精度报警</li>
+                                    <li><span>设备电量报警</span><input type="checkbox" value="18811"
+                                                                   class="alarmCheck"><input type="hidden" value=10200
+                                                                                             class="appVersion"></li>
+                                    <li><span>急加速报警</span><input type="checkbox" value="18711"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion"></li>
+                                    <li><span>急减速报警</span><input type="checkbox" value="18712"
+                                                                     class="alarmCheck"><input type="hidden" value=10200
+                                                                                               class="appVersion"></li>
+                                    <li><span>急转弯报警</span><input type="checkbox" value="18713"
+                                                                 class="alarmCheck"><input type="hidden" value=10200
+                                                                                           class="appVersion"></li>
+                                    <li><span>异常移动报警</span><input type="checkbox" value="18714"
+                                                                 class="alarmCheck"><input type="hidden" value=10200
+                                                                                           class="appVersion"></li>
+                                    <li><span>加速度传感器异常报警</span><input type="checkbox" value="18715"
+                                                                 class="alarmCheck"><input type="hidden" value=10200
+                                                                                           class="appVersion"></li>
+                                    <li><span>ACC接线异常报警</span><input type="checkbox" value="18716"
+                                                                 class="alarmCheck"><input type="hidden" value=10200
+                                                                                           class="appVersion"></li>
+                                    <li><span>车辆电池馈电报警</span><input type="checkbox" value="18717"
+                                                                 class="alarmCheck"><input type="hidden" value=10200
+                                                                                           class="appVersion"></li>
+                                    <li><span>碰撞报警</span><input type="checkbox" value="18719"
+                                                                    class="alarmCheck"><input type="hidden" value=10200
+                                                                                              class="appVersion"></li>
+
+                                    <!--<li class="title">ADAS报警</li>
+                                    <li><span>前车碰撞预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>车道偏移预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>车距过近预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>行人碰撞预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>频繁变道预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>障碍物预警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>急加/急减/急转弯报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>道路标识超限报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+
+                                    <li class="title">DSM报警</li>
+                                    <li><span>接打电话报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>抽烟报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>闭眼报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>打哈欠报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>姿态异常报警</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>人证不符</span><input type="checkbox" value="" class="alarmCheck"></li>
+                                    <li><span>未检测到驾驶员</span><input type="checkbox" value="" class="alarmCheck"></li>-->
+
+                                    <!--↑以上报警如有增加或减少需要去application.properties修改alarm.number的数量-->
+
+                                </ul>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="checkAllAlarm" class="btn btn-primary">全选</button>
+                            <button type="button" id="noCheckAllAlarm" class="btn btn-primary">全不选</button>
+                            <button type="button" id="saveAlarmType" class="btn btn-primary">提交</button>
+                            <button type="button" id="closeAlarmType" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查看配置 -->
+            <div class="modal fade" id="alarmSettingDetail" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">配置详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <ul class="mult-check-ul" id="alarmDeatilUl"></ul>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 综合统计配置 -->
+            <div class="modal fade" id="editStatistics" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">修改配置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" action="#" method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                    <label class="col-md-2 control-label searchListSelect">参考组织：</label>
+                                    <div class="col-md-4">
+                                        <select id="organization1" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <ul class="mult-check-ul" id="statisticsUl">
+                                    <li><span>里程统计</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=20102 class="appVersion" checked></li>
+                                    <li><span>行驶统计</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>停止统计</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>上线统计</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>超速统计</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>报警排名</span><input type="checkbox" value="1" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>报警处置</span><input type="checkbox" value="1" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>工时统计</span><input type="checkbox" value="3" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li><span>油量里程</span><input type="checkbox" value="2" class="statisticsCheck" checked><input
+                                            type="hidden" value=10200 class="appVersion" checked></li>
+                                    <li>
+                                        <span>油耗里程</span>
+                                        <input type="checkbox" value="2" class="statisticsCheck" checked>
+                                        <input type="hidden" value=20102 class="appVersion" checked>
+                                    </li>
+                                </ul>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="checkAllStatistics" class="btn btn-primary">全选</button>
+                            <button type="button" id="noCheckAllStatistics" class="btn btn-primary">全不选</button>
+                            <button type="button" id="saveStatistics" class="btn btn-primary">提交</button>
+                            <button type="button" id="closeStatistics" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查看综合统计配置 -->
+            <div class="modal fade" id="statisticsSettingDetail" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">配置详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <ul class="mult-check-ul" id="statisticsDeatilUl"></ul>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主动安全配置 -->
+            <div class="modal fade" id="editActiveSafety" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">主动安全功能</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" action="#" method="post" role="form">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-4 control-label">
+                                        <input class="adasFlag" type="radio" name="adasFlag" value="0" checked> 关闭
+                                    </label>
+                                    <label class="col-md-4 control-label">
+                                        <input class="adasFlag" type="radio" name="adasFlag" value="1"> 开启
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveActiveSafety" class="btn btn-primary">提交</button>
+                            <button type="button" id="closeActiveSafety" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 对象详情 -->
+            <div class="modal fade" id="editDetailSetting" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">修改配置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal" action="#" method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                    <label class="col-md-2 control-label searchListSelect">参考组织：</label>
+                                    <div class="col-md-4">
+                                        <select id="organization2" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <!--tab-->
+                                <ul class="nav nav-tabs">
+                                    <li class="active" id="vehicle">
+                                        <a href="#vehicleCon" data-toggle="tab">车</a>
+                                    </li>
+                                    <li id="person">
+                                        <a href="#personCon" data-toggle="tab">人</a>
+                                    </li>
+                                    <li id="thing">
+                                        <a href="#thingCon" data-toggle="tab">物</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <!--车-->
+                                    <div id="vehicleCon" class="tab-pane active">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;">
+                                            <li class="title">对象基本信息</li>
+                                            <li>
+                                                <span>组织名称</span>
+                                                <input type="checkbox" value="0" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>分组信息</span>
+                                                <input type="checkbox" value="0" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>车主姓名</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>联系电话</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>车辆类别</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>车辆类型</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>创建日期</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>计费日期</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端信息</li>
+                                            <li>
+                                                <span>终端编号</span>
+                                                <input type="checkbox" value="0" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>通讯类型</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>IMEI号</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端手机号信息</li>
+                                            <li>
+                                                <span>终端手机号</span>
+                                                <input type="checkbox" value="0" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>ICCID号</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="0" class="detailCheck">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!--人-->
+                                    <div id="personCon" class="tab-pane">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;">
+                                            <li class="title">对象基本信息</li>
+                                            <li>
+                                                <span>组织名称</span>
+                                                <input type="checkbox" value="1" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>分组信息</span>
+                                                <input type="checkbox" value="1" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>姓名</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>身份证号</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>性别</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>联系电话</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>创建日期</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>计费日期</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端信息</li>
+                                            <li>
+                                                <span>终端编号</span>
+                                                <input type="checkbox" value="1" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>通讯类型</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>IMEI号</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端手机号信息</li>
+                                            <li>
+                                                <span>终端手机号</span>
+                                                <input type="checkbox" value="1" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>ICCID号</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="1" class="detailCheck">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!--物-->
+                                    <div id="thingCon" class="tab-pane">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;">
+                                            <li class="title">对象基本信息</li>
+                                            <li>
+                                                <span>组织名称</span>
+                                                <input type="checkbox" value="2" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>分组信息</span>
+                                                <input type="checkbox" value="2" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>物品名称</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>物品类别</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>物品类型</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>品牌</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>型号</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>创建日期</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>计费日期</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端信息</li>
+                                            <li>
+                                                <span>终端编号</span>
+                                                <input type="checkbox" value="2" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>通讯类型</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>IMEI号</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li class="title">终端手机号信息</li>
+                                            <li>
+                                                <span>终端手机号</span>
+                                                <input type="checkbox" value="2" class="detailCheck" checked>
+                                            </li>
+                                            <li>
+                                                <span>ICCID号</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                            <li>
+                                                <span>到期日期</span>
+                                                <input type="checkbox" value="2" class="detailCheck">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveDetailType" class="btn btn-primary">提交</button>
+                            <button type="button" id="closeDetailType" class="btn btn-default" data-dismiss="modal">关闭
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 对象详情,查看配置 -->
+            <div class="modal fade" id="detailSetting" role="dialog" aria-hidden="true" data-backdrop="static"
+                 aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">配置详情</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group clearfix">
+                                    <label class="col-md-2 control-label">当前组织：</label>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control curOrganization" disabled="disabled"
+                                               value=""
+                                               placeholder="当前组织"/>
+                                    </div>
+                                </div>
+                                <hr style="margin-bottom:20px;"/>
+                                <!--tab-->
+                                <ul class="nav nav-tabs">
+                                    <li class="active" id="vehicle2">
+                                        <a href="#vehicleCon2" data-toggle="tab">车</a>
+                                    </li>
+                                    <li id="person2">
+                                        <a href="#personCon2" data-toggle="tab">人</a>
+                                    </li>
+                                    <li id="thing2">
+                                        <a href="#thingCon2" data-toggle="tab">物</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <!--车-->
+                                    <div id="vehicleCon2" class="tab-pane active">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;"></ul>
+                                    </div>
+                                    <!--人-->
+                                    <div id="personCon2" class="tab-pane">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;"></ul>
+                                    </div>
+                                    <!--物-->
+                                    <div id="thingCon2" class="tab-pane">
+                                        <ul class="mult-check-ul" style="margin-top:20px;padding: 0;"></ul>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+  var aggregationNumNull = [[#{appSetting.aggregationNum.null}]];
+  var aggregationNumError = [[#{appSetting.aggregationNum.error}]];
+  var selectObjNumNull = [[#{appSetting.selectObjNum.null}]];
+  var selectObjNumError = [[#{appSetting.selectObjNum.error}]];
+</script>
+<script src="/clbs/resources/js/tg_util.js"></script>
+<script src="/clbs/resources/js/appSetting.js"></script>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>日志查询</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #logContent {
+            word-wrap: break-word;
+        }
+
+        .hasNewline {
+            margin: 0 auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">系统管理</li>
+                            <li class="active">日志查询</li>
+                        </ul>
+                        <h1 class="h1 ">日志查询</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch">
+                                    <h3 class="panel-title fwb">查询</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="stretch-body">
+                                    <div class="col-md-12 alarmSearchToolPanel">
+                                        <form id="logSearchList" class="form-horizontal" action="#" method="post"
+                                            role="form">
+                                            <div class="form-group">
+                                                <label
+                                                    class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                <div class="col-md-3 col-sm-6 searchListSelect">
+                                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                                        class="form-control layer-date laydate-icon" id="timeInterval"
+                                                        name="timeInterval" readonly />
+                                                </div>
+                                                <label
+                                                    class="col-md-1 col-sm-3 control-label searchListSelect">操作用户：</label>
+                                                <div class="col-md-2 col-sm-6 searchListSelect">
+                                                    <input id="usernameSearch" type="text" class="form-control"
+                                                        placeholder="用户名" />
+                                                </div>
+                                                <label
+                                                    class="col-md-1 col-sm-3 control-label searchListSelect">操作内容：</label>
+                                                <div class="col-md-2 col-sm-6 searchListSelect">
+                                                    <input id="messageSearch" type="text" class="form-control"
+                                                        placeholder="操作对象" />
+                                                </div>
+                                                <label
+                                                    class="col-md-1 col-sm-3 control-label searchListSelect">日志来源：</label>
+                                                <div class="col-md-1 col-sm-6 searchListSelect">
+                                                    <select name="logSource" id="logSource" class="form-control">
+                                                        <option value="">全部</option>
+                                                        <option value="1">终端上传</option>
+                                                        <option value="2">平台下发</option>
+                                                        <option value="3" selected>平台操作</option>
+                                                        <option value="4">APP操作</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-12 control-label" id="dateSearchData">
+                                                    <button id="todayClick" type="button" class="btn btn-primary"
+                                                        onclick="logSearch.inquireClick(0)">今天
+                                                    </button>
+                                                    <button id="yesterdayClick" type="button" class="btn btn-primary"
+                                                        onclick="logSearch.inquireClick(-1)">前一天
+                                                    </button>
+                                                    <button id="nearlyThreeDays" type="button" class="btn btn-primary"
+                                                        onclick="logSearch.inquireClick(-3)">前三天
+                                                    </button>
+                                                    <button id="nearlySevenDays" type="button" class="btn btn-primary"
+                                                        onclick="logSearch.inquireClick(-7)">前七天
+                                                    </button>
+                                                    <button id="inquireClick" type="button" class="btn btn-primary"
+                                                        name="1" onclick="logSearch.inquireClick(1)">查询
+                                                    </button>
+                                                    <button id="export" type="button" class="btn btn-purple export-btn"
+                                                        onclick="logSearch.export()"><i
+                                                            class="glyphicon glyphicon-log-out"></i> 导出
+                                                    </button>
+                                                    <button id="printBtn" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                            class="glyphicon glyphicon-log-out"></i> 打印
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch2">
+                                    <h3 class="panel-title fwb">日志列表</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="stretch2-body">
+                                    <div class="alarmTable" style="overflow:auto">
+                                        <table id="dataTable"
+                                            class="table table-striped table-bordered table-hover noCheckTable"
+                                            cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th class="text-center">操作时间</th>
+                                                    <th class="text-center">IP地址</th>
+                                                    <th class="text-center">操作人</th>
+                                                    <th class="text-center">监控对象</th>
+                                                    <th class="text-center">颜色</th>
+                                                    <th class="text-center">操作内容</th>
+                                                    <th class="text-center">日志来源</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+    <div class="modal fade" id="logDetailDiv" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width:30% ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">日志内容</h4>
+                </div>
+                <div class="modal-body" id="logContent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade in" id="mapPicModal" role="dialog" aria-labelledby="eventMediaModalLabel"
+        aria-hidden="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                    <h4 class="modal-title">打印预览</h4>
+                </div>
+                <div class="modal-body" style="height: 500px; max-height: 750px;">
+                    <div id="mapPic">
+                        <img src="" id="picImg" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="print">打印</button>
+                    <!--<button type="button" class="btn btn-primary" id="downloadPic">下载</button>-->
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{ export.fail }]];
+</script>
+<script src="/clbs/resources/js/html2canvas.min.js"></script>
+<script src="/resources/js/logSearch.js" th:src="@{/resources/js/logSearch.js}"></script>
+
+</html>

@@ -1,0 +1,101 @@
+<form th:object="${result}" id="baseValue" role="form" class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">工时基值修正</h4>
+        <style>
+            #baseValue .control-label {
+                float: left;
+            }
+
+            .top-group {
+                margin-bottom: 25px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .modal-footer {
+                padding: 19px 5px 20px;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <input th:field="*{id}" id="bid" type="hidden"/>
+        <input th:field="*{vehicleId}" id="vehicleId" type="hidden"/>
+        <input th:field="*{sensorId}" id="sensorId" type="hidden"/>
+        <div class="form-group top-group">
+            <label class="col-md-3 control-label">监控对象：</label>
+            <div class="col-md-7">
+                <input type="text" id="plateNumber" th:field="*{plateNumber}" readonly class="form-control"
+                       name="plateNumber"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3"> <label
+                    class="text-danger">*</label> 总工作基值：
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalWorkBaseValue" class="form-control" name="totalWorkBaseValue"
+                       placeholder="请输入0到600000之间的整数"/>
+            </div>
+            <label class="control-label"> 小时
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalWorkSecond" name="totalWorkSecond" class="form-control"
+                       placeholder="请输入0到59之间的整数"/>
+            </div>
+            <label class="control-label"> 分钟</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3"> <label
+                    class="text-danger">*</label> 总待机基值：
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalAwaitBaseValue" class="form-control" name="totalAwaitBaseValue"
+                       placeholder="请输入0到600000之间的整数"/>
+            </div>
+            <label class="control-label"> 小时
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalAwaitSecond" name="totalAwaitSecond" class="form-control"
+                       placeholder="请输入0到59之间的整数"/>
+            </div>
+            <label class="control-label"> 分钟</label>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-3"> <label
+                    class="text-danger">*</label> 总停机基值：
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalHaltBaseValue" class="form-control" name="totalHaltBaseValue"
+                       placeholder="请输入0到600000之间的整数"/>
+            </div>
+            <label class="control-label"> 小时
+            </label>
+            <div class="col-md-3">
+                <input type="text" id="totalHaltSecond" name="totalHaltSecond" class="form-control"
+                       placeholder="请输入0到59之间的整数"/>
+            </div>
+            <label class="control-label"> 分钟</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="text-left">
+            <label class="col-md-3 control-label">下发状态：</label>
+            <div class="col-md-3">
+                <input id="sendStatus" class="form-control" readonly/>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="paramDataSend">参数下发</button>
+        <button type="button" class="btn btn-default" style="margin-right: 15px!important;" data-dismiss="modal">关闭
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var hourNull = [[#{workHourVehicle.hour.null}]];
+    var secondNull = [[#{workHourVehicle.second.null}]];
+    var hourError = [[#{workHourVehicle.hour.error}]];
+    var secondError = [[#{workHourVehicle.second.error}]];
+</script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/workHourVehicleSettingBaseValueUpdate.js"></script>

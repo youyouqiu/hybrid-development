@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasAlarmJingParamSettingDao">
+    <delete id="deleteParamSetting">
+        DELETE from zw_m_adas_jing_alarm_param_setting WHERE
+        vehicle_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and param_type in
+        <foreach item="item" collection="paramTypeSet" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteParamSettingByVehicleIds">
+        DELETE from zw_m_adas_jing_alarm_param_setting WHERE
+        vehicle_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </delete>
+    <select id="findJingParamByVehicleId" resultType="com.zw.adas.domain.define.setting.AdasJingParamSetting">
+        select  * from zw_m_adas_jing_alarm_param_setting where  flag=1 and vehicle_id = #{vehicleId}
+    </select>
+
+
+    <select id="selectJingParamList" resultType="com.zw.adas.domain.define.setting.AdasSettingListDo">
+        SELECT DISTINCT f.id AS vehicleId, f.brand, GROUP_CONCAT(DISTINCT c.protocol_type SEPARATOR ',') as bindId,
+        f.create_data_time AS createDataTime
+        FROM
+        zw_m_vehicle_info f
+        LEFT JOIN zw_m_adas_jing_alarm_param_setting c ON f.id = c.vehicle_id and c.flag =1
+        WHERE
+        f.id IN
+        <foreach item="item" collection="params.list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY f.id ORDER BY f.create_data_time DESC, f.id DESC
+    </select>
+
+
+    <insert id="addJingAlarmSettingByBatch">
+        insert into zw_m_adas_jing_alarm_param_setting (
+        id,
+        risk_function_id,
+        parameter_id,
+        vehicle_id,
+        alarm_level,
+        alarm_volume,
+        speech,
+        alarm_video_duration,
+        video_resolution,
+        photograph_number,
+        camera_resolution,
+        photograph_time,
+        speed_limit,
+        duration_threshold,
+        protocol_type,
+        param_type,
+        flag)
+        values
+        <foreach collection="settings" item="item" index="index" separator=",">
+            (#{item.id},#{item.riskFunctionId}, #{item.parameterId}, #{item.vehicleId},
+            #{item.alarmLevel}, #{item.alarmVolume},#{item.speech},
+            #{item.alarmVideoDuration}, #{item.videoResolution},#{item.photographNumber},
+            #{item.cameraResolution},#{item.photographTime}, #{item.speedLimit},
+            #{item.durationThreshold},#{item.protocolType}, #{item.paramType},
+            #{item.flag}
+            )
+        </foreach>
+    </insert>
+    <select id="findJingUnAutomaticInfo" resultType="com.zw.adas.domain.define.setting.AdasPlatformParamSetting">
+        SELECT
+            vehicle_id AS vehicleId,
+            event_code AS riskFunctionId,
+            one_level_remind AS alarmRemindOne,
+            two_level_remind AS alarmRemindTwo,
+            distance_threshold distanceThreshold,
+            distance_remind AS distanceAlarmRemind,
+            distance_num AS distanceAlarmNumThreshold,
+            time_num AS timeAlarmNumThreshold,
+            time_remind AS timeAlarmRemind,
+            time_threshold AS timeThreshold,
+            one_level_deal_time_interval AS processingIntervalOne,
+            two_level_deal_time_interval AS processingIntervalTwo,
+            push_switch AS alarmSwitch,
+            param_type AS paramType,
+            three_level_remind AS alarmRemindThree,
+            three_level_deal_time_interval AS processingIntervalThree,
+            one_level_automatic_get AS automaticGetOne,
+            two_level_automatic_get AS automaticGetTwo,
+            three_level_automatic_get AS automaticGetThree,
+            one_level_automatic_deal AS automaticDealOne,
+            two_level_automatic_deal AS automaticDealTwo,
+            three_level_automatic_deal AS automaticDealThree
+        FROM
+            zw_m_adas_platform_param_setting
+        WHERE
+            one_level_automatic_get = 0
+            OR two_level_automatic_get = 0
+            OR three_level_automatic_get = 0
+            OR one_level_automatic_deal = 1
+            OR two_level_automatic_deal = 1
+            OR three_level_automatic_deal = 1
+    </select>
+
+    <select id="selectProtocolByVid" resultType="integer">
+      select protocol_type from zw_m_adas_jing_alarm_param_setting  where flag = 1 and vehicle_id = #{vid} limit 1
+    </select>
+
+</mapper>

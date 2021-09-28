@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" href="/clbs/resources/js/jQueryPowertip/justtool.css"/>
+<head>
+	<title>多媒体管理</title>
+	<div th:replace="fragments/header">header</div>
+	<style>
+		#showMedia{
+			max-width: 80%;
+		}
+	</style>
+</head>
+<body>
+<section id="container">
+	<div th:replace="fragments/nav">nav</div>
+	<section class="main-content-wrapper">
+		<div th:replace="fragments/menu">menu</div>
+		<section id="main-content">
+			<div class="row eightIsZero">
+				<div class="col-md-12">
+					<ul class="breadcrumb">
+						<li><a th:href="@{/}">首页</a></li>
+						<li class="active">报表管理</li>
+						<li class="active">多媒体报表</li>
+						<li class="active">多媒体管理</li>
+					</ul>
+					<h1 class="h1 ">多媒体管理</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch">
+								<h3 class="panel-title fwb">查询</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa chevron-down" id="stretch-chevron"></i>
+								</div>
+							</div>
+							<div class="panel-body" id="stretch-body">
+								<div class="col-md-12 alarmSearchToolPanel">
+									<form id="hourslist" class="form-horizontal" action="#"
+										  method="post" role="form">
+										<div class="form-group">
+											<div class="col-md-4">
+												<label class="col-md-3 control-label">组织：</label>
+												<div class="has-feedback fastClear col-md-9">
+													<select name="queryType" id="queryType"
+															class="Inlinesearch form-control treeSelect">
+														<option value="vehicle" selected="">监控对象</option>
+														<option value="group">企业</option>
+														<option value="assignment">分组</option>
+													</select>
+													<input type="text"
+														   style="cursor: pointer; background-color: #fafafa;"
+														   placeholder="请选择"
+														   name="groupSelect" class="form-control moreQueryGroup"
+														   id="groupSelect" autocomplete="off"/>
+													<span class="fa fa-chevron-down form-control-feedback"
+														  style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+														  id="groupSelectSpan"></span>
+													<div id="menuContent" class="menuContent">
+														<ul id="treeDemo" class="ztree"></ul>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-3 noPadding">
+												<label class="col-md-3 control-label searchListSelect">监控对象：</label>
+												<div class="col-md-9 searchListSelect">
+													<div style="position:relative;">
+														<div class="input-group">
+															<input name="charSelect" type="text" placeholder="请选择监控对象"
+																   class="form-control sixRightPadding" maxlength="20"
+																   id="charSelect">
+															<div class="input-group-btn">
+																<button type="button" id="button"
+																		class="btn btn-white dropdown-toggle disabled loading-state-button"
+																		data-toggle="dropdown">
+																	<i class="fa fa-spinner loading-state"></i>
+																</button>
+																<ul class="dropdown-menu dropdown-menu-right"
+																	role="menu">
+																</ul>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-5 noPadding">
+												<label class="col-md-2 control-label searchListSelect">时间：</label>
+												<div class="col-md-10 searchListSelect">
+													<input style="cursor: pointer; background-color: #fafafa;"
+														   class="form-control layer-date laydate-icon"
+														   id="timeInterval" name="timeInterval" readonly/>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-md-4">
+												<label class="col-md-3 control-label searchListSelect">多媒体类型：</label>
+												<div class="col-md-9 searchListSelect">
+													<select class="form-control" id="mediaCheckType">
+														<option value="0">图片</option>
+														<option value="1">音频</option>
+														<option value="2">视频</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-8 control-label" id="dateSearchData">
+												<button id="todayClick" type="button" class="btn btn-primary">今天
+												</button>
+												<button id="yesterdayClick" type="button" class="btn btn-primary">前一天
+												</button>
+												<button id="nearlyThreeDays" type="button" class="btn btn-primary">前三天
+												</button>
+												<button id="nearlySevenDays" type="button" class="btn btn-primary">前七天
+												</button>
+												<button id="inquireClick" type="button"
+														class="btn btn-primary search-btn"><i
+														class="glyphicon glyphicon-search"></i> 查询
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 多媒体展示 -->
+					<div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">
+									多媒体展示
+									<div class="carName" style="display:none;">
+										<i id="leftClickVehicle" class="toopTip-btn-left"
+										   style="display: inline-block;">
+											<img data-toggle="tooltip" data-placement="left" title=""
+												 src="../../../../clbs/resources/img/car-left.svg" width="16px"
+												 data-original-title="上一辆">
+										</i>&nbsp;&nbsp;&nbsp;<span id="carName"></span>&nbsp;&nbsp;&nbsp;<i
+											id="rightClickVehicle" class="toopTip-btn-right"
+											style="display: inline-block;">
+										<img data-toggle="tooltip" data-placement="right" title=""
+											 src="../../../../clbs/resources/img/car-right.svg" width="16px"
+											 data-original-title="下一辆">
+									</i>
+									</div>
+								</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+							<div class="panel-body mileage-Content" style="display:none;" id="graphShow">
+								<div class="container-area">
+									<div id="showMedia">
+									</div>
+									<div class="col-md-12 text-center hidden" id="photoChange">
+										<div class="btn-group btn-group-sm" role="group">
+											<button type="button" class="btn btn-white" id="left-arrow">上一个</button>
+											<button type="button" class="btn btn-white" id="right-arrow">下一个</button>
+										</div>
+									</div>
+									<i class="left-btn hidden" id="yesterdayChange"></i>
+									<i class="right-btn hidden" id="tomorrowChange"></i>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 多媒体信息列表 -->
+					<div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch2">
+								<h3 class="panel-title fwb">多媒体信息列表</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa chevron-down" id="stretch2-chevron"></i>
+								</div>
+							</div>
+							<div class="panel-body" id="stretch2-body">
+								<div class="alarmTable">
+									<table id="dataTable"
+										   class="table table-striped table-bordered table-hover noCheckTable"
+										   cellspacing="0" width="100%">
+										<thead>
+										<tr>
+											<th></th>
+											<th class="text-center">操作设置</th>
+											<th class="text-center">监控对象</th>
+											<th class="text-center">车牌颜色</th>
+											<th class="text-center">所属分组</th>
+											<th class="text-center">事件项</th>
+											<th class="text-center">时间</th>
+											<th class="text-center">多媒体名称</th>
+											<th class="text-center">多媒体类型</th>
+											<th class="text-center">操作人</th>
+											<th class="text-center">备注</th>
+										</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+
+<!-- --修改备注-- -->
+<div class="modal fade" id="editDescriptionModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+	 role="dialog" aria-labelledby="editDescriptionModal">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<form id="descriptionForm" role="form" th:action="@{/m/reportManagement/media/updateMediaDescription}" method="post"
+				  class="form-horizontal">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+					<h4 class="modal-title">修改备注</h4>
+					<input id="vehicleId" name="id" hidden>
+				</div>
+				<div class="modal-body">
+					<div class="row" id="purposeCategories">
+						<div class="form-group">
+							<label class="col-md-2 control-label">备&nbsp;&nbsp;&nbsp;注：</label>
+							<div class=" col-md-9">
+								<textarea rows="5" cols="20" placeholder="请输入备注" class="form-control"
+										  id="description" name="description" maxlength="50"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="saveDescription" class="btn btn-primary">提交</button>
+					<button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</body>
+<script th:inline="javascript">
+	var selectMonitoringObjec = [[#{select.monitoring.objec}]];
+	var maxSelectItem = [[#{max.select.item}]];
+	var lastFile = [[#{last.file}]];
+	var firstFile = [[#{first.file}]];
+	var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+	var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/echarts.js" th:src="@{/resources/js/echarts.js}"></script>
+<script type="text/javascript" src="/resources/js/zTree/js/ztreeSearch.js"
+		th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script type="text/javascript" src="/resources/js/mediaInfoManagement.js"
+		th:src="@{/resources/js/mediaInfoManagement.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+</html>

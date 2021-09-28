@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>温湿度监控</title>
+    <div th:replace="fragments/header">header</div>
+
+    <!--map-->
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+    <link rel="stylesheet" href="resources/css/realTimeMonitoring.css" th:href="@{/resources/css/realTimeMonitoring.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/humiture.css"/>
+    <link rel="stylesheet" href="/clbs/resources/js/jQueryPowertip/justtool.css"/>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+
+    <!--main content start-->
+    <section class="main-content-wrapper main-content-toggle-left">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content" class="mainContenTop" style="padding-top:0px;"><input id="jumpId" type="hidden"/>
+            <div class="row">
+                <div class="col-md-12" style="padding-left:1px;padding-right:0px !important;">
+                    <div id="content-left" class="col-md-2"
+                         style="padding-right: 0px; padding-left: 0px;position:relative">
+                        <div class="panel panel-default" style="margin:0px;border-top:none" id="panDefLeft">
+                            <div class="panel-heading" style="padding:0px;">
+                                <div class="dropdown panel-title fwb">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active" id="TabFenceBox"><a href="#home1" data-toggle="tab">监控对象</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body panTabPadd">
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="home1">
+                                        <div class="form-horizontal">
+                                            <div class="form-group allGroup">
+                                                <div style="cursor:pointer" id="chooseAll"
+                                                     class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding">
+                                                    <span>全部</span><span id="tall">(...)</span>
+                                                </div>
+                                                <div style="cursor:pointer" id="online"
+                                                     class="col-md-4 col-sm-5 col-xs-5 text-center btnPaddingOnLine">
+                                                    <span>在线</span><span id="tline">(...)</span>
+                                                </div>
+                                                <div style="cursor:pointer" id="chooseMissLine"
+                                                     onclick="treeMonitoring.misslines(1)"
+                                                     class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding">
+                                                    <span>离线</span><span id="tmiss">(...)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group allGroup">
+
+                                            <input type="hidden" id="searchType" value="name"/>
+                                            <div class="col-md-10 col-sm-12 col-xs-12"
+                                                 style="padding: 0px 5px 0px 0px;">
+                                                <input id="search_condition" name="search" autocomplete="off"
+                                                       type="text" class="form-control" placeholder="关键字"/>
+
+                                            </div>
+                                            <div class="col-md-2 col-sm-12 col-xs-12" style="padding: 0px 0px 0px 0px;">
+                                                <button id="refresh" class="btn btn-default" type="button"
+                                                        name="refresh" title="刷新">
+                                                    <span class="glyphicon glyphicon-refresh"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 groupzTree" id="thetree" style="height:calc(100vh - 265px);">
+                                            <div id='treeLoading' style="text-align: center; height: 100px; line-height: 100px;">
+                                                <i class="fa fa-spinner loading-state"></i>
+                                                <span>加载中，请稍后</span>
+                                            </div>
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                        <div class="col-md-12 stateArea" id="IdentificationInfo" style="padding:0;">
+                                            <div class="col-md-12 form-group">
+                                                <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+													<span type="button" id="chooseOnline" style="cursor:pointer"
+                                                          class="onlineDrivingArea">
+														<span class="onlineDriving_ico"></span>&nbsp;在&nbsp;&nbsp;&nbsp;线
+													</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+													<span class="offlineIconArea" style="cursor:pointer"
+                                                          id="chooseOffline" type="button">
+														<span class="offlineIcon_ico"></span>&nbsp;&nbsp;&nbsp;离&nbsp;&nbsp;&nbsp;线
+													</span>
+                                                </div>
+                                                <div class="col-md-4 col-sm-4 col-xs-4 stateIcon text-center">
+													<span type="button" id="chooseAlarm" style="cursor:pointer"
+                                                          class="warningArea">
+														<span class="warning_ico"></span>&nbsp;报&nbsp;&nbsp;&nbsp;警
+													</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 右侧区域start -->
+                    <div id="content-left" class="col-md-10"
+                         style="height:100%;position:absolute;right:0px;top:0px;bottom:0px">
+                        <div class="row no-gutter" style="height:50%;">
+                            <div class="col-md-6" style="height:100%;padding:2px;padding-top:0px;">
+                                <div th:replace="vas/monitoring/humiture.map">map</div>
+                            </div>
+                            <div class="col-md-6" style="height:100%;padding:1px;overflow:hidden;padding-top:0px;">
+                                <div th:replace="vas/monitoring/humiture.line">line</div>
+                            </div>
+                        </div>
+                        <div class="row no-gutter" style="height:50%;">
+                            <div class="col-md-6" style="height:100%;">
+                                <div th:replace="vas/monitoring/humiture.gauge">gauge</div>
+                            </div>
+                            <div class="col-md-6" style="height:100%;">
+                                <div th:replace="vas/monitoring/humiture.table">table</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 右侧区域end -->
+                </div>
+
+            </div>
+            </div>
+        </section>
+    </section>
+    <!--main content end-->
+</section>
+<div th:replace="fragments/footer_realTime">footer</div>
+</body>
+<!--/***** 当前页js end *****/-->
+<script type="text/javascript">
+    var publicErrorTip = "[[#{public.error}]]";
+</script>
+
+<script src="resources/js/zTree/js/ztreeSearch.js"
+        th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor"></script>
+<script src="resources/js/sockjs-1.1.1.min.js"
+        th:src="@{/resources/js/sockjs-1.1.1.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/echarts-4.1.js"
+        th:src="@{/resources/js/echarts-4.1.js}"></script>
+
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script src="/wro/humitureWatch.js" th:src="@{/wro/humitureWatch.js}"></script>
+<script src="resources/js/dataTables/js/dataTablesBootstrap.js"
+        th:src="@{/resources/js/dataTables/js/dataTablesBootstrap.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script type="text/javascript" src="resources/js/inputClear.min.js"
+        th:src="@{/resources/js/inputClear.min.js}"></script>
+
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script th:src="@{/resources/js/jquery.MyDigitClock.js}"></script>
+<script th:src="@{/resources/js/dataTables/js/jquery.dataTables.js}"></script>
+<script th:src="@{/resources/js/dataTables/js/dataTables.bootstrap.js}"></script>
+<script th:src="@{/resources/js/jQueryValidate.js}"></script>
+<script th:src="@{/resources/js/tg_common.js}"></script>
+<script th:src="@{/resources/js/tg_util.js}"></script>
+<script th:src="@{/resources/js/clockPlugins.js}"></script>
+<script th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:src="@{/resources/js/personalized.js}"></script>
+
+</html>

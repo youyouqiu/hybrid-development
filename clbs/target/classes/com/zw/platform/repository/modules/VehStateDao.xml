@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.VehStateDao">
+
+    <select id="getSingleOrgVehStateDO" resultType="com.zw.platform.domain.reportManagement.form.VehStateDO">
+        select * from zw_s_orgnization_alarms where oid=#{query.orgId} and time between #{query.startDateSecond} and  #{query.endDateSecond}
+    </select>
+    <select id="getManyOrgVehStateDO" resultType="com.zw.platform.domain.reportManagement.form.VehStateDO">
+        select * from zw_s_orgnization_alarms where oid
+        IN
+        <foreach item="item" collection="query.orgIdList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and time between #{query.startDateSecond} and #{query.endDateSecond}
+    </select>
+
+    <select id="getOrgVehicleIds" resultType="string">
+        select distinct vid from zw_s_orgnization_alarms where oid=#{query.orgId} and time between #{query.startDateSecond} and  #{query.endDateSecond}
+    </select>
+
+    <select id="getBindVehicleMap" resultType="com.zw.platform.domain.reportManagement.form.VehBasicDO">
+        SELECT DISTINCT c.vehicle_id ,v.is_start ,v.brand,v.group_id as orgId from zw_m_vehicle_info v join zw_m_config
+        c on
+        v.id=c.vehicle_id and v.flag=1 and c.flag=1
+        where v.group_id
+        IN
+        <foreach item="item" collection="orgIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDayOrgVehStateDo" resultType="com.zw.platform.domain.reportManagement.form.VehStateDO">
+        select * from zw_s_orgnization_alarms where oid=#{orgId} and time= #{startDaySecond}
+    </select>
+
+
+    <select id="getDayBeforeData" resultType="com.zw.platform.domain.reportManagement.form.VehStateDO">
+        select time,oid,vid from zw_s_orgnization_alarms where  time &lt;= #{timeSecond}
+    </select>
+
+
+    <delete id="deleteExpireData">
+        delete from zw_s_orgnization_alarms where (time,oid,vid)
+        IN
+        <foreach item="item" collection="vehStateDOList" separator="," open="(" close=")">
+            (#{item.time},#{item.oid},#{item.vid})
+        </foreach>
+    </delete>
+</mapper>

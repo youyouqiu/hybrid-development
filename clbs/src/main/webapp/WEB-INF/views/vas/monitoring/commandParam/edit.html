@@ -1,0 +1,1949 @@
+<form th:action="@{/v/monitoring/command/edit}"
+      id="editForm" role="form" action="#" method="post"
+      class="form-horizontal">
+    <style>
+        .bindInfo {
+            padding-right: 20px
+        }
+
+        #baseStationParameters, #connectSpecifyServer, #eventSetting, #gnssParameters, #infoDemandMenu, #locationReporting, #phoneBookSetting, #reportParameters, #telephoneParameters, #terminalParameters, #unlimitedUpgrade, #videoCameraParameters {
+            display: block;
+        }
+    </style>
+    <div class="form-horizontal">
+        <div class="modal-header">
+            <button id="doXEditTwo" type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="bindTitle">通讯参数设置</h4>
+        </div>
+        <div class="modal-body" style="overflow: hidden auto">
+            <div class="row">
+                <input type="text" id="referVehicleList" th:value="${referVehicleList}" hidden/>
+                <input th:value="${commandType}" type="hidden" id="commandType"/>
+                <input th:value="${commandName}" type="hidden" id="commandTypeName"/>
+                <input th:value="${vid}" type="hidden" id="vid"/>
+                <input th:value="${result}" type="hidden" id="result"/>
+                <div class="col-md-12">
+                    <div class="form-group" style="padding-right: 20px">
+                        <label class="col-md-3 control-label">监控对象：</label>
+                        <div class="col-md-3">
+                            <input type="text" id="brand" class="form-control" th:value="${brand}" readonly/>
+                        </div>
+                        <label class="col-md-3 control-label" id="commandTypeLabel"
+                               th:if="${commandType!='23'&&commandType!='27'&&commandType!='28'&&commandType!='29'&&commandType!='30'}">参考对象：</label>
+                        <div class="col-md-3"
+                             th:if="${commandType!='23'&&commandType!='27'&&commandType!='28'&&commandType!='29'&&commandType!='30'}">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="referent">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-white dropdown-toggle"
+                                            data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!--通讯参数-->
+                    <div class="bindInfo" id="reportParameters" th:if="${commandType=='11'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="无线通信拨号访问点。如网络制式为CDMA则该处为PPP拨号号码">
+                                </i>
+                                主服务器APN：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportMainApn" name="mainServerAPN" maxlength="20"
+                                       th:value="${result.mainServerAPN}" class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="IP或域名">
+                                </i>
+                                主服务器地址：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportMainAddress" name="mainServerAddress" maxlength="30"
+                                       th:value="${result.mainServerAddress}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group addItemInfo">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="从服务器APN,该值为空时,终端应使用主服务器相同配置">
+                                </i>
+                                从服务器APN：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="slaveServerApn" name="slaveServerApn" maxlength="20"
+                                       class="form-control" th:value="${result.slaveServerAPN}">
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="从服务器地址备份地址,IP或域名,主机和端口用冒号分割,多个服务器使用分号分割">
+                                </i>
+                                从服务器地址：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="slaveServerAddress" name="slaveServerAddress" maxlength="30"
+                                       class="form-control" th:value="${result.slaveServerAddress}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="无线通信拨号访问点">
+                                </i>
+                                备份服务器APN：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportBackupApn" name="backupServerAPN" maxlength="20"
+                                       th:value="${result.backupServerAPN}" class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="IP或域名">
+                                </i>
+                                备份服务器地址：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportBackupAddress" name="backupServerAddress" maxlength="30"
+                                       th:value="${result.backupServerAddress}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group removeItemInfo">
+                            <label class="col-md-3 control-label">服务器TCP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportServerTcp" name="serverTCPPort" maxlength="5"
+                                       th:value="${result.serverTCPPort}" class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">服务器UDP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportServerUdp" name="serverUDPPort" maxlength="5"
+                                       th:value="${result.serverUDPPort}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">主服务器无线通信拨号用户名：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportServerAccound" name="mainServerCallUserName" maxlength="20"
+                                       th:value="${result.mainServerCallUserName}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">主服务器无线通信拨号密码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportServerPwd" name="mainServerCallUserPwd" maxlength="20"
+                                       th:value="${result.mainServerCallUserPwd}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group addItemInfo">
+                            <label class="col-md-3 control-label">从服务器无线通信拨号用户名：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="slaveServerCallUserName" name="slaveServerCallUserName"
+                                       maxlength="20"
+                                       class="form-control" th:value="${result.slaveServerCallUserName}">
+                            </div>
+                            <label class="col-md-3 control-label">从服务器无线通信拨号密码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="slaveServerCallUserPwd" name="slaveServerCallUserPwd"
+                                       maxlength="20"
+                                       class="form-control" th:value="${result.slaveServerCallUserPwd}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">备份服务器无线通信拨号用户名：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportBackupAccound" name="backupServerCallUserName"
+                                       maxlength="20" th:value="${result.backupServerCallUserName}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">备份服务器无线通信拨号密码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="reportBackupPwd" name="backupServerCallUserPwd" maxlength="20"
+                                       th:value="${result.backupServerCallUserPwd}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!--终端参数-->
+                    <div class="bindInfo" id="terminalParameters" th:if="${commandType=='12'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端心跳发送间隔(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalSendTime" name="heartSpace" value="5" maxlength="5"
+                                       th:value="${result.heartSpace}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">TCP消息应答超时时间(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalAnswerTime" name="tcpAckTimeOut" value="10" maxlength="5"
+                                       th:value="${result.tcpAckTimeOut}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">TCP消息重传次数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalAnswerTcp" name="tcpReUpTimes" value="5" maxlength="3"
+                                       th:value="${result.tcpReUpTimes}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">UDP消息应答超时时间(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalAnswerUdp" name="udpAckTimeOut" value="10" maxlength="5"
+                                       th:value="${result.udpAckTimeOut}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">UDP消息重传次数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalUdpNum" name="udpReUpTimes" value="5" maxlength="3"
+                                       th:value="${result.udpReUpTimes}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">SMS消息应答超时时间(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalAnswerSms" name="smsAckTimeOut" value="20" maxlength="5"
+                                       th:value="${result.smsAckTimeOut}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">SMS消息重传次数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalSmsNum" name="smsReUpTimes" value="10" maxlength="3"
+                                       th:value="${result.smsReUpTimes}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">拐点补传角度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="inflectionPointAdditional" name="inflectionPointAdditional"
+                                       value="25" maxlength="3" th:value="${result.inflectionPointAdditional}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">电子围栏半径(m)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="electronicFenceRadius" name="electronicFenceRadius"
+                                       value="15" maxlength="5" th:value="${result.electronicFenceRadius}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!--无线升级-->
+                    <div class="bindInfo" id="unlimitedUpgrade" th:if="${commandType=='131'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+                                </i>
+                                拨号点名称：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeDial" name="wDailName" maxlength="20"
+                                       th:value="${result.wDailName}" class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">拨号用户名：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeDialName" name="wDailUserName" maxlength="20"
+                                       placeholder="服务器无线通信拨号用户名" th:value="${result.wDailUserName}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">拨号密码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeDialPwd" name="wDailPwd" maxlength="20"
+                                       placeholder="服务器无线通信拨号密码" th:value="${result.wDailPwd}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">地址：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeAddress" name="wAddress" maxlength="30"
+                                       placeholder="服务器地址 IP或域名" th:value="${result.wAddress}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">TCP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeTcpTort" name="wTcpPort" maxlength="5"
+                                       placeholder="服务器 TCP 端口" th:value="${result.wTcpPort}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">UDP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeUdpTort" name="wUdpPort" maxlength="5"
+                                       placeholder="服务器 UDP 端口" th:value="${result.wUdpPort}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">制造商ID：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeManufacturer" name="manufactorId" maxlength="20"
+                                       placeholder="终端制造商编码" th:value="${result.manufactorId}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="终端的硬件版本号，由制造商自定">
+                                </i>
+                                硬件版本：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeHardware" name="hardwareVersion" maxlength="50"
+                                       th:value="${result.hardwareVersion}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="终端的固件版本号，由制造商自定">
+                                </i>
+                                固件版本：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeFirmware" name="firmwareVersion" maxlength="50"
+                                       class="form-control" th:value="${result.firmwareVersion}">
+                            </div>
+                            <label class="col-md-3 control-label">URL地址：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeUrlAddress" name="url" maxlength="300"
+                                       placeholder="完整 URL地址" th:value="${result.url}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title=""
+                                   data-original-title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+                                </i>
+                                连接到指定服务器时限：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="UpgradeTimeLimit" name="wTimeLimit" maxlength="5"
+                                       class="form-control" th:value="${result.wTimeLimit}">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 控制终端连接指定服务器 -->
+                    <div class="bindInfo" id="connectSpecifyServer" th:if="${commandType=='132'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title=""
+                                   data-original-title="0：切换到指定监管平台服务器，连接到该服务器后即进入应急状态，此状态下仅有下发控制指令的监管平台可发送包括短信在内的控制指令；1：切换回原缺省监控平台服务器，并恢复正常状态">
+                                </i>
+                                连接控制：
+                            </label>
+                            <div class="col-md-3">
+                                <select id="specifyServerConnect" onchange="commandParamEdit.connectionControlSH();"
+                                        th:value="${result.accessControl}"
+                                        name="accessControl" class="form-control">
+                                    <option th:selected="${result.accessControl == 0}" value="0">切换到指定监控平台服务器</option>
+                                    <option th:selected="${result.accessControl == 1}" value="1">切换回原缺省监控平台服务器</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">监管平台鉴权码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerAuthCode" name="authCode" maxlength="45"
+                                       th:value="${result.authCode}" placeholder="监管平台鉴权码" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group connectSpecifyInfo">
+                            <label class="col-md-3 control-label connectSpecifyInfo">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+                                </i>
+                                拨号点名称：
+                            </label>
+                            <div class="col-md-3 connectSpecifyInfo">
+                                <input type="text" id="specifyServerDial" name="dailName" maxlength="20"
+                                       class="form-control" th:value="${result.dailName}">
+                            </div>
+                            <label class="col-md-3 control-label">拨号用户名：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerDialName" name="dailUserName" maxlength="20"
+                                       th:value="${result.dailUserName}"
+                                       placeholder="服务器无线通信拨号用户名" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group connectSpecifyInfo">
+                            <label class="col-md-3 control-label">拨号密码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerDialPwd" name="dailPwd" maxlength="20"
+                                       placeholder="服务器无线通信拨号密码" th:value="${result.dailPwd}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">地址：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerAddress" name="address" maxlength="30"
+                                       placeholder="服务器地址,IP或域名" th:value="${result.address}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group connectSpecifyInfo">
+                            <label class="col-md-3 control-label">TCP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerTcpPort" name="tcpPort" maxlength="5"
+                                       placeholder="服务器 TCP 端口" th:value="${result.tcpPort}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">UDP端口：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerUdpPort" name="udpPort" maxlength="5"
+                                       placeholder="服务器 UDP 端口" th:value="${result.udpPort}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group connectSpecifyInfo">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title=""
+                                   data-original-title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+                                </i>
+                                连接到指定服务器时限：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="specifyServerTimeLimit" name="timeLimit" maxlength="5"
+                                       class="form-control" th:value="${result.timeLimit}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 位置汇报参数 -->
+                    <div class="bindInfo" id="locationReporting" th:if="${commandType=='14'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">位置汇报策略：</label>
+                            <div class="col-md-3">
+                                <select id="locationTactics" th:value="${result.positionUpTactics}"
+                                        name="positionUpTactics" class="form-control">
+                                    <option th:selected="${result.positionUpTactics == 0}" value="0">定时汇报</option>
+                                    <option th:selected="${result.positionUpTactics == 1}" value="1">定距汇报</option>
+                                    <option th:selected="${result.positionUpTactics == 2}" value="2">定时和定距汇报</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">位置汇报方案：</label>
+                            <div class="col-md-3">
+                                <select id="locationProgram" name="positionUpScheme" class="form-control"
+                                        th:value="${result.positionUpScheme}">
+                                    <option th:selected="${result.positionUpScheme == 0}" value="0">根据ACC状态</option>
+                                    <option th:selected="${result.positionUpScheme == 1}" value="1">根据登录状态和ACC状态
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="allLocationInfo" style="display: none">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">缺省时间汇报间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="100" maxlength="5"
+                                           name="defaultTimeUpSpace" th:value="${result.defaultTimeUpSpace}"
+                                           class="form-control locationDefaultTime">
+                                </div>
+                                <label class="col-md-3 control-label">休眠时汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="15" maxlength="5"
+                                           name="dormancyUpTimeSpace" th:value="${result.dormancyUpTimeSpace}"
+                                           class="form-control locationSleep">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">紧急报警时汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="emergencyAlarmUpTimeSpace"
+                                           maxlength="5" value="200" th:value="${result.emergencyAlarmUpTimeSpace}"
+                                           class="form-control locationAlarmTime">
+                                </div>
+                                <label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="30" maxlength="5"
+                                           name="driverLoggingOutUpTimeSpace"
+                                           th:value="${result.driverLoggingOutUpTimeSpace}"
+                                           class="form-control locationNoLogin">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">缺省距离汇报间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="500" maxlength="5"
+                                           th:value="${result.defaultDistanceUpSpace}"
+                                           name="defaultDistanceUpSpace" class="form-control locationDefaultDistance">
+                                </div>
+                                <label class="col-md-3 control-label">休眠时汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="30" maxlength="5"
+                                           name="dormancyUpDistanceSpace" th:value="${result.dormancyUpDistanceSpace}"
+                                           class="form-control locationSleepDistance">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">紧急报警时汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="20000" maxlength="5"
+                                           th:value="${result.emergencyAlarmUpDistanceSpace}"
+                                           name="emergencyAlarmUpDistanceSpace"
+                                           class="form-control locationAlarmDistance">
+                                </div>
+                                <label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="120" maxlength="5"
+                                           name="driverLoggingOutUpDistanceSpace"
+                                           class="form-control locationNoLoginDistance"
+                                           th:value="${result.driverLoggingOutUpDistanceSpace}">
+                                </div>
+                            </div>
+                        </div>
+                        <!--定时显示-->
+                        <div class="timingInfo">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">缺省时间汇报间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="100" maxlength="5"
+                                           name="defaultTimeUpSpace" th:value="${result.defaultTimeUpSpace}"
+                                           class="form-control locationDefaultTime">
+                                </div>
+                                <label class="col-md-3 control-label">休眠时汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="15" maxlength="5"
+                                           name="dormancyUpTimeSpace" th:value="${result.dormancyUpTimeSpace}"
+                                           class="form-control locationSleep">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">紧急报警时汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" name="emergencyAlarmUpTimeSpace"
+                                           maxlength="5" value="200" th:value="${result.emergencyAlarmUpTimeSpace}"
+                                           class="form-control locationAlarmTime">
+                                </div>
+                                <label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(s)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="30" maxlength="5"
+                                           name="driverLoggingOutUpTimeSpace"
+                                           th:value="${result.driverLoggingOutUpTimeSpace}"
+                                           class="form-control locationNoLogin">
+                                </div>
+                            </div>
+                        </div>
+                        <!--定距显示-->
+                        <div class="distanceInfo" style="display: none">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">缺省距离汇报间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="500" maxlength="5"
+                                           th:value="${result.defaultDistanceUpSpace}"
+                                           name="defaultDistanceUpSpace" class="form-control locationDefaultDistance">
+                                </div>
+                                <label class="col-md-3 control-label">休眠时汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="30" maxlength="5"
+                                           name="dormancyUpDistanceSpace" th:value="${result.dormancyUpDistanceSpace}"
+                                           class="form-control locationSleepDistance">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">紧急报警时汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="20000" maxlength="5"
+                                           th:value="${result.emergencyAlarmUpDistanceSpace}"
+                                           name="emergencyAlarmUpDistanceSpace"
+                                           class="form-control locationAlarmDistance">
+                                </div>
+                                <label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(m)：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="120" maxlength="5"
+                                           name="driverLoggingOutUpDistanceSpace"
+                                           class="form-control locationNoLoginDistance"
+                                           th:value="${result.driverLoggingOutUpDistanceSpace}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 电话参数 -->
+                    <div class="bindInfo" id="telephoneParameters" th:if="${commandType=='16'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">监控平台电话号码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneNumber" name="platformPhoneNumber" maxlength="15"
+                                       class="form-control" th:value="${result.platformPhoneNumber}">
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="可采用此电话号码拨打终端电话让终端复位">
+                                </i>
+                                复位电话号码：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneResetNumber" name="resetPhoneNumber" maxlength="15"
+                                       th:value="${result.resetPhoneNumber}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                   title="" data-original-title="可采用此电话号码拨打终端电话让终端恢复出厂设置">
+                                </i>
+                                恢复出厂设置电话号码：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneSetNumber" name="reInitialPhoneNumber" maxlength="15"
+                                       th:value="${result.reInitialPhoneNumber}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">监控平台SMS电话号码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneSnsNumber" name="platformSMSPhoneNumber" maxlength="15"
+                                       th:value="${result.platformSMSPhoneNumber}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">接收终端SMS文本报警号码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneSnsAlarm" name="receiveDeviceSMSTxtAlarmPhoneNumber"
+                                       maxlength="15" th:value="${result.receiveDeviceSMSTxtAlarmPhoneNumber}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">终端电话接听策略：</label>
+                            <div class="col-md-3">
+                                <select id="telephoneStrategy" name="deviceAnswerPhoneType" class="form-control"
+                                        th:value="${result.deviceAnswerPhoneType}">
+                                    <option th:selected="${result.deviceAnswerPhoneType == 0}" value="0">自动接听</option>
+                                    <option th:selected="${result.deviceAnswerPhoneType == 1}" value="1">根据ACC状态
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">每次最长通话时间(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneMaxTime" name="timesMaxCallTime" maxlength="5"
+                                       class="form-control" th:value="${result.timesMaxCallTime}">
+                            </div>
+                            <label class="col-md-3 control-label">当月最长通话时间(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneMonthTime" name="monthlyMaxCallTime" maxlength="5"
+                                       th:value="${result.monthlyMaxCallTime}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">监听电话号码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="telephoneMonitor" name="listenPhoneNumber" maxlength="15"
+                                       class="form-control" th:value="${result.listenPhoneNumber}">
+                            </div>
+                            <label class="col-md-3 control-label">监管平台特权短信号码：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="monitorPrivilege" name="platformPrivilegeSMSNumber"
+                                       maxlength="15" th:value="${result.platformPrivilegeSMSNumber}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 视频拍照参数 -->
+                    <div class="bindInfo" id="videoCameraParameters" th:if="${commandType=='17'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">视频拍照策略：</label>
+                            <div class="col-md-3">
+                                <select id="videoTactics" onchange="commandParamEdit.connectionControlSH();"
+                                        th:value="${result.videoTactics}" name="videoTactics" class="form-control">
+                                    <option value="0" th:selected="${result.videoTactics == 0}">定时拍照</option>
+                                    <option value="1" th:selected="${result.videoTactics == 1}">定距拍照</option>
+                                    <option value="2" th:selected="${result.videoTactics == 2}">定时和定距拍照</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="videoTiming">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道1定时拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchOne" name="cameraTimerOpenFlag1" class="form-control"
+                                            th:value="${result.cameraTimerOpenFlag1}">
+                                        <option th:selected="${result.cameraTimerOpenFlag1 == 0}" value="0">不允许</option>
+                                        <option th:selected="${result.cameraTimerOpenFlag1 == 1}" value="1">允许</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道1定时拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageOne" name="cameraTimerSaveFlag1" class="form-control"
+                                            th:value="${result.cameraTimerSaveFlag1}">
+                                        <option th:selected="${result.cameraTimerSaveFlag1 == 0}" value="0">储存</option>
+                                        <option th:selected="${result.cameraTimerSaveFlag1 == 1}" value="1">上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道2定时拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchTwo" name="cameraTimerOpenFlag2" class="form-control"
+                                            th:value="${result.cameraTimerOpenFlag2}">
+                                        <option th:selected="${result.cameraTimerOpenFlag2 == 0}" value="0">不允许</option>
+                                        <option th:selected="${result.cameraTimerOpenFlag2 == 1}" value="1">允许</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道2定时拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageTwo" name="cameraTimerSaveFlag2" class="form-control"
+                                            th:value="${result.cameraTimerSaveFlag2}">
+                                        <option th:selected="${result.cameraTimerSaveFlag2 == 0}" value="0">储存</option>
+                                        <option th:selected="${result.cameraTimerSaveFlag2 == 1}" value="1">上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道3定时拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchThree" name="cameraTimerOpenFlag3" class="form-control"
+                                            th:value="${result.cameraTimerOpenFlag3}">
+                                        <option th:selected="${result.cameraTimerOpenFlag3 == 0}" value="0">不允许</option>
+                                        <option th:selected="${result.cameraTimerOpenFlag3 == 1}" value="1">允许</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道3定时拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageThree" name="cameraTimerSaveFlag3"
+                                            class="form-control"
+                                            th:value="${result.cameraTimerSaveFlag3}">
+                                        <option th:selected="${result.cameraTimerSaveFlag3 == 0}" value="0">储存</option>
+                                        <option th:selected="${result.cameraTimerSaveFlag3 == 1}" value="1">上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道4定时拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchFour" name="cameraTimerOpenFlag4" class="form-control"
+                                            th:value="${result.cameraTimerOpenFlag4}">
+                                        <option th:selected="${result.cameraTimerOpenFlag4 == 0}" value="0">不允许</option>
+                                        <option th:selected="${result.cameraTimerOpenFlag4 == 1}" value="1">允许</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道4定时拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageFour" name="cameraTimerSaveFlag4" class="form-control"
+                                            th:value="${result.cameraTimerSaveFlag4}">
+                                        <option th:selected="${result.cameraTimerSaveFlag4 == 0}" value="0">储存</option>
+                                        <option th:selected="${result.cameraTimerSaveFlag4 == 1}" value="1">上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道5定时拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchFive" name="cameraTimerOpenFlag5" class="form-control"
+                                            th:value="${result.cameraTimerOpenFlag5}">
+                                        <option th:selected="${result.cameraTimerOpenFlag5 == 0}" value="0">不允许</option>
+                                        <option th:selected="${result.cameraTimerOpenFlag5 == 1}" value="1">允许</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道5定时拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageFive" name="cameraTimerSaveFlag5" class="form-control"
+                                            th:value="${result.cameraTimerSaveFlag5}">
+                                        <option th:selected="${result.cameraTimerSaveFlag5 == 0}" value="0">储存</option>
+                                        <option th:selected="${result.cameraTimerSaveFlag5 == 1}" value="1">上传</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">定时时间单位：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraTimeUnit" name="timingUnit" class="form-control"
+                                            th:value="${result.timingUnit}">
+                                        <option th:selected="${result.timingUnit == 0}" value="0">秒</option>
+                                        <option th:selected="${result.timingUnit == 1}" value="1">分</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                       title="" data-original-title="收到参数设置或重新启动后执行">
+                                    </i>
+                                    定时时间间隔:
+                                </label>
+                                <div class="col-md-3 ">
+                                    <input type="text" id="videoCameraTimeInterval" name="timingSpace" maxlength="5"
+                                           class="form-control" th:value="${result.timingSpace}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="videoDistance" style="display: none">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道1定距拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchMarkOne" name="cameraDistanceOpenFlag1"
+                                            th:value="${result.cameraDistanceOpenFlag1}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceOpenFlag1 == 0}" value="0">不允许
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceOpenFlag1 == 1}" value="1">允许
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道1定距拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageMarkOne" name="cameraDistanceSaveFlag1"
+                                            th:value="${result.cameraDistanceSaveFlag1}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceSaveFlag1 == 0}" value="0">储存
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceSaveFlag1 == 1}" value="1">上传
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道2定距拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchMarkTwo" name="cameraDistanceOpenFlag2"
+                                            th:value="${result.cameraDistanceOpenFlag2}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceOpenFlag2 == 0}" value="0">不允许
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceOpenFlag2 == 1}" value="1">允许
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道2定距拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageMarkTwo" name="cameraDistanceSaveFlag2"
+                                            th:value="${result.cameraDistanceSaveFlag2}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceSaveFlag2 == 0}" value="0">储存
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceSaveFlag2 == 1}" value="1">上传
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道3定距拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchMarkThree" name="cameraDistanceOpenFlag3"
+                                            th:value="${result.cameraDistanceOpenFlag3}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceOpenFlag3 == 0}" value="0">不允许
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceOpenFlag3 == 1}" value="1">允许
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道3定距拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageMarkThree" name="cameraDistanceSaveFlag3"
+                                            th:value="${result.cameraDistanceSaveFlag3}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceSaveFlag3 == 0}" value="0">储存
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceSaveFlag3 == 1}" value="1">上传
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道4定距拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchMarkFour" name="cameraDistanceOpenFlag4"
+                                            th:value="${result.cameraDistanceOpenFlag4}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceOpenFlag4 == 0}" value="0">不允许
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceOpenFlag4 == 1}" value="1">允许
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道4定距拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageMarkFour" name="cameraDistanceSaveFlag4"
+                                            th:value="${result.cameraDistanceSaveFlag4}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceSaveFlag4 == 0}" value="0">储存
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceSaveFlag4 == 1}" value="1">上传
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">摄像通道5定距拍照开关标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraSwitchMarkFive" name="cameraDistanceOpenFlag5"
+                                            th:value="${result.cameraDistanceOpenFlag5}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceOpenFlag5 == 0}" value="0">不允许
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceOpenFlag5 == 1}" value="1">允许
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">摄像通道5定距拍照存储标志：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraStorageMarkFive" name="cameraDistanceSaveFlag5"
+                                            th:value="${result.cameraDistanceSaveFlag5}"
+                                            class="form-control">
+                                        <option th:selected="${result.cameraDistanceSaveFlag5 == 0}" value="0">储存
+                                        </option>
+                                        <option th:selected="${result.cameraDistanceSaveFlag5 == 1}" value="1">上传
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">定距距离单位：</label>
+                                <div class="col-md-3">
+                                    <select id="videoCameraDistanceUnit" name="distanceUnit" class="form-control"
+                                            th:value="${result.distanceUnit}">
+                                        <option th:selected="${result.distanceUnit == 0}" value="0">米</option>
+                                        <option th:selected="${result.distanceUnit == 1}" value="1">公里</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                       title="" data-original-title="收到参数设置或重新启动后执行">
+                                    </i>
+                                    定距距离间隔：
+                                </label>
+                                <div class="col-md-3 ">
+                                    <input type="text" id="videoCameraDistanceInterval" name="distanceSpace"
+                                           maxlength="5"
+                                           th:value="${result.distanceSpace}"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">图像/视频质量：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="videoCameraQuality" value="5" name="pictureQuality" maxlength="2"
+                                       th:value="${result.pictureQuality}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">亮度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="videoCameraBrightness" value="125" name="luminance" maxlength="3"
+                                       th:value="${result.luminance}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">对比度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="videoCameraContrast" value="60" name="contrast" maxlength="3"
+                                       th:value="${result.contrast}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">饱和度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="videoCameraSaturation" value="60" name="saturation" maxlength="3"
+                                       th:value="${result.saturation}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">色度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="videoCameraChroma" value="125" name="chroma" maxlength="3"
+                                       th:value="${result.chroma}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- GNSS参数 -->
+                    <div class="bindInfo" id="gnssParameters" th:if="${commandType=='18'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GPS定位：</label>
+                            <div class="col-md-3">
+                                <select id="GPSFlag" name="gPSFlag" class="form-control" th:value="${result.gPSFlag}">
+                                    <option th:selected="${result.gPSFlag == 0}" value="0">禁用GPS定位</option>
+                                    <option th:selected="${result.gPSFlag == 1}" value="1">启用GPS定位</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">北斗定位：</label>
+                            <div class="col-md-3">
+                                <select id="beidouFlag" name="beidouFlag" class="form-control"
+                                        th:value="${result.beidouFlag}">
+                                    <option th:selected="${result.beidouFlag == 0}" value="0">禁用北斗定位</option>
+                                    <option th:selected="${result.beidouFlag == 1}" value="1">启用北斗定位</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GLONASS定位：</label>
+                            <div class="col-md-3">
+                                <select id="GLONASSFlag" name="gLONASSFlag" class="form-control"
+                                        th:value="${result.gLONASSFlag}">
+                                    <option th:selected="${result.gLONASSFlag == 0}" value="0">禁用GLONASS定位</option>
+                                    <option th:selected="${result.gLONASSFlag == 1}" value="1">启用GLONASS定位</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">Galileo定位：</label>
+                            <div class="col-md-3">
+                                <select id="GalileoFlag" name="galileoFlag" class="form-control"
+                                        th:value="${result.galileoFlag}">
+                                    <option th:selected="${result.galileoFlag == 0}" value="0">禁用Galileo定位</option>
+                                    <option th:selected="${result.galileoFlag == 1}" value="1">启用Galileo定位</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GNSS波特率：</label>
+                            <div class="col-md-3">
+                                <select id="GNSSBaudRate" name="gNSSBaudRate" class="form-control"
+                                        th:value="${result.gNSSBaudRate}">
+                                    <option th:selected="${result.gNSSBaudRate == 0}" value="0">4800</option>
+                                    <option th:selected="${result.gNSSBaudRate == 1}" value="1">9600</option>
+                                    <option th:selected="${result.gNSSBaudRate == 2}" value="2">19200</option>
+                                    <option th:selected="${result.gNSSBaudRate == 3}" value="3">38400</option>
+                                    <option th:selected="${result.gNSSBaudRate == 4}" value="4">57600</option>
+                                    <option th:selected="${result.gNSSBaudRate == 5}" value="5">115200</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">GNSS模块详细定位数据输出频率：</label>
+                            <div class="col-md-3">
+                                <select id="GNSSPositionOutputRate" name="gNSSPositionOutputRate" class="form-control"
+                                        th:value="${result.gNSSPositionOutputRate}">
+                                    <option th:selected="${result.gNSSPositionOutputRate == 1}" value="1">1000ms
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionOutputRate == 0}" value="0">500ms</option>
+                                    <option th:selected="${result.gNSSPositionOutputRate == 2}" value="2">2000ms
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionOutputRate == 3}" value="3">3000ms
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionOutputRate == 4}" value="4">4000ms
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GNSS模块详细定位数据采集频率(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSPositionCollectRate" name="gNSSPositionCollectRate"
+                                       maxlength="5" value="1" th:value="${result.gNSSPositionCollectRate}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-3 control-label">GNSS模块详细定位数据上传方式：</label>
+                            <div class="col-md-3">
+                                <select id="gnss" name="gNSSPositionUploadType" class="form-control"
+                                        th:value="${result.gNSSPositionUploadType}">
+                                    <option th:selected="${result.gNSSPositionUploadType == 0}" value="0">本地存储 不上传
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionUploadType == 1}" value="1">按时间间隔上传
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionUploadType == 2}" value="2">按距离间隔上传
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionUploadType == 11}" value="11">按累计时间上传
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionUploadType == 12}" value="12">按累计距离上传
+                                    </option>
+                                    <option th:selected="${result.gNSSPositionUploadType == 13}" value="13">按累计条数上传
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 事件设置 -->
+                    <div class="bindInfo" id="eventSetting" th:if="${commandType=='19'}">
+                        <div class="form-group defaultDiv">
+                            <label class="col-md-3 control-label">操作类型：</label>
+                            <div class="col-md-3"><select id="eventOperateType" name="operationType"
+                                                          th:value="${result[0].operationType}"
+                                                          class="form-control"
+                                                          onchange="commandParamEdit.eventSettingOperateType()">
+                                <option th:selected="${result[0].operationType == 1}" value="1">更新</option>
+                                <option th:selected="${result[0].operationType == 2}" value="2">追加</option>
+                                <option th:selected="${result[0].operationType == 3}" value="3">修改</option>
+                                <option th:selected="${result[0].operationType == 4}" value="4">删除</option>
+                                <option th:selected="${result[0].operationType == 0}" value="0">删除所有</option>
+                            </select></div>
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-3"></div>
+                        </div>
+                        <div id="eventMain-container">
+                            <div class="form-group insertDiv" th:each="event,eventStat:${result}">
+                                <label class="col-md-3 control-label">
+                                    <label class="text-danger">*</label> 事件ID：
+                                </label>
+                                <div class="col-md-3 eventIdInfo">
+                                    <select style="display: none" id="eventSelectId" th:value="${event.eventId}"
+                                            name="eventId" class="form-control eventSelectId"
+                                            onchange="commandParamEdit.eventSettIdFn()">
+                                        <option th:selected="${event.eventId == 1}" value="1">1</option>
+                                        <option th:selected="${event.eventId == 2}" value="2">2</option>
+                                        <option th:selected="${event.eventId == 3}" value="3">3</option>
+                                    </select>
+                                    <input th:id="${'eventId_'+eventStat.index}" type="text" name="eventId"
+                                           th:value="${event.eventId}"
+                                           value="1" class="form-control eventId"
+                                           onblur="commandParamEdit.inputBlur()">
+
+                                </div>
+                                <label class="col-md-2 control-label">
+                                    <label class='text-danger'>*</label> 事件内容：
+                                </label>
+                                <div class="col-md-3"><input type="text" th:id="${'eventContent_'+eventStat.index}"
+                                                             name="eventContent"
+                                                             th:value="${event.eventContent}"
+                                                             placeholder="请输入事件内容" class="form-control"
+                                                             onblur="commandParamEdit.inputBlur()"></div>
+                                <div class="col-md-1">
+                                    <button id="event-add-btn"
+                                            th:onclick="${(result[0].operationType == 3||result[0].operationType == 4)?'commandParamEdit.addEventSettingIsSelect()':'commandParamEdit.addEventSetting()'}"
+                                            th:if="${eventStat.index == 0}"
+                                            type="button" class="btn btn-primary addIcon"><span
+                                            class="glyphicon glyphiconPlus" aria-hidden="true"></span></button>
+                                    <button type='button' class='btn btn-danger eventSettingDelete deleteIcon'
+                                            th:if="${eventStat.index != 0}">
+                                        <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 电话本设置 -->
+                    <div class="bindInfo" id="phoneBookSetting" th:if="${commandType=='20'}">
+                        <div class="form-group defaultDiv">
+                            <label class="col-md-3 control-label">操作类型：</label>
+                            <div class="col-md-3"><select id="phoneBookOperateType" name="operationType"
+                                                          th:value="${result[0].operationType}"
+                                                          class="form-control"
+                                                          onchange="commandParamEdit.phoneBookSettingOperateType()">
+                                <option th:selected="${result[0].operationType == 1}" value="1">更新</option>
+                                <option th:selected="${result[0].operationType == 2}" value="2">追加</option>
+                                <option th:selected="${result[0].operationType == 3}" value="3">修改</option>
+                                <option th:selected="${result[0].operationType == 0}" value="0">删除所有</option>
+                            </select></div>
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-3"></div>
+                        </div>
+                        <div id="phoneBook-MainContent" th:each="event,eventStat:${result}">
+                            <div class="insertDiv">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">
+                                        <label class="text-danger">*</label> 联系人ID：</label>
+                                    <div class="col-md-3 phoneBookIdInfo">
+                                        <select id="phoneBookSelectId" style="display: none"
+                                                th:value="${event.phoneBookId}" name="phoneBookId"
+                                                class="form-control valid phoneBookSelectId"
+                                                onchange="commandParamBind.phoneBookSettIdFn()" aria-required="true"
+                                                aria-invalid="false">
+                                            <option th:selected="${event.phoneBookId == 1}" value="1">1</option>
+                                            <option th:selected="${event.phoneBookId == 2}" value="2">2</option>
+                                            <option th:selected="${event.phoneBookId == 3}" value="3">3</option>
+                                        </select>
+                                        <input type="text"
+                                               th:id="${'phoneBookId_'+eventStat.index}"
+                                               th:value="${event.phoneBookId}"
+                                               name="phoneBookId" value="1"
+                                               class="form-control phoneBookId"
+                                               onblur="commandParamEdit.inputBlur()">
+                                    </div>
+                                    <label class="col-md-2 control-label">
+                                        <label class="text-danger">*</label> 联系人：</label>
+                                    <div class="col-md-3"><input type="text"
+                                                                 th:id="${'phoneBookContact_'+eventStat.index}"
+                                                                 name="contact"
+                                                                 th:value="${event.contact}"
+                                                                 placeholder="请输入联系人" class="form-control"
+                                                                 onblur="commandParamEdit.inputBlur()"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">
+                                        <label class="text-danger">*</label> 电话号码：</label>
+                                    <div class="col-md-3"><input type="text"
+                                                                 th:id="${'phoneBookNumber_'+eventStat.index}"
+                                                                 name="phoneNo"
+                                                                 th:value="${event.phoneNo}"
+                                                                 placeholder="请输入电话号码" class="form-control"
+                                                                 onblur="commandParamEdit.inputBlur()"></div>
+                                    <label class="col-md-2 control-label">
+                                        <label class="text-danger">*</label> 呼叫类型：</label>
+                                    <div class="col-md-3"><select id="phoneBookOperateType_2" name="callType"
+                                                                  th:value="${event.callType}"
+                                                                  class="form-control">
+                                        <option th:selected="${event.callType == 1}" value="1">呼入</option>
+                                        <option th:selected="${event.callType == 2}" value="2">呼出</option>
+                                        <option th:selected="${event.callType == 3}" value="3">呼入/呼出</option>
+                                    </select></div>
+                                    <div class="col-md-1">
+                                        <button id="phoneBook-add-btn"
+                                                th:onclick="${result[0].operationType == 3?'commandParamEdit.addPhoneBookEventIsSelect()':'commandParamEdit.addPhoneBookEvent()'}"
+                                                th:if="${eventStat.index == 0}"
+                                                type="button" class="btn btn-primary addIcon"><span
+                                                class="glyphicon glyphiconPlus" aria-hidden="true"></span></button>
+                                        <button type='button' class='btn btn-danger eventSettingDelete deleteIcon'
+                                                th:if="${eventStat.index != 0}">
+                                            <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 信息点播菜单 -->
+                    <div class="bindInfo" id="infoDemandMenu" th:if="${commandType=='21'}">
+                        <div class="form-group defaultDiv"><label class="col-md-3 control-label">操作类型：</label>
+                            <div class="col-md-3"><select id="infoDemandOperateType" name="operationType"
+                                                          th:value="${result[0].operationType}"
+                                                          class="form-control"
+                                                          onchange="commandParamEdit.infoDemandMenuSettingOperateType()">
+                                <option th:selected="${result[0].operationType == 1}" value="1">更新</option>
+                                <option th:selected="${result[0].operationType == 2}" value="2">追加</option>
+                                <option th:selected="${result[0].operationType == 3}" value="3">修改</option>
+                                <option th:selected="${result[0].operationType == 0}" value="0">删除所有</option>
+                            </select></div>
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-3"></div>
+                        </div>
+                        <div class="insertDiv" th:each="event,eventStat:${result}">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">
+                                    <label class="text-danger">*</label> 信息ID：</label>
+                                <div class="col-md-3 infoDemandMenuId">
+                                    <input type="text" id="infoIdList" th:value="${infoIdList}" hidden>
+                                    <select id="infoDemandSelect" th:value="${event.infoId}" style="display: none"
+                                            name="infoId" class="form-control infoDemandSelect"
+                                            onchange="commandParamEdit.infoDemandSettIdFn()">
+                                        <option th:each="infoItem:${infoIdList}"
+                                                th:selected="${event.infoId == infoItem}" th:value="${infoItem}"
+                                                th:text="${infoItem}"></option>
+                                        <!--<option th:selected="${event.infoId == 1}" value="1">1</option>
+                                        <option th:selected="${event.infoId == 2}" value="2">2</option>
+                                        <option th:selected="${event.infoId == 3}" value="3">3</option>-->
+                                    </select>
+                                    <input type="text" th:id="${'infoDemandId_'+eventStat.index}" name="infoId"
+                                           th:value="${event.infoId}"
+                                           value="1" class="form-control infoDemandId"
+                                           onblur="commandParamEdit.inputBlur()">
+                                </div>
+                                <label class="col-md-2 control-label">
+                                    <label class="text-danger">*</label> 信息名称：</label>
+                                <div class="col-md-3"><input type="text" th:id="${'infoDemandName_'+eventStat.index}"
+                                                             name="infoContent"
+                                                             th:value="${event.infoContent}"
+                                                             placeholder="请输入信息名称" class="form-control"
+                                                             onblur="commandParamEdit.inputBlur()"></div>
+                                <!--<div class="col-md-1">
+                                    <button id="infoDemand-add-btn"
+                                            th:onclick="${result[0].operationType == 3?'commandParamEdit.addInfoDemandEventIsSelect()':'commandParamEdit.addInfoDemandEvent()'}"
+                                            th:if="${eventStat.index == 0}"
+                                            type="button" class="btn btn-primary addIcon"><span
+                                            class="glyphicon glyphiconPlus" aria-hidden="true"></span></button>
+                                    <button type='button' class='btn btn-danger eventSettingDelete deleteIcon'
+                                            th:if="${eventStat.index != 0}">
+                                        <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
+                                    </button>
+                                </div>-->
+                            </div>
+                            <div class="form-group">
+                                <label
+                                        class="col-md-3 control-label">
+                                    <label class="text-danger">*</label> 信息内容：</label>
+                                <div class="col-md-3 infoDemandMenuId">
+                                    <input type="text" id="messageContent"
+                                           name="messageContent" class="form-control"
+                                           placeholder="请输入信息内容"
+                                           th:id="${'messageContent_'+eventStat.index}"
+                                           th:value="${event.messageContent}"
+                                           onblur="commandParamEdit.inputBlur()">
+                                </div>
+                                <label class="col-md-2 control-label">
+                                    <label class="text-danger">*</label> 自动下发时间(s)：</label>
+                                <div class="col-md-3">
+                                    <select name="sendFrequency"
+                                            th:id="${'sendFrequency_'+eventStat.index}"
+                                            th:value="${event.sendFrequency}" class="form-control">
+                                        <option value="0">45</option>
+                                        <option value="1">60</option>
+                                        <option value="2">75</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button id="infoDemand-add-btn"
+                                            th:onclick="${result[0].operationType == 3?'commandParamEdit.addInfoDemandEventIsSelect()':'commandParamEdit.addInfoDemandEvent()'}"
+                                            th:if="${eventStat.index == 0}"
+                                            type="button" class="btn btn-primary addIcon"><span
+                                            class="glyphicon glyphiconPlus" aria-hidden="true"></span></button>
+                                    <button type='button' class='btn btn-danger eventSettingDelete deleteIcon'
+                                            th:if="${eventStat.index != 0}">
+                                        <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 基站参数设置 -->
+                    <div class="bindInfo" id="baseStationParameters" th:if="${commandType=='22'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">上报模式：</label>
+                            <div class="col-md-3">
+                                <select id="baseStationReportMode" name="requitePattern" class="form-control"
+                                        th:value="${result.requitePattern}"
+                                        onchange="commandParamEdit.baseStationReportModeCheckFn()">
+                                    <option th:selected="${result.requitePattern == 0}" value="0">按频率上报</option>
+                                    <option th:selected="${result.requitePattern == 1}" value="1">按定点上报</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label">定位模式：</label>
+                            <div class="col-md-3">
+                                <select id="baseStationpositioningMode" name="locationPattern"
+                                        th:value="${result.locationPattern}"
+                                        class="form-control">
+                                    <option th:selected="${result.locationPattern == 0}" value="0">卫星+LBS定位</option>
+                                    <option th:selected="${result.locationPattern == 1}" value="1">LBS定位</option>
+                                    <option th:selected="${result.locationPattern == 2}" value="2">卫星定位</option>
+                                    <option th:selected="${result.locationPattern == 3}" value="3">WIFI+LBS定位</option>
+                                    <option th:selected="${result.locationPattern == 4}" value="4">卫星+WIFI+LBS定位
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">上报起始时间点：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="baseStationStartTimePoint" name="requiteTime"
+                                       th:field="${result.requiteTime}"
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">上报间隔(s)：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="baseStationReportInterval" name="requiteInterval"
+                                       th:field="${result.requiteInterval}"
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div id="baseStation-MainContent">
+                            <div class="form-group" th:if="${result.locationTimes == null}">
+                                <label class="col-md-3 control-label">定点时间：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="baseStationFixedTime" name="locationTime"
+                                           class="form-control" disabled="disabled">
+                                </div>
+                                <div class="col-md-1">
+                                    <button id="baseStation-add-btn" type="button" class="btn btn-primary addIcon"
+                                            style="display: none;">
+                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-5"></div>
+                            </div>
+                            <input type="text" id="locationTimesLen" th:value="${result.locationTimes == null? 0 : result.locationTimes.length}" hidden>
+                            <div class="form-group" th:if="${result.locationTimes != null}"
+                                 th:each="event,eventStat:${result.locationTimes}">
+                                <label class="col-md-3 control-label">定点时间：</label>
+                                <div class="col-md-3">
+                                    <input type="text" th:id="${'baseStationFixedTime'+eventStat.index}"
+                                           name="locationTime" th:value="${event}"
+                                           class="form-control baseStationFixedTime">
+                                </div>
+                                <div class="col-md-1">
+                                    <button id="baseStation-add-btn" type="button" class="btn btn-primary addIcon"
+                                            style="display: none;" th:if="${eventStat.index == 0}">
+                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                    </button>
+                                    <button type='button' class='btn btn-danger baseStationDelete deleteIcon'
+                                            th:if="${eventStat.index != 0}">
+                                        <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 终端信息 -->
+                    <div class="bindInfo" id="terminalInfo" th:if="${commandType=='23'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端类型0：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType0" name="terminalType0" class="form-control"
+                                       readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端类型1：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType1" name="terminalType1" class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端类型2：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType2" name="terminalType2" class="form-control"
+                                       readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端类型3：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType3" name="terminalType3" class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端类型6：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType6" name="terminalType6" class="form-control"
+                                       readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端类型7：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType7" name="terminalType7" class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">制造商ID：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="manufacturerID" name="manufacturerID" class="form-control"
+                                       readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端型号：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalType" name="terminalType" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端ID：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalID" name="terminalID" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端终端手机号ICCID：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalSIM" name="terminalSIM" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">终端硬件版本号：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalHardwareVersionNum" name="terminalHardwareVersionNum"
+                                       class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">终端固件版本号：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="terminalFirmwareVersionNum" name="terminalFirmwareVersionNum"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GNSS模块属性0：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSModuleAttribute0" name="GNSSModuleAttribute0"
+                                       class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">GNSS模块属性1：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSModuleAttribute1" name="GNSSModuleAttribute1"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GNSS模块属性2：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSModuleAttribute2" name="GNSSModuleAttribute2"
+                                       class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">GNSS模块属性3：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSModuleAttribute3" name="GNSSModuleAttribute3"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通信模块属性0：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute0"
+                                       name="communicationModuleAttribute0" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">通信模块属性1：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute1"
+                                       name="communicationModuleAttribute1" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通信模块属性2：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute2"
+                                       name="communicationModuleAttribute2" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">通信模块属性3：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute3"
+                                       name="communicationModuleAttribute3" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通信模块属性4：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute4"
+                                       name="communicationModuleAttribute4" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-3 control-label">通信模块属性5：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute5"
+                                       name="communicationModuleAttribute5" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通信模块属性7：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="communicationModuleAttribute7"
+                                       name="communicationModuleAttribute7" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- RS232串口参数 -->
+                    <div class="bindInfo" id="RS232serialPortParameters" th:if="${commandType=='24'}">
+                        <input type="hidden" name="type" value="1">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label
+                                    class="text-danger">*</label> 串口个数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="RS232Numbers" name="baseStationStartTimePoint"
+                                       th:value="${result.size()}"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="insertDiv" th:each="event,eventStat:${result}">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"
+                                       id="RS232Num">串口[[${eventStat.index}]]参数</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"><label
+                                        class="text-danger">*</label> 串口序号：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="RS232serialPortNumber" name="serialPortNumber"
+                                           th:value="${event.serialPortNumber}"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">波特率：</label>
+                                <div class="col-md-3">
+                                    <select id="RS232baudRate" name="baudRate" class="form-control"
+                                            th:value="${event.baudRate}">
+                                        <option th:selected="${event.baudRate == 1}" value="1">2400</option>
+                                        <option th:selected="${event.baudRate == 2}" value="2">4800</option>
+                                        <option th:selected="${event.baudRate == 3}" value="3">9600</option>
+                                        <option th:selected="${event.baudRate == 4}" value="4">19200</option>
+                                        <option th:selected="${event.baudRate == 5}" value="5">38400</option>
+                                        <option th:selected="${event.baudRate == 6}" value="6">57600</option>
+                                        <option th:selected="${event.baudRate == 7}" value="7">115200</option>
+                                        <option th:selected="${event.baudRate == -1}" value="-1">不修改波特率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS232dataBits" name="dataBits" th:value="${event.dataBits}"
+                                            class="form-control">
+                                        <option th:selected="${event.dataBits == 5}" value="5">5</option>
+                                        <option th:selected="${event.dataBits == 6}" value="6">6</option>
+                                        <option th:selected="${event.dataBits == 7}" value="7">7</option>
+                                        <option th:selected="${event.dataBits == 8}" value="8">8</option>
+                                        <option th:selected="${event.dataBits == -1}" value="-1">不修改数据位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">停止位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS232stopBit" name="stopBit" class="form-control"
+                                            th:value="${event.stopBit}">
+                                        <option th:selected="${event.stopBit == 1}" value="1">1</option>
+                                        <option th:selected="${event.stopBit == 2}" value="2">2</option>
+                                        <option th:selected="${event.stopBit == -1}" value="-1">不修改停止位</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">校验位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS232parityBit" name="parityBit" th:value="${event.parityBit}"
+                                            class="form-control">
+                                        <option th:selected="${event.parityBit == 1}" value="1">奇校验</option>
+                                        <option th:selected="${event.parityBit == 2}" value="2">偶校验</option>
+                                        <option th:selected="${event.parityBit == 3}" value="3">无校验</option>
+                                        <option th:selected="${event.parityBit == -1}" value="-1">不修改校验位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">流控：</label>
+                                <div class="col-md-3">
+                                    <select id="RS232flowControl" name="flowControl" class="form-control"
+                                            th:value="${event.flowControl}">
+                                        <option th:selected="${event.flowControl == 1}" value="1">无流控</option>
+                                        <option th:selected="${event.flowControl == 2}" value="2">硬件流控</option>
+                                        <option th:selected="${event.flowControl == 3}" value="3">软件流控</option>
+                                        <option th:selected="${event.flowControl == -1}" value="-1">不修改流控</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据接收超时(毫秒)：</label>
+                                <div class="col-md-3">
+                                    <div class="col-md-15">
+                                        <input type="text" id="RS232dataAcceptanceTimeoutTime"
+                                               name="dataAcceptanceTimeoutTime" maxlength="4"
+                                               th:value="${event.dataAcceptanceTimeoutTime}"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="insertAddr"></div>
+                    </div>
+
+                    <!-- RS485串口参数 -->
+                    <div class="bindInfo" id="RS485serialPortParameters" th:if="${commandType=='25'}">
+                        <input type="hidden" name="type" value="2">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label
+                                    class="text-danger">*</label> 串口个数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="RS485Numbers" name="baseStationStartTimePoint"
+                                       th:value="${result.size()}"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="insertDiv" th:each="event,eventStat:${result}">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"
+                                       id="RS485Num">串口[[${eventStat.index}]]参数</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"><label
+                                        class="text-danger">*</label> 串口序号：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="RS485serialPortNumber" name="serialPortNumber"
+                                           th:value="${event.serialPortNumber}"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">波特率：</label>
+                                <div class="col-md-3">
+                                    <select id="RS485baudRate" name="baudRate" class="form-control"
+                                            th:value="${event.baudRate}">
+                                        <option th:selected="${event.baudRate == 1}" value="1">2400</option>
+                                        <option th:selected="${event.baudRate == 2}" value="2">4800</option>
+                                        <option th:selected="${event.baudRate == 3}" value="3">9600</option>
+                                        <option th:selected="${event.baudRate == 4}" value="4">19200</option>
+                                        <option th:selected="${event.baudRate == 5}" value="5">38400</option>
+                                        <option th:selected="${event.baudRate == 6}" value="6">57600</option>
+                                        <option th:selected="${event.baudRate == 7}" value="7">115200</option>
+                                        <option th:selected="${event.baudRate == -1}" value="-1">不修改波特率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS485dataBits" name="dataBits" th:value="${event.dataBits}"
+                                            class="form-control">
+                                        <option th:selected="${event.dataBits == 5}" value="5">5</option>
+                                        <option th:selected="${event.dataBits == 6}" value="6">6</option>
+                                        <option th:selected="${event.dataBits == 7}" value="7">7</option>
+                                        <option th:selected="${event.dataBits == 8}" value="8">8</option>
+                                        <option th:selected="${event.dataBits == -1}" value="-1">不修改数据位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">停止位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS485stopBit" name="stopBit" class="form-control"
+                                            th:value="${event.stopBit}">
+                                        <option th:selected="${event.stopBit == 1}" value="1">1</option>
+                                        <option th:selected="${event.stopBit == 2}" value="2">2</option>
+                                        <option th:selected="${event.stopBit == -1}" value="-1">不修改停止位</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">校验位：</label>
+                                <div class="col-md-3">
+                                    <select id="RS485parityBit" name="parityBit" th:value="${event.parityBit}"
+                                            class="form-control">
+                                        <option th:selected="${event.parityBit == 1}" value="1">奇校验</option>
+                                        <option th:selected="${event.parityBit == 2}" value="2">偶校验</option>
+                                        <option th:selected="${event.parityBit == 3}" value="3">无校验</option>
+                                        <option th:selected="${event.parityBit == -1}" value="-1">不修改校验位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">流控：</label>
+                                <div class="col-md-3">
+                                    <select id="RS485flowControl" name="flowControl" class="form-control"
+                                            th:value="${event.flowControl}">
+                                        <option th:selected="${event.flowControl == 1}" value="1">无流控</option>
+                                        <option th:selected="${event.flowControl == 2}" value="2">硬件流控</option>
+                                        <option th:selected="${event.flowControl == 3}" value="3">软件流控</option>
+                                        <option th:selected="${event.flowControl == -1}" value="-1">不修改流控</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据接收超时(毫秒)：</label>
+                                <div class="col-md-3">
+                                    <div class="col-md-15">
+                                        <input type="text" id="RS485dataAcceptanceTimeoutTime"
+                                               name="dataAcceptanceTimeoutTime" maxlength="4"
+                                               th:value="${event.dataAcceptanceTimeoutTime}"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="insertAddr"></div>
+                    </div>
+
+                    <!-- CAN总线参数 -->
+                    <div class="bindInfo" id="CANserialPortParameters" th:if="${commandType=='26'}">
+                        <input type="hidden" name="type" value="3">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label
+                                    class="text-danger">*</label> 串口个数：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="CANNumbers" name="baseStationStartTimePoint"
+                                       th:value="${result.size()}"
+                                       class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="insertDiv" th:each="event,eventStat:${result}">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"
+                                       id="CANNum">串口[[${eventStat.index}]]参数</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label"><label
+                                        class="text-danger">*</label> 串口序号：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="CANserialPortNumber" name="serialPortNumber"
+                                           th:value="${event.serialPortNumber}"
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">波特率：</label>
+                                <div class="col-md-3">
+                                    <select id="CANbaudRate" name="baudRate" class="form-control"
+                                            th:value="${event.baudRate}">
+                                        <option th:selected="${event.baudRate == 1}" value="1">2400</option>
+                                        <option th:selected="${event.baudRate == 2}" value="2">4800</option>
+                                        <option th:selected="${event.baudRate == 3}" value="3">9600</option>
+                                        <option th:selected="${event.baudRate == 4}" value="4">19200</option>
+                                        <option th:selected="${event.baudRate == 5}" value="5">38400</option>
+                                        <option th:selected="${event.baudRate == 6}" value="6">57600</option>
+                                        <option th:selected="${event.baudRate == 7}" value="7">115200</option>
+                                        <option th:selected="${event.baudRate == -1}" value="-1">不修改波特率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据位：</label>
+                                <div class="col-md-3">
+                                    <select id="CANdataBits" name="dataBits" th:value="${event.dataBits}"
+                                            class="form-control">
+                                        <option th:selected="${event.dataBits == 5}" value="5">5</option>
+                                        <option th:selected="${event.dataBits == 6}" value="6">6</option>
+                                        <option th:selected="${event.dataBits == 7}" value="7">7</option>
+                                        <option th:selected="${event.dataBits == 8}" value="8">8</option>
+                                        <option th:selected="${event.dataBits == -1}" value="-1">不修改数据位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">停止位：</label>
+                                <div class="col-md-3">
+                                    <select id="CANstopBit" name="stopBit" class="form-control"
+                                            th:value="${event.stopBit}">
+                                        <option th:selected="${event.stopBit == 1}" value="1">1</option>
+                                        <option th:selected="${event.stopBit == 2}" value="2">2</option>
+                                        <option th:selected="${event.stopBit == -1}" value="-1">不修改停止位</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">校验位：</label>
+                                <div class="col-md-3">
+                                    <select id="CANparityBit" name="parityBit" th:value="${event.parityBit}"
+                                            class="form-control">
+                                        <option th:selected="${event.parityBit == 1}" value="1">奇校验</option>
+                                        <option th:selected="${event.parityBit == 2}" value="2">偶校验</option>
+                                        <option th:selected="${event.parityBit == 3}" value="3">无校验</option>
+                                        <option th:selected="${event.parityBit == -1}" value="-1">不修改校验位</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">流控：</label>
+                                <div class="col-md-3">
+                                    <select id="CANflowControl" name="flowControl" class="form-control"
+                                            th:value="${event.flowControl}">
+                                        <option th:selected="${event.flowControl == 1}" value="1">无流控</option>
+                                        <option th:selected="${event.flowControl == 2}" value="2">硬件流控</option>
+                                        <option th:selected="${event.flowControl == 3}" value="3">软件流控</option>
+                                        <option th:selected="${event.flowControl == -1}" value="-1">不修改流控</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label">数据接收超时(毫秒)：</label>
+                                <div class="col-md-3">
+                                    <div class="col-md-15">
+                                        <input type="text" id="CANdataAcceptanceTimeoutTime"
+                                               name="dataAcceptanceTimeoutTime" maxlength="4"
+                                               th:value="${event.dataAcceptanceTimeoutTime}"
+                                               class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="insertAddr"></div>
+                    </div>
+
+                    <!-- GNSS及无线网络状态 -->
+                    <div class="bindInfo" id="GNSSAndWifi" th:if="${commandType=='27'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">GNSS状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="GNSSStatus" name="GNSSStatus" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-2 control-label">信号强度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="signalEmphasis" name="signalEmphasis" class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">网络类型：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="networkType" name="networkType" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">SIM状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="SIMStatus" name="SIMStatus" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 视频通道状态 -->
+                    <div class="bindInfo" id="videoChannelStatus" th:if="${commandType=='28'}">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道1状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel1" class="form-control" readonly>
+                            </div>
+                            <label class="col-md-2 control-label">通道2状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel2" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道3状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel3" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">通道4状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel4" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道5状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel5" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">通道6状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel6" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道7状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel7" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">通道8状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel8" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道9状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel9" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">通道10状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel10" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道11状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel11" readonly
+                                       class="form-control">
+                            </div>
+                            <label class="col-md-2 control-label">通道12状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel12" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道13状态：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="channel13" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--录像存储状态 -->
+                    <div class="bindInfo" id="videoStorageStatus" th:if="${commandType=='29'}">
+                        <div class="form-group storageRow">
+                            <label class="col-md-3 control-label">存储硬盘数量：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="storageNum" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="storageInsertAddr"></div>
+                        <div class="form-group SDRow">
+                            <label class="col-md-3 control-label">SD卡数量：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="SDNum" readonly
+                                       class="form-control">
+                            </div>
+                        </div>
+                        <div class="SDInsertAddr"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="readButton" type="button" class="btn btn-primary" th:if="${commandType != '19' && commandType != '22' &&
+                                                     commandType != '131' && commandType != '132' && commandType != '20'  && commandType != '21' && commandType != '30'}">
+                读取
+            </button>
+            <button id="sendButton" type="button" class="btn btn-primary"
+                    th:if="${commandType!='23'&&commandType!='27'&&commandType!='28'&&commandType!='29'}">下发
+            </button>
+            <button id="doCloseEditTwo" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        </div>
+    </div>
+</form>
+<script th:inline="javascript">
+    var pub65535error = [[#{commandParam.65535.error}]];
+    var pub2000error = [[#{commandParam.2000.error}]];
+    var pub10error = [[#{commandParam.10.error}]];
+    var pub255error = [[#{commandParam.255.error}]];
+    var pub127error = [[#{commandParam.127.error}]];
+    var numberError = [[#{commandParam.number.error}]];
+</script>
+<script src="/clbs/resources/js/commandParamEdit.js"></script>

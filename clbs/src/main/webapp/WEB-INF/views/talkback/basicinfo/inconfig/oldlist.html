@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>信息列表</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section class="leftMenuBg">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">信息配置</li>
+                        <li class="active">信息列表</li>
+                    </ul>
+                    <h1 class="h1">信息列表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <!--<div class="col-md-2"  style="padding-right: 0px; padding-left:0px;">-->
+                    <!--<div class="panel panel-default">-->
+                    <!--<div class="panel-heading">-->
+                    <!--<h3 class="panel-title fwb">组织架构</h3>-->
+                    <!--<div class="actions pull-right listActions">-->
+                    <!--<i class="fa fa-chevron-down"></i>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="panel-body" style="padding: 0px;">-->
+                    <!--<div class="form-group" style="margin-top: 15px;">-->
+                    <!--<div class="col-md-12">-->
+                    <!--<input id="search_condition" name="search" class="form-control" style="margin-bottom: 10px;" type="text" placeholder="请输入分组名称" />-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg" style="padding: 0px;height:699px !important;">-->
+                    <!--<ul id="groupTreeDemo" class="ztreee" style="height:684px !important;overflow:auto;"></ul>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="col-md-10" style="padding-right: 0px;padding-left: 10px;">-->
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch" >
+                            <h3 class="panel-title fwb">信息录入</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down"  id="stretch-chevron" ></i>
+                            </div>
+                        </div>
+                        <div class="panel-body"  id="stretch-body">
+                            <section class="fuelux">
+                                <div class="wizard">
+                                    <ul class="steps">
+                                        <li class="fwb quickEntry">
+                                            <div th:if="${hasRole}">
+                                                <button type="button" id="quickEntry" onclick="window.location.href='/clbs/m/infoconfig/infoFastInput/add'" class="btn btn-primary btn-mini btn-next" data-last="star">快速录入</button>
+                                                <button type="button" id="informationSpeed"  class="btn btn-primary btn-mini btn-next" data-last="star">极速录入</button>
+                                                <button type="button" id="scanCodeEntryShow" class="btn btn-primary btn-mini btn-next" data-last="star">扫码录入</button>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="wizard infoinputCon">
+                                    <ul class="steps isAdminProcess">
+                                        <li class="fwb">
+                                            <div th:if="${hasRole}">
+                                                <button id="processInput" type="button" onclick="window.location.href='/clbs/m/infoconfig/infoinput/addlist'"
+                                                        class="btn btn-primary btn-mini btn-next" data-last="star">流程录入
+                                                </button>
+                                            </div>
+                                        </li>
+                                        <li data-target="#step1">
+                                            <span class="badge">1</span>
+                                            <span>监控对象<span class="asterisk">*</span></span>
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step2">
+                                            <span class="badge">2</span>分组<span class="asterisk">*</span>
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step3">
+                                            <span class="badge">3</span>终端号<span class="asterisk">*</span>
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step4">
+                                            <span class="badge">4</span>终端手机号<span class="asterisk">*</span>
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step5">
+                                            <span class="badge">5</span>服务期限
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step6">
+                                            <span class="badge">6</span>从业人员
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step7">
+                                            <span class="badge">7</span>综合展示
+                                            <span class="chevron"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-md-2" style="padding-right: 0px; padding-left:0px;"></div>-->
+                <div class="col-md-12" id="scanCodeEntry" style="display:none;">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">扫码录入</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down" id="sceFac"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="scanCodeEntryContent" style="padding-right: 0px;">
+                            <form class="col-md-12 form-horizontal" id="addScanCodeEntry" th:action="@{/m/infoconfig/infoFastInput/scanningRecord}" method="post" role="form">
+                                <div class="form-group">
+                                    <div class="col-md-4 lab-group">
+                                        <div class="col-sm-6 col-md-3 col-md-offset-3 text-center">
+                                            <input type="radio" name="monitorType" checked="checked" value="0" class="monitoringSelect chooseCar"/>
+                                            <label class="monitoringSelect selectCar chooseCarLab activeIcon" data-toggle="tooltip" data-placement="top" title="车"></label>
+                                        </div>
+                                        <div class="col-sm-6 col-md-3 text-center" style="margin:-4px 0px 0px 0px;">
+                                            <input type="radio" name="monitorType" value="1" class="monitoringSelect choosePeople"/>
+                                            <label class="monitoringSelect selectPeople choosePeopleLab" data-toggle="tooltip" data-placement="top" title="人"></label>
+                                        </div>
+                                        <div class="col-sm-6 col-md-3 text-center" style="margin:-4px 0px 0px 0px;">
+                                            <input type="radio" name="monitorType" value="2" class="monitoringSelect chooseThing"/>
+                                            <label class="monitoringSelect selectThing chooseThingLab" data-toggle="tooltip" data-placement="top" title="物"></label>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 control-label">分组：</label>
+                                    <div class="col-md-3 has-feedback">
+                                        <input class="form-control groupZtree" id="groupid" name="groupid"  type="text" readonly="readonly" style="background-color: #fafafa; cursor: pointer;" value="" />
+                                        <span class="fa fa-chevron-down form-control-feedback groupZtree" aria-hidden="true" style="cursor: pointer;"></span>
+                                        <input id="citySelidVal" name="citySelID" class="form-control hidden">
+                                        <div id="menuContent" class="menuContent">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 control-label">通讯类型：</label>
+                                    <div class="col-md-3">
+                                        <select id="communicationType" class="form-control" name="deviceType">
+                                            <option  value="1">交通部JT/T808-2013</option>
+                                            <option  value="0">交通部JT/T808-2011(扩展)</option>
+                                            <option value="2">移为</option>
+                                            <option value="3">天禾</option>
+                                            <option value="5">BDTD-SM</option>
+                                            <option  value="6">KKS</option>
+                                            <option  value="8">BSJ-A5</option>
+                                            <option  value="9">ASO</option>
+                                            <option  value="10">F3超长待机</option>
+                                        </select>
+                                    </div>
+                                    <!--<label class="col-md-1 control-label">功能类型：</label>
+                                    <div class="col-md-3">
+                                        <select id="functionType" class="form-control" name="functionalType">
+                                            <option value="1">简易型车机</option>
+                                            <option value="2">行车记录仪</option>
+                                            <option value="3">对讲设备</option>
+                                            <option value="5">超长待机设备</option>
+                                        </select>
+                                    </div>-->
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-1 control-label">监控对象：</label>
+                                    <div class="col-md-3">
+                                        <input type="text" id="monitorTheObject" class="form-control" readonly="readonly" style="cursor:auto;" name="brands">
+                                    </div>
+                                    <label class="col-md-1 control-label">终端手机号：</label>
+                                    <div class="col-md-3">
+                                        <input type="text" id="simCardNumber" class="form-control" name="sims">
+                                    </div>
+                                    <label class="col-md-1 control-label">终端号：</label>
+                                    <div class="col-md-3">
+                                        <input type="text" id="terminal" class="form-control" name="devices">
+                                        <div id="SCEMsgBox" style="display:none;"></div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-md-2" style="padding-right: 0px; padding-left:0px;"></div>-->
+                <div class="col-md-12"  >
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2" >
+                            <h3 class="panel-title fwb">信息列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down"  id="stretch2-chevron" ></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body form-horizontal"  id="stretch2-body">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" placeholder="请输入 监控对象/终端号/终端手机号"></label>
+                                            <button type="button" id="search_button" onclick="myTable.requestData()"
+                                                    class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" />
+                                        </form>
+                                    </div>
+                                    <div th:if="${hasRole}" class="dropdown pull-left">
+                                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                            <li><a th:href="@{/m/infoconfig/infoinput/export.gsp}" id="exportId"><i class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a></li>
+                                            <li><a href="javascript:void(0);" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量解除</a></li>
+                                            <li><a th:href="@{/m/infoconfig/infoinput/import}" id="importId" data-toggle="modal" data-target="#commonSmWin"><i class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="columns btn-group pull-right InformationList">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh" title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable" class="table table-striped table-bordered table-hover checkTable" cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th><input type="checkbox" id="checkAll"></th>
+                                    <th>操作设置</th>
+                                    <th>监控对象</th>
+                                    <th>监控对象类型</th>
+                                    <th>分组</th>
+                                    <th>终端手机号</th>
+                                    <th>终端号</th>
+                                    <th>通讯类型</th>
+                                    <th>功能类型</th>
+                                    <th>外设</th>
+                                    <th>计费日期</th>
+                                    <th>到期日期</th>
+                                    <th>从业人员</th>
+                                    <th>创建时间</th>
+                                    <th>修改时间</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!--</div>-->
+                </div>
+            </div>
+
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<!--    <div class="modal fade" id="detailShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="position: absolute">
+		<div class="modal-dialog" role="document" style="width:20%;position:absolute;top:40%;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" >详情</h4>
+				</div>
+				<div class="modal-body" id = "detailContent" >
+				</div>
+			</div>
+		</div>
+	</div>-->
+<div class="modal fade" id="detailShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+    <div class="modal-dialog" role="document" style="width:20%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">详情</h4>
+            </div>
+            <div class="modal-body" id = "detailContent" >
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+    // var assignmentMaxCarNum = [[#{infoinput.cluster.maxCarNum}]];
+    var systemErrorFlag = false;
+    var systemError = [[#{system.error}]];
+    var selectItem = [[#{select.item}]];
+    var deviceSpeedNumberError = [[#{device.speedNumber.error}]];
+</script>
+<script src="/wro/infoinputList.js" th:src="@{/wro/infoinputList.js}"></script>
+</html>

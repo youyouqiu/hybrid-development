@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.AccessPlatformDao">
+
+    <select id="getByID" parameterType="string"
+            resultType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+        SELECT
+        *
+        FROM
+        zw_m_access_platform
+        WHERE flag=1 and
+        id = #{id}
+    </select>
+    
+    <select id="getByIDs" parameterType="java.util.List"
+            resultType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+        SELECT
+        *
+        FROM
+        zw_m_access_platform
+        WHERE flag=1 and
+        id IN 
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+        	#{id}
+        </foreach>
+    </select>
+
+    <select id="find" resultType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+    	SELECT * FROM zw_m_access_platform WHERE platform_name LIKE BINARY CONCAT('%',#{simpleQueryParam},'%') or ip
+    	LIKE CONCAT('%',#{simpleQueryParam},'%') ORDER BY create_data_time DESC
+    </select>
+
+    <insert id="add" parameterType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+        INSERT INTO zw_m_access_platform (id,platform_name, status, ip,type,create_data_time,create_data_username, update_data_time,
+        update_data_username)
+        VALUES(
+        #{id}, #{platformName},#{status},#{ip},#{type},#{createDataTime},#{createDataUsername},#{updateDataTime},#{updateDataUsername}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+        UPDATE zw_m_access_platform SET  platform_name = #{platformName},status = #{status},ip = #{ip}, create_data_time = #{createDataTime},
+        create_data_username = #{createDataUsername}, update_data_time = #{updateDataTime}, update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="String">
+    	DELETE FROM zw_m_access_platform WHERE id = #{id}
+    </delete>
+    
+    <delete id="deleteByIds" parameterType="java.util.List">
+    	DELETE FROM zw_m_access_platform WHERE id IN
+    	<foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+        	#{id}
+        </foreach>
+    </delete>
+
+	<select id="check808InputPlatFormSole" parameterType="string" resultType="String">
+        SELECT id FROM zw_m_access_platform where flag = 1 AND platform_name = BINARY #{platFormName}
+    </select>
+
+    <!-- 根据接入平台名称查询是否有重复的平台名称-->
+    <select id = "findPlateformNameByName" parameterType="string" resultType="String">
+        SELECT * from zw_m_access_platform where flag = 1 and platform_name = BINARY #{name}
+    </select>
+
+    <!-- 批量新增接入平台信息 -->
+    <insert id="addPlateformBatch" parameterType="com.zw.platform.domain.accessPlatform.AccessPlatform">
+        INSERT INTO zw_m_access_platform (id,platform_name, status, ip,type,flag,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.platformName}, #{item.status},#{item.ip},
+            #{item.type},#{item.flag},#{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 查询全部的接入平台信息 -->
+    <select id="findAllIp" resultType="com.zw.platform.domain.accessPlatform.AccessPlatformForm">
+        SELECT * from zw_m_access_platform where flag = 1
+    </select>
+
+</mapper>

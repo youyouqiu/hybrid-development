@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.webMaster.alarmType.AppAlarmTypeDao">
+    <select id="getAlarmType" resultType="com.zw.app.domain.webMaster.alarmType.AppAlarmConfigInfo">
+        SELECT * FROM zw_app_alarm_config
+        WHERE group_id = #{groupId}
+        AND group_default = #{groupDefault}
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+    <select id="getAlarmTypeByVersion" resultType="com.zw.app.domain.webMaster.alarmType.AppAlarmConfigInfo">
+        SELECT * FROM zw_app_alarm_config
+        WHERE group_id = #{groupId}
+        AND group_default = #{groupDefault}
+        <if test="appVersion != null">
+            AND app_version <![CDATA[ <= ]]> #{appVersion}
+        </if>
+        AND flag = 1
+        ORDER by update_data_time asc
+    </select>
+    <select id="getGroupName" resultType="java.lang.String">
+		SELECT group_name FROM zw_app_alarm_config
+		WHERE group_id = #{groupId}
+		AND group_default = 0
+		AND flag = 1
+		limit 1
+	</select>
+    <delete id="deleteGroupAlarmType" parameterType="com.zw.app.domain.webMaster.alarmType.AppAlarmConfigInfo">
+	delete from zw_app_alarm_config
+	WHERE group_id = #{groupId}
+	AND group_default = #{groupDefault}
+	</delete>
+    <insert id="addGroupAlarmType" parameterType="com.zw.app.domain.webMaster.alarmType.AppAlarmConfigInfo">
+        INSERT INTO zw_app_alarm_config
+        (id,group_id,group_name,group_default,category,`name`,`type`,app_version,flag,update_data_time,update_data_username,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.groupId},#{item.groupName},#{item.groupDefault},#{item.category},#{item.name},#{item.type},#{item.appVersion},#{item.flag},#{item.updateDataTime},#{item.updateDataUsername},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="getAlarmMaxDateByGroupId" parameterType="string" resultType="int">
+        SELECT
+            alarm_time_limit
+        FROM
+            zw_app_personalized_config
+        WHERE
+            group_id = #{groupId}
+        AND group_default = 0
+        AND flag = 1
+    </select>
+</mapper>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>视频轮播</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="refresh" content="36000; url=/clbs/login?type=timeout"/>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" id="icoLink" name="favicon.ico" th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" th:href="@{/resources/js/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}"/>
+    <link rel="stylesheet" href="/wro/animate.css" th:href="@{/wro/animate.css}"/>
+    <link rel="stylesheet" href="/wro/main.css" th:href="@{/wro/main.css}"/>
+    <link rel="stylesheet" href="resources/js/zTree/css/zTreeStyle.css"
+          th:href="@{/resources/js/zTree/css/zTreeStyle.css}"/>
+    <link rel="stylesheet" href="/wro/wizard.css" th:href="@{/wro/wizard.css}"/>
+    <link rel="stylesheet" href="/wro/adaptiveStyle.css" th:href="@{/wro/adaptiveStyle.css}"/>
+    <link rel="stylesheet" href="/wro/clockPlugins.css" th:href="@{/wro/clockPlugins.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/twinkle.css"/>
+    <link rel="stylesheet" href="resources/js/nstSlider/css/jquery.nstSlider.css"
+          th:href="@{/resources/js/nstSlider/css/jquery.nstSlider.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/js/jQueryPowertip/justtool.css"/>
+    <link rel="stylesheet" href="/clbs/resources/css/videoCarousel.css"/>
+    <script src="resources/js/modernizr-2.6.2.min.js" th:src="@{/resources/js/modernizr-2.6.2.min.js}"></script>
+    <script src="resources/js/jquery-1.10.2.min.js" th:src="@{/resources/js/jquery-1.10.2.min.js}"></script>
+</head>
+<body>
+<section>
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper main-content-wrapper-white main-content-toggle-left">
+        <div th:replace="fragments/menu">menu</div>
+        <div class="content">
+            <div class="left-part" id="leftPart">
+               <!-- <div class="panel-heading page-heading">
+                    <h3 class="panel-title page-title">监控对象</h3>
+                </div>-->
+                <div class="leftView">
+                    <div class="disabledMark"></div>
+                    <div class="form-horizontal">
+                        <div class="form-group allGroup" style="padding-top:15px;padding-left:15px;padding-right:15px;">
+                            <div style="cursor:pointer" id="chooseAll"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding tree-type-link"
+                                 data-type="all">
+                                <span>全部</span><span id="tall">(...)</span>
+                            </div>
+                            <div style="cursor:pointer" id="online"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPaddingOnLine tree-type-link"
+                                 data-type="online">
+                                <span>在线</span><span id="tline">(...)</span>
+                            </div>
+                            <div style="cursor:pointer" id="chooseMissLine"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding tree-type-link"
+                                 data-type="offline">
+                                <span>不在线</span><span id="tmiss">(...)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 form-group clearfix allGroup">
+                        <div class="col-md-5 col-sm-12 col-xs-12" style="padding: 0px 5px 0px 0px;">
+                            <select id="searchType" placeholder="请选择搜索类别"
+                                    class="form-control">
+                                <option selected="selected" value="name">监控对象</option>
+                                <option value="deviceNumber">终端号</option>
+                                <option value="simcardNumber">终端手机号</option>
+                                <option value="group">企业</option>
+                                <option value="assignName">分组</option>
+                                <option value="professional">从业人员</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 col-sm-12 col-xs-12"
+                             style="padding: 0px 10px 0px 0px;">
+                            <input id="search_condition" name="search" autocomplete="off"
+                                   type="text" class="form-control" placeholder="关键字"/>
+                        </div>
+                        <div class="col-md-2 col-sm-12 col-xs-12" style="padding: 0px 0px 0px 0px;">
+                            <button id="realSetBtn" class="btn btn-default dropdown-toggle" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="fa fa-cog"></span>
+                            </button>
+                            <ul id="realSetMenu" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                <li><a href="javascript:void(0);" id="refresh" name="refresh" title="刷新"
+                                       data-stoppropagation="true"><i class="glyphicon glyphicon-refresh"></i>刷新</a>
+                                </li>
+                                <li data-stoppropagation="true">
+                                    <a href="javascript:void(0);" id="showAliases">
+                                        <label for="showName"><input type="checkbox" id="showName">显示别名</label></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-12 tree-container" id="thetree">
+                        <div id="treeLoad" style="width: 140px; margin: 20px auto 0 65px";>
+                            <i class="fa fa-spinner loading-state"></i>
+                            <span>加载中，请稍候</span>
+                        </div>
+                        <ul id="treeDemo" class="ztree"></ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="small-window-container">
+                        <div class="small-window-number">
+                            <span id="window-4" class="small-window-number-span active number-icon"
+                                  data-type="4">4</span>
+                            <span id="window-6" class="small-window-number-span number-icon" data-type="6">6</span>
+                            <span id="window-9" class="small-window-number-span number-icon" data-type="9">9</span>
+                            <span id="window-10" class="small-window-number-span number-icon" data-type="10">10</span>
+                            <span id="window-16" class="small-window-number-span number-icon" data-type="16">16</span>
+                            <span id="window-25" class="small-window-number-span number-icon" data-type="25">25</span>
+                            <span id="window-36" class="small-window-number-span number-icon" data-type="36">36</span>
+                        </div>
+                    </div>
+                    <div class="form-horizontal">
+                        <div class="clearfix carouselTimeBox">
+                            <label class="col-md-3 control-label col-padding-left">轮播时长：</label>
+                            <div class="col-md-9">
+                                <select name="" id="carouselTime" class="form-control">
+                                    <option value="30">无操作时30秒切换</option>
+                                    <option value="60">无操作时1分钟切换</option>
+                                    <option value="120">无操作时2分钟切换</option>
+                                    <option value="300">无操作时5分钟切换</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="clearfix carouselModelBox">
+                            <label class="col-md-4 control-label radioLabel">
+                                <input type="radio" class="carouselModel" name="carouselModel" value="1"> 单车模式
+                            </label>
+                            <label class="col-md-4 control-label radioLabel">
+                                <input type="radio" class="carouselModel" name="carouselModel" value="2" checked> 多车模式
+                            </label>
+                        </div>
+                    </div>
+                    <div class="video-handle-container">
+                        <button type="button" id="videoPlayBtn" class="btn btn-primary">开始轮播</button>
+                        <button type="button" id="videoToggleBtn" class="videoBtn" title="下一屏" disabled></button>
+                        <button type="button" id="videoLockBtn" class="videoBtn" title="锁定所有窗格" disabled></button>
+                        <button type="button" id="videoSettingBtn" class="videoBtn" title="视频设置" disabled></button>
+                        <button type="button" id="videoFullScreenBtn" class="videoBtn" title="全屏" disabled></button>
+                    </div>
+                </div>
+                <canvas id="canvasForVideo" width="524" height="400"></canvas>
+            </div>
+            <div class="right-part" id="rightPart">
+                <div class="multi-window-container" id="multiWindowContainer">
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div th:replace="fragments/footer_multi_window_monitoring">footer</div>
+</section>
+<div class="drag-placeholder"></div>
+<!--视频窗口默认内容-->
+<script type="text/html" id="windowDefaultTmpl">
+    <div class="video-box">
+        <div class="video-bag">
+            <video autoplay width="100%" height="100%"></video>
+        </div>
+        <div class="ope-container">
+            <span class="playInfo"></span>
+            <span class="lock-icon ope-icon" title="锁定"></span>
+            <span class="snapshots-icon ope-icon" title="截图"></span>
+        </div>
+    </div>
+</script>
+<!-- 视频画面控制 -->
+<div class="modal fade" id="videoScreenControl" tabindex="-1" aria-hidden="false" data-backdrop="static" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 500px !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">视频画面控制 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-horizontal">
+                    <!-- 亮度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">亮度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsBrightness" data-range_min="0" data-range_max="255"
+                                 data-cur_min="255">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="brightnessVal" readonly/></div>
+                    </div>
+                    <!-- 色度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">色度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsChroma" data-range_min="0" data-range_max="358" data-cur_min="0">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="chromaVal" readonly/></div>
+                    </div>
+                    <!-- 对比度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">对比度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsContrast" data-range_min="0" data-range_max="255" data-cur_min="128">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="contrastVal" readonly/></div>
+                    </div>
+                    <!-- 饱和度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">饱和度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsSaturation" data-range_min="0" data-range_max="255"
+                                 data-cur_min="128">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="saturationVal" readonly/></div>
+                    </div>
+                    <!-- 音量 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">音量：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsVolume" data-range_min="0" data-range_max="100" data-cur_min="50">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="volumeVal" readonly/></div>
+                    </div>
+                    <!-- 码流 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">码流：</div>
+                        <div class="col-md-6">
+                            <label class="col-md-5 radioLabel noPadding">
+                                <input type="radio" class="videoStream" name="videoStream" value="0" checked> 主码流
+                            </label>
+                            <label class="col-md-5 radioLabel noPadding">
+                                <input type="radio" class="videoStream" name="videoStream" value="1"> 子码流
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="resources/js/sockjs-1.1.1.min.js" th:src="@{/resources/js/sockjs-1.1.1.min.js}"></script>
+<script src="resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/clbs/resources/js/nstSlider/js/jquery.nstSlider.js"
+        th:src="@{/resources/js/nstSlider/js/jquery.nstSlider.js}"></script>
+
+<script src="/clbs/resources/js/media/three.min.js"></script>
+<script src="/clbs/resources/js/media/OrbitControls.js"></script>
+<script src="/wro/mediaController.js" th:src="@{/wro/mediaController.js}"></script>
+
+<script src="/wro/video-carousel.js" th:src="@{/wro/video-carousel.js}"></script>
+
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+    var vehicleNumberChoose = [[#{vehicle.number.choose}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var videoRequestUrl = [[${session.videoUrl}]];
+    var audioRequestPort = [[${session.audioPort}]];
+    var videoRequestPort = [[${session.videoPort}]];
+    var videoResourcePort = [[${session.resourcePort}]];
+</script>
+</body>
+</html>

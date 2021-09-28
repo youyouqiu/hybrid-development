@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasVehicleCardNumDao">
+
+    <insert id="insert">
+        INSERT IGNORE INTO zw_m_vehicle_ic_history (vehicle_id, driver_name, identification_number)
+        VALUES (#{vehicleId}, #{driverName}, #{identificationNumber})
+   </insert>
+
+    <select id="findAllBindIcCardVehicleId" resultType="string">
+        SELECT DISTINCT vehicle_id FROM zw_m_vehicle_ic_history where identification_number > ''
+    </select>
+
+    <select id="listUniqueIdentificationNumber" resultType="string">
+        SELECT DISTINCT CONCAT(identification_number, '_', driver_name) FROM zw_m_vehicle_ic_history
+        <if test="vehicleIds != null and vehicleIds.size > 0 ">
+            WHERE vehicle_id IN
+            <foreach collection="vehicleIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="listOldData" resultType="java.util.Map">
+        SELECT * FROM zw_m_vehicle_card_num
+        <if test="skipId != null">
+            WHERE vid > #{skipId}
+        </if>
+        ORDER BY vid LIMIT #{batchSize}
+    </select>
+
+    <insert id="batchInsert">
+        INSERT IGNORE INTO zw_m_vehicle_ic_history (vehicle_id, driver_name, identification_number) VALUES
+        <foreach collection="list" item="item" open="(" close=")" separator="),(">
+            #{item.vehicleId}, #{item.driverName}, #{item.identificationNumber}
+        </foreach>
+    </insert>
+</mapper>

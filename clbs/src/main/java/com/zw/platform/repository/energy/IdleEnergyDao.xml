@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.energy.IdleEnergyDao">
+    <!--根据车辆id查询怠速基准 -->
+    <select id="findIdleStandards" resultType="com.zw.platform.domain.energy.IdleStandard" parameterType="string">
+                select
+                id,
+                vehicle_Id,
+                start_time,
+                end_time,
+                idle_time,
+                idle_mile,
+                idle_fuel,
+                idle_base,
+                idle_base_cap
+                from zw_m_energy_idle where vehicle_id = #{vehicleId} and flag = 1 ORDER BY create_data_time DESC
+    </select>
+
+    <!--根据车辆id查询基准最大结束时间 -->
+    <select id="findBaseTimeByVehicleId" resultType="java.util.Date" parameterType="string">
+    SELECT end_time baseTime FROM zw_m_energy_idle WHERE vehicle_id=#{vehicleId} and flag = 1 ORDER BY start_time DESC LIMIT 1
+    </select>
+
+    <!--根据车辆id查询怠速汇总数据-->
+    <select id="findIdleEnergyByVehicleId" resultType="com.zw.platform.domain.energy.IdleEnergy" parameterType="string">
+        select
+        idle_time idleTime,
+        idle_total idleTotal,
+        idle_base_list idleBaseList,
+        idle_mile idleMile,
+        idle_total_cap idleTotalCap,
+        idle_base_cap idleBaseCap
+        from zw_m_energy where vehicle_id = #{vehicleId} and flag = 1
+    </select>
+
+    <!-- 根据怠速基准id删除怠速基准-->
+    <delete id="deleteIdleStandards" parameterType="string">
+        delete from zw_m_energy_idle where id = #{id}
+    </delete>
+
+    <!-- 根据车辆id添加怠速汇总数据-->
+    <update id="upDateIdleCollectData" parameterType="com.zw.platform.domain.energy.IdleEnergy">
+        update
+        zw_m_energy
+        set
+        idle_time = #{idleTime},
+        idle_total = #{idleTotal},
+        idle_base_list = #{idleBaseList},
+        idle_mile = #{idleMile},
+        idle_total_cap = #{idleTotalCap},
+        idle_base_cap = #{idleBaseCap}
+        where vehicle_id=#{vehicleId} and flag=1
+    </update>
+
+    <insert id="addIdleStandards" parameterType="com.zw.platform.domain.energy.IdleStandard">
+        insert into zw_m_energy_idle(
+        id,
+        vehicle_id,
+        start_time,
+        end_time,
+        idle_time,
+        idle_mile,
+        idle_fuel,
+        idle_base,
+        idle_base_cap,
+        flag,
+        create_data_time,
+        create_data_username) values(
+          #{id},
+          #{vehicleId},
+          #{startTime},
+          #{endTime},
+          #{idleTime},
+          #{idleMile},
+          #{idleFuel},
+          #{idleBase},
+          #{idleBaseCap},
+          #{flag},
+          #{createDataTime},
+          #{createDataUsername}
+        )
+    </insert>
+</mapper>

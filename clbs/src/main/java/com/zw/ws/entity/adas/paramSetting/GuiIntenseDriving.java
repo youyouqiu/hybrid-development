@@ -1,0 +1,201 @@
+package com.zw.ws.entity.adas.paramSetting;
+
+import com.zw.adas.domain.define.setting.AdasAlarmParamSetting;
+import com.zw.adas.domain.define.setting.query.AdasParamSettingForm;
+import com.zw.platform.util.IntegerUtil;
+import com.zw.protocol.msg.t808.T808MsgBody;
+import com.zw.ws.entity.adas.AdasParamCommonMethod;
+import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @Description:主动安全参数(桂标) (激烈驾驶参数设置)
+ */
+@Data
+public class GuiIntenseDriving implements T808MsgBody, AdasParamCommonMethod {
+    /**
+     * 激烈驾驶报警使能
+     */
+    private Integer alarmEnable = 0;
+
+    /**
+     * 急加速报警时间阈值
+     */
+    private Integer speedUpTime = 0xFFFF;
+
+    /**
+     * 急加速重力速度阈值
+     */
+    private Integer speedUpGravity = 0xFFFF;
+
+    /**
+     * 预留1
+     */
+    private byte[] keep1 = new byte[2];
+
+    /**
+     * 急减速报警时间阈值
+     */
+    private Integer speedDownTime = 0xFFFF;
+
+    /**
+     * 急减速重力速度阈值
+     */
+    private Integer speedDownGravity = 0xFFFF;
+
+    /**
+     * 预留2
+     */
+    private byte[] keep2 = new byte[2];
+
+    /**
+     * 急转弯报警时间阈值
+     */
+    private Integer swerveTime = 0xFFFF;
+
+    /**
+     * 急转弯重力速度阈值
+     */
+    private Integer swerveGravity = 0xFFFF;
+
+    /**
+     * 预留3
+     */
+    private byte[] keep3 = new byte[2];
+
+    /**
+     * 怠速报警时间阈值
+     */
+    private Integer idlingTime = 0xFFFF;
+
+    /**
+     * 怠速车速阈值
+     */
+    private Integer idlingSpeed = 0xFFFF;
+
+    /**
+     * 怠速发动机阈值
+     */
+    private Integer idlingEngine = 0xFFFF;
+
+    /**
+     * 异常熄火报警时间阈值
+     */
+    private Integer abnormalTime = 0xFFFF;
+
+    /**
+     * 异常熄火报警车速阈值
+     */
+    private Integer abnormalSpeed = 0xFFFF;
+
+    /**
+     * 异常熄火报警发动机转速阈值
+     */
+    private Integer abnormalEngine = 0xFFFF;
+
+    /**
+     * 空挡滑行报警时间阈值
+     */
+    private Integer neutralGearTime = 0xFFFF;
+
+    /**
+     * 空挡滑行报警车速阈值
+     */
+    private Integer neutralGearSpeed = 0xFFFF;
+
+    /**
+     * 空挡滑行发动机转速阈值
+     */
+    private Integer neutralGearEngine = 0xFFFF;
+
+    /**
+     * 发动机超转报警时间阈值
+     */
+    private Integer engineTime = 0xFFFF;
+
+    /**
+     * 发动机超转报警发动机超转报警车速阈值
+     */
+    private Integer engineSpeed = 0xFFFF;
+
+    /**
+     * 发动机超转报警发动机转速阈值
+     */
+    private Integer engineOverspeed = 0xFFFF;
+
+    /**
+     * 预留4
+     */
+    private byte[] keep4 = new byte[8];
+
+    /**
+     * 1464081 急加速
+     * 1464082 急减速
+     * 1464083 急转弯
+     * 147001 怠速报警
+     * 147002 异常熄火
+     * 147003 空挡滑行
+     * 147004 发动机超转
+     */
+    private static Map<String, Object> intenseAlarmEnableMap = new HashMap();
+
+    private static Map<String, Object> intenseAlarmParamMap = new HashMap();
+
+    static {
+        //报警使能顺序维护
+        String[][] alarmEnableOrder =
+            { { "1464081", "0" }, { "1464082", "1" }, { "1464083", "2" }, { "147001", "3" }, { "147002", "4" },
+                { "147003", "5" }, { "147004", "6" } };
+        for (String[] ints : alarmEnableOrder) {
+            intenseAlarmEnableMap.put(ints[0], ints[1]);
+        }
+        //报警事件参数设置参数交互字段维护
+        String[][] intenseAlarmParamOrder =
+            { { "1464081", "speedUpTime,speedUpGravity" }, { "1464082", "speedDownTime,speedDownGravity" },
+                { "1464083", "swerveTime,swerveGravity" }, { "147001", "idlingTime,idlingSpeed,idlingEngine" },
+                { "147002", "abnormalTime,abnormalSpeed,abnormalEngine" },
+                { "147003", "neutralGearTime,neutralGearSpeed,neutralGearEngine" },
+                { "147004", "engineTime,engineSpeed,engineOverspeed" } };
+        for (String[] ints : intenseAlarmParamOrder) {
+            intenseAlarmParamMap.put(ints[0], ints[1]);
+        }
+    }
+
+    public GuiIntenseDriving(AdasParamSettingForm paramSettingForm) {
+        for (AdasAlarmParamSetting paramSetting : paramSettingForm.getAdasAlarmParamSettings()) {
+            String key = paramSetting.getRiskFunctionId().toString();
+            //组装报警使能
+            handelAlarmEnable(paramSetting, key);
+            //组装报警事件参数设置
+            handelAlarmParam(paramSetting, key);
+        }
+    }
+
+    private void handelAlarmParam(AdasAlarmParamSetting paramSetting, String key) {
+        String[] params = intenseAlarmParamMap.get(key).toString().split(",");
+        //时间阈值
+        setValIfPresent(params[0], paramSetting.getTimeThreshold());
+        //急加急减急转弯(只需要设置时间阈值和重力加速度阈值)
+        if (params.length == 2) {
+            //报警重力加速度
+            setValIfPresent(params[1],
+                IntegerUtil.getOrDefault(paramSetting.getGravityAccelerationThreshold(), 0xFFFF));
+        }
+        //其他激烈驾驶需要设置车速阈值和发动机转速阈值（无重力加速度阈值）
+        if (params.length == 3) {
+            //车速阈值
+            setValIfPresent(params[1], IntegerUtil.getOrDefault(paramSetting.getEngineThreshold(), 0xFFFF));
+            //发动机转速阈值
+            setValIfPresent(params[2], IntegerUtil.getOrDefault(paramSetting.getSpeedThreshold(), 0xFFFF));
+        }
+    }
+
+    private void handelAlarmEnable(AdasAlarmParamSetting paramSetting, String key) {
+        alarmEnable = calBinaryData(alarmEnable, paramSetting.getAlarmEnable(),
+            Integer.parseInt(intenseAlarmEnableMap.get(key).toString()));
+    }
+
+}
+

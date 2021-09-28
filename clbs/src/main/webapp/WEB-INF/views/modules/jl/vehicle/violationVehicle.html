@@ -1,0 +1,340 @@
+<!--违规车辆数据-->
+<div id="violatVehicle" class="violatVehicle" style="display: none">
+    <div class="panel-default">
+        <div class="panel-heading" style="padding-bottom: 0">
+            <div class="actions pull-right listActions">
+            </div>
+            <ul class="nav nav-tabs" style="border-bottom: none;">
+                <li class="active"><a href="#violatVehicle1" data-toggle="tab">违规车辆设置</a>
+                </li>
+                <li class=""><a href="#violatVehicle2" data-toggle="tab">违规车辆上传记录</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="tab-content">
+        <!--违规车辆设置-->
+        <div class="tab-pane active" id="violatVehicle1">
+            <div class="panel-body" style="background-color: #fff;margin-bottom: 10px;">
+                <div class="col-md-12 alarmSearchToolPanel">
+                    <form id="violatVehicleForm" class="form-horizontal" action="#" method="post" role="form">
+                        <div class="form-group">
+                            <label class="col-md-2 col-sm-3 control-label searchListSelect"><span class="text-danger">*</span> 平台名称：</label>
+                            <div class="col-md-3 col-sm-8">
+                                <select class="form-control offOperatePlatform" id="violatVehiclePlatform" name="violatVehiclePlatform"></select>
+                            </div>
+                            <label class="col-md-2 col-sm-3 control-label"><span class="text-danger">*</span> 车辆：</label>
+                            <div class="col-md-3 col-sm-8 has-feedback fastClear">
+                                <select name="violatVehicleType" id="violatVehicleType" class="Inlinesearch form-control treeSelect">
+                                    <option value="vehicle" selected="">监控对象</option>
+                                    <option value="group">企业</option>
+                                    <option value="assignment">分组</option>
+                                </select>
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       placeholder="请选择" class="form-control moreQueryGroup"
+                                       id="violatVehicleInput" name="groupSelect" type="text" maxlength="30" autocomplete="off"/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;"
+                                      aria-hidden="true"></span>
+                                <div id="violatVehicleMenu" class="menuContent">
+                                    <ul id="violatVehicleTree" class="ztree"></ul>
+                                    <div id="violatVehicleNotree" style="text-align: center">未查询到匹配项</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12 control-label">
+                                <button type="button" class="btn btn-primary search-btn fixed-width" name="1" onclick="violatVehicleSetting.inquireClick(1)"><i class="glyphicon glyphicon-search"></i> 查询</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title fwb">违规车辆设置列表</h3>
+                    <div class="actions pull-right listActions">
+                        <i class="fa fa-chevron-down" id="stretch-chevron"></i>
+                    </div>
+                </div>
+                <div class="panel-body fixed-table-body">
+                    <div class="ToolPanel">
+                        <div class="bars pull-left">
+                            <div class="btn-group pull-left barsMargin" role="group">
+                                <form role="form" class="syntheticBox" style="position: relative;display: inline-block">
+                                    <label>
+                                        <input type="text" class="Inlinesearch form-control"
+                                               id="violatVehicleQuery" maxlength="30"
+                                               style="width: 300px" placeholder="请输入监控对象" />
+                                        <i class="delIcon" style="right: 156px;display: none"></i>
+                                    </label>
+                                    <input type="text" style="display: none" />
+                                    <button type="button" id="violatVehicleSearch"
+                                            class="btn btn-outline btn-default">搜索
+                                    </button>
+                                </form>
+                                <button data-toggle="modal" type="button" id="violatVehicleBatchBtn"
+                                        class="btn btn-outline btn-default" style="float: none;">批量上传
+                                </button>
+                            </div>
+                        </div>
+                        <div class="columns btn-group pull-right fuelConsumptionS">
+                            <button id="violatVehicleRefresh" class="btn btn-default" type="button" name="refresh"
+                                    title="刷新">
+                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                            </button>
+                            <div class="keep-open btn-group" title="定制显示列">
+                                <button type="button"
+                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                        class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" id="violatVehicleColumn">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="violatVehicleTable"
+                           class="table table-striped table-bordered table-hover checkTable"
+                           cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th width="50">序号</th>
+                            <th width="35"><input type="checkbox" id="checkAll"></th>
+                            <th width="95">操作</th>
+                            <th width="130">监控对象</th>
+                            <th width="200">上传状态</th>
+                            <th width="150">上传类型</th>
+                            <th width="110">车牌颜色</th>
+                            <th width="250">分组</th>
+                            <th>所属企业</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div id="violatVehicleTimeWrap"></div>
+        </div>
+        <!--违规车辆上传记录-->
+        <div class="tab-pane" id="violatVehicle2">
+            <div class="panel-body" style="background-color: #fff;margin-bottom: 10px;">
+                <div class="col-md-12 alarmSearchToolPanel">
+                    <form id="violatVehicleUpForm" class="form-horizontal" action="#" method="post" role="form">
+                        <div class="form-group">
+                            <label class="col-md-2 col-sm-3 control-label searchListSelect">车辆：</label>
+                            <input class="form-control hidden"/>
+                            <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                <select name="violatVehicleUpType" id="violatVehicleUpType" class="Inlinesearch form-control treeSelect">
+                                    <option value="vehicle" selected="">监控对象</option>
+                                    <option value="group">企业</option>
+                                    <option value="assignment">分组</option>
+                                </select>
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       placeholder="请选择" class="form-control moreQueryGroup"
+                                       id="violatVehicleUpInput" name="groupSelect" type="text" maxlength="30" autocomplete="off"/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;"
+                                      aria-hidden="true"></span>
+                                <div id="violatVehicleUpMenu" class="menuContent">
+                                    <ul id="violatVehicleUpTree" class="ztree"></ul>
+                                </div>
+                            </div>
+                            <label class="col-md-2 col-sm-3 control-label"><span class="text-danger">*</span> 上报日期：</label>
+                            <input class="form-control hidden"/>
+                            <div class="col-md-3 col-sm-8">
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="violatVehicleUpTime" name="violatVehicleUpTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group panel panel-default">
+                            <label class="col-md-2 col-sm-3 control-label"> 上传状态：</label>
+                            <div class="col-md-2 col-sm-8">
+                                <select class="form-control" id="violatVehicleUpStatus">
+                                    <option value="">全部</option>
+                                    <option value="1">上传成功</option>
+                                    <option value="0">上传失败</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 col-sm-3 control-label"> 违规类型：</label>
+                            <div class="col-md-2 col-sm-8">
+                                <select class="form-control" id="violatVehicleUpAlarmType">
+                                    <option value="">全部</option>
+                                    <option value="1">扭动镜头</option>
+                                    <option value="2">遮挡镜头</option>
+                                    <option value="3">无照片</option>
+                                    <option value="4">无定位数据</option>
+                                    <option value="5">轨迹异常</option>
+                                    <option value="6">超员</option>
+                                    <option value="7">超速</option>
+                                    <option value="8">脱线运行</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12 control-label" id="dateSearchData">
+                                <button type="button" class="btn btn-primary fixed-width" name="0" onclick="violatVehicleUpData.inquireClick(0)">今天</button>
+                                <button type="button" class="btn btn-primary fixed-width" name="-1" onclick="violatVehicleUpData.inquireClick(-1)">前一天</button>
+                                <button type="button" class="btn btn-primary fixed-width" name="-3" onclick="violatVehicleUpData.inquireClick(-3)">前三天</button>
+                                <button type="button" class="btn btn-primary fixed-width" name="-7" onclick="violatVehicleUpData.inquireClick(-7)">前七天</button>
+                                <button type="button" class="btn btn-primary search-btn fixed-width" name="1" onclick="violatVehicleUpData.inquireClick(1)"><i class="glyphicon glyphicon-search"></i> 查询</button>
+                                <button id="violatVehicleUpExport" type="button" class="btn btn-purple export-btn fixed-width" disabled><i class="glyphicon glyphicon-log-out"></i> 导出</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title fwb">违规车辆上传记录列表</h3>
+                    <div class="actions pull-right listActions">
+                        <i class="fa fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="panel-body fixed-table-body">
+                    <div class="ToolPanel">
+                        <div class="bars pull-left">
+                            <div class="btn-group pull-left barsMargin" role="group">
+                                <form role="form" class="syntheticBox">
+                                    <label>
+                                        <input type="text" class="Inlinesearch form-control"
+                                               id="violatVehicleUpQuery" maxlength="30"
+                                               style="width: 300px" placeholder="请输入监控对象">
+                                    </label>
+                                    <button type="button" id="violatVehicleUpSearch" onclick="violatVehicleUpData.inquireClick(1)"
+                                            class="btn btn-outline btn-default">搜索
+                                    </button>
+                                    <input type="text" style="display: none"/>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="columns btn-group pull-right fuelConsumptionS">
+                            <button id="violatVehicleUpRefresh" class="btn btn-default" type="button" name="refresh"
+                                    title="刷新">
+                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                            </button>
+                            <div class="keep-open btn-group" title="定制显示列">
+                                <button type="button"
+                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                        class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" id="violatVehicleUpColumn">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="violatVehicleUpTable"
+                           class="table table-striped table-bordered table-hover checkTable"
+                           cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th width="50">序号</th>
+                            <th width="130">监控对象</th>
+                            <th width="180">违规时间</th>
+                            <th width="130">违规类型</th>
+                            <th width="110">车牌颜色</th>
+                            <th>所属企业</th>
+                            <th width="180">上报时间</th>
+                            <th width="200">上传状态</th>
+                            <th width="150">操作人</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 违规车辆设置 -->
+<div class="modal fade" id="violatVehicleUploadModal" style="" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <form id="violatVehicleUploadForm" role="form" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="upgradePackageName">违规车辆设置</h4>
+                </div>
+                <div class="modal-body" style="overflow: auto;padding-right: 80px">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group uploadModalSetting">
+                                <label class="col-md-3 control-label">上报设置： </label>
+                                <div class="col-md-9">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="uploadType" value="1" checked> 统一设置
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="uploadType" value="2"> 分别设置
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="settingTotal">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">监控对象：</label>
+                                    <div class="col-md-9">
+                                        <input type="text" name="uploadObject" id="violatVehicleUploadObject" class="form-control" autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label"><span class="text-danger">*</span> 违规时间：</label>
+                                    <div class="col-md-9">
+                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                               class="form-control layer-date laydate-icon"
+                                               name="uploadDatetime" readonly/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label"><span class="text-danger">*</span> 违规类型： </label>
+                                    <div class="col-md-9">
+                                        <div style="margin-bottom: 7px;">
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="1" checked> 扭动镜头
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="2"> 遮挡镜头
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="3"> 无照片
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="4"> 无定位数据
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="5"> 轨迹异常
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="6"> 超员
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="7"> 超速
+                                            </label>
+                                            <label class="radio-inline" style="width: 100px">
+                                                <input type="radio" name="uploadAlarm" value="8"> 脱线运行
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="settingSingle" style="display: none;">
+                                <div class="singleItem"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="violatVehicleUploadSubmit" class="btn btn-primary">上传</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

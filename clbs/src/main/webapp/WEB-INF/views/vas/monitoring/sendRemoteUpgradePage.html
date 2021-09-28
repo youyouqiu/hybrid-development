@@ -1,0 +1,105 @@
+<form id="upgradeForm" role="form" th:action="@{/v/sensorConfig/sensorUpgrade/sendRemoteUpgrade}"
+      action="#" method="post" class="form-horizontal" enctype="multipart/form-data" onkeydown="if(event.keyCode==13)return false;">
+    <style>
+        #allUpgrade {
+            margin-left: -15px
+        }
+
+        .hiddenDiv {
+            display: none
+        }
+
+        .complete {
+            color: #00B83F
+        }
+
+        .failure {
+            color: #E50C0C
+        }
+
+        .inpFilePhoto {
+            padding: 5px 8px
+        }
+
+        .fileName {
+            width: 60%;
+            margin-left: -15px;
+        }
+
+        .progressBox {
+            padding-top: 7px
+        }
+
+        .floatItem {
+            float: left;
+            margin-right: 10px
+        }
+
+        .progress.floatItem {
+            width: 60%;
+            height: 10px;
+            margin-top: 5px;
+        }
+
+        .leftInfo {
+            float: left;
+            width: 112px;
+        }
+
+        .noPadding {
+            padding: 0
+        }
+        .targetDiv button{
+            width: 84px;
+        }
+        .inpFilePhoto .changeFile{
+            padding: 0;
+        }
+        @media screen and (max-width: 1500px) {
+            .progress.floatItem, .fileName {
+                width: 50%;
+            }
+        }
+    </style>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="upgradeTitle">传感器远程升级</h4>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" id="remoteUpgradeTaskList" th:value="${remoteUpgradeTaskList}">
+        <input type="hidden" id="peripheralId" th:value="${peripheralId}" name="peripheralId">
+        <input type="hidden" id="monitorIds" name="monitorIds">
+        <div class="form-group">
+            <div class="leftInfo" style="margin:0 0 0 15px">
+                <div class="inpFilePhoto">
+                    <input type="file" id="excelPath" name="file">
+                    <label class="changeFile" for="excelPath">选择升级文件</label>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="col-md-8">
+                    <input placeholder="升级文件名" class="form-control fileName" readonly/>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button id="allUpgrade" type="button" class="btn btn-outline btn-primary">批量升级</button>
+            </div>
+        </div>
+        <hr>
+        <div class="form-group text-center">
+            <div class="col-md-5">
+                <label class="control-label">平台----终端</label>
+            </div>
+            <div class="col-md-6">
+                <label class="control-label col-md-5">终端----外设</label>
+            </div>
+        </div>
+        <div class="progressContainer"></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="closeButton" data-dismiss="modal">关闭</button>
+    </div>
+</form>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script src="/clbs/resources/js/sendRemoteUpgradePage.js"></script>

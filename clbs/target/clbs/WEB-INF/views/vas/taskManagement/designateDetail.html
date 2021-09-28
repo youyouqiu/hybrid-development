@@ -1,0 +1,138 @@
+<style>
+  .schedule-list {
+    border: 1px solid #eee;
+    padding: 0 20px;
+    margin-bottom: 20px; /*max-height:260px;overflow: hidden;overflow-y: auto;*/
+  }
+
+  .zw-title {
+    background: #eee;
+    padding: 5px;
+    height: 38px;
+    margin-top: 20px;
+  }
+
+  .zw-title .control-label {
+    padding-top: 0;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .stayMinute {
+    width: 40px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .inputStyleHide {
+    padding: 0;
+  }
+
+  .peopleList {
+    max-height: 200px;
+    overflow: hidden;
+    padding-top: 8px;
+    padding-bottom: 6px;
+    overflow-y: auto;
+    word-break: break-all;
+  }
+</style>
+<form th:object="${designate}"
+  id="detailForm"
+  role="form"
+  class="form-horizontal"
+  xmlns:th="http://www.w3.org/1999/xhtml">
+
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">指派详情</h4>
+  </div>
+
+  <div class="modal-body" style="overflow: auto">
+    <div class="row">
+      <div class="col-md-12">
+        <input type="hidden" id="result" th:value="${details}">
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 指派名称：</label>
+          <div class="col-md-4">
+            <input th:value="*{designateName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 选择任务： </label>
+          <div class="col-md-4">
+            <input id="taskList" th:data-value="*{taskId}" th:value="*{taskName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+          </div>
+          <div class="col-md-4">
+            <button id="taskDetail" style="padding:8px 14px;margin-bottom:0;" class="btn btn-primary" type="button">任务详情</button>
+          </div>
+        </div>
+        <!--任务详情 start-->
+        <ul id="schedule-list" class="schedule-list" style="display:none;"></ul>
+        <!--任务详情 end-->
+
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 指派开始日期： </label>
+          <div class="col-md-4">
+            <input th:value="*{startDateStr}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+          </div>
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 指派结束日期： </label>
+          <div class="col-md-4">
+            <input th:value="*{endDateStr}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 日期重复类型：</label>
+          <div class="col-md-4">
+            <input th:value="*{dateDuplicateType.indexOf('8')!= -1 ? '每天' : '周期'}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+            <input type="hidden" id="dateDuplicateType" th:value="*{dateDuplicateType}" />
+          </div>
+        </div>
+
+        <div th:class="*{dateDuplicateType.indexOf('8')!= -1 ? 'form-group hide' : 'form-group'}">
+          <label class="col-md-2 control-label"></label>
+          <div class="col-md-10">
+            <label class="checkbox-inline" for="week1"><input id="week1" name="week" type="checkbox" disabled value="1" /> 周一</label>
+            <label class="checkbox-inline" for="week2"><input id="week2" name="week" type="checkbox" disabled value="2" /> 周二</label>
+            <label class="checkbox-inline" for="week3"><input id="week3" name="week" type="checkbox" disabled value="3" /> 周三</label>
+            <label class="checkbox-inline" for="week4"><input id="week4" name="week" type="checkbox" disabled value="4" /> 周四</label>
+            <label class="checkbox-inline" for="week5"><input id="week5" name="week" type="checkbox" disabled value="5" /> 周五</label>
+            <label class="checkbox-inline" for="week6"><input id="week6" name="week" type="checkbox" disabled value="6" /> 周六</label>
+            <label class="checkbox-inline" for="week7"><input id="week7" name="week" type="checkbox" disabled value="7" /> 周日</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label
+            class="text-danger">*</label> 选择对象：</label>
+          <div class="col-md-10 peopleList">
+            <div id="peopleNames" th:data-value="*{designatePeopleInfosStr}"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-md-2 control-label"> 备注： </label>
+          <div class="col-md-10">
+            <textarea readonly th:value="*{remark}" th:text="*{remark}" name="remark" maxlength="100" type="text"
+              class="form-control inputStyleHide" id="remarks" style="background: none;padding-top: 7px"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    	<span>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">
+	            <strong>关 闭</strong>
+	        </button>
+    	</span>
+  </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/designateDetails.js"></script>

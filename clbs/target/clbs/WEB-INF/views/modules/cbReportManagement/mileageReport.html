@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>车辆里程统计</title>
+<div th:replace="fragments/header">header</div>
+<style type="text/css">
+.nav-tabs{
+			border-bottom:none;
+		}
+</style>
+</head>
+<body>
+	<section id="container">
+		<div th:replace="fragments/nav">nav</div>
+		<section class="main-content-wrapper">
+			<div th:replace="fragments/menu">menu</div>
+			<section id="main-content">
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">四川监管报表</li>
+							<li class="active">车辆里程统计</li>
+						</ul>
+						<h1 class="h1 " style="float:none">车辆里程统计</h1>
+						<div class="panel-default">
+							<div class="panel-heading" style="padding-bottom:0px"> 
+								<ul class="nav nav-tabs dataTableShow">
+	
+									<li class="active" id="amountReport"><a href="#user"
+										data-toggle="tab">车辆里程统计表</a></li>
+									<li id="spillReport"><a href="#detail" data-toggle="tab">车辆日里程报表</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-content">
+
+					<div role="tabpanel" class="tab-pane active" id="user">
+						<div>
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12 col-sm-12"
+										style="padding-right: 0px; padding-left: 0px;">
+										<div class="panel panel-default">
+											<div class="panel-body" id="stretch3-body">
+												<div class="col-md-12 alarmSearchToolPanel">
+													<form id="hourslist3" class="form-horizontal" action="#"
+														method="post" role="form">
+														<div class="form-group">
+															<label class="col-md-1 col-sm-3 control-label">组织：</label>
+															<input class="form-control hidden" />
+															<div class="has-feedback fastClear col-md-3 col-sm-8">
+																<select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+																	<option value="vehicle" selected="">监控对象</option>
+																	<option value="group">企业</option>
+																	<option value="assignment">分组</option>
+																</select>
+																<input
+																	style="cursor: pointer; background-color: #fafafa;"
+																	placeholder="请选择" class="form-control moreQueryGroup"
+																	id="groupSelect3" name="groupSelect3" type="text" autocomplete="off"/> <span
+																	class="fa fa-chevron-down form-control-feedback"
+																	style="top: 0; right: 15px; cursor: pointer;"
+																	aria-hidden="true" id="groupSelectSpan3"></span>
+																<div id="menuContent3" class="menuContent">
+																	<ul id="treeDemo3" class="ztree"></ul>
+																</div>
+															</div>
+															<label
+																class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+															<div class="col-md-4 col-sm-4 searchListSelect">
+																<input
+																	style="cursor: pointer; background-color: #fafafa;"
+																	class="form-control layer-date laydate-icon"
+																	id="timeInterval" name="timeInterval" readonly />
+															</div>
+														</div>
+														<div class="form-group">
+															<div class="col-md-12 control-label" id="dateSearchData">
+																<button id="todayClick" type="button"
+																	class="btn btn-primary fixed-width"
+																	onclick="mainObj.inquireClick(0)">今天</button>
+																<button id="yesterdayClick" type="button"
+																	class="btn btn-primary fixed-width"
+																	onclick="mainObj.inquireClick(-1)">前一天
+																</button>
+																<button id="nearlyThreeDays" type="button"
+																	class="btn btn-primary fixed-width"
+																	onclick="mainObj.inquireClick(-3)">前三天
+																</button>
+																<!--<button id="nearlySevenDays" type="button"-->
+																	<!--class="btn btn-primary fixed-width"-->
+																	<!--onclick="mainObj.inquireClick(-7)">前七天-->
+																<!--</button>-->
+																<button id="inquireClick" type="button"
+																	class="btn btn-primary search-btn fixed-width" name="1"
+																	onclick="mainObj.inquireClick(1)">
+																	<i class="glyphicon glyphicon-search"></i> 查询
+																</button>
+																<button id="exportMileage3" type="button"
+																	class="btn btn-purple export-btn fixed-width" disabled>
+																	<i class="glyphicon glyphicon-log-out" ></i> 导出
+																</button>
+															</div>
+														</div>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-12 col-sm-12"
+										style="padding-right: 0px; padding-left: 0px;">
+										<div class="panel panel-default">
+											<div class="panel-heading" id="3stretch">
+												<h3 class="panel-title fwb">数据列表</h3>
+												<div class="actions pull-right listActions">
+													<i class="fa chevron-down" id="3stretch-chevron"></i>
+												</div>
+											</div>
+											<div class="panel-body fixed-table-body" id="3stretch-body">
+												<div class="ToolPanel">
+													<div class="bars pull-left">
+														<div class="btn-group pull-left barsMargin" role="group">
+															<form role="form">
+																<label><input autocomplete="off" type="text"
+																	class="Inlinesearch form-control"
+																	id="simpleQueryParam3" name="simpleQueryParam"
+																	style="width: 300px" placeholder="请输入车牌号"></label>
+																<button type="button" id="search_button3"
+																	class="btn btn-outline btn-default">搜索</button>
+																<input id="hiddenText" type="text" style="display: none" />
+															</form>
+														</div>
+													</div>
+													<div class="columns btn-group pull-right fuelConsumptionS">
+														<button id="refreshTable" class="btn btn-default"
+															type="button" name="refresh" title="刷新">
+															<i class="glyphicon glyphicon-refresh icon-refresh"></i>
+														</button>
+														<div class="keep-open btn-group" id="keepOpen3"
+															title="定制显示列">
+															<button id="customizeColumns" type="button"
+																class="btn btn-default dropdown-toggle btn-border-radius"
+																data-toggle="dropdown">
+																<i class="glyphicon glyphicon-th icon-th"></i> <span
+																	class="caret"></span>
+															</button>
+															<ul class="dropdown-menu" role="menu" id="Ul-menu-text3">
+															</ul>
+														</div>
+													</div>
+												</div>
+												<table id="dataTable3"
+													class="table table-striped table-bordered table-hover noCheckTable"
+													cellspacing="0" width="100%">
+													<thead>
+														<tr>
+															<th class="text-center">序号</th>
+															<th class="text-center">车牌号</th>
+															<th class="text-center">车牌颜色</th>
+															<th class="text-center">车辆类型</th>
+															<th class="text-center">道路运输企业</th>
+															<th class="text-center">行驶时间段</th>
+															<th class="text-center">行驶里程数</th>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<div role="tabpanel" class="tab-pane" id="detail">
+						<div>
+							<div class="row">
+								<div class="col-md-12">
+									<div class="col-md-12 col-sm-12"
+										style="padding-right: 0px; padding-left: 0px;">
+										<div class="panel panel-default">
+											<div class="panel-body" id="stretch2-body">
+												<div class="col-md-12 alarmSearchToolPanel">
+													<form id="hourslist2" class="form-horizontal" action="#"
+														method="post" role="form">
+														<div class="form-group">
+															<label class="col-md-1 col-sm-3 control-label">组织：</label>
+															<input class="form-control hidden" />
+															<div class="has-feedback fastClear col-md-3 col-sm-8">
+																<select name="queryType" id="queryType1" class="Inlinesearch form-control treeSelect">
+																	<option value="vehicle" selected="">监控对象</option>
+																	<option value="group">企业</option>
+																	<option value="assignment">分组</option>
+																</select>
+																<input
+																	style="cursor: pointer; background-color: #fafafa;"
+																	placeholder="请选择" class="form-control moreQueryGroup"
+																	id="groupSelect2" name="groupSelect2"  type="text"  autocomplete="off"/> <span
+																	class="fa fa-chevron-down form-control-feedback"
+																	style="top: 0; right: 15px; cursor: pointer;"
+																	aria-hidden="true" id="groupSelectSpan2"></span>
+																<div id="menuContent2" class="menuContent">
+																	<ul id="treeDemo2" class="ztree"></ul>
+																</div>
+															</div>
+															<label
+																class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+															<div class="col-md-2 col-sm-4 searchListSelect">
+																<select class="form-control" id="select2">
+																</select>
+															</div>
+														</div>
+														<div class="form-group">
+															<div class="col-md-12 control-label" id="dateSearchData">
+																<button id="toMonthClick2" type="button"
+																	class="btn btn-primary fixed-width"
+																	onclick="mainObj.monthClick2(0)">本月</button>
+																<button id="yesterMonthClick2" type="button"
+																	class="btn btn-primary fixed-width"
+																	onclick="mainObj.monthClick2(-1)">上个月</button>
+																<button id="inquireClick2" type="button"
+																	class="btn btn-primary search-btn fixed-width" name="1"
+																	onclick="mainObj.monthClick2(1)">
+																	<i class="glyphicon glyphicon-search"></i> 查询
+																</button>
+																<button id="exportMileage2" type="button"
+																	class="btn btn-purple export-btn fixed-width" disabled>
+																	<i class="glyphicon glyphicon-log-out"></i> 导出
+																</button>
+															</div>
+														</div>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+							
+									<div class="col-md-12 col-sm-12"
+										style="padding-right: 0px; padding-left: 0px;">
+										<div class="panel panel-default">
+											<div class="panel-heading" id="2stretch">
+												<h3 class="panel-title fwb">数据列表</h3>
+												<div class="actions pull-right listActions">
+													<i class="fa chevron-down" id="2stretch-chevron"></i>
+												</div>
+											</div>
+											<div class="panel-body fixed-table-body" id="2stretch-body">
+												<div class="ToolPanel">
+													<div class="bars pull-left">
+														<div class="btn-group pull-left barsMargin" role="group">
+															<form role="form">
+																<label><input type="text"
+																	class="Inlinesearch form-control"
+																	id="simpleQueryParam2" name="simpleQueryParam"
+																	style="width: 300px" placeholder="请输入车牌号"></label>
+																<button type="button" id="search_button2"
+																	class="btn btn-outline btn-default">搜索</button>
+																<input id="hiddenText" type="text" style="display: none" />
+															</form>
+														</div>
+													</div>
+													<div class="columns btn-group pull-right fuelConsumptionS">
+														<button id="refreshTableMonth2" class="btn btn-default"
+															type="button" name="refresh" title="刷新">
+															<i class="glyphicon glyphicon-refresh icon-refresh"></i>
+														</button>
+														<div class="keep-open btn-group" id="keepOpen2"
+															title="定制显示列">
+															<button id="customizeColumns" type="button"
+																class="btn btn-default dropdown-toggle btn-border-radius"
+																data-toggle="dropdown">
+																<i class="glyphicon glyphicon-th icon-th"></i> <span
+																	class="caret"></span>
+															</button>
+															<ul class="dropdown-menu" role="menu" id="Ul-menu-text2">
+															</ul>
+														</div>
+													</div>
+												</div>
+												<table id="dataTable2"
+													class="table table-striped table-bordered table-hover noCheckTable"
+													cellspacing="0" width="100%">
+													<thead>
+														<tr>
+														</tr>
+													</thead>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</section>
+		</section>
+	</section>
+	<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+	var maxSelectItem = [[#{max.select.item}]];
+	var monitoringObjecNull = [[#{monitoring.objec.null}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+	var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+	var notDataExport = [[#{not.data.export}]];
+	var exportFail = [[#{export.fail}]];
+	var publicError = [[#{public.error}]];
+	
+</script>
+
+<script src="resources/js/zTree/js/ztreeSearch.js"
+	th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/cbMileageStatistics.js"
+	th:src="@{/resources/js/cbMileageStatistics.js}"></script>
+</html>

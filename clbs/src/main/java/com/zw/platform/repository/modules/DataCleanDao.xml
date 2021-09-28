@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DataCleanDao">
+
+   <select id="get" resultType="com.zw.platform.domain.systems.form.DataCleanSettingForm">
+        select * from zw_m_data_clean_setting
+   </select>
+
+    <update id="saveSetting">
+        update zw_m_data_clean_setting
+        set
+        <if test="type == 1">
+            positional_time = #{value}
+        </if>
+        <if test="type == 2">
+            alarm_time = #{value}
+        </if>
+        <if test="type == 3">
+            media_time = #{value}
+        </if>
+        <if test="type == 4">
+            log_time = #{value}
+        </if>
+        <if test="type == 5">
+            spot_check_time = #{value}
+        </if>
+    </update>
+
+    <update id="saveTime">
+        update zw_m_data_clean_setting
+        set `time` = #{time} ,
+            clean_type = #{cleanType}
+    </update>
+
+    <select id="getSpotCheckIds" resultType="java.lang.String">
+        select id
+        from zw_m_vehicle_spot_check
+        where spot_check_time &lt; #{overTime}
+    </select>
+
+    <delete id="deleteSpotCheck">
+        delete from zw_m_vehicle_spot_check
+        where id in
+        <foreach collection="ids" item="item" close=")" open="(" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getMedia" resultType="map">
+        select id, media_url_new
+        from zw_m_media
+        where create_data_time &lt; #{overTime}
+    </select>
+
+    <delete id="deleteMedia">
+        delete from zw_m_media
+        where id in
+        <foreach collection="ids" item="item" close=")" open="(" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ThingInfoDao">
+	<!-- 查询 flog为1的所有参数 -->
+	<!-- 参数类型，返回值类型 -->
+	<select id="find"
+		parameterType="com.zw.platform.domain.basicinfo.query.ThingInfoQuery"
+		resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT ThingInfo.* FROM zw_m_thing_info ThingInfo where flag=1
+		<if test="simpleQueryParam != null and simpleQueryParam!=''">
+			and (name LIKE CONCAT('%',#{simpleQueryParam},'%')
+			or thing_number LIKE CONCAT('%',#{simpleQueryParam},'%') )
+		</if>
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 新增 -->
+	<insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.ThingInfoForm">
+		INSERT INTO zw_m_thing_info (
+		id, name, thing_number,group_id,category,type,label,model,material, weight,spec,manufacture,dealer,place,product_date,thing_photo,remark,create_data_time,
+		create_data_username
+		)
+		VALUES(
+		#{id}, #{name}, #{thingNumber},#{groupId},#{category},#{type},#{label},#{model},#{material}, #{weight},#{spec},#{manufacture},#{dealer},#{place},
+		#{productDate},#{thingPhoto},#{remark},#{createDataTime},
+		#{createDataUsername}
+		)
+	</insert>
+	<!-- 批量新增 -->
+	<insert id="addByBatch" parameterType="java.util.List">
+		INSERT INTO zw_m_thing_info (
+		id, name, thing_number,group_id,category,type,label,model,material, weight,spec,manufacture,dealer,place,product_date,thing_photo,remark,create_data_time,
+		create_data_username
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+				 separator=",">
+		(
+		#{item.id}, #{item.name}, #{item.thingNumber},#{item.groupId},#{item.category},#{item.type},#{item.label},#{item.model},
+		#{item.material},#{item.weight},#{item.spec},#{item.manufacture},#{item.dealer},#{item.place},
+		#{item.productDate},#{item.thingPhoto},#{item.remark},#{item.createDataTime},
+		#{item.createDataUsername}
+		)
+		</foreach>
+	</insert>
+	<!-- 根据id删除一个 ThingInfo -->
+	<delete id="delete" parameterType="string">
+		UPDATE zw_m_thing_info set flag=0 WHERE id = #{id}
+	</delete>
+	<!-- 通过id得到一个 User -->
+	<select id="get" parameterType="string"
+		resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT
+		<include refid="thingValue"></include>
+		FROM zw_m_thing_info WHERE id = #{id}
+	</select>
+
+	<select id="getAll"
+			resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT id, thing_number
+		FROM zw_m_thing_info WHERE flag = 1
+	</select>
+	<!-- 修改 PER -->
+	<update id="update" parameterType="com.zw.platform.domain.basicinfo.form.ThingInfoForm">
+		UPDATE zw_m_thing_info SET
+		name = #{name},
+		thing_number = #{thingNumber},
+		group_id = #{groupId},
+		category = #{category},
+		type = #{type},
+		label = #{label},
+		model = #{model},
+		material = #{material},
+		weight = #{weight},
+		spec = #{spec},
+		manufacture = #{manufacture},
+		dealer = #{dealer},
+		place = #{place},
+		product_date = #{productDate},
+		thing_photo = #{thingPhoto},
+		remark = #{remark},
+		flag = #{flag},
+		update_data_time = #{updateDataTime},
+		update_data_username = #{updateDataUsername}
+		WHERE id = #{id}
+	</update>
+    <update id="updateThingNumber">
+		UPDATE zw_m_thing_info
+		SET
+			thing_number = #{thingNumber},
+			update_data_time = #{updateDataTime},
+			update_data_username = #{updateDataUsername}
+		WHERE id = #{id} AND flag = 1
+	</update>
+    <!-- 查询物品信息 -->
+	<select id="findByThingNumber" parameterType="string"
+		resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT
+		<include refid="thingValue"/>
+		FROM zw_m_thing_info
+		WHERE flag = 1
+		<if test="thingNumber != null and thingNumber != ''">
+			AND thing_number = BINARY #{thingNumber}
+		</if>
+	</select>
+
+	<sql id="thingValue">
+		id,
+		name,
+		thing_number,
+		group_id,
+		category,
+		type,
+		label,
+		model,
+		material,
+		weight,
+		spec,
+		manufacture,
+		dealer,
+		place,
+		DATE_FORMAT( product_date, '%Y-%m-%d') AS productDate,
+		thing_photo,
+		remark,
+		create_data_time,
+		create_data_username,
+		update_data_time,
+		update_data_username
+	</sql>
+
+	<!-- 批量新增车辆 -->
+	<insert id="addThingInfoByBatch" parameterType="com.zw.platform.domain.basicinfo.form.ThingInfoForm">
+		INSERT INTO zw_m_thing_info (
+		id,
+		name,
+		thing_number,
+		group_id,
+		category,
+		type,
+		label,
+		model,
+		material,
+		weight,
+		spec,
+		manufacture,
+		dealer,
+		place,
+		product_date,
+		thing_photo,
+		remark,
+		create_data_time,
+		create_data_username
+		)
+		VALUES
+		<foreach collection="importList" item="item" index="index"
+			separator=",">
+			(#{item.id}, #{item.name}, #{item.thingNumber},
+			#{item.groupId},
+			#{item.category},#{item.type},#{item.label},#{item.model},
+			#{item.material}, #{item.weight}
+			, #{item.spec}
+			, #{item.manufacture}
+			, #{item.dealer}
+			, #{item.place}
+			, #{item.productDate}
+			, #{item.thingPhoto}
+			, #{item.remark}
+			, #{item.createDataTime}
+			, #{item.createDataUsername})
+		</foreach>
+	</insert>
+	<!-- 根据物品编号查询物品信息 -->
+	<select id="findByThingInfo" parameterType="string"
+		resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT
+		<include refid="thingValue"/>
+		FROM zw_m_thing_info WHERE flag = 1 AND thing_number = BINARY #{thingNumber}
+	</select>
+	<select id="isExist" parameterType="string"
+		resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT * FROM zw_m_thing_info WHERE flag = 1 and thing_number = BINARY
+		#{thingNumber}
+		<if test="id != null and id != ''">
+			and id <![CDATA[ <> ]]>
+			#{id}
+		</if>
+	</select>
+
+	<!-- 根据ids删除多个物品信息 -->
+	<delete id="deleteMuch" parameterType="string">
+		UPDATE zw_m_thing_info set flag=0 WHERE id IN
+		<foreach item="item" collection="ids" separator="," open="("
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="findThingInfoWithOutAuth" resultType="map">
+		SELECT t.id,t.thing_number AS thingNumber,t.name,t.category, t.type, t.label,t.model,t.material,t.weight,t.spec,t.manufacture,t.dealer,
+		t.place,t.product_date AS productDate, DATE_FORMAT( t.product_date, '%Y-%m-%d') AS productDateStr,t.thing_photo AS thingPhoto, t.flag,
+		t.create_data_time AS createDataTime,DATE_FORMAT( t.create_data_time, '%Y-%m-%d') AS createDataTimeStr,
+		t.update_data_time AS updateDataTime,DATE_FORMAT( t.update_data_time,'%Y-%m-%d') AS updateDataTimeStr, device.device_number AS deviceNumber,
+		sim.simcard_number AS simcardNumber,t.group_id AS groupName,t.group_id AS groupId, GROUP_CONCAT(ma.name SEPARATOR ',') AS assign, 	GROUP_CONCAT(DISTINCT mag.group_id SEPARATOR ',') AS assignGroup, GROUP_CONCAT(ma.id SEPARATOR ',') AS assignId, t.remark AS remark
+		FROM zw_m_thing_info t
+		LEFT JOIN zw_m_config con ON con.vehicle_id=t.id AND con.flag =1 AND con.monitor_type = 2
+		LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+		LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+		LEFT JOIN zw_m_assignment_vehicle mav ON mav.vehicle_id= t.id AND mav.flag=1
+		LEFT JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+		LEFT JOIN zw_m_assignment_group mag ON ma.id = mag.assignment_id AND mag.flag = 1
+		WHERE t.flag = 1
+		 AND t.id IN (
+			SELECT id FROM zw_m_thing_info WHERE id IN
+			(
+			SELECT av.vehicle_id FROM zw_m_assignment_vehicle av
+			INNER JOIN zw_m_assignment_user au ON au.assignment_id=av.assignment_id AND au.flag = 1
+			INNER JOIN zw_m_assignment_group ag ON ag.assignment_id = au.assignment_id AND ag.flag = 1
+			WHERE av.flag =1
+			) OR id IN (
+			SELECT tg.id FROM zw_m_thing_info tg
+			WHERE tg.flag = 1
+			AND NOT EXISTS (SELECT 1 FROM zw_m_assignment_vehicle av1 WHERE av1.vehicle_id=tg.id AND av1.flag = 1)
+			)
+		   )
+		 GROUP BY t.create_data_time DESC,t.id DESC
+	</select>
+    <select id="findAllThingConfig" resultType="com.zw.platform.domain.infoconfig.dto.ConfigMonitorDTO">
+		SELECT t.id as monitorId, t.thing_number as monitorName,c.id AS configId,t.group_id
+		FROM zw_m_thing_info t
+				 LEFT JOIN zw_m_config c on c.vehicle_id = t.id  and c.flag = 1
+		WHERE t.flag = 1
+	</select>
+
+	<select id="findIdAndNumbersByNumbers" resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		SELECT id, thing_number
+		FROM zw_m_thing_info WHERE flag = 1
+		<if test="numbers != null and numbers.size > 0">
+			and binary thing_number in
+			<foreach item="item" collection="numbers" separator="," open="(" close=")">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="getByIds" resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+		select id, name, thing_number, group_id, category, type, label, model, material, weight, spec, manufacture,
+		dealer, place, product_date, thing_photo, remark, thing_icon
+		from zw_m_thing_info
+		where flag = 1
+		and id in
+		<foreach collection="ids" separator="," item="id" open="(" close=")">
+			#{id}
+		</foreach>
+	</select>
+
+	<update id="updateGroupIdByIdIn">
+		UPDATE zw_m_thing_info
+		SET group_id = #{groupId}
+		WHERE id IN
+		<foreach collection="thingIds" separator="," item="id" open="(" close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

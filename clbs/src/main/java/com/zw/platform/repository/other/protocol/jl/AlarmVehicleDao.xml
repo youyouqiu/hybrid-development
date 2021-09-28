@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zw.platform.repository.other.protocol.jl.AlarmVehicleDao">
+
+    <insert id="insertBatchAlarmUploadRecord"
+            parameterType="com.zw.platform.domain.other.protocol.jl.dto.AlarmVehicleDO">
+        INSERT INTO zw_m_alarm_vehicle
+        (id,
+        monitor_id,
+        monitor_name,
+        start_time,
+        end_time,
+        alarm_type,
+        alarm_status,
+        plate_color,
+        group_name,
+        upload_time,
+        upload_state,
+        operator,
+        error_msg)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.monitorId},
+            #{item.monitorName},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.alarmType},
+            #{item.alarmStatus},
+            #{item.plateColor},
+            #{item.groupName},
+            #{item.uploadTime},
+            #{item.uploadState},
+            #{item.operator},
+            #{item.errorMsg}
+            )
+        </foreach>
+    </insert>
+
+    <select id="listAlarmVehicleUploadRecord"
+            parameterType="com.zw.platform.domain.other.protocol.jl.query.AlarmVehiclePageReq"
+            resultType="com.zw.platform.domain.other.protocol.jl.dto.AlarmVehicleDO">
+        select zmav.*
+        from zw_m_alarm_vehicle zmav
+        where zmav.upload_time BETWEEN #{uploadStartDate} and #{uploadEndDate}
+        <if test="monitorIds != null and monitorIds.size() > 0">
+            and zmav.monitor_id in
+            <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+                #{monitorId}
+            </foreach>
+        </if>
+        <if test="uploadState != null">
+            and zmav.upload_state = #{uploadState}
+        </if>
+        <if test="alarmType != null">
+            and zmav.alarm_type = #{alarmType}
+        </if>
+        <if test="alarmHandleStatus != null">
+            and zmav.alarm_status = #{alarmHandleStatus}
+        </if>
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and zmav.monitor_name like #{simpleQueryParam}
+        </if>
+        order by upload_time desc
+    </select>
+</mapper>

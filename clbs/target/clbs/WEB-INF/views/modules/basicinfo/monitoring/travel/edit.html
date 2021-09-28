@@ -1,0 +1,98 @@
+<form th:action="@{/cb/vehicle/travel/edit.gsp}" id="editForm" th:object="${result}"
+      role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改行程单号</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" id="tId" type="text" hidden="true"/>
+                <input th:value="*{travelId}" id="oldTravelId" type="text" hidden="true"/>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 行程单号：</label>
+                    <div class="col-md-4">
+                        <input name="travelId" th:field="*{travelId}" onblur="this.value=this.value.toUpperCase()" placeholder="请输入行程单号" type="text" id="travelId"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 车牌号：</label>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" th:value="*{brand}" class="form-control"
+                                   id="brand" placeholder="- 请选择客车车牌号 -"
+                                   onkeyup="this.value=this.value.replace(/(^\s+)|(\s+$)/g,'')">
+                            <div class="input-group-btn">
+                                <button id="objectMonitoring" type="button" style="margin-bottom: 0"
+                                        class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                        data-toggle="dropdown">
+                                    <i class="fa fa-spinner loading-state"></i>
+                                </button>
+                                <ul id="charNumList" class="dropdown-menu dropdown-menu-right"
+                                    role="menu" style="right:0;width:100%!important;min-width:100%;max-width:100%;">
+                                </ul>
+                            </div>
+                        </div>
+                        <input id="vehicleId" th:field="*{vehicleId}" name="vehicleId" class="hidden">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">开始时间：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择开始时间"
+                               id="startTime" autocomplete="off" th:field="*{startTime}" name="startTime"/>
+                    </div>
+                    <label class="col-md-2 control-label">结束时间：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择结束时间"
+                               id="endTime" autocomplete="off" th:field="*{endTime}" name="endTime"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">地点：</label>
+                    <div class="col-md-4">
+                        <input name="address" th:field="*{address}" placeholder="请输入地点" type="text" id="address"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">行程内容：</label>
+                    <div class="col-md-10">
+                        <textarea name="travelContent" th:field="*{travelContent}" type="text" class="form-control"
+                                  rows="8" placeholder="请输入行程内容（500字以内）"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input name="remark" th:field="*{remark}" placeholder="请输入备注" type="text" id="remark"
+                               class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doEditSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var travelIdExists = [[#{vehicleTravel.travelId.exists}]];
+    var travelIdNull = [[#{vehicleTravel.travelId.null}]];
+    var vehicleBrand = [[#{vehicleInsurance.brand}]];
+    var vehicleTime = [[#{vehicleTravel.time}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var publicSize500 = [[#{public.size500.length}]];
+</script>
+<script src="/resources/js/vehicleTravelEdit.js" th:src="@{/resources/js/vehicleTravelEdit.js}"></script>

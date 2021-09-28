@@ -1,0 +1,79 @@
+<form th:action="@{/c/user/batchEdit.gsp}"
+      id="batchEditForm" role="form" action="#" class="form-horizontal"
+      method="post">
+    <div class="modal-header">
+        <button type="button" id="doXEdit" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改用户</h4>
+        <style>
+            .form-control[disabled] {
+                cursor: not-allowed !important;
+                background-color: #eee !important;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">用户名：</label>
+                    <div class="col-md-7">
+                        <input readonly class="form-control" id="currentName"/>
+                        <input type="hidden" name="userId" id="userIds"/>
+                        <input type="hidden" name="userName" id="userNames"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"> 密码：</label>
+                    <div class="col-md-7">
+                        <input id="passwordEdit" name="password" placeholder="请输入密码，长度8-25位，必须包含字母、数字和特殊字符（不含空格）中的两者" class="form-control"
+                               autocomplete="off" type="password"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger"></label> 状态：</label>
+                    <div class="col-md-7">
+                        <select class="form-control" name="state">
+                            <option value="">请选择状态</option>
+                            <option value="1">启用</option>
+                            <option value="0">停用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">授权截止日期：</label>
+                    <div class="col-md-7">
+                        <input name="authorizationDate" class="form-control layer-date laydate-icon"
+                               placeholder="请选择授权截止日期" style="background-color: #fff"
+                               readonly id="authorizationDateEdit"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var passWordNull = [[#{password.null}]];
+    var passwordMinLength = [[#{password.minLength}]];
+    var passwordCompareNull = [[#{password.compare.null}]];
+    var publicMinSize2Length = [[#{ public.minSize2.length}]];
+    var publicSelectGroupNull = [[#{public.selectGroup.null}]];
+    var publicMinSize6Length = [[#{public.minSize6.length}]];
+    var publicSize25 = [[#{public.size25.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize60 = [[#{public.size60.length}]];
+    var publicNull = [[#{public.null}]];
+    var publicEditSuccess = [[#{public.edit.success}]];
+    var publicEditError = [[#{public.edit.error}]];
+</script>
+<script src="/clbs/resources/js/batchUserEdit.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

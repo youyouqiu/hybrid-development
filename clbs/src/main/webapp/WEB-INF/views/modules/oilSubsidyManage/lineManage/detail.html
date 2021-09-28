@@ -1,0 +1,403 @@
+<form th:object="${result}" th:action="@{/m/line/manage/add}" id="addForm" role="form" action="#" method="post"
+    class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">线路详情</h4>
+    </div>
+    <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+        id="avoidRepeatSubmitToken">
+    <input class="form-control hidden" name="direction" id="direction" />
+    <input class="form-control hidden" name="reslutDataId" th:value="${result}" id="reslutDataId" />
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 对接码组织：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input class="form-control" disabled id="zTreeCitySel" placeholder="请选择所属企业"
+                            style="background-color: #fafafa; cursor: pointer;" type="text" autocomplete="off" />
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                            aria-hidden="true"></span>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <input id="selectGroup" name="dockingCodeOrgId" type="text" hidden="true" />
+                        <label id="error_label_add" class="error" style="display: none;"></label>
+                    </div>
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 线路标识：</label>
+                    <div class="col-md-4">
+                        <input name="identify" disabled maxlength="30" placeholder="请输入线路标识" type="text"
+                            class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 线路名称：</label>
+                    <div class="col-md-4">
+                        <input name="name" disabled placeholder="请输入线路名称" type="text" class="form-control" />
+                    </div>
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 线路类别：</label>
+                    <div class="col-md-4">
+                        <select class="form-control" name="lineType" id="lineType" disabled>
+                            <option value="0">干线线路</option>
+                            <option value="1">支线线路</option>
+                            <option value="2">快线线路</option>
+                            <option value="3">高峰线路</option>
+                            <option value="4">夜间线路</option>
+                            <option value="5">快速公共汽车线路</option>
+                            <option value="9">其它</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注：</label>
+                    <div class="col-md-4">
+                        <input disabled id="remarkAdd" name="remark" rows="1" placeholder="请输入描述"
+                            class="form-control"></input>
+                    </div>
+                </div>
+                <div>
+                    <div class="panel-heading">
+                        <div class="dropdown  fwb">
+                            <ul class="nav nav-tabs" style="font-size: 16px;">
+                                <li class="active" id="TabFenceBox"><a href="#home1" data-toggle="tab">下行</a></li>
+                                <li id="TabCarBox"><a href="#profile1" data-toggle="tab">上行</a></li>
+                            </ul>
+                            <div>
+                                <div class="panel-body" style="padding-top: 12px !important; ">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active isDevice" id="home1">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label"><label
+                                                            class="text-danger">*</label> 下行起点站名：</label>
+                                                    <div class="col-md-4">
+                                                        <!-- <input name="downStart" placeholder="请选择线路起点站" type="text"
+															class="form-control" /> -->
+                                                        <select disabled name="firstStationId" placeholder="请选择线路起点站"
+                                                            class="form-control">
+                                                        </select>
+                                                    </div>
+                                                    <label class="col-md-2 control-label"><label
+                                                            class="text-danger">*</label> 下行终点站名：</label>
+                                                    <div class="col-md-4">
+                                                        <!-- <input name="downEND" placeholder="请选择线路终点站" type="text"
+															class="form-control" /> -->
+                                                        <select disabled name="lastStationId" placeholder="请选择线路起点站"
+                                                            class="form-control">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group contentHeader">
+                                                    <div class="col-md-12 control-label text-right">
+                                                        <span id="transportCertificate" class="info-span"
+                                                            style="cursor: pointer;">
+                                                            <font>隐藏信息</font><span class="fa fa-chevron-up"
+                                                                aria-hidden="true"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div id="transportCertificate-content" class="content"
+                                                    style="display: block">
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 下行里程(千米)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="mile" placeholder="请输入里程,单位千米"
+                                                                type="text" class="form-control" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 下行线路站距(米)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="distance" placeholder="请输入线路平均站距,单位米"
+                                                                type="text" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 夏季首班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="summerFirstTrainTime"
+                                                                placeholder="请选择夏季首班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='summerFirstTrainTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 夏季末班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="summerLastTrainTime"
+                                                                placeholder="请选择夏季末班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='summerLastTrainTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 冬季首班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="winterFirstTrainTime"
+                                                                placeholder="请选择冬季首班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='winterFirstTrainTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 冬季末班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="winterLastTrainTime"
+                                                                placeholder="请选择冬季末班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='winterLastTrainTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 早高峰起始时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="morningPeakStartTime"
+                                                                placeholder="请选择早高峰起始时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='morningPeakStartTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 早高峰结束时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="morningPeakEndTime"
+                                                                placeholder="请选择早高峰结束时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='morningPeakEndTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 晚高峰起始时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="eveningPeakStartTime"
+                                                                placeholder="请选择晚高峰起始时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='eveningPeakStartTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 晚高峰结束时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="eveningPeakEndTime"
+                                                                placeholder="请选择晚高峰结束时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='eveningPeakEndTime'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 高峰发车间隔(秒)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="peakDepartureInterval"
+                                                                placeholder="请输入高峰发车间隔,单位为秒,如180" type="text"
+                                                                class="form-control" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 非高峰发车间隔(秒)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="offPeakDepartureInterval"
+                                                                placeholder="请输入非高峰发车间隔,单位为秒,如600" type="text"
+                                                                class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>下行站点信息编辑</div>
+                                            <div class="stationTable" id='station-line-manage-table'>
+                                                <div class="station-title-line">
+                                                    <!-- <div class="station-title">操作</div> -->
+                                                    <div class="station-title">站序号</div>
+                                                    <div class="station-title">站点名称(编号)</div>
+                                                    <div class="station-title">经度</div>
+                                                    <div class="station-title">纬度</div>
+                                                    <div class="station-title">站点描述</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane isDevice" id="profile1">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label"><label
+                                                            class="text-danger">*</label> 上行起点站名：</label>
+                                                    <div class="col-md-4">
+                                                        <!-- <input name="name" placeholder="请选择线路起点站" type="text"
+															class="form-control" /> -->
+                                                        <select disabled name="firstStationId2" placeholder="请选择线路起点站"
+                                                            class="form-control">
+                                                        </select>
+                                                    </div>
+                                                    <label class="col-md-2 control-label"><label
+                                                            class="text-danger">*</label> 上行终点站名：</label>
+                                                    <div class="col-md-4">
+                                                        <!-- <input name="name" placeholder="请选择线路终点站" type="text"
+															class="form-control" /> -->
+                                                        <select disabled name="lastStationId2" placeholder="请选择线路起点站"
+                                                            class="form-control">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group contentHeader">
+                                                    <div class="col-md-12 control-label text-right">
+                                                        <span id="transportCertificate-up" class="info-span-up"
+                                                            style="cursor: pointer;">
+                                                            <font>隐藏信息</font><span class="fa fa-chevron-up"
+                                                                aria-hidden="true"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div id="transportCertificate-up-content" class="content"
+                                                    style="display: block">
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 上行里程(千米)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="mile2" placeholder="请输入里程,单位千米"
+                                                                type="text" class="form-control" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 上行线路站距(米)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="distance2" placeholder="请输入线路平均站距,单位米"
+                                                                type="text" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 夏季首班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="summerFirstTrainTime2"
+                                                                placeholder="请选择夏季首班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='summerFirstTrainTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 夏季末班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="summerLastTrainTime2"
+                                                                placeholder="请选择夏季末班发车时间："
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='summerLastTrainTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 冬季首班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="winterFirstTrainTime2"
+                                                                placeholder="请选择冬季首班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='winterFirstTrainTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 冬季末班发车时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="winterLastTrainTime2"
+                                                                placeholder="请选择冬季首班发车时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='winterLastTrainTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 早高峰起始时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="morningPeakStartTime2"
+                                                                placeholder="请选择早高峰起始时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='morningPeakStartTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 早高峰结束时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="morningPeakEndTime2"
+                                                                placeholder="请选择早高峰结束时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='morningPeakEndTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 晚高峰起始时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="eveningPeakStartTime2"
+                                                                placeholder="请选择晚高峰起始时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='eveningPeakStartTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 晚高峰结束时间：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled id="eveningPeakEndTime2"
+                                                                placeholder="请选择晚高峰结束时间"
+                                                                class='form-control layer-date laydate-icon'
+                                                                name='eveningPeakEndTime2'
+                                                                style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 高峰发车间隔(秒)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="peakDepartureInterval2"
+                                                                placeholder="请输入高峰发车间隔,单位为秒,如180" type="text"
+                                                                class="form-control" />
+                                                        </div>
+                                                        <label class="col-md-2 control-label"><label
+                                                                class="text-danger">*</label> 非高峰发车间隔(秒)：</label>
+                                                        <div class="col-md-4">
+                                                            <input disabled name="offPeakDepartureInterval2"
+                                                                placeholder="请输入非高峰发车间隔,单位为秒,如600" type="text"
+                                                                class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div>上行站点信息编辑</div>
+                                            <div class="stationTable" id='station-line-manage-table-up'>
+                                                <div class="station-title-line">
+                                                    <div class="station-title">站序号</div>
+                                                    <div class="station-title">站点名称(编号)</div>
+                                                    <div class="station-title">经度</div>
+                                                    <div class="station-title">纬度</div>
+                                                    <div class="station-title">站点描述</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <!-- <button id="doSubmitAdd" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button> -->
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script src="/resources/js/oilSubsidyManage/lineManageDetail.js"
+    th:src="@{/resources/js/oilSubsidyManage/lineManageDetail.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

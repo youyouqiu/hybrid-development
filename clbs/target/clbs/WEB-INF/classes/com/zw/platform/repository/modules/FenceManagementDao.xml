@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.FenceManagementDao">
+    <insert id="addFenceType">
+        insert zw_m_fence_type(id, fence_type_name, color_code, transparency, draw_way, remark, flag, create_data_time,
+                               create_data_username,group_id)
+        values (#{id}, #{fenceTypeName}, #{colorCode}, #{transparency}, #{drawWay}, #{remark}, #{flag},
+                #{createDataTime},
+                #{createDataUsername},#{groupId})
+    </insert>
+
+    <insert id="saveUserFenceDisplaySet" parameterType="com.zw.platform.domain.regionmanagement.UserFenceDisplaySet">
+        insert into zw_m_user_defined_setting
+        (id, relation_id, user_id, mark, flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ( #{item.id}, #{item.relationId}, #{item.userId}, #{item.mark}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <update id="updateFenceType" parameterType="com.zw.platform.domain.regionmanagement.FenceTypeFrom">
+        update zw_m_fence_type
+        SET fence_type_name      = #{fenceTypeName},
+            color_code           = #{colorCode},
+            transparency         = #{transparency},
+            draw_way             = #{drawWay},
+            remark               = #{remark},
+            update_data_time     = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteFenceTypeByFenceTypeId">
+        update zw_m_fence_type
+        set flag = 0
+        where id = #{fenceTypeId}
+    </update>
+    <update id="updateFenceArea" parameterType="com.zw.platform.domain.functionconfig.form.ManageFenceFrom">
+        update zw_m_fence_info
+        set area = #{area}
+        where shape = #{shape}
+          and flag = 1
+    </update>
+
+    <update id="deleteUserFenceDisplaySet">
+        update zw_m_user_defined_setting
+        set flag = 0
+        where user_id = #{userId}
+    </update>
+
+    <select id="getFenceTypeInfoByFenceTypeId" resultType="com.zw.platform.domain.regionmanagement.FenceTypeInfo">
+        select zmft.*, GROUP_CONCAT(DISTINCT zmfi.type) as alreadyDrawFence
+        from zw_m_fence_type zmft
+                 left join zw_m_fence_info zmfi on zmft.id = zmfi.fence_type_id and zmfi.flag = 1
+        where zmft.flag = 1
+          and zmft.id = #{fenceTypeId}
+        group by zmft.id
+    </select>
+
+    <select id="getFenceTypeInfoByFenceTypeName"
+            resultType="com.zw.platform.domain.regionmanagement.FenceTypeInfo">
+        select *
+        from zw_m_fence_type
+        where flag = 1
+          and fence_type_name = #{fenceTypeName}
+    </select>
+
+    <select id="getAllFenceType" resultType="com.zw.platform.domain.regionmanagement.FenceTypeInfo">
+        select *
+        from zw_m_fence_type
+        where flag = 1
+        order by create_data_time
+    </select>
+
+    <select id="getFenceTypeList" resultType="com.zw.platform.domain.regionmanagement.FenceTypeInfo">
+        select *
+        from zw_m_fence_type
+        where flag = 1
+        and group_id IN
+        <foreach item="item" collection="organizationIdList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by create_data_time
+    </select>
+
+    <select id="getAlreadyDrawFenceByFenceTypeId" resultType="java.lang.String">
+        SELECT distinct type
+        FROM zw_m_fence_info
+        WHERE fence_type_id = #{fenceTypeId}
+          AND flag = 1
+    </select>
+
+    <select id="getFenceInfoList" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+        select zmfi.id, zmfi.type, zmfi.shape, fence.name as fenceName, zmfi.fence_type_id, zmfi.area
+        from zw_m_fence_info zmfi
+        inner join
+        (
+        select zmp.id, zmp.name, zmp.group_id
+        from zw_m_polygon zmp
+        where zmp.flag = 1
+        UNION ALL
+        select zmc.id, zmc.name, zmc.group_id
+        from zw_m_circle zmc
+        where zmc.flag = 1
+        UNION ALL
+        select zml.id, zml.name, zml.group_id
+        from zw_m_line zml
+        where zml.flag = 1
+        UNION ALL
+        select zmm.id, zmm.name, zmm.group_id
+        from zw_m_marker zmm
+        where zmm.flag = 1
+        UNION ALL
+        select zma.id, zma.name, zma.group_id
+        from zw_m_administration zma
+        where zma.flag = 1
+        ) fence on zmfi.shape = fence.id
+        where zmfi.flag = 1
+        and zmfi.fence_type_id is not null
+        <if test="fenceTypeId != null and fenceTypeId != ''">
+            and zmfi.fence_type_id = #{fenceTypeId}
+        </if>
+        <if test="organizationIdList != null and organizationIdList.size > 0">
+            AND fence.group_id IN
+            <foreach item="item" collection="organizationIdList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY zmfi.create_data_time
+    </select>
+
+    <select id="getFenceInfo" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+        select zmfi.type, zmfi.shape, fence.name as fenceName, zmfi.fence_type_id, zmfi.area
+        from zw_m_fence_info zmfi
+                 inner join
+             (
+                 select zmp.id, zmp.name, zmp.group_id
+                 from zw_m_polygon zmp
+                 where zmp.flag = 1
+                 UNION ALL
+                 select zmc.id, zmc.name, zmc.group_id
+                 from zw_m_circle zmc
+                 where zmc.flag = 1
+                 UNION ALL
+                 select zml.id, zml.name, zml.group_id
+                 from zw_m_line zml
+                 where zml.flag = 1
+                 UNION ALL
+                 select zmm.id, zmm.name, zmm.group_id
+                 from zw_m_marker zmm
+                 where zmm.flag = 1
+                 UNION  ALL
+                 select zma.id, zma.name, zma.group_id
+                   from zw_m_administration zma
+                  where zma.flag = 1
+             ) fence on zmfi.shape = fence.id
+        where zmfi.flag = 1
+          and zmfi.fence_type_id = #{fenceTypeId}
+          and fence.name = #{fenceName}
+    </select>
+
+    <select id="getFenceRelationSchedulingInfoList"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+        select DISTINCT zmsi.*
+        from zw_m_scheduled_item_info zmsii
+                 inner join zw_m_scheduled_info zmsi on zmsi.id = zmsii.scheduled_info_id and zmsi.flag = 1
+                 inner join zw_m_fence_info zmfi on zmfi.shape = zmsii.fence_info_id and zmfi.flag = 1
+        where zmsii.flag = 1
+          and zmfi.shape = #{fenceId}
+    </select>
+
+    <select id="getFenceRelationTaskInfoList" resultType="com.zw.platform.domain.taskmanagement.TaskInfo">
+        select DISTINCT zmti.*
+        from zw_m_task_item_info zmtii
+                 inner join zw_m_task_info zmti on zmti.id = zmtii.task_id and zmti.flag = 1
+                 inner join zw_m_fence_info zmfi on zmfi.shape = zmtii.fence_info_id and zmfi.flag = 1
+        where zmtii.flag = 1
+          and zmfi.shape = #{fenceId}
+    </select>
+
+    <select id="getFenceInfoByFenceId" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+        select zmfi.type, zmfi.shape, fence.name as fenceName, zmfi.fence_type_id, zmfi.area
+        from zw_m_fence_info zmfi
+                 inner join
+             (
+                 select zmp.id, zmp.name, zmp.group_id
+                 from zw_m_polygon zmp
+                 where zmp.flag = 1
+                 UNION ALL
+                 select zmc.id, zmc.name, zmc.group_id
+                 from zw_m_circle zmc
+                 where zmc.flag = 1
+                 UNION ALL
+                 select zml.id, zml.name, zml.group_id
+                 from zw_m_line zml
+                 where zml.flag = 1
+                 UNION ALL
+                 select zmm.id, zmm.name, zmm.group_id
+                 from zw_m_marker zmm
+                 where zmm.flag = 1
+             ) fence on zmfi.shape = fence.id
+        where zmfi.flag = 1
+          and zmfi.shape = #{fenceId}
+    </select>
+
+    <select id="getFenceRelationDesignateInfoList"
+            resultType="com.zw.platform.domain.taskmanagement.DesignateInfo">
+        select zmdi.id,
+               zmdi.task_id,
+               zmdi.start_date,
+               zmdi.end_date,
+               zmdi.date_duplicate_type,
+               zmtii.start_time,
+               zmtii.end_time
+        from zw_m_designate_info zmdi
+                 inner join zw_m_task_info zmti on zmti.id = zmdi.task_id and zmti.flag = 1
+                 inner join zw_m_task_item_info zmtii on zmtii.task_id = zmti.id and zmtii.flag = 1
+                 inner join zw_m_fence_info zmfi on zmfi.shape = zmtii.fence_info_id and zmfi.flag = 1
+        where zmdi.flag = 1
+          and zmfi.shape = #{id}
+    </select>
+
+    <select id="getUserFenceDisplaySetting" resultType="java.lang.String">
+        select zmuds.relation_id
+        from zw_m_user_defined_setting zmuds
+        where zmuds.flag = 1
+          and zmuds.user_id = #{id}
+    </select>
+
+    <select id="findSettingFenceInfo" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+        SELECT
+        DISTINCT fen.id as id,
+        fen.type as type,
+        fen.shape as shape
+        FROM
+        zw_m_fence_info fen
+        LEFT JOIN zw_m_user_defined_setting setting ON setting.relation_id = fen.shape
+        WHERE
+        fen.flag = 1
+        AND setting.flag = 1 and setting.mark=1
+        AND setting.user_id = #{userId}
+    </select>
+
+    <update id="deleteFenceInfo">
+        update zw_m_fence_info
+        set flag = 0
+        where shape = #{fenceId}
+    </update>
+
+</mapper>

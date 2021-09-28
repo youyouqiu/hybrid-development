@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>F3高精度报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}"/>
+    <style>
+        .has-feedback-q i.delIcon {
+            right: 45px;
+        }
+        #modal-q {
+            width: 340px;
+            font-weight: normal;
+            text-align: left;
+            padding: 30px;
+            line-height: 30px;
+        }
+        #modal-q>div {
+            line-height: 40px;
+        }
+        #modal-q .modal-body {
+            padding: 10px 30px;
+        }
+        #modal-q .modal-footer {
+            border: none;
+            padding: 10px 30px;
+        }
+        #modal-q input {
+            width: 70px;
+            height: 30px;
+        }
+        #travelTimeq1,#idleTimeq1,#mileageq1,#fuelq1 {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">传感器报表</li>
+                        <li class="active">F3高精度报表</li>
+                    </ul>
+                    <h1 class="h1 ">F3高精度报表</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <input id="vehicleList" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <div class="col-md-5 noPadding">
+                                        <label class="col-md-2 control-label">组织：</label>
+                                        <input class="form-control hidden" />
+                                        <div class="col-md-10  has-feedback has-feedback-q">
+                                            <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                <option value="vehicle">监控对象</option>
+                                                <option value="group">企业</option>
+                                                <option value="assignment">分组</option>
+                                            </select>
+                                            <input style="cursor: pointer; background-color: #fafafa;" type="text" placeholder="请选择" maxlength="20" class="form-control moreQueryGroup" id="groupSelect" name="groupSelect" autocomplete="off">
+                                            <span class="fa fa-chevron-down form-control-feedback" aria-hidden="true" id="groupSelectSpan"></span>
+
+                                            <div id="menuContent" class="menuContent">
+                                                <ul id="treeDemo" class="ztree"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 noPadding">
+                                        <label class="col-md-2 control-label searchListSelect">时间：</label>
+                                        <div class="col-md-10 searchListSelect">
+                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                   class="form-control layer-date laydate-icon"
+                                                   id="timeInterval" name="timeInterval" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <button id="todayClick" type="button" class="btn btn-primary"
+                                                onclick="oilstatiscal.inquireClick(0)"
+                                        >今天</button>
+                                        <button id="yesterdayClick" type="button"
+                                                class="btn btn-primary"
+                                                onclick="oilstatiscal.inquireClick(-1)"
+                                        >前一天
+                                        </button>
+                                        <button id="nearlyThreeDays" type="button"
+                                                class="btn btn-primary"
+                                                onclick="oilstatiscal.inquireClick(-3)"
+                                        >前三天
+                                        </button>
+                                        <button id="nearlySevenDays" type="button"
+                                                class="btn btn-primary"
+                                                onclick="oilstatiscal.inquireClick(-7)"
+                                        >前七天
+                                        </button>
+                                        <button id="inquireClick" type="button"
+                                                class="btn btn-primary search-btn"
+                                                onclick="oilstatiscal.inquireClick()"
+                                        ><i class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                        <button id="exportBtn"
+                                                type="button" class="btn btn-purple">
+                                            <i class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" id="graphArea">
+                        <div class="panel-heading" id="graphShowq">
+                            <h3 class="panel-title fwb" style="position:reative">图形展示
+                                <div class="carName">
+                                    <i class="toopTip-btn-left" onclick="oilstatiscal.left_arrow()">
+                                        <img data-toggle="tooltip"
+                                             data-placement="left"
+                                             title="上一辆"
+                                             src="/clbs/resources/img/car-left.svg"
+                                             width="16px"/></i>&nbsp;&nbsp;&nbsp;
+                                    <span id="carName" data-toggle="tooltip" data-placement="top" title="车牌号"></span>&nbsp;&nbsp;&nbsp;<i
+                                        class="toopTip-btn-right" onclick="oilstatiscal.right_arrow()"><img
+                                        data-toggle="tooltip" data-placement="right" title="下一辆"
+                                        src="/clbs/resources/img/car-right.svg" width="16px"/></i></div>
+                            </h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down" id="graphShowq-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="display:none;" id="graphShowq-body">
+                            <div class="container-area">
+                                <div id="sjcontainer" style="height: 600px;width:1620px; margin: 0 auto"></div>
+                            </div>
+                            <div class="col-md-12 item-title">
+                                <ul>
+                                    <li>电压最高值：<span id="travelTimeq">- V</span></li>
+                                    <li>电压最低值：<span id="idleTimeq">- V</span></li>
+                                    <li>打火电压阈值：<span id="mileageq">- V</span></li>
+                                    <li>熄火电压阈值：<span id="fuelq">- V</span></li>
+                                    <li>
+                                        <button type="button" class="btn btn-primary btn-lg hide" data-toggle="modal" data-target="#myModal">
+                                            设置电压阈值
+                                        </button>
+                                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                            <div class="modal-dialog" role="document" id="modal-q">
+                                                <div class="modal-content">
+                                                    <div class="modal-body">
+                                                        <div>电压最高值：<span id="travelTimeq1">- V</span></div>
+                                                        <div>电压最低值：<span id="idleTimeq1">- V</span></div>
+                                                        <div>打火电压阈值：<input type="value" id="mileageq1" />- V</div>
+                                                        <div>熄火电压阈值：<input type="value" id="fuelq1" />- V</div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-primary" id="model-setq">保存下发</button>
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal" id="model-closeq">关闭</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="strenchTable">
+                            <h3 class="panel-title fwb">F3终端状态列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="strenchTable-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body form-horizontal" id="strenchTable-body">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                </div>
+                            </div>
+                            <div style="overflow:auto">
+                                <table id="oilTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                       cellspacing="0"
+                                       width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>监控对象</th>
+                                        <th>分组</th>
+                                        <th>时间</th>
+                                        <th>速度</th>
+                                        <th>电压</th>
+                                        <th>电量</th>
+                                        <th>气压值</th>
+                                        <th>电压有效性</th>
+                                        <th>ACC有效性</th>
+                                        <th>发动机状态</th>
+                                        <th>行驶状态</th>
+                                        <th>通讯类型</th>
+                                        <th>运营商</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var selectMonitoringObjec = [[#{select.monitoring.objec}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var publicError = [[#{public.error}]];
+    var systemLoadingTimout = [[#{system.loading.timout}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="resources/js/dataTables/js/dataTablesBootstrap.js"
+        th:src="@{/resources/js/dataTables/js/dataTablesBootstrap.js}"></script>
+<!-- <script type="text/javascript" src="/wro/oilquantitystatistics.js" th:src="@{/wro/oilquantitystatistics.js}"></script> -->
+<script type="text/javascript" src="/resources/js/echarts-4.1.js"
+        th:src="@{/resources/js/echarts-4.1.js}"></script>
+<script type="text/javascript" src="/resources/js/f3hpr.js"
+        th:src="@{/resources/js/f3hpr.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+</html>
+<style>
+    #oilTable tr td {
+        cursor: pointer;
+    }
+</style>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.MileageSensorDao">
+
+    <!-- 根据查询条件查询信息 -->
+    <select id="findByQuery" parameterType="com.zw.platform.domain.vas.mileageSensor.MileageSensorQuery"
+            resultType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        select
+        t.*
+        from zw_m_mileage_sensor t
+        WHERE flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (sensor_type LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+            OR remark LIKE BINARY CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time desc,id DESC
+    </select>
+
+    <!-- 根据查询条件查询信息 -->
+    <select id="findAll"
+            resultType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        select
+        t.*
+        from zw_m_mileage_sensor t
+        WHERE flag = 1
+        ORDER BY t.sensor_type asc
+    </select>
+
+
+    <!--  根据ID查询MileageSensor -->
+    <select id="checkConfig" parameterType="string"  resultType="String">
+        SELECT c.sensor_type FROM zw_m_mileage_sensor c
+        INNER JOIN zw_m_mileage_sensor_config sc on sc.mileage_sensor_id=c.id and sc.flag=1
+        WHERE c.flag = 1 AND c.id = #{id} GROUP BY c.sensor_type
+    </select>
+
+    <!--  根据ID查询MileageSensor -->
+    <select id="findById" parameterType="string"  resultType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        SELECT * FROM zw_m_mileage_sensor WHERE flag = 1 AND id = #{id}
+    </select>
+    <!--  根据sensorType查询MileageSensor -->
+    <select id="findBySensorType" parameterType="string"  resultType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        SELECT * FROM zw_m_mileage_sensor WHERE flag = 1 AND sensor_type = BINARY #{sensorType}
+    </select>
+
+
+
+
+    <!-- 新增MileageSensor -->
+    <insert id="addMileageSensor" parameterType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        INSERT INTO
+        zw_m_mileage_sensor (
+        id, sensor_type, comp_en,
+        parity_check,filter_factor,baud_rate, remark,flag, create_data_time,
+        create_data_username)
+        VALUES
+        (#{id}, #{sensorType}, #{compEn}, #{parityCheck},#{filterFactor}, #{baudRate}, #{remark},
+         #{flag},
+        #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <!-- 批量添加MileageSensor -->
+    <insert id="addBatchMileageSensors" parameterType="java.util.List">
+        INSERT INTO
+        zw_m_mileage_sensor (
+        id, sensor_type, comp_en,
+        parity_check,filter_factor,baud_rate, remark,flag, create_data_time,
+        create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.sensorType}, #{item.compEn}, #{item.parityCheck}
+            , #{item.filterFactor}, #{item.baudRate}, #{item.remark}, #{item.flag},#{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 修改 MileageSensor -->
+    <update id="updateMileageSensor" parameterType="com.zw.platform.domain.vas.mileageSensor.MileageSensor">
+        update zw_m_mileage_sensor
+        set
+        <if test="compEn != null">
+            comp_en = #{compEn},
+        </if>
+        <if test="baudRate != null">
+            baud_rate = #{baudRate},
+        </if>
+        <if test="filterFactor != null">
+            filter_factor = #{filterFactor},
+        </if>
+        <if test="parityCheck != null">
+            parity_check = #{parityCheck},
+        </if>
+        <if test="remark != null and remark!=''">
+            remark = #{remark},
+        </if>
+        <if test="sensorType != null and sensorType!=''">
+            sensor_type = #{sensorType},
+        </if>
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where id = #{id}
+    </update>
+
+
+    <!-- 根据id批量删除一个 车辆 -->
+    <update id="deleteBatchMileageSensor">
+        update zw_m_mileage_sensor
+        set flag = 0
+        where flag = 1
+        and id in
+        <foreach item="item" collection="mileageSensorids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="findBindingMonitor" resultType="map" parameterType="map">
+      select v.id,ms.sensor_type as type from zw_m_vehicle_info v
+      INNER JOIN zw_m_mileage_sensor_config msc on v.id = msc.vehicle_id and msc.flag=1
+      INNER JOIN zw_m_mileage_sensor ms on msc.mileage_sensor_id=ms.id and ms.flag=1
+      where v.flag=1
+        <if test="sensorType != null and sensorType!=''">
+            and ms.sensor_type = #{sensorType}
+        </if>
+        <if test="id != null and id!=''">
+            and  ms.id = #{id}
+        </if>
+        AND v.brand NOT LIKE '扫%'
+    </select>
+
+
+</mapper>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewVehicleSubTypeDao">
+    <update id="delete">
+        UPDATE zw_m_vehicle_type
+        SET flag = 0
+        WHERE flag = 1
+          AND id = #{id}
+    </update>
+
+    <select id="getByName" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select id, vehicle_subtypes subType, vehicle_category categoryId, vehicle_type type, description, pid typeId, driving_way,ico_id iconId
+        from zw_m_vehicle_type
+        where flag = 1
+        and pid <![CDATA[ <> ]]> ''
+        and  vehicle_subtypes = #{name}
+        and vehicle_type = #{vehicleType}
+        limit 1
+    </select>
+
+    <select id="getById" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select t.vehicle_category categoryId,c.vehicle_category category,sub.pid typeId, t.vehicle_type type,
+        sub.id, sub.vehicle_subtypes subType,sub.description, sub.driving_way,sub.ico_id iconId, ic.ico_name iconName
+        from zw_m_vehicle_type sub
+        LEFT JOIN zw_m_vehicle_type t on sub.pid = t.id
+        LEFT JOIN  zw_m_vehicle_category c on t.vehicle_category = c.id
+        LEFT JOIN zw_c_ico_config  ic on sub.ico_id = ic.id
+        where sub.flag = 1
+        and sub.pid<![CDATA[ <> ]]> ''
+        and sub.id = #{id}
+    </select>
+
+    <select id="getByIds" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select t.vehicle_category categoryId,c.vehicle_category category,sub.pid typeId, t.vehicle_type type,
+        sub.id, sub.vehicle_subtypes subType,sub.description, sub.driving_way,sub.ico_id iconId, ic.ico_name iconName
+        from zw_m_vehicle_type sub
+        LEFT JOIN zw_m_vehicle_type t on sub.pid = t.id
+        LEFT JOIN zw_m_vehicle_category c on t.vehicle_category = c.id
+        LEFT JOIN zw_c_ico_config ic on sub.ico_id = ic.id
+        where sub.flag = 1
+        and sub.pid<![CDATA[ <> ]]> ''
+        and sub.id in
+        <foreach collection="ids" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getByKeyword" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select t.vehicle_category categoryId,c.vehicle_category category,sub.pid typeId, t.vehicle_type type,
+        sub.id, sub.vehicle_subtypes subType,sub.description, sub.driving_way,sub.ico_id iconId, ic.ico_name iconName
+        from zw_m_vehicle_type sub
+        LEFT JOIN zw_m_vehicle_type t on sub.pid = t.id
+        LEFT JOIN zw_m_vehicle_category c on t.vehicle_category = c.id
+        LEFT JOIN zw_c_ico_config ic on sub.ico_id = ic.id
+        where sub.flag = 1
+        and sub.pid<![CDATA[ <> ]]> ''
+        <if test="_parameter != null and _parameter != ''">
+            and BINARY sub.vehicle_subtypes LIKE CONCAT('%',#{_parameter},'%')
+        </if>
+        ORDER BY sub.create_data_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.VehicleTypeDO">
+        INSERT INTO zw_m_vehicle_type
+        (
+        id,
+        vehicle_category,
+        vehicle_type,
+        description,
+        create_data_time,
+        create_data_username,
+        flag,
+        pid,
+        ico_id,
+        vehicle_subtypes,
+        driving_way,
+        code_num,
+        service_cycle
+        )
+        values (
+        #{id},
+        #{vehicleCategory},
+        #{vehicleType},
+        #{description},
+        now(),
+        #{createDataUsername},
+        #{flag},
+        #{pid},
+        #{icoId},
+        #{vehicleSubtypes},
+        #{drivingWay},
+        #{codeNum},
+        #{serviceCycle}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.VehicleTypeDO">
+        UPDATE zw_m_vehicle_type
+        <set>
+            vehicle_category = #{vehicleCategory},
+            vehicle_type = #{vehicleType},
+            description = #{description},
+            update_data_time = #{updateDataTime},
+            update_data_username = #{updateDataUsername},
+            flag = #{flag},
+            pid = #{pid},
+            ico_id = #{icoId},
+            vehicle_subtypes = #{vehicleSubtypes},
+            driving_way = #{drivingWay},
+            code_num = #{codeNum},
+            service_cycle = #{serviceCycle}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByBatch" parameterType="string">
+        UPDATE zw_m_vehicle_type
+        set flag = 0,
+        update_data_time = now()
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
+    <select id="getVehicleBindTypeList" resultType="string">
+        SELECT DISTINCT vehicle_sub_type_id
+        from zw_m_vehicle_info
+        where flag = 1
+        and vehicle_sub_type_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getByPage" parameterType="com.zw.platform.domain.basicinfo.query.VehicleSubTypeQuery"
+            resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select t.vehicle_category categoryId,c.vehicle_category category,sub.pid typeId, t.vehicle_type type,
+        sub.id, sub.vehicle_subtypes subType,sub.description, sub.driving_way,sub.ico_id iconId, ic.ico_name iconName
+        from zw_m_vehicle_type sub
+        INNER JOIN zw_m_vehicle_type t on sub.pid = t.id
+        INNER JOIN zw_m_vehicle_category c on t.vehicle_category = c.id
+        LEFT JOIN zw_c_ico_config ic on sub.ico_id = ic.id
+        where sub.flag = 1
+        and sub.pid<![CDATA[ <> ]]> ''
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and BINARY sub.vehicle_subtypes LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY sub.create_data_time DESC
+    </select>
+
+    <select id="getByType" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        select t.vehicle_category categoryId,c.vehicle_category category,sub.pid typeId, t.vehicle_type type,
+        sub.id, sub.vehicle_subtypes subType,sub.description, sub.driving_way,sub.ico_id iconId, ic.ico_name iconName
+        from zw_m_vehicle_type sub
+        INNER JOIN zw_m_vehicle_type t on sub.pid = t.id
+        INNER JOIN zw_m_vehicle_category c on t.vehicle_category = c.id
+        LEFT JOIN zw_c_ico_config ic on sub.ico_id = ic.id
+        where sub.flag = 1
+        and sub.pid<![CDATA[ <> ]]> ''
+        and sub.pid = #{vehicleTypeId}
+        ORDER BY sub.create_data_time DESC
+    </select>
+
+    <select id="getByVehicleTypeAndSubType" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        SELECT vt.id,
+               vt.vehicle_subtypes subType,
+               vt.vehicle_category categoryId,
+               vt.vehicle_type     type,
+               vt.description,
+               vt.pid              typeId,
+               vt.driving_way,
+               vt.ico_id           iconId
+        FROM zw_m_vehicle_type vt
+        WHERE vt.flag = 1
+          AND vt.pid IS NOT NULL
+          AND vt.vehicle_type = BINARY #{vehicleType}
+          AND vt.vehicle_subtypes = BINARY #{vehicleSubType}
+    </select>
+
+    <select id="checkVehicleSubTypeIsBinding" resultType="java.lang.Boolean">
+        SELECT COUNT(*)
+        FROM zw_m_vehicle_type vt
+                 INNER JOIN zw_m_vehicle_info vi ON vt.id = vi.vehicle_sub_type_id AND vi.flag = 1
+        WHERE vt.flag = 1
+          AND vt.pid IS NOT NULL
+          AND vt.id = #{id}
+    </select>
+
+    <select id="findByVehicleSubType" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        SELECT vt.id,
+               vt.vehicle_subtypes subType,
+               vt.vehicle_category categoryId,
+               vt.vehicle_type     type,
+               vt.description,
+               vt.pid              typeId,
+               vt.driving_way,
+               vt.ico_id           iconId
+        FROM zw_m_vehicle_type vt
+        WHERE vt.flag = 1
+          AND vt.pid IS NOT NULL
+          AND vt.vehicle_subtypes = #{vehicleSubType}
+    </select>
+
+    <select id="findByVehicleId" resultType="com.zw.platform.basic.dto.VehicleSubTypeDTO">
+        SELECT vt.id,
+               vt.vehicle_subtypes subType,
+               vt.vehicle_category categoryId,
+               vt.vehicle_type     type,
+               vt.description,
+               vt.pid              typeId,
+               vt.driving_way,
+               vt.ico_id           iconId,
+               conf.ico_name AS    iconName
+        FROM zw_m_vehicle_info vei
+                 INNER JOIN zw_m_vehicle_type vt ON vt.id = vei.vehicle_sub_type_id AND vt.flag = 1
+                 INNER JOIN zw_c_ico_config conf ON conf.id = vt.ico_id AND conf.flag = 1
+        WHERE vei.flag = 1
+          AND vei.id = #{vehicleId}
+        GROUP BY vei.id
+    </select>
+
+</mapper>

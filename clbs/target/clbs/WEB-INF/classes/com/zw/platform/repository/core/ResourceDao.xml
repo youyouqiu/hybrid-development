@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.core.ResourceDao">
+
+    <!-- 缓存 <cache type="org.mybatis.caches.ehcache.LoggingEhcache" /> -->
+    <!-- 查询全部 Resource -->
+    <select id="find" resultType="com.zw.platform.domain.core.Resource">
+		SELECT resource.*
+		FROM zw_c_resource resource
+		where resource.flag = 1 OR resource.permission = 'appRegister'
+		ORDER BY resource.sort_order ASC
+	</select>
+
+    <!-- 根据查询条件查询资源 -->
+    <select id="findResource" parameterType="com.zw.platform.domain.core.query.ResourceQuery"
+            resultType="com.zw.platform.domain.core.Resource">
+        SELECT resource.* FROM zw_c_resource resource
+        WHERE flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND resource_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据角色list查询权限 -->
+    <select id="findResourceByRoleIds" resultType="String">
+        SELECT distinct resource.id
+        FROM zw_c_resource resource
+        LEFT JOIN zw_c_role_resource rr ON resource.id = rr.resource_id AND rr.flag = 1
+        WHERE (resource.flag = 1 OR resource.permission = 'appRegister')
+        AND rr.role_id IN
+        <foreach item="item" collection="roleIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY resource.sort_order ASC
+    </select>
+    <!-- 根据角色list查询权限 -->
+    <select id="findResourceListByRoleIds" resultType="com.zw.platform.domain.core.Resource">
+        SELECT distinct resource.*
+        FROM zw_c_resource resource
+        LEFT JOIN zw_c_role_resource rr ON resource.id = rr.resource_id AND rr.flag = 1
+        WHERE (resource.flag = 1 OR resource.permission = 'appRegister')
+        AND rr.role_id IN
+        <foreach item="item" collection="roleIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY resource.sort_order ASC
+    </select>
+
+    <!-- 根据资源id查询资源 -->
+    <select id="findResourceById" resultType="com.zw.platform.domain.core.Resource">
+		SELECT resource.*
+		FROM zw_c_resource resource 
+		WHERE resource.flag = 1
+		AND resource.id = #{id}
+	</select>
+    <!-- 添加资源-->
+    <insert id="addResource" parameterType="com.zw.platform.domain.core.Resource">
+		insert into zw_c_resource (id,icon_cls,resource_name,type,code,perm_value,description,parent_id,sort_order,editable,enabled,
+		create_data_time,create_data_username,code_num,flag,permission) values (#{resource.id},#{resource.iconCls},#{resource.resourceName},#{resource.type},#{resource.code}
+		,#{resource.permValue},#{resource.description},#{resource.parentId},#{resource.sortOrder},#{resource.editable},
+		#{resource.enabled},#{resource.createDataTime},#{resource.createDataUsername},#{resource.codeNum},#{resource.flag},#{resource.permission})
+
+	</insert>
+    <!-- 修改资源-->
+    <update id="update" parameterType="com.zw.platform.domain.core.Resource">
+		update zw_c_resource set resource_name = #{resource.resourceName},icon_cls =#{resource.iconCls},type =#{resource.type}
+		,perm_value =#{resource.permValue},description =#{resource.description},parent_id =#{resource.parentId},sort_order =#{resource.sortOrder}
+		,editable =#{resource.editable},enabled =#{resource.enabled},code_num =#{resource.codeNum},update_data_time =#{resource.updateDataTime}
+		,update_data_username =#{resource.updateDataUsername} where id = #{resource.id}
+	</update>
+    <!-- 逻辑删除-->
+    <update id="updateflag">
+		update zw_c_resource set flag = #{flag} where id = #{id}
+	</update>
+
+    <select id="getReportMenuByNames" resultType="com.zw.lkyw.domain.ReportMenu">
+        select id as id, resource_name as name,perm_value as url from zw_c_resource where flag =1 and resource_name in
+        <foreach item="item" collection="names" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and id not in('923213ba-4ddb-118e-9c2d-af7ae01abcpj','dfd958b6-3fa2-410e-a5c4-3a665a0a21e2')
+    </select>
+
+    <select id="checkAppRegister" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM zw_c_role_resource rs INNER JOIN zw_c_resource cr ON cr.id = rs.resource_id
+        WHERE rs.flag = 1 AND cr.permission = 'appRegister'
+        AND rs.role_id IN
+        <foreach item="item" collection="roleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getIdByNameAndType" parameterType="map" resultType="string">
+		select id from zw_c_resource
+		 where  resource_name =#{resourceName} and type=#{type} and flag =1 order by sort_order
+	</select>
+
+</mapper>

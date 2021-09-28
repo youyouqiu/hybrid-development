@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>领导看板</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" type="text/css" href="resources/css/zhonghuan-show/screen-qy-lg.css" th:href="@{/resources/css/zhonghuan-show/screen-qy-lg.css}" media="screen and (min-width: 1600px)">
+    <link rel="stylesheet" type="text/css" href="resources/css/zhonghuan-show/screen-sm.css" th:href="@{/resources/css/zhonghuan-show/screen-sm.css}" media="screen and (max-width: 1600px)">
+    <link rel="stylesheet" href="resources/css/electronicFence-map.css"  th:href="@{/resources/css/electronicFence-map.css}" />
+    <link rel="stylesheet" href="resources/css/realTimeMonitoring.css"  th:href="@{/resources/css/realTimeMonitoring.css}" />
+    <link rel="stylesheet" href="resources/css/lborg-list.css"  th:href="@{/resources/css/lborg-list.css}" />\
+    <style>
+        #container-box {
+            height: 100%;
+        }
+        .map-box{
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .charts-container {
+            height: 100%;
+            margin: 0;
+        }
+        #mapContainer{
+            width: 100%;
+            height: 100%;
+        }
+        .chart-text .item{
+            width:50%;
+            overflow: hidden;
+        }
+        .chart-text .item .riskLevel{
+            display:inline-block;
+            width:85%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-align: right;
+        }
+        .chart-text .item .chart-icon{
+            float:right;
+            margin-top:4px;
+        }
+        .right-chart{
+            width:70%;
+            float:left;
+        }
+        .left-chart{
+            width:30%;
+            float:left;
+        }
+        #container .sidebar{overflow-y:auto}
+        #container .sidebar::-webkit-scrollbar{width:1px;height:1px;background-color:#28282e}
+        #container .sidebar::-webkit-scrollbar-track{-webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);border-radius:10px;background-color:#f5f5f5}
+        .amap-info-sharp{margin:0 0 0 -8px!important;}
+</style>
+</head>
+<body>
+<section id="container">
+    <input type="hidden" id="vehicleIds" th:value="${vehicleIds}">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper main-content-toggle-left">
+        <div th:replace="fragments/menu_adas">menu</div>
+        <div id="container-box">
+            <!--地图-->
+            <div class="map-box fl" style="padding-bottom:15px;">
+                <div id="mapContainer"></div>
+                <!--//实时风控预警量-->
+                <div id="realTimeWarningNum" class="data-show-box-left">
+                    <p>实时报警数(主动安全)</p>
+                    <p class="warning-number" id="warning-number">
+                        件
+                    </p>
+                </div>
+                <!--昨日报警数-->
+                <div id="yesterdayWarningNum" class="data-show-box-left yesterday-data-show-box-left">
+                    <div class="pull-left">
+                        <p>昨日整天报警数(主动安全)</p>
+                        <p class="warning-number" id="yesterDay-warning-number"></p>
+                    </div>
+                    <div class="pull-left" style="margin-left: 10px;">
+                        <p>
+                            环比
+                            <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="今天0点至此时的主动安全报警数与昨日同时段环比所得"></i>
+                        </p>
+                        <p class="warning-number">
+                            <span id="yesterDay-ratio-up"></span>
+                            <span class="chart-icon"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!--在线车辆-->
+                <div id="onlinePercent" class="data-show-box-right online-data-show-box-right">
+                    <p>
+                        今日上线车辆：<span id="online-now"></span>
+                        &nbsp;&nbsp;上线率：<span id="onlinePercent-now"></span></p>
+                    <p>
+                        昨日上线车辆：<span id="online-yesterday"></span>
+                        &nbsp;&nbsp;上线率：<span id="onlinePercent-yesterday"></span>
+                    </p>
+                </div>
+
+                <div class="top-right-box">
+                    <!--在线车辆-->
+                    <div id="onlineVehicle">
+                        <p>在线车辆</p>
+                        <p class="warning-number" id="online-vehicle-number">
+                            <span></span>辆
+                        </p>
+                    </div>
+
+                    <div  class="tool-box">
+                        <!--工具条-->
+                        <div class = "toolClickArea">
+                            <div id="toolClick" class="toolClick">
+                                <img alt="" src="/clbs/resources/img/tool.svg">
+                            </div>
+                            <div id="toolOperateClick" class="toolOperateClick">
+                                <a class="fenceA" id="mapDropSetting"><i class="map-drop-sett"></i><span>地图设置</span></a>
+                                <a class="fenceA" id="magnifyClick"><i class="map-magnify"></i><span class="mapToolClick">拉框放大</span></a>
+                                <a class="fenceA" id="shrinkClick"><i class="map-shrink"></i><span class="mapToolClick">拉框缩小</span></a>
+                                <a class="fenceA" id="countClick"><i class="map-count"></i><span class="mapToolClick">距离量算</span></a>
+                                <a class="fenceA" id="displayClick"><i class="map-displaySetting"></i><span class="mapToolClick">显示设置</span></a>
+                            </div>
+                        </div>
+                        <!-- 地图设置下拉 -->
+                        <div class="mapDropSettingMenu" id="mapDropSettingMenu">
+                            <p class="m-line">
+                                <input type="checkbox" id="realTimeRC" class="monitoringSelect"/>
+                                <label for="realTimeRC" id="realTimeRCLab" class="monitoringSelect">路况</label>
+                            </p><hr>
+                            <p>
+                                <input type="checkbox" id="defaultMap" class="monitoringSelect"/>
+                                <label for="defaultMap" id="defaultMapLab" class="monitoringSelect">卫星地图</label>
+                            </p><hr>
+                            <p>
+                                <input type="checkbox" id="googleMap" class="monitoringSelect"/>
+                                <label for="googleMap" id="googleMapLab" class="monitoringSelect">谷歌地图</label>
+                            </p>
+                        </div>
+                        <!-- 显示设置下拉 -->
+                        <div class="disSetMenu" id="disSetMenu">
+                            <p>
+                                <input type="checkbox" checked="checked" id="logoDisplay" class="monitoringSelect"/>
+                                <label for="logoDisplay" id="logoDisplayLab" class="monitoringSelect preBlue">标识显示</label>
+                            </p>
+                            <p>
+                                <input type="checkbox" id="weather" class="monitoringSelect"/>
+                                <label for="weather" id="weatherLab" class="monitoringSelect">天气情况</label>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--报表-->
+            <div class="charts-container fl row">
+                <!--下拉框-->
+                <div class="form-group clearfix">
+                    <div class="col-md-3" style="padding-left: 5px;margin:0;">
+                        <div class="has-feedback">
+                            <input style="cursor: pointer; background-color: #fafafa;" type="text" placeholder="请选择企业" value="全部企业" autocomplete="off" class="form-control" id="groupSelect">
+                            <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right:0;z-index:99;" aria-hidden="true" id="groupSelectSpan"></span>
+
+                            <div id="menuContent" class="menuContent">
+                                <ul id="treeDemo" class="ztree"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 panel-tab pull-left">
+                        <button class="btn btn-default btn-primary">今日</button>
+                        <button class="btn btn-default">昨日</button>
+                    </div>
+                </div>
+
+                <!--报表-->
+                <div class="charts-content" style="height: calc(100% - 53px);">
+                    <!--风险报警占比-->
+                    <div class="chart-wrap left-chart">
+                        <div id="riskWarnChart" class="chart-box"></div>
+                        <div class="chart-text clearfix">
+                            <div class="item pull-left">
+                                <span id="riskWarnTxt"></span>
+                            </div>
+                            <div class="item pull-right">
+                                <span class="riskLevel" id="riskWarnTxt2"></span>
+                                <span id="radioIcon" class="chart-icon"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--报警类型排行-->
+                    <div class="chart-wrap right-chart">
+                        <div id="riskEventChart" class="chart-box"></div>
+                    </div>
+
+                    <!--风险等级占比-->
+                    <div class="chart-wrap left-chart">
+                        <div id="riskLevelChart" class="chart-box"></div>
+                        <div class="chart-text clearfix">
+                            <div class="item pull-left" id="riskLevelTxt"></div>
+                            <div class="item pull-right">
+                                <span class="riskLevel" id="riskLevelTxt2"></span>
+                                <span id="radioIcon2" class="chart-icon"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--风险报警趋势-->
+                    <div class="chart-wrap right-chart">
+                        <div id="riskTrendChart" class="chart-box"></div>
+                    </div>
+
+                    <!--风险处置情况-->
+                    <div class="chart-wrap left-chart">
+                        <div id="riskDealChart" class="chart-box"></div>
+                        <div class="chart-text clearfix">
+                            <div class="item pull-left" id="riskDealTxt"></div>
+                            <div class="item pull-right">
+                                <span class="riskLevel" id="riskDealTxt2"></span>
+                                <span id="radioIcon3" class="chart-icon"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--监控对象在线率、报警数分布情况及客服人员-->
+                    <div class="chart-wrap right-chart">
+                        <div id="riskDistributedChart" class="chart-box"></div>
+                    </div>
+                </div>
+                <div th:replace="common/common_chat_window::window(windowId=chatWin)">聊天窗口</div>
+            </div>
+        </div>
+    </section>
+</section>
+</body>
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script  src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&amp;key=6b953aec395d345fd37e1b5434d587a9&amp;plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor,AMap.MarkerClusterer"></script>
+<script src="/resources/js/echarts-4.1.js" th:src="@{/resources/js/echarts-4.1.js}"></script>
+<script src="/resources/js/china.js" th:src="@{/resources/js/china.js}"></script>
+<script src="//a.amap.com/jsapi_demos/static/china.js"></script>
+<script  src="/wro/divscroll.js" th:src="@{/wro/divscroll.js}"></script>
+<script src="/clbs/resources/js/zTree/js/ztreeSearch.js"></script>
+<script src="/clbs/resources/js/zTree/js/fuzzySearch.min.js"></script>
+<script src="/resources/js/mapWeather.js" th:src="@{/resources/js/mapWeather.js}"></script>
+<script  src="/resources/js/lbOrgList.js" th:src="@{/resources/js/lbOrgList.js}"></script>
+</html>

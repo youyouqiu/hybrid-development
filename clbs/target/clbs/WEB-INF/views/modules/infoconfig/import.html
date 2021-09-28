@@ -1,0 +1,222 @@
+<div id="importBox">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">导入信息配置</h4>
+        <style>
+            .modal-dialog{
+                width: 50%;
+            }
+            .inpFilePhoto .changeFile{
+                padding: 6px 14px 5px !important;
+            }
+            .nodeProgressbar{
+                padding: 0;
+                height: 50px;
+                margin-left: 32px;
+            }
+            .importSuccess{
+                position: absolute;
+                top:15px;
+                left:700px;
+                width: 30px;
+            }
+            .arrow_stage5{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 0px;
+            }
+            .arrow_stage0{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 16.6%;
+            }
+            .arrow_stage1{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 33%;
+            }
+            .arrow_stage2{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 50%;
+            }
+            .arrow_stage3{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 67%;
+            }
+
+            .arrow_stage4{
+                width: 30px;
+                height: 30px;
+                z-index: 99;
+                position: absolute;
+                left: 84%;
+            }
+
+            .progress{
+                width:calc(100% - 25px);
+                height: 10px;
+                position: absolute;
+                top: 11px;
+                left: 28px;
+            }
+
+            @keyframes turn {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                }
+                25% {
+                    -webkit-transform: rotate(90deg);
+                }
+                50% {
+                    -webkit-transform: rotate(180deg);
+                }
+                75% {
+                    -webkit-transform: rotate(270deg);
+                }
+                100% {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+
+            .loading{
+                animation: turn 1s linear infinite;
+            }
+
+            .fileIcon{
+                width: 25px;
+                height: 25px;
+                display: none;
+            }
+
+            .fileNameShow span{
+                font-size: 16px;
+                font-weight: bold;
+                color:#2482e2;
+            }
+
+            .progress-bar-error{
+                background-color: #eb2910;
+            }
+
+            .inpFilePhoto{
+                overflow: inherit;
+                padding: 0;
+            }
+
+            #success{
+                position: absolute;
+                width: 30px;
+                height:30px;
+                left: 100%;
+            }
+
+
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <label style="margin:7px 15px 0 30px" class="control-label">
+                    <label class="text-danger">*</label>选择文件:
+                </label>
+                <a class="btn btn-primary" th:href="@{/m/infoconfig/infoinput/download}"><strong>下载模板</strong></a>
+                <div class="inpFilePhoto">
+                    <form th:action="@{/m/infoconfig/infoinput/import}" id="importForm" role="form" action="#" method="post"
+                          class="form-horizontal importVehicle active" enctype="multipart/form-data">
+                        <input type="file" id="excelPath" name="file" class="excelPath" onchange="changeActive(this)"/>
+                        <label class="changeFile" for="excelPath">导入文件</label>
+                    </form>
+                </div>
+                <div class="fileNameShow" style="padding: 0;margin: 0 0 0 38px; display: inline">
+                    <img src="../../../resources/img/pin.png" class="fileIcon">
+                    <span>请选择要上传的Excel文件</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="width: 100%;padding: 20px 0 20px 20px;position: relative">
+            <div class="col-md-11 nodeProgressbar" id="stage">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-progress stage5" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="progress-bar progress-bar-progress stage0" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="progress-bar progress-bar-progress stage1" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="progress-bar progress-bar-progress stage2" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="progress-bar progress-bar-progress stage3" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="progress-bar progress-bar-progress stage4" style="width: 0%">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage5">
+                <span class="nodeText_stage5" style="position: absolute;top:43px;left:-1.5%;color:#505050;">校验文件</span>
+
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage0">
+                <span class="nodeText_stage0" style="position: absolute;top:43px;left:13.5%;color:#505050;">导入监控对象</span>
+
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage1">
+                <span class="nodeText_stage1" style="position: absolute;top:43px;left:30%;color:#505050;">导入终端信息</span>
+
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage2">
+                <span class="nodeText_stage2" style="position: absolute;top:43px;left:46%;color:#505050;">导入SIM卡信息</span>
+
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage3">
+                <span class="nodeText_stage3" style="position: absolute;top:43px;left:64%;color:#505050;">导入分组信息</span>
+
+                <img src="../../../resources/img/rightArrow.png" class="arrow_stage4">
+                <span class="nodeText_stage4" style="position: absolute;top:43px;left:81%;color:#505050;">导入绑定关系</span>
+
+                <img src="../../../resources/img/rightArrow.png" id="success">
+                <span id="successText" style="position: absolute;top:43px;left:98%;color:#505050;width: 60px">导入完成</span>
+            </div>
+        </div>
+        <div class="row" style="margin: 15px 0 0 15px">
+            <div class="col-md-12">
+                <div id="errorMessage" style="height: 20px;font-size: 15px; color:red">
+                    <span></span>
+                    <a href="" style="display: none;color:#6dcff6">下载文件</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer modal-footer-martop">
+<!--        <button id="doCancel" class="btn btn-primary" style="display: none" type="button">-->
+<!--            <strong>取 消</strong>-->
+<!--        </button>-->
+        <button id="doSubmits" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="close" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</div>
+<script>
+    function changeActive(event) {
+        $(".importVehicle").removeClass("active");
+        $(event).closest("form").addClass("active");
+    }
+</script>
+<script src="resources/js/importFileBaseInfoConfigs.js" th:src="@{/resources/js/importFileBaseInfoConfig.js}"></script>

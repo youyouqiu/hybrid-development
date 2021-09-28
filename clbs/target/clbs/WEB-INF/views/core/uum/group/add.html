@@ -1,0 +1,477 @@
+<form th:action="@{/c/group/newgroup}" th:object="${result}" id="addForm" role="form" action="#" method="post"
+    class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" id="doXAdd" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">新增组织</h4>
+    </div>
+    <div class="modal-body">
+        <input type="text" th:field="*{cid}" class="hidden" />
+        <input type="text" th:field="*{pid}" class="hidden" />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"><label class="text-danger">*</label> 组织机构名称：</label>
+                        <div class="col-md-7">
+                            <input name="name" placeholder="请输入组织名称" type="text" maxlength="25" class="form-control"
+                                id="name" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input name="organizationCode" placeholder="请输入组织机构代码" type="text" maxlength="20"
+                                class="form-control" id="organizationCode" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 上级组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input name="upOrganizationCode" placeholder="请输入上级组织机构代码" type="text" maxlength="20"
+                                class="form-control" id="upOrganizationCode" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 管理组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input name="managerOrganizationCode" placeholder="请输入管理组织机构代码" type="text" maxlength="30"
+                                class="form-control" autocomplete="off" id="managerOrganizationCode" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营范围：</label>
+                        <div class="col-md-7 ">
+                            <select id="scopeOfOperation" class="form-control selectpicker" multiple title="请选择经营范围">
+                            </select>
+                            <input id="scopeOfOperationInput" type="hidden" />
+                            <input id="scopeOfOperationVal" name="scopeOfOperation" type="hidden" />
+                            <input id="scopeOfOperationIds" name="scopeOfOperationIds" type="hidden" />
+                            <input id="scopeOfOperationCodes" name="scopeOfOperationCodes" type="hidden" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">行业类别：</label>
+                        <div class="col-md-7">
+                            <select id="operation" class="form-control" name="operation" placeholder="请选择行业类别">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 发证机关：</label>
+                        <div class="col-md-7">
+                            <input name="issuingOrgan" placeholder="请输入发证机关" type="text" maxlength="50"
+                                class="form-control" id="issuingOrgan" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证号：</label>
+                        <div class="col-md-7">
+                            <input name="license" placeholder="请输入经营许可证号" type="text" maxlength="20"
+                                class="form-control" id="license" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证字别：</label>
+                        <div class="col-md-7">
+                            <select id="businessLicenseType" class="form-control" name="businessLicenseType"
+                                placeholder="请选择"></select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 许可证有效期起：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                class="form-control layer-date laydate-icon" autocomplete="off"
+                                id="licenseValidityStartDate" name="licenseValidityStartDate" placeholder="请选择起始日期" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">许可证有效期止：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                class="form-control layer-date laydate-icon" autocomplete="off"
+                                id="licenseValidityEndDate" name="licenseValidityEndDate" placeholder="请选择截止日期" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">经营状态：</label>
+                        <div class="col-md-7">
+                            <select id="operatingState" class="form-control" name="operatingState"
+                                placeholder="请选择经营状态">
+                                <option value="1" selected>营业</option>
+                                <option value="2">停业</option>
+                                <option value="3">整改</option>
+                                <option value="4">停业整顿</option>
+                                <option value="5">歇业</option>
+                                <option value="6">注销</option>
+                                <option value="7">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div data-toggle="distpicker">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">省、直辖市：</label>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="provinceName">Province</label>
+                                <select class="form-control" data-province="—— 省 ——" name="provinceName"
+                                    id="provinceName"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">市、区：</label>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="cityName">City</label>
+                                <select class="form-control" data-city="—— 市 ——" name="cityName" id="cityName"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">县：</label>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="cityName">County</label>
+                                <select class="form-control" name="countyName" data-district="—— 县 ——"
+                                    id="countyName"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label"> 行政区划代码：</label>
+                            <div class="col-md-7">
+                                <input name="areaNumber" id="areaNumber" placeholder="请输入行政区划代码" type="text"
+                                    maxlength="6" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">注册日期：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                class="form-control layer-date laydate-icon" autocomplete="off" id="registerDate"
+                                name="registerDate" placeholder="请选择注册日期" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 企业法人：</label>
+                        <div class="col-md-7">
+                            <input name="principal" id="principal" placeholder="请输入企业法人" type="text" maxlength="20"
+                                class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 法人电话号码：</label>
+                        <div class="col-md-7">
+                            <input name="principalPhone" id="principalPhone" placeholder="请输入法人电话号码" type="text"
+                                maxlength="13" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 联系人：</label>
+                        <div class="col-md-7">
+                            <input name="contactName" id="contactName" placeholder="请输入联系人" type="text" maxlength="20"
+                                class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 电话号码：</label>
+                        <div class="col-md-7">
+                            <input name="phone" id="phone" placeholder="请输入电话号码" type="text" maxlength="13"
+                                class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 联系地址：</label>
+                        <div class="col-md-7">
+                            <input name="address" id="address" placeholder="请输入联系地址" type="text" maxlength="50"
+                                class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 备注：</label>
+                        <div class="col-md-7">
+                            <input name="description" id="description" maxlength="50" placeholder="请输入备注" type="text"
+                                class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="submitAdd" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+        id="avoidRepeatSubmitToken">
+</form>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+    th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+
+<script th:inline="javascript">
+    (function ($, window) {
+        var scopeOfOperationData = [];// 经营范围数据
+        groupAdd = {
+            init: function () {
+                $.ajax({
+                    url: '/clbs/c/group/findOperations',
+                    type: 'POST',
+                    data: "",
+                    async: false,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success == true) {
+                            var operations = [];
+                            var selector = $("#operation");
+                            selector.append('<option  value = "">' + "请选择行业类别" + '</option>');
+                            //selector.append('<optgroup label="请选择运营资质类别"></optgroup>');
+                            if (data.obj.operation != null && data.obj.operation.length > 0) {
+                                var calldata = data.obj.operation;
+                                for (var i = 0; i < calldata.length; i++) {
+                                    selector.append('<option  value="' + calldata[i].operationType + '">' + calldata[i].operationType + '</option>');
+                                }
+                            }
+                        }
+                    },
+                });
+                laydate.render({ elem: '#registerDate', theme: '#6dcff6' });
+                laydate.render({ elem: '#licenseValidityStartDate', theme: '#6dcff6' });
+                laydate.render({ elem: '#licenseValidityEndDate', theme: '#6dcff6' });
+
+                json_ajax("POST", '/clbs/m/dictionary/businessScope', "json", false, null, groupAdd.renderScope);
+                json_ajax("POST", '/clbs/m/dictionary/businessLicenseType', "json", false, null, groupAdd.renderBusinessLicenseType);
+            },
+            /**
+             * 渲染经营范围字段选项
+             * @param data
+             */
+            renderScope: function (data) {
+                if (data.success) {
+                    var result = data.obj;
+                    scopeOfOperationData = result;
+                    var optionHtml = '';
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        optionHtml += '<option value="' + i + '">' + item.value + '</option>'
+                    }
+                    $('#scopeOfOperation').html(optionHtml);
+                    $('#scopeOfOperation').selectpicker({
+                        'selectedText': 'cat'
+                    });
+                    $("#scopeOfOperation").change(function () {
+                        $("#scopeOfOperationInput").val($("#scopeOfOperation").val())
+                    });
+                }
+            },
+            /**
+             * 渲染经营许可证字别字段选项
+             * @param data
+             */
+            renderBusinessLicenseType: function (data) {
+                if (data.success) {
+                    var result = data.obj;
+                    var optionHtml = '<option value="">请选择</option>';
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        optionHtml += '<option value="' + item.code + '">' + item.code + '</option>'
+                    }
+                    $('#businessLicenseType').html(optionHtml);
+                }
+            },
+            // 提交
+            doSubmit: function () {
+                groupAdd.validates();
+                if (groupAdd.validates() == true) {
+                    var s = $("#operation").val();
+                    if (s == null) {
+                        $("#operation").val("");
+                    }
+                    var scopeOfOperationVal = [];
+                    var scopeOfOperationIds = [];
+                    var scopeOfOperationCodes = [];
+                    if ($('#scopeOfOperationInput').val() !== '') {
+                        var scopeOfOperationIndex = $('#scopeOfOperationInput').val().split(',');
+                        for (var i = 0; i < scopeOfOperationIndex.length; i++) {
+                            var item = scopeOfOperationData[scopeOfOperationIndex[i]];
+                            scopeOfOperationVal.push(item.value);
+                            scopeOfOperationIds.push(item.id);
+                            scopeOfOperationCodes.push(item.code);
+                        }
+                    }
+                    $("#scopeOfOperationVal").val(scopeOfOperationVal.join(','));
+                    $("#scopeOfOperationIds").val(scopeOfOperationIds.join(','));
+                    $("#scopeOfOperationCodes").val(scopeOfOperationCodes.join(','));
+
+                    addHashCode1($("#addForm"));
+                    $("#addForm").ajaxSubmit(function (data) {
+                        var result = $.parseJSON(data);
+                        if (result.success) {
+                            var ou = result.msg;
+                            $("#commonWin").modal("hide");
+                            layer.msg("添加成功！", { move: false });
+                            groupUserManage.userTree();
+                            groupUserManage.refreshTable();
+                            $("#search_condition").val("");
+                            $.post('/clbs/c/group/addGroupRedis', { "ou": ou }, function (data) {
+
+                            })
+                            $("#search_condition").val("");
+                        } else {
+                            layer.msg(result.msg, { move: false });
+                        }
+                    });
+                }
+            },
+            clearPreviousValue: function () {
+                if ($(".remote").data("previousValue")) {
+                    $(".remote").data("previousValue").old = null;
+                }
+            },
+            //校验
+            validates: function () {
+                return $("#addForm").validate({
+                    rules: {
+                        name: {
+                            required: true,
+                            maxlength: 25
+                        },
+                        organizationCode: {
+                            maxlength: 20,
+                            remote: {
+                                type: "post",
+                                async: false,
+                                url: "/clbs/c/group/uniquenessOrganizationCode",
+                                data: {
+                                    organizationCode: function () {
+                                        return $("#organizationCode").val();
+                                    }
+                                }
+                            }
+                        },
+                        upOrganizationCode: {
+                            maxlength: 20
+                        },
+                        managerOrganizationCode: {
+                            regularChar: true
+                        },
+                        // scopeOfOperation: {
+                        //     maxlength: 20
+                        // },
+                        license: {
+                            maxlength: 20
+                        },
+                        issuingOrgan: {
+                            maxlength: 50
+                        },
+                        areaNumber: {
+                            isDigits: true,
+                            minlength: 6,
+                            maxlength: 6
+                        },
+                        registerDate: {
+                            selectRegDate: true
+                        },
+                        principal: {
+                            isCN: true,
+                            maxlength: 20
+                        },
+                        phone: {
+                            isLandline: true
+                        },
+                        address: {
+                            maxlength: 50
+                        },
+                        contactName: {
+                            maxlength: 20
+                        },
+                        //                        licenseValidityStartDate: {
+                        //                            compareDateCanNull: "#licenseValidityEndDate"
+                        //                        },
+                        licenseValidityEndDate: {
+                            compareDateCanNull: "#licenseValidityStartDate"
+                        }
+                    },
+                    messages: {
+                        name: {
+                            required: [[#{ public.null }]],
+                            maxlength: [[#{ public.size25.length }]]
+                        },
+                        organizationCode: {
+                            maxlength: [[#{ public.size20.length }]],
+                            remote: [[#{ group.code.exists }]]
+                        },
+                        upOrganizationCode: {
+                            maxlength: [[#{ public.size20.length }]]
+                        },
+                        // scopeOfOperation: {
+                        //     maxlength: [[#{public.size20.length}]]
+                        // },
+                        license: {
+                            maxlength: [[#{ public.size20.length }]]
+                        },
+                        issuingOrgan: {
+                            maxlength: [[#{ public.size50.length }]]
+                        },
+                        areaNumber: {
+                            isDigits: '请输入6位整数',
+                            minlength: '请输入6位整数',
+                            maxlength: '请输入6位整数'
+                        },
+                        registerDate: {
+                            selectRegDate: [[#{ group.registration.date }]]
+                        },
+                        principal: {
+                            isCN: [[#{ group.name.error }]],
+                            maxlength: [[#{ public.size20.length }]]
+                        },
+                        phone: {
+                            isLandline: [[#{ telPhone.error }]]
+                        },
+                        address: {
+                            maxlength: [[#{ public.size50.length }]]
+                        },
+                        contactName: {
+                            maxlength: [[#{ public.size20.length }]]
+                        },
+                        //                        licenseValidityStartDate: {
+                        //                            compareDateCanNull: "开始时间必须小于结束时间"
+                        //                        },
+                        licenseValidityEndDate: {
+                            compareDateCanNull: "结束时间必须大于开始时间"
+                        }
+                    }
+                }).form();
+            }
+        }
+        $(function () {
+            groupAdd.init();
+            $("#submitAdd").on("click", groupAdd.doSubmit);
+            $('input').inputClear();
+            $("#name,#organizationCode,#upOrganizationCode,#registerDate,#licenseValidityEndDate,#licenseValidityStartDate,#license,#principal,#phone,#address").on("change", groupAdd.clearPreviousValue);
+        });
+    })($, window)
+</script>

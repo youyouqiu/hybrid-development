@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>监控对象评分</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/vehicleScore.css" />
+</head>
+<style>
+    .layui-laydate{
+        z-index: 1030!important;
+    }
+</style>
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">报表管理</li>
+                            <li class="active">主动安全报表</li>
+                            <li class="active">监控对象评分</li>
+                        </ul>
+                        <h1 class="h1 ">监控对象评分统计</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch">
+                                    <h3 class="panel-title fwb">查询</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="stretch-body">
+                                    <div class="col-md-12 alarmSearchToolPanel">
+                                        <form id="lifeCycleForm" class="form-horizontal" action="#" method="post"
+                                            role="form">
+                                            <div class="form-group">
+                                                <div class="col-md-4">
+                                                    <label class="col-md-2 control-label">组织：</label>
+                                                    <div class="has-feedback fastClear col-md-10">
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                            placeholder="请选择企业" class="form-control" type="text"
+                                                            id="groupSelect" name="groupSelect" autocomplete="off" />
+                                                        <span class="fa fa-chevron-down form-control-feedback"
+                                                            style="top: 0; right: 15px;cursor:pointer;"
+                                                            aria-hidden="true" id="groupSelectSpan"></span>
+                                                        <div id="menuContent" class="menuContent">
+                                                            <ul id="treeDemo" class="ztree"></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 noPadding">
+                                                    <label class="col-md-4 control-label searchListSelect">时间：</label>
+                                                    <div class="col-md-8 searchListSelect">
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                            class="form-control layer-date laydate-icon"
+                                                            id="timeInterval" name="queryDateStr" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-12 control-label" id="dateSearchData">
+                                                    <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="lifeCycleExpire.inquireClick(1)"><i
+                                                            class="glyphicon glyphicon-search"></i> 查询
+                                                    </button>
+                                                    <button id="exportAlarm-q1" type="button"
+                                                        class="btn btn-primary export-btn" style="width: 135px">
+                                                        <i class="glyphicon glyphicon-log-out"></i> 批量导出明细
+                                                    </button>
+                                                    <button id="exportAlarm-q2" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                            class="glyphicon glyphicon-log-out"></i> 导出
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch3">
+                                    <h3 class="panel-title fwb">综合得分</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch3-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <div class="panel-body" id="stretch3-body" style="display: none">
+                                    <div class="driverHeader">
+                                        <div class="clearfix diriverTop">
+                                            <div class="col-md-11 noPadding">
+                                                <div class="diriverTopTxt">
+
+                                                    <div class="ratingNum">
+                                                        <div id="score-q1"></div>
+                                                        <div class="ratingNum-point">分</div>
+                                                    </div>
+                                                    <div class="rightHeader">
+                                                        <h3 id="scoreRingRatio">监控对象综合得分<span class="greenTxt" id="score-static-numberq1"></span><span id="score-static-numberqq1">，请继续保持管理力度</span></h3>
+                                                        <p id="behaviorText">触发报警行为<span  id="score-comment-statusq1"></span>，得分<span id="score-comment-numberq1"></span>分布最多</p>
+                                                    </div>
+                                                </div>
+                                                <div class="diriverTopNum">
+                                                    <div class="numItem numItem-wrap">
+                                                        <img data-toggle="tooltip" data-placement="left" src="../../../../clbs/resources/img/caricon.svg" width="105px"
+                                                             class="numItem-img"
+                                                        />
+                                                        <div class="numItem-div1"><b id="monitorSize-q"></b><span> 辆</span></div>
+                                                        <div class="numItem-div2">监控对象总数</div>
+                                                        <div><span>日均行驶时长 </span><span id="averageTravelTime-q"></span></div>
+                                                    </div>
+                                                    <div class="numItem numItem-wrap">
+                                                        <img data-toggle="tooltip" data-placement="left" src="../../../../clbs/resources/img/alarm.svg" width="105px"
+                                                             class="numItem-img"
+                                                        />
+                                                        <div class="numItem-div1"><b id="alarmTotal-q"></b><span> 次</span></div>
+                                                        <div class="numItem-div2">触发报警次数</div>
+                                                        <div><span>环比 </span><span id="alarmRingRatio-q"></span></div>
+                                                    </div>
+                                                    <div class="numItem numItem-wrap">
+                                                        <img data-toggle="tooltip" data-placement="left" src="../../../../clbs/resources/img/alarm.svg" width="105px"
+                                                             class="numItem-img"
+                                                        />
+                                                        <div class="numItem-div1"><b id="hundredsAlarmTotal-q"></b><span> 次</span></div>
+                                                        <div class="numItem-div2">百公里触发报警数</div>
+                                                        <div><span>环比 </span><span id="hundredsAlarmRingRatio-q"></span></div>
+                                                    </div>
+                                                    <div class="numItem numItem-wrap">
+                                                        <img data-toggle="tooltip" data-placement="left" src="../../../../clbs/resources/img/carSpeed.svg" width="105px"
+                                                             class="numItem-img"
+                                                        />
+                                                        <div class="numItem-div1"><b id="travelSpeed-q"></b><span>km/h</span></div>
+                                                        <div class="numItem-div2">平均车速</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch2">
+                                    <h3 class="panel-title fwb">数据列表</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body fixed-table-body" id="stretch2-body">
+                                    <div class="ToolPanel" style="">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form">
+                                                    <label><input type="text" class="Inlinesearch form-control"
+                                                            id="simpleQueryParam" name="simpleQueryParam"
+                                                            style="width:300px" placeholder="请输入车牌号" autocomplete="off"></label>
+                                                    <button type="button" id="search_button"
+                                                        class="btn btn-outline btn-default">搜索
+                                                    </button>
+                                                    <input id="hiddenText" type="text" style="display:none" />
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="columns btn-group pull-right fuelConsumptionS">
+                                            <button id="refreshTable" class="btn btn-default" type="button"
+                                                name="refresh" title="刷新">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group" title="定制显示列">
+                                                <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle btn-border-radius"
+                                                    data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="dataTable"
+                                        class="display table table-striped table-bordered table-hover noCheckTable monitoringObjTable"
+                                        cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">序号</th>
+                                                <th class="text-center" style="position: relative">监控对象<i class="monitoringObjI"
+                                                                               onclick="select.showDropDown()" id="selectForList-q"></i></th>
+                                                <th class="text-center">运营类型</th>
+                                                <th class="text-center rank-q">行驶里程(km)</th>
+                                                <th class="text-center rank-q">行驶次数</th>
+                                                <th class="text-center" id="average-q">日均行驶时长</th>
+                                                <th class="text-center rank-q">平均速度(km/h)</th>
+                                                <th class="text-center">所属企业</th>
+                                                <th class="text-center rank-q">报警数</th>
+                                                <th class="text-cente rank-q">综合得分</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <ul id="dropDown-q" class="dropdown-menu"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </section>
+        </section>
+    </section>
+    <div class="popup-q" id="popup-q">
+        <div class="panel panel-default">
+            <div class="panel-heading panel-head-q">
+                <h4 class="col-md-4 panel-head-q-title">监控对象评分明细</h4>
+                <div class="panel-head-q-timer">
+<!--                    <div style="margin: -5px auto;width: 138px">-->
+                    <div style="margin: -5px auto;width: 426px;position:absolute;top:0;left:0;right:0;margin: auto">
+<!--                        <button type="button" class="panel-head-q-btn" id="panel-head-q-general"></button>-->
+<!--                        <img data-toggle="tooltip" data-placement="left" class="panel-head-q-btn" id="panel-head-q-general"-->
+<!--                             src="/clbs/resources/img/car-left.svg" width="16px" data-original-title="上一月">-->
+                        <i class="toopTip-btn-left" style="display: inline-block;width: 160px" id="panel-head-q-general">
+                            <img data-toggle="tooltip" data-placement="left" src="/clbs/resources/img/car-left.svg" width="16px" data-original-title="上一月">
+                        </i>
+                        <div class="panel-head-q-date" id="panel-head-q-date" style="font-weight: 700;"></div>
+<!--                        <button type="button"  class="panel-head-q-btn" id="panel-head-q-detail"></button>-->
+<!--                        <img data-toggle="tooltip" data-placement="right" title="" id="panel-head-q-detail" class="panel-head-q-btn"-->
+<!--                             src="/clbs/resources/img/car-right.svg" width="16px" data-original-title="下一月">-->
+                        <i class="toopTip-btn-right" style="display: inline-block;width: 160px" id="panel-head-q-detail">
+                            <img data-toggle="tooltip" data-placement="right" title="" src="/clbs/resources/img/car-right.svg" width="16px" data-original-title="下一月">
+                        </i>
+                    </div>
+
+                </div>
+                <div class="panel-head-q-close" style="float:right;margin-right:15px;">
+                    <i id="panel-head-q-close1"></i>
+                </div>
+            </div>
+
+            <div class="panel-body" style="padding-top: 0">
+                <div class="dropdown panel-title fwb">
+                    <ul class="nav nav-tabs">
+                        <li id="panel-toggle-q1" class="active panel-toggle-q custom-tab" ><a href="#situationBox">概况</a></li>
+                        <li id="panel-toggle-q2" class="panel-toggle-q custom-tab"><a href="#detailBox">明细</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content" style="position: relative">
+                    <div id="situationBox" class="tab-pane active">
+                        <div class="row" id="general-q1">
+                            <div class="row homeText homeText-q2">
+                                <div class="col-md-2" id="scoreq-img">
+                                    <div class="score-q">
+                                        <div id="score-q2"></div>
+                                        <div style="font-size: 17px;">分</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9" style="padding: 0">
+                                    <div class="scores-wrap-q">
+                                        <div class="score-static-q" style="font-size: 20px;font-family: 'Microsoft YaHei'">监控对象综合得分<span class="score-static-numberq" id="score-static-numberq2"></span>
+                                            <span id="score-static-numberq3"></span>
+                                        </div>
+                                        <div class="score-comment-q" style="font-size: 14px;margin:5px 0 10px 0">触发报警数
+                                            <span class="score-comment-statusq" id="score-comment-statusq2">增加11%</span>
+                                        </div>
+                                        <div style="font-size: 14px">车辆点评：您的综合得分为<span id="score-spanq">62</span><span id="score-spanq1"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row homeText homeText-q2 homeText-underlineQ" style="margin: 0px 0 10px 15px;">
+                                <div class="" style="padding: 0">
+                                    <div class="fenceUrl-q2">
+                                        <div class="rect-left-q2">
+                                            <span class="quant" id="monitorSize-q2" style="color: #000;font-size: 30px;font-weight: 600;">102</span>
+                                            <span class="unit" style="color: #000">次</span>
+                                            <div class="title" style="font-size: 14px;font-family: 'Microsoft YaHei';color: #000">触发报警次数</div>
+                                        </div>
+                                        <div class="rect-right-q2">
+                                            <div class="title" style="font-size: 14px">环比</div>
+                                            <span class="number" id="averageTravelTime-q2">16.3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="" style="padding: 0">
+                                    <div class="fenceUrl-q2">
+                                        <div class="rect-left-q2">
+                                            <span class="quant" id="alarmTotal-q2" style="color: #000;font-size: 30px;font-weight: 600;">836</span>
+                                            <span class="unit" style="color: #000">次</span>
+                                            <div class="title" style="font-size: 14px;font-family: 'Microsoft YaHei';color: #000">百公里触发报警数</div>
+                                        </div>
+                                        <div class="rect-right-q2">
+                                            <div class="title" style="font-size: 14px">环比</div>
+                                            <span class="number" id="alarmRingRatio-q2">+ 37%</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="" style="padding: 0">
+                                    <div class="fenceUrl-q2">
+                                        <div class="rect-left-q2">
+                                            <span class="quant" id="hundredsAlarmTotal-q2" style="color: #000;font-size: 30px;font-weight: 600;">109.63</span>
+                                            <span class="unit" style="color: #000">km</span>
+                                            <div class="title" style="font-size: 14px;font-family: 'Microsoft YaHei';color: #000">行驶总里程数</div>
+                                        </div>
+                                        <div class="rect-right-q2">
+                                            <div class="title" style="font-size: 14px">日均行驶时长</div>
+                                            <span class="number" id="hundredsAlarmRingRatio-q2">+ 41%</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row panel-display-q" id="general-q2">
+                            <div class="panel-display-q1 col-md-4"></div>
+                            <div class="panel-display-q2 col-md-8" style="font-size:16px;">
+                                <div>
+                                    <span class="title">监控对象：</span>
+                                    <span id="brand-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">车牌颜色：</span>
+                                    <span id="plateColor-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">所属企业：</span>
+                                    <span id="groupName-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">运营类型：</span>
+                                    <span id="purposeCategory-q">-</span>
+                                </div>
+                                <div class="special">
+                                    <span class="title">车辆状态：</span>
+                                    <span id="isStart-q">-</span>
+                                </div>
+<!--                                <div style="margin: 20px 0">-->
+<!--                                    <span class="title" style="font-weight: 600;">行驶证信息</span>-->
+<!--                                    <span></span>-->
+<!--                                </div>-->
+
+<!--                            </div>-->
+<!--                            <div class="panel-display-q3 col-md-8" style="font-size:16px;">-->
+<!--                                <div>-->
+<!--                                    <span class="title">运营类型</span>-->
+<!--                                    <span id="purposeCategory-q">-</span>-->
+<!--                                </div>-->
+<!--                                <div class="special">-->
+<!--                                    <span class="title">车辆状态</span>-->
+<!--                                    <span id="isStart-q">-</span>-->
+<!--                                </div>-->
+                                <div style="margin-top: 20px">
+                                    <span class="title">车架号：</span>
+                                    <span id="chassisNumber-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">发证日期：</span>
+                                    <span id="licenseIssuanceDate-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">使用性质：</span>
+                                    <span id="usingNature-q">-</span>
+                                </div>
+                                <div>
+                                    <span class="title">行驶有效期至：</span>
+                                    <span id="registrationEndDate-q">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="detailBox" class="tab-pane active">
+                        <div class="" id="echarts-q">
+                            <div class="" id="echarts-q1"></div>
+                        </div>
+                        <div class="row" id="echarts-q3">
+                            <div class="title bold" style="font-weight:600;font-size:16px;line-height:35px;border-top: 1px solid rgb(229, 229, 229);
+                                margin: 0 15px;">明细列表</div>
+                            <div class="row fixed-table-body" id="echarts-q2">
+                                <table id="dataTable2-q" class="col-md-12 table table-striped table-bordered table-hover noCheckTable monitoringObjTable dataTable"
+                                       cellspacing="0" aria-describedby="dataTable_info">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center" >驾驶员</th>
+                                            <th class="text-center" >报警事件</th>
+                                            <th class="text-center" >风险等级</th>
+                                            <th class="text-center" >报警时间</th>
+                                            <th class="text-center" >车辆速度(km/h)</th>
+                                            <th class="text-center" >报警位置</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-footer detail-footer" style="padding-bottom:11px; position: absolute;width:100%">
+                <button id="exportAlarm-q3" type="button"
+                        class="panel-export-q"><i
+                        class="glyphicon glyphicon-log-out glyphicon-q"></i> 导出
+                </button>
+                <button class="panel-final-close" id="panel-final-close">关闭</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    // 后端缓存
+    var vehicleSelectGroup = [[#{ Vehicle.select.group }]];
+    var exportFail = [[#{ export.fail }]];
+</script>
+<script src="/clbs/resources/js/echarts.js"></script>
+
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+
+<script src="resources/js/vehicleScorq.js" th:src="@{/resources/js/vehicleScorq.js}"></script>
+
+</html>

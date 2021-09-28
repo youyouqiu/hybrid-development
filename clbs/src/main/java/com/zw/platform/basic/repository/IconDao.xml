@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.IconDao">
+    <select id="getById" resultType="com.zw.platform.basic.domain.IconDO">
+     SELECT id,ico_name,ico_url,defult_state,monitor_type,flag,create_data_time,create_data_username,update_data_time,update_data_username
+     from zw_c_ico_config
+     where flag = 1
+       and id = #{id}
+    </select>
+    <select id="getAll" resultType="com.zw.platform.basic.dto.IconDTO">
+     SELECT id,ico_name,ico_url,defult_state,monitor_type,flag,create_data_time,create_data_username,update_data_time,update_data_username
+     from zw_c_ico_config
+     where flag = 1
+     ORDER BY defult_state desc,create_data_time desc
+    </select>
+
+    <delete id="delete">
+        DELETE from zw_c_ico_config where id=#{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.IconDO">
+        insert into zw_c_ico_config (id,ico_name,ico_url,defult_state,monitor_type,create_data_time,create_data_username)
+		VALUES(#{id},#{icoName},#{icoUrl},#{defultState},#{monitorType},#{createDataTime},#{createDataUsername})
+    </insert>
+</mapper>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>服务器监管报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/assets/css/server-monitorlist.css" th:href="@{/resources/css/server-monitorlist.css}">
+    <style>
+        .ram-tips{
+            position:absolute;
+            bottom:10px;
+            left:0;
+            right:0;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">服务类报表</li>
+                        <li class="active">服务器监管报表</li>
+                    </ul>
+                    <h1 class="h1 ">运营平台服务器监控界面</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <!--全部数据-->
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">全部数据</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    <!--table-->
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">服务器名称</th>
+                                            <th class="text-center">IP地址</th>
+                                            <th class="text-center">是否在线</th>
+                                            <th class="text-center">操作系统</th>
+                                            <th class="text-center">服务器用途</th>
+                                            <th class="text-center">运行时长</th>
+                                            <th class="text-center">服务器状态</th>
+                                            <th class="text-center">CPU状态</th>
+                                            <th class="text-center">内存状态</th>
+                                            <th class="text-center">硬盘状态</th>
+                                            <th class="text-center">网络状态</th>
+                                            <th class="text-center">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--服务器状态展现-->
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">
+                                    服务器状态展现
+                                    <!--服务器切换-->
+                                    <div class="carName">
+                                        <i id="leftClickVehicle" class="toopTip-btn-left"
+                                           style="display: inline-block;">
+                                            <img
+                                                    data-toggle="tooltip" data-placement="left" title=""
+                                                    src="../../../../clbs/resources/img/car-left.svg"
+                                                    width="16px" data-original-title="上一辆">
+                                        </i>
+                                        <div id="carName">
+                                            <span class="name" id="fistServer"></span>
+
+                                            <div id="showBox" class="hidden">
+                                                <div class="show-wraper">
+                                                    <div class="show-content" id="serverLists"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <i id="rightClickVehicle" class="toopTip-btn-right"
+                                           style="display: inline-block;">
+                                            <img
+                                                    data-toggle="tooltip" data-placement="right" title=""
+                                                    src="../../../../clbs/resources/img/car-right.svg"
+                                                    width="16px" data-original-title="下一辆">
+                                        </i>
+                                    </div>
+                                </h3>
+
+                                <div class="actions pull-right listActions" id="serverArrow">
+                                    <i class="fa fa-chevron-up"></i>
+                                </div>
+                            </div>
+
+                            <div class="panel-body" id="basicInfo" style="display: none;">
+                                <div class="row">
+                                    <!--服务器基本信息-->
+                                    <div class="col-md-2">
+                                        <div class="infoMessage">
+                                            <h4 class="col-md-12" id="serverName"></h4>
+                                            <div class="form-group" style="padding:0 15px;">
+                                                <img style="margin-top:15px;" src="../../../../clbs/resources/img/server.png" alt="">
+                                            </div>
+                                        </div>
+
+                                        <div class="infoMessage">
+                                            <h4 class="col-md-12">运行时长</h4>
+                                            <div class="form-group" id="serverDate" style="padding:0 15px;">
+                                                <div class="row">
+                                                    <div class="item col-md-3" style="margin-left:4%;">
+                                                        <div class="box">
+                                                            <p class="p1" id="H"></p>
+                                                            <p class="p2">天</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="hLine col-md-1">
+                                                        <span>-</span>
+                                                    </div>
+                                                    <div class="item col-md-3">
+                                                        <div class="box">
+                                                            <p class="p1" id="M"></p>
+                                                            <p class="p2">时</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="hLine col-md-1">
+                                                        <span>-</span>
+                                                    </div>
+                                                    <div class="item col-md-3">
+                                                        <div class="box">
+                                                            <p class="p1" id="S"></p>
+                                                            <p class="p2">分</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="infoMessage">
+                                            <h4 class="col-md-12">基本信息</h4>
+                                            <div class="sever-info form-horizontal">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">ip地址：</label>
+                                                    <div class="col-md-7 col-padding-zero" id="info1"></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">是否在线：</label>
+                                                    <div class="col-md-7 col-padding-zero" id="info2"></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">状态：</label>
+                                                    <div class="col-md-7 col-padding-zero" id="info3">
+                                                        <span class="normal"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">操作系统：</label>
+                                                    <div class="col-md-7 col-padding-zero" id="info4"></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">用途：</label>
+                                                    <div class="col-md-7 col-padding-zero" id="info5"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--服务器基本数据报表-->
+                                    <div class="col-md-10">
+                                        <div class="row charts-wrap">
+                                            <div class="col-md-8">
+                                                <!--cpu-->
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" id="stretch">
+                                                        <h3 class="panel-title">cpu</h3>
+                                                        <div class="actions pull-right">
+                                                            <i class="fa chevron-down" id="stretch-chevron"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body" id="stretch-body">
+                                                        <div id="cpuCharts" style="height:300px;width:100%;"></div>
+                                                    </div>
+                                                </div>
+                                                <!--进程-->
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" id="stretch2">
+                                                        <h3 class="panel-title">进程</h3>
+                                                        <div class="actions pull-right">
+                                                            <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body clearfix" id="stretch2-body">
+                                                        <div class="progress-menu pull-left">
+                                                            <div class="menu-list">
+                                                                <!--<p class="item">进程名称一</p>-->
+                                                            </div>
+                                                        </div>
+                                                        <div class="progress-content pull-left">
+                                                            <div id="progressCharts" style="height:300px;width:100%;"></div>
+                                                            <div class="progress-legend">
+                                                                <p class="item">CPU占用: <span id="processTotal1"></span></p>
+                                                                <p class="item">内存占用: <span id="processTotal2"></span></p>
+                                                                <p class="item">网络流出: <span id="processTotal3"></span></p>
+                                                                <p class="item">网络接入: <span id="processTotal4"></span></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <!--内存-->
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" id="stretch3">
+                                                        <h3 class="panel-title">内存</h3>
+                                                        <div class="actions pull-right">
+                                                            <i class="fa chevron-down" id="stretch3-chevron"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body" id="stretch3-body">
+                                                        <div id="ramCharts" style="height:300px;width:100%;"></div>
+                                                        <div id="ramTips" class="ram-tips"></div>
+                                                    </div>
+                                                </div>
+                                                <!--硬盘-->
+                                                <div class="panel panel-default">
+                                                    <div class="panel-heading" id="stretch4">
+                                                        <h3 class="panel-title">硬盘</h3>
+                                                        <div class="actions pull-right">
+                                                            <i class="fa chevron-down" id="stretch4-chevron"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body" id="stretch4-body">
+                                                        <div id="diskCharts" style="height:300px;width:100%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+</body>
+<!--common-->
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<!--common-->
+<script src="/resources/js/echarts.js" th:src="@{/resources/js/echarts.js}"></script>
+<script src="/resources/js/serverMonitorList.js" th:src="@{/resources/js/serverMonitorList.js}"></script>
+</html>

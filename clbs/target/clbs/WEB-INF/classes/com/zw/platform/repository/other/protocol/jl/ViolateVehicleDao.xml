@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zw.platform.repository.other.protocol.jl.ViolateVehicleDao">
+    <sql id="violateColumn">
+        id,monitor_id,monitor_name,violate_time,type,plate_color,group_name,upload_time,upload_state,operator,error_msg
+    </sql>
+    <insert id="insertBatchViolateUpload">
+        INSERT INTO zw_m_violate_vehicle
+        (
+        id,
+        monitor_id,
+        monitor_name,
+        violate_time,
+        type,
+        plate_color,
+        group_name,
+        upload_time,
+        upload_state,
+        operator,
+        error_msg
+        )
+        values
+        <foreach collection="list" item="vio" separator=",">
+            (
+            #{vio.id},
+            #{vio.monitorId},
+            #{vio.monitorName},
+            #{vio.violateTime},
+            #{vio.type},
+            #{vio.plateColor},
+            #{vio.groupName},
+            #{vio.uploadTime},
+            #{vio.uploadState},
+            #{vio.operator},
+            #{vio.errorMsg}
+            )
+        </foreach>
+    </insert>
+    <select id="listViolateVehicle"
+            resultType="com.zw.platform.domain.other.protocol.jl.dto.ViolateVehicleDO">
+        select
+        <include refid="violateColumn"/>
+        from zw_m_violate_vehicle vv
+        <where>
+            <if test="monitorIds != null and monitorIds.size() > 0">
+                AND vv.monitor_id in
+                <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+                    #{monitorId}
+                </foreach>
+            </if>
+            <if test="uploadState != null">
+                AND vv.upload_state = #{uploadState}
+            </if>
+            <if test="type != null">
+                AND vv.type = #{type}
+            </if>
+            <if test="violateStartTime != null and violateEndTime != null">
+                AND vv.violate_time between #{violateStartTime} and #{violateEndTime}
+            </if>
+            <if test="simpleQueryParam != null and simpleQueryParam != ''">
+                AND vv.monitor_name like #{simpleQueryParam}
+            </if>
+        </where>
+        ORDER BY vv.upload_time DESC
+    </select>
+</mapper>

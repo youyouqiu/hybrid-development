@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.oilsubsidy.StatisticalCheckOfLocationInformationDao">
+    <select id="getByOrgIdAndTime" resultType="com.zw.platform.domain.oilsubsidy.locationinformation.OilSubsidyLocationInformationDTO">
+        SELECT id,
+               forward_org_id,
+        DATE_FORMAT(start_time, '%Y-%m-%d %T') as startTime,
+        DATE_FORMAT(end_time, '%Y-%m-%d %T') as endTime,
+        location_num
+        from zw_m_oil_subsidy_location_info
+        where <![CDATA[ DATE_FORMAT(start_time, '%Y-%m-%d %H:%i:%s') >= DATE_FORMAT(#{startTime}, '%Y-%m-%d %H:%i:%s') ]]>
+         and <![CDATA[ DATE_FORMAT(end_time, '%Y-%m-%d %T') <= DATE_FORMAT(#{endTime}, '%Y-%m-%d %T') ]]>
+        <if test="orgIds != null">
+           and `forward_org_id` in
+            <foreach item="item" collection="orgIds" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by start_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.domain.oilsubsidy.locationinformation.OilSubsidyLocationInformationDO">
+        INSERT INTO zw_m_oil_subsidy_location_info
+        (
+        id,
+        forward_org_id,
+        start_time,
+        end_time,
+        location_num
+        )
+        values (
+        #{id},
+        #{forwardOrgId},
+        #{startTime},
+        #{endTime},
+        #{locationNum}
+        )
+    </insert>
+
+
+</mapper>

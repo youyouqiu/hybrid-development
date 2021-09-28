@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.webMaster.feedBack.AppFeedBackDao">
+    <select id="getFeedBackTotal" parameterType="com.zw.app.domain.webMaster.feedBack.FeedBackQuery" resultType="java.lang.Integer">
+		SELECT count(*) FROM zw_app_feedback
+		WHERE 1=1
+        <if test="startTime != null">
+            AND submit_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND submit_date &lt;= #{endTime}
+        </if>
+        <if test="userName != null and userName !=''">
+            AND username LIKE
+            CONCAT('%',#{userName},'%')
+        </if>
+	</select>
+    <select id="searchFeedBack" parameterType="com.zw.app.domain.webMaster.feedBack.FeedBackQuery" resultType="com.zw.app.domain.webMaster.feedBack.FeedBack">
+        SELECT f.submit_date,f.username,f.feedback FROM zw_app_feedback f
+        WHERE 1=1
+        <if test="startTime != null">
+            AND submit_date &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND submit_date &lt;= #{endTime}
+        </if>
+        <if test="userName != null and userName !=''">
+            AND username LIKE
+            CONCAT('%',#{userName},'%')
+        </if>
+        ORDER BY submit_date DESC
+    </select>
+    <insert id="addFeedBack" parameterType="com.alibaba.fastjson.JSONObject">
+        INSERT INTO zw_app_feedback
+        (id,submit_date,username,feedback)
+        VALUES
+        (#{id},#{submitDate},#{userName},#{feedback})
+    </insert>
+
+</mapper>

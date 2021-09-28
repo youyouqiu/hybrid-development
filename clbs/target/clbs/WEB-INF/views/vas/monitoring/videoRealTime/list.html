@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实时视频</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/videoContent.css" th:href="@{/resources/css/videoContent.css}"/>
+    <link rel="stylesheet" href="resources/js/nstSlider/css/jquery.nstSlider.css"
+          th:href="@{/resources/js/nstSlider/css/jquery.nstSlider.css}"/>
+    <style>
+        #alarm-remark {
+            margin-top: 15px;
+            padding-left: 67px;
+        }
+        #alarm-remark > div {
+            padding-right: 0
+        }
+        .modal-footer select {
+            line-height: 22px !important;
+        }
+        #realSetBtn {
+            padding: 6px 10px;
+        }
+        #realSetMenu {
+            top: 42px;
+            left: auto;
+            right: 0px;
+            padding: 10px 6px;
+        }
+        #realSetMenu a{
+            height: 30px;
+            line-height: 24px;
+            margin-bottom: 1px;
+            padding-right: 6px;
+        }
+        #realSetMenu a label{
+            display: block;
+            cursor: pointer;
+        }
+        #showName{
+            margin-right: 10px;
+            vertical-align: -1px;
+        }
+        .icon-online_ico_open + span + span.aliasesStyle, .icon-online_ico_close + span + span.aliasesStyle, .icon-heartbeat_ico_open + span + span.aliasesStyle, .icon-heartbeat_ico_close + span + span.aliasesStyle {
+            color: #333;
+        }
+        .vehicle-info .col-padding-zero{
+            word-break: break-all;
+        }
+        #noInfo{
+            display: none;
+            margin-left: 10px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section id="mainContent" class="main-content-wrapper main-content-toggle-left">
+        <!-- 菜单 -->
+        <div th:replace="fragments/menu_adas">menu</div>
+        <!-- 页面主体内容 -->
+        <section class="video-main-content">
+            <!-- 左侧 -->
+            <div class="video-main-left">
+                <!-- 车辆树 -->
+                <div class="vehicle-content">
+                    <div class="panel-heading">
+                        <strong>监控对象</strong>
+                        <input th:value="${logFlag}" id="logFlag" hidden/>
+                        <a href="/clbs/realTimeVideo/resource/list" target="_blank">
+                        <div id="jumpToResource" class="actions3 pull-right"
+                             style="top:-6px!important;left:6px!important" data-toggle="tooltip" data-placement="left"
+                             title="视频回放">
+                            <img src="/clbs/resources/img/ziyuanhuifang.svg">
+                        </div>
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <div id="realSetBox" class="clearfix" style="position: relative">
+                            <div class="col-md-5 col-sm-12 col-xs-12" style="padding: 0px 5px 0px 0px;">
+                                <select id="searchType" placeholder="请选择搜索类别"
+                                        class="form-control">
+                                    <option selected="selected" value="name">监控对象</option>
+                                    <option value="deviceNumber">终端号</option>
+                                    <option value="simcardNumber">终端手机号</option>
+                                    <option value="group">企业</option>
+                                    <option value="assignName">分组</option>
+                                    <option value="professional">从业人员</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5 col-sm-12 col-xs-12"
+                                 style="padding: 0px 10px 0px 0px;">
+                                <input autocomplete="off" type="text" style="width: 100%;" id="search_condition" class="form-control"
+                                       placeholder="请输入关键字">
+                            </div>
+                            <div class="col-md-2 col-sm-12 col-xs-12" style="padding: 0px 0px 0px 0px;">
+                                <button id="realSetBtn" class="btn btn-default dropdown-toggle" type="button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-cog"></span>
+                                </button>
+                                <ul id="realSetMenu" class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0);" id="refresh" name="refresh" title="刷新" data-stopPropagation="true">
+                                            <i class="glyphicon glyphicon-refresh"></i>刷新
+                                        </a>
+                                    </li>
+                                    <li data-stopPropagation="true">
+                                        <a href="javascript:void(0);" id="showAliases">
+                                            <label for="showName"><input type="checkbox" id="showName">显示别名</label>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tree-show-area" id="thetree">
+                            <div id='treeLoading' style="text-align: center; height: 100px; line-height: 100px; display: none">
+                                <i class="fa fa-spinner loading-state"></i>
+                                <span>加载中，请稍后</span>
+                            </div>
+                            <div id="vTree" class="ztree">
+                                <ul id="vTreeList"></ul>
+                            </div>
+<!--                            <div id="noInfo">无数据</div>-->
+                        </div>
+                        <!-- 状态信息 -->
+                        <div class="vehicle-status">
+                            <div id="searchOffLine" class="col-md-4 text-right cursor-style">
+                                <span class="v-not-online"></span>不在线
+                            </div>
+                            <div id="searchOnline" class="col-md-4 text-right cursor-style">
+                                <span class="v-online"></span>在线
+                            </div>
+                            <div id="searchHeartBeat" class="col-md-4 text-right cursor-style">
+                                <span class="v-heartbeat"></span>心跳
+                            </div>
+                        </div>
+                        <!-- 监控对象信息 -->
+                        <div class="vehicle-info form-horizontal">
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">监控对象：</label>
+                                <div class="col-md-7 col-padding-zero" id="vehicleName"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">定位时间：</label>
+                                <div class="col-md-7 col-padding-zero" id="updateTime"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">终端号：</label>
+                                <div class="col-md-7 col-padding-zero" id="deviceNo"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">终端手机号：</label>
+                                <div class="col-md-7 col-padding-zero" id="simNo"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">从业人员：</label>
+                                <div class="col-md-7 col-padding-zero" id="driverName"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">速度：</label>
+                                <div class="col-md-7 col-padding-zero" id="updateSpeed"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">ACC：</label>
+                                <div class="col-md-7 col-padding-zero" id="accStatus"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">位置：</label>
+                                <div class="col-md-7 col-padding-zero" id="formattedAddress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--</div>-->
+                </div>
+            </div>
+
+            <!-- 右侧 -->
+            <div class="video-main-right" id="videoMainRight">
+                <!-- 视频及地图 -->
+                <div class="video-right-top" id="videoRightTop">
+                    <!-- 视频 -->
+                    <div class="col-md-9 col-padding-zero video-module animate-display" id="video-module">
+                        <div class="pull-left v-one">
+                            <video autoplay width="100%" height="100%" id="v_0_Source"></video>
+                        </div>
+                        <div class="pull-left v-two">
+                            <video autoplay width="100%" height="100%" id="v_1_Source"></video>
+                        </div>
+                        <div class="pull-left v-three">
+                            <video autoplay width="100%" height="100%" id="v_2_Source"></video>
+                        </div>
+                        <div class="pull-left v-four">
+                            <video autoplay width="100%" height="100%" id="v_3_Source"></video>
+                        </div>
+                    </div>
+                    <!-- 地图 -->
+                    <div class="col-md-3 col-padding-zero map-module animate-display" id="map-module">
+                        <!-- 显示隐藏视频按钮 -->
+                        <div id="mapAllShow">
+                            <i class="fa fa-chevron-left"></i>
+                        </div>
+                        <!-- 右键监听模块 -->
+                        <div class="right-click-monitor hidden" id="rightClickMonitor">
+                            <div class="col-md-4 text-right">
+                                <img src="../../resources/img/play.png" id="monitorIco"/>
+                            </div>
+                            <div class="col-md-8 col-padding-zero text-left">
+                                <span id="monitorText">数据等待中...</span>
+                            </div>
+                            <div class="col-md-12 nstSlider-voice" style="margin-top: 5px;">
+                                <div style="width: 100%;" class="nstSlider audioVoice" data-range_min="0"
+                                     data-range_max="100" data-cur_min="100">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 列表 -->
+                <div class="video-right-bottom">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li id="warnRecord" class="active"><a href="#alarmRecord" data-toggle="tab">报警记录</a></li>
+                        <li id="operationLog"><a href="#logging" data-toggle="tab">日志记录</a></li>
+                        <!-- 控制面板模块 -->
+                        <li class="video-control-panel">
+                            <!-- 云台 -->
+                            <i id="videoYunSett" class="video-yun-sett"></i>
+                            <!-- 亮度 -->
+                            <i id="videoDimming" class="video-dimming"></i>
+                            <!-- 屏幕分隔 -->
+                            <div id="videoSeparated">
+                                <i id="videoFour" class="video-four video-four-check" title=""></i>
+                                <i id="videoSix" class="video-six" title=""></i>
+                                <i id="videoNine" class="video-nine" title=""></i>
+                                <i id="videoTen" class="video-ten" title=""></i>
+                                <i id="videoSixteen" class="video-sixteen" title=""></i>
+                            </div>
+                            <!-- 左侧及底部 -->
+                            <i id="videoWin" class="video-win" title=""></i>
+                            <!-- 全屏 -->
+                            <i id="videoFullScreen" class="video-full-screen" title=""></i>
+                        </li>
+                        <li class="tab-hide-down">
+                            <!-- 特殊参数设置按钮 -->
+                            <i id="setBtn" class="glyphicon glyphicon-cog" style="display: none"></i>
+                            <!-- 向下隐藏按钮 -->
+                            <i id="scalingBtn" class="fa fa-chevron-up"></i>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <!-- 报警记录 -->
+                        <div role="tabpanel" class="tab-pane active" id="alarmRecord">
+                            <table id="alarmRecordDataTable" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th width="50px">序号</th>
+                                    <th>监控对象</th>
+                                    <th>报警时间</th>
+                                    <th>处理状态</th>
+                                    <th>所属分组</th>
+                                    <th>对象类型</th>
+                                    <th>车牌颜色</th>
+                                    <th>报警类型</th>
+                                    <th>报警开始速度</th>
+                                    <th>行车记录仪速度</th>
+                                    <th>从业人员</th>
+                                    <th>围栏类型</th>
+                                    <th>围栏名称</th>
+                                    <th>报警位置</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 日志记录 -->
+                        <div role="tabpanel" class="tab-pane" id="logging">
+                            <table id="loggingDataTable" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th width="50px">序号</th>
+                                    <th>时间</th>
+                                    <th>IP地址</th>
+                                    <th>操作人</th>
+                                    <th>监控对象</th>
+                                    <th>车牌颜色</th>
+                                    <th>内容描述</th>
+                                    <th>日志类型</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div id="rMenu"></div>
+<!-- 视频画面控制 -->
+<div class="modal fade" id="videoScreenControl" tabindex="-1" aria-hidden="false" data-backdrop="static" role="dialog">
+    <div class="modal-dialog" role="document" style="width: 500px !important">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">视频画面控制 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-horizontal">
+                    <!-- 亮度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">亮度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsBrightness" data-range_min="0" data-range_max="255"
+                                 data-cur_min="255">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="brightnessVal" readonly/></div>
+                    </div>
+                    <!-- 色度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">色度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsChroma" data-range_min="0" data-range_max="360" data-cur_min="0">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="chromaVal" readonly/></div>
+                    </div>
+                    <!-- 对比度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">对比度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsContrast" data-range_min="0" data-range_max="255" data-cur_min="51">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="contrastVal" readonly/></div>
+                    </div>
+                    <!-- 饱和度 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">饱和度：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsSaturation" data-range_min="0" data-range_max="255"
+                                 data-cur_min="51">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="saturationVal" readonly/></div>
+                    </div>
+                    <!-- 音量 -->
+                    <div class="form-group">
+                        <div class="col-md-3 text-right control-label">音量：</div>
+                        <div class="col-md-6">
+                            <div class="nstSlider nsVolume" data-range_min="0" data-range_max="100" data-cur_min="50">
+                                <div class="leftGrip"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                                                 id="volumeVal" readonly/></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 云台 -->
+<div class="modal fade" id="haeundaeModal" tabindex="-1" aria-hidden="false" data-backdrop="static" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="haeundaeBrand"></h4>
+            </div>
+            <div class="modal-body">
+                <input id="connectState" type="text" hidden/>
+                <div class="row">
+                    <div class="pull-left cloud-left">
+                        <table>
+                            <tr>
+                                <td><i id="haeundaeLeftTop"></i></td>
+                                <td><i id="haeundaeTop"></i></td>
+                                <td><i id="haeundaeRightTop"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i id="haeundaeLeft"></i></td>
+                                <td><i id="haeundaeCenter"></i></td>
+                                <td><i id="haeundaeRight"></i></td>
+                            </tr>
+                            <tr>
+                                <td><i id="haeundaeLeftBottom"></i></td>
+                                <td><i id="haeundaeBottom"></i></td>
+                                <td><i id="haeundaeRightBottom"></i></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="pull-right cloud-right">
+                        <div class="cloud-right-top">
+                            <div class="col-md-7 col-padding-zero">
+                                <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                    <button type="button" class="btn btn-default btn-vertical-default" id="zoomPlus"><i
+                                            class="plus"></i></button>
+                                    <button type="button" class="btn btn-default btn-vertical-default">变焦</button>
+                                    <button type="button" class="btn btn-default btn-vertical-default" id="zoomLess"><i
+                                            class="less"></i></button>
+                                </div>
+                                <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                    <button type="button" class="btn btn-default btn-vertical-default" id="doublePlus">
+                                        <i class="plus"></i></button>
+                                    <button type="button" class="btn btn-default btn-vertical-default">变倍</button>
+                                    <button type="button" class="btn btn-default btn-vertical-default" id="doubleLess">
+                                        <i class="less"></i></button>
+                                </div>
+                                <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                    <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="aperturePlus"><i class="plus"></i></button>
+                                    <button type="button" class="btn btn-default btn-vertical-default">光圈</button>
+                                    <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="apertureLess"><i class="less"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-5 col-padding-zero">
+                                <div class="col-md-12 text-center">灯光</div>
+                                <div class="col-md-12">
+                                    <label class="ag-switch">
+                                        <input type="checkbox" id="haeundaeLight"/>
+                                        <i></i>
+                                    </label>
+                                </div>
+                                <div class="col-md-12 text-center">雨刷</div>
+                                <div class="col-md-12">
+                                    <label class="ag-switch">
+                                        <input type="checkbox" id="haeundaeWipers"/>
+                                        <i></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cloud-right-bottom">
+                            <div class="left-grip">速度：慢</div>
+                            <div class="nstSlider haeundaeNstSlider" data-range_min="0" data-range_max="255"
+                                 data-cur_min="127">
+                                <div class="leftGrip"></div>
+                            </div>
+                            <div class="right-grip">快</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--磁盘存储-->
+<div class="modal fade" id="diskSaveModal" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">设置</h4>
+            </div>
+            <div class="modal-body">
+                <form id="specialParamSet" class="form-horizontal" role="form" action="#"
+                      th:action="@{/realTimeVideo/video/saveDiskInfo}" method="post">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">视频播放缺省时间（s）：</label>
+                            <div class="col-md-6 right-input">
+                                <input class="form-control" id="videoPlayTime" value="300" name="videoPlayTime"
+                                       type="text" placeholder="设置视频播放缺省时间">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">视频空闲断开时间（s）：</label>
+                            <div class="col-md-6 right-input">
+                                <input class="form-control" id="videoRequestTime" value="30" name="videoStopTime"
+                                       type="text" placeholder="设置视频空闲断开时间">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">存储容量预警阈值（%）：</label>
+                            <div class="col-md-6 right-input">
+                                <input class="form-control" id="ftpStorage" name="memoryRate" type="text"
+                                       placeholder="设置FTP存储空间">
+                            </div>
+                        </div>
+                        <div class="form-group" style="padding: 0 15px !important;">
+                            <h3>存储容量状态 <span id="videoMemory" class="pull-right"></span></h3>
+                            <div class="progress">
+                                <input id="videoSaveState" name="memory" hidden/>
+                                <div id="videoMemoryProgress" class="progress-bar progress-bar-info" role="progressbar"
+                                     aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                                     style="width: 30%;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label style="padding-right:0;" class="col-md-6 control-label radio-label">
+                                <input id="videoCovered" type="radio" value="0" name="memoryType" checked>
+                                存储空间满后自动覆盖
+                            </label>
+                            <label style="padding-right:0;" class="col-md-6 control-label radio-label">
+                                <input id="stopRecording" type="radio" value="1" name="memoryType">
+                                存储空间满后停止录制
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="submitBtn" class="btn btn-primary" type="button">提交</button>
+                        <button id="closeBtn" data-dismiss="modal" class="btn btn-default btn-off" type="button">关闭
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 视频右键菜单 -->
+<ul id="videoMenu" class="videoRightList">
+    <li id="closeVideo">关闭视频</li>
+    <li id="closeAllVideo">关闭所有视频</li>
+    <li id="mainCodeStream">主码流</li>
+    <li id="subcodeFlow">子码流</li>
+    <li class="showScale" id="scaleShow">显示比例&nbsp;&nbsp;<span class="glyphicon glyphicon-play"></span>
+    </li>
+    <li id="takePhoto">抓拍</li>
+    <div class="scaleList" id="scaleRight">
+        <ul>
+            <li id="defaultScale">原始比例</li>
+            <li id="twoScale">4:3</li>
+            <li id="threeScale">16:9</li>
+        </ul>
+    </div>
+    <input type="hidden" id="videoVehicleId" class="form-control"/>
+    <input type="hidden" id="videoChannelNum" class="form-control"/>
+    <input type="hidden" id="videoChannelType" class="form-control"/>
+    <input type="hidden" id="videoDomId" class="form-control"/>
+</ul>
+<label id="error_label" class='error' style='display: none;'></label>
+
+<!-- 日志内容 -->
+<div class="modal fade" id="logDetailDiv" role="dialog" aria-hidden="true" data-backdrop="static"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:60%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">日志内容</h4>
+            </div>
+            <div class="modal-body" id="logContent">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 报警处理 -->
+<div class="modal fade" id="warningManage" role="dialog" style="overflow-y:hidden" data-backdrop="static"
+     data-keyboard="false" aria-labelledby="alarmSettingInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <style>
+            #warningManage .modal-dialog {
+                width: 900px !important;
+            }
+        </style>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">报警处理</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">监控对象：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningCarName"></span>
+                        </div>
+                        <label class="col-md-3 control-label">从业人员：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningPeo"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">所属分组：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningGroup" style="word-break: break-all"></span>
+                        </div>
+                        <label class="col-md-3 control-label">报警时间：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningTime"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">报警类型：</label>
+                        <div class="col-md-8 dataStatistics-value warningTypeArea">
+                            <span id="warningDescription"></span>
+                        </div>
+                    </div>
+                    <!-- 超速预警 -->
+                    <div class="form-group warningDeal" id="overSpeedGap">
+                        <label class="col-md-3 control-label">超速预警差值(km/h)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="overSpeedGapValue"></span>
+                        </div>
+                    </div>
+                    <!-- 疲劳驾驶预警 -->
+                    <div class="form-group warningDeal" id="tiredDriveGap">
+                        <label class="col-md-3 control-label">疲劳驾驶预警差值(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="tiredDriveGapValue"></span>
+                        </div>
+                    </div>
+                    <!-- 碰撞报警 -->
+                    <div class="form-group warningDeal" id="crashWarning">
+                        <label class="col-md-3 control-label">碰撞时间(ms)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="crashTime"></span>
+                        </div>
+                        <label class="col-md-3 control-label">碰撞加速度(0.1g)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="crashSpeed"></span>
+                        </div>
+                    </div>
+                    <!-- 侧翻预警 -->
+                    <div class="form-group warningDeal" id="turnOnWarning">
+                        <label class="col-md-3 control-label">侧翻角度(度)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="turnOnValue"></span>
+                        </div>
+                    </div>
+                    <!-- 超速报警 -->
+                    <div class="form-group warningDeal" id="overSpeeds">
+                        <label class="col-md-3 control-label">最高速度(km/h)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningSpeed"></span>
+                        </div>
+                        <label class="col-md-3 control-label">超速持续时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningAllTime"></span>
+                        </div>
+                    </div>
+                    <!-- 疲劳驾驶 -->
+                    <div class="form-group warningDeal" id="tiredDrive">
+                        <label class="col-md-3 control-label">连续驾驶时间门限(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="continuousDriveTime"></span>
+                        </div>
+                        <label class="col-md-3 control-label">最小休息时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="breakTime"></span>
+                        </div>
+                    </div>
+                    <!-- 当天累计驾驶超时 -->
+                    <div class="form-group warningDeal" id="addUpDrive">
+                        <label class="col-md-3 control-label">当天累计驾驶时间门限(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="addUpDriveTime"></span>
+                        </div>
+                    </div>
+                    <!-- 超时停车 -->
+                    <div class="form-group warningDeal" id="overTimeStop">
+                        <label class="col-md-3 control-label">最长停车时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="overTimeStopTime"></span>
+                        </div>
+                    </div>
+                    <!-- 凌晨2-5点行驶报警 -->
+                    <div class="form-group warningDeal" id="earlyRun">
+                        <label class="col-md-3 control-label">凌晨2-5点行驶报警参数：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="earlyRunValue"></span>
+                        </div>
+                    </div>
+                    <!-- 车辆非法位移 -->
+                    <div class="form-group warningDeal" id="displacementCar">
+                        <label class="col-md-3 control-label">车辆非法位移(m)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="displacementCarDistance"></span>
+                        </div>
+                    </div>
+                    <!-- 车机疑似屏蔽报警 -->
+                    <div id="shieldWarning" class="warningDeal">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">离线时间超过时间报警(s)：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineTime"></span>
+                            </div>
+                            <label class="col-md-3 control-label">起始时间：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineStartTime"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">结束时间：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineEndTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <span id="color" style="color: red; display: none; margin-left: 20px;">注：持续性报警结束前暂时不能处理</span>
+                    <input id="warningType" type="hidden" name="warningType"/>
+                    <input id="earlyAlarmStartTime" type="hidden"/>
+                    <input type="hidden" id="simcard" name="simcard"/>
+                    <input type="hidden" id="vUuid" name="vUuid"/>
+                    <input type="hidden" id="device" name="device"/>
+                    <input type="hidden" id="sno" name="sno"/>
+                </div>
+            </div>
+            <div class="modal-footer" id="warningHiden" style="text-align:center!important;">
+                <button id="warningManageListening" type="button" class="btn btn-primary btn-alarm-manage">监听</button>
+                <button id="warningManagePhoto" type="button" class="btn btn-primary btn-alarm-manage">拍照</button>
+                <button id="warningManageSend" type="button" class="btn btn-primary btn-alarm-manage">下发短信</button>
+                <button id="warningManageAffirm" type="button" class="btn btn-primary btn-alarm-manage"
+                        style="padding: 9px 0 8px">人工确认报警
+                </button>
+                <button id="warningManageCancel" type="button" class="btn btn-primary btn-alarm-manage">不做处理</button>
+                <button id="warningManageFuture" type="button" class="btn btn-primary btn-alarm-manage">将来处理</button>
+                <button id="warningManageClose" type="button" class="btn btn-default btn-alarm-manage">关闭</button>
+
+                <!-- 报警处理-监听 -->
+                <div id="listeningContent">
+                    <form th:action="@{/v/monitoring/handleAlarm}" role="form" id="listeningAlarm" action="#"
+                          method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:20px 0px 0;text-align: left;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarmListen" name="vehicleId" value="">
+                                <input class="hidden" name="orderType" value="41">
+                                <input class="hidden" id="brandListen" name="plateNumber" value="">
+                                <input class="hidden" id="alarmListen" name="alarm" value="">
+                                <input class="hidden" id="startTimeListen" name="startTime" value="">
+                                <input class="hidden" id="simcardListen" name="simcard" value="">
+                                <input class="hidden" id="deviceListen" name="device" value="">
+                                <input class="hidden" id="snoListen" name="sno" value="">
+                                <input class="hidden" id="handleTypeListen" name="handleType" value="">
+                                <input class="hidden" id="descriptionListen" name="description" value="">
+                                <textarea class="hidden" id="remarkListen" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">电话号码：</label>
+                                <div class=" col-md-9">
+                                    <input type="text" placeholder="请输入电话号码" autocomplete="off" class="form-control"
+                                           id="listenPhone"
+                                           name="monitorPhone" maxlength="20"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- 报警处理-拍照 -->
+                <div id="takePicturesContent">
+                    <form th:action="@{/v/monitoring/photo}" role="form" id="takePhotoForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;text-align: left;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="1">
+                                <input class="hidden" id="brandPhoto" name="plateNumber" value="">
+                                <input class="hidden" id="alarmPhoto" name="alarm" value="">
+                                <input class="hidden" id="startTimePhoto" name="startTime" value="">
+                                <input class="hidden" id="simcardPhoto" name="simcard" value="">
+                                <input class="hidden" id="devicePhoto" name="device" value="">
+                                <input class="hidden" id="snoPhoto" name="sno" value="">
+                                <input class="hidden" id="handleTypePhoto" name="handleType" value="">
+                                <input class="hidden" id="description-photo" name="description" value="">
+                                <textarea class="hidden" id="remark-photo" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class=" col-md-3">
+                                    <select name="wayID" class="form-control">
+                                        <option value="1" selected="true">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">间隔时间(秒)：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="0表示按最小间隔拍照" class="form-control" id="time"
+                                           name="time"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">拍照张数：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="默认1,最大10" value="1" class="form-control"
+                                           name="command"/>
+                                </div>
+                                <label class="col-md-3 control-label">保存标志：</label>
+                                <div class=" col-md-3">
+                                    <select name="saveSign" class="form-control">
+                                        <option value="0" selected="true">实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class=" col-md-3">
+                                    <select name="distinguishability" class="form-control">
+                                        <option id="minResolution" value="0">最低分辨率</option>
+                                        <option id="defaultValue" value="1">320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">176*144</option>
+                                        <option value="6">352*288</option>
+                                        <option value="7">704*288</option>
+                                        <option value="8">704*576</option>
+                                        <option id="maxResolution" value="255">最高分辨率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    图像质量：
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" value="5" name="quality" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="luminance" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">对比度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="contrast" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="saturability" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">色度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="chroma" class="form-control"/>
+                                </div>
+                            </div>
+                            <input type="hidden" value="2" name="webType"/>
+                        </div>
+
+                    </form>
+                </div>
+                <!-- 报警处理-下发短信 -->
+                <div id="sendTextMessages">
+                    <form th:action="@{/v/monitoring/sendTxt}" role="form" id="txtSendForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;text-align: left;">
+                            <div class="form-group newDeviceInfo">
+                                <div class="col-md-9" style="margin-left: 64px;">
+                                    <label class="radio-inline"><input type="radio" name="textType" value="1" checked>
+                                        通知</label>
+                                    <label class="radio-inline"><input type="radio" name="textType" value="2">
+                                        服务</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input class="hidden" id="vidSendTxtForAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="5">
+                                <input class="hidden" id="brandTxt" name="plateNumber" value="">
+                                <input class="hidden" id="alarmTxt" name="alarm" value="">
+                                <input class="hidden" id="startTimeTxt" name="startTime" value="">
+                                <input class="hidden" id="simcardTxt" name="simcard" value="">
+                                <input class="hidden" id="deviceTxt" name="device" value="">
+                                <input class="hidden" id="snoTxt" name="sno" value="">
+                                <input class="hidden" id="handleTypeTxt" name="handleType" value="">
+                                <input class="hidden" id="description-Txt" name="description" value="">
+                                <input class="hidden" id="deviceTypeTxt" name="deviceType">
+                                <textarea class="hidden" id="remark-Txt" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">文本内容：</label>
+                                <div class=" col-md-9">
+                                    <textarea class="form-control" id="smsTxt" name="txt" rows="3"
+                                              maxlength="512"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-9 noPadding">
+                                    <div class="col-md-6 newDeviceInfo">
+                                        <select name="messageTypeOne" class="form-control">
+                                            <option value="1">服务</option>
+                                            <option value="2">紧急</option>
+                                            <option value="3">通知</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 newDeviceInfo">
+                                        <select name="messageTypeTwo" class="form-control">
+                                            <option value="0">中心导航信息</option>
+                                            <option value="1">CAN故障码信息</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 oldDeviceInfo">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="1" type="checkbox">紧急</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="3" checked="checked" type="checkbox"/>终端显示器显示</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="4" checked="checked" type="checkbox"/>终端TTS读播</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 oldDeviceInfo">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="5" checked="checked" type="checkbox"/>广告屏显示</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" value="2" name="webType"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="alarm-remark" class="clearfix">
+                    <label class="col-md-1 col-sm-3 control-label paddingRight text-right">备注：</label>
+                    <div class="col-md-10 col-sm-8 searchListSelect" style="padding-right: 9px">
+                        <textarea rows="4" class="form-control" id="alarmRemark" maxlength="50"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer listenFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goListeningForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer takePicturesFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goPhotographsForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer sendTextFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goTxtSendForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 抓拍 -->
+<div class="modal fade" id="videoSnap" role="dialog" aria-hidden="true" data-backdrop="static"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">抓拍</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <div id="videoPictureSave" class="col-md-12" style="height: 400px; margin-bottom: 5px;">
+                            <canvas id="canvasForVideo" width="524" height="400"></canvas>
+                            <input id="videoImage" type="text" name="file" hidden/>
+                            <input id="vehicleId" type="text" name="vehicleId" hidden/>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="col-md-3 control-label">监控对象：</label>
+                            <div class="col-md-3">
+                                <span id="photoObjName"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="col-md-3 control-label">标识颜色：</label>
+                            <div class="col-md-3">
+                                <span id="photoObjColor"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="col-md-3 control-label">通道号：</label>
+                            <div class="col-md-3">
+                                <span id="photoObjNumber"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea id="snapText" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" id="snapSubmit" class="btn btn-primary btn-alarm-manage">提交
+                </button>
+                <button type="button" data-dismiss="modal" id="" class="btn btn-default btn-alarm-manage">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 唤醒 -->
+<div class="modal fade" id="wakeupModal" role="dialog" aria-hidden="true" data-backdrop="static"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">唤醒</h4>
+                <input id="wakeupMonitorId" type="text" hidden />
+            </div>
+            <div class="modal-body">
+                <form id="wakeupForm">
+                    <div class="row form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-4 col-md-offset-2">
+                                <input type="text" value="10" id="wakeupTime" name="wakeupTime" class="form-control" placeholder="可输入范围是：0-1000" />
+                            </div>
+                            <label class="col-md-4 control-label" style="text-align: left">分钟后，自动进入休眠状态</label>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-10 col-md-offset-2">
+                                <span>(0表示一直处于唤醒状态)</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="wakeupSubmit" class="btn btn-primary btn-alarm-manage">提交
+                </button>
+                <button type="button" id="wakeupClose" class="btn btn-default btn-alarm-manage">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="common/common_window::window(windowId=commonWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_lg_window::window(windowId=commonLgWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_sm_window::window(windowId=commonSmWin)">公共弹出窗口(小)</div>
+<div th:replace="common/common_window::window(windowId=uploaderWin)">公共上传窗口</div>
+<div th:replace="common/common_chat_window::window(windowId=chatWin)">聊天窗口</div>
+<!--  -->
+<script th:src="@{/resources/js/jquery.cookie.js}"></script>
+<script src="https://pv.sohu.com/cityjson?ie=utf-8"></script>
+<script src="resources/js/layui/layer/layer.js" th:src="@{/resources/js/layui/layer/layer.js}"></script>
+<script src="resources/js/laydate/laydate.js" th:src="@{/resources/js/laydate/laydate.js}"></script>
+<script src="resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script th:inline="javascript">
+    var headers = {
+        "access_token": [[${ session.access_token }]],
+        "refresh_token": [[${ session.refresh_token }]],
+    };
+    var alarmError = [[#{dataTableOperation.alarm.error}]];
+    var alarmDisabled = [[#{dataTableOperation.alarm.disabled}]];
+    var alarmSearchChannelID = [[#{alarmSearch.channel.ID}]];
+    var alarmSearchIntervalTime = [[#{alarmSearch.interval.time}]];
+    var alarmSearchIntervalError = [[#{alarmSearch.interval.error}]];
+    var alarmSearchIntervalSize = [[#{alarmSearch.interval.size}]];
+    var alarmSearchPhotoSize = [[#{alarmSearch.photo.size}]];
+    var alarmSearchPhotoNull = [[#{alarmSearch.photo.null}]];
+    var alarmSearchSaveNull = [[#{alarmSearch.save.null}]];
+    var alarmSearchResolutionNull = [[#{alarmSearch.resolution.null}]];
+    var alarmSearchMovieSize = [[#{alarmSearch.movie.size}]];
+    var alarmSearchMovieNull = [[#{alarmSearch.movie.null}]];
+    var alarmSearchBrightnessSize = [[#{alarmSearch.brightness.size}]];
+    var alarmSearchBrightnessNull = [[#{alarmSearch.brightness.null}]];
+    var alarmSearchContrastSize = [[#{alarmSearch.contrast.size}]];
+    var alarmSearchContrastNull = [[#{alarmSearch.contrast.null}]];
+    var alarmSearchSaturatedSize = [[#{alarmSearch.saturated.size}]];
+    var alarmSearchSaturatedNull = [[#{alarmSearch.saturated.null}]];
+    var alarmSearchColorSize = [[#{alarmSearch.color.size}]];
+    var alarmSearchColorNull = [[#{alarmSearch.color.null}]];
+    var publicIssuedSuccess = [[#{public.Issued.success}]];
+    var publicIssuedFailure = [[#{public.Issu ed.failure}]];
+    var videoRequestUrl = [[${session.videoUrl}]];
+    var audioRequestPort = [[${session.audioPort}]];
+    var videoRequestPort = [[${session.videoPort}]];
+    var videoResourcePort = [[${session.resourcePort}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=2.0&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.AutoComplete,AMap.Geocoder,AMap.MoveAnimation,AMap.PlaceSearch,AMap.PolygonEditor,AMap.PolylineEditor,AMap.CircleEditor"></script>
+<script src="resources/js/bootstrap/js/bootstrap.min.js"
+        th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/nstSlider/js/jquery.nstSlider.js"
+        th:src="@{/resources/js/nstSlider/js/jquery.nstSlider.js}"></script>
+<script src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/media/three.min.js"></script>
+<script src="/clbs/resources/js/media/OrbitControls.js"></script>
+<script src="/wro/mediaController.js" th:src="@{/wro/mediaController.js}"></script>
+<script src="/clbs/resources/js/require.js" defer async="true" data-main="/clbs/resources/js/realTimeVideo/index"></script>
+</body>
+</html>
+<script>
+    $("[data-toggle='tooltip']").tooltip();
+</script>

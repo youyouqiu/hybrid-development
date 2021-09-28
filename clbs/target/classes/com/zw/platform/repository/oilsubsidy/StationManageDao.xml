@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.oilsubsidy.StationManageDao">
+    <select id="getByNumber" parameterType="string" resultType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        SELECT `id`,`name`,`number`,`longitude`,`latitude`,`describe`,`remark`
+          from zw_m_oil_subsidy_station_info
+          where `number` = #{number}
+          and flag = 1
+          order by create_data_time desc LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        INSERT INTO zw_m_oil_subsidy_station_info
+        (
+        id,
+        `name`,
+        `number`,
+        longitude,
+        latitude,
+        `describe`,
+        remark,
+        flag,
+        create_data_time,
+        create_data_username,
+        update_data_time,
+        update_data_username
+        )
+        values (
+        #{id},
+        #{name},
+        #{number},
+        #{longitude},
+        #{latitude},
+        #{describe},
+        #{remark},
+        #{flag},
+        now(),
+        #{createDataUsername},
+        now(),
+        #{updateDataUsername}
+        )
+    </insert>
+
+    <select id="getById" parameterType="string" resultType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        SELECT * from zw_m_oil_subsidy_station_info where id = #{id} and flag = 1
+    </select>
+
+    <update id="update" parameterType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        UPDATE zw_m_oil_subsidy_station_info
+        <set>
+            <if test='null != name'>`name` = #{name},</if>
+            <if test='null != number'>`number` = #{number},</if>
+            <if test='null != longitude'>longitude = #{longitude},</if>
+            <if test='null != latitude'>latitude = #{latitude},</if>
+            <if test='null != describe'>`describe` = #{describe},</if>
+            <if test='null != remark'>remark = #{remark},</if>
+            <if test='null != flag'>flag = #{flag},</if>
+            <if test='null != createDataTime'>create_data_time = #{createDataTime},</if>
+            <if test='null != createDataUsername'>create_data_username = #{createDataUsername},</if>
+            <if test='null != updateDataTime'>update_data_time = #{updateDataTime},</if>
+            <if test='null != updateDataUsername'>update_data_username = #{updateDataUsername},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getUsedByIds" parameterType="string" resultType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        SELECT DISTINCT s.* from
+        zw_m_oil_subsidy_direction_station_middle m
+        INNER JOIN zw_m_oil_subsidy_station_info s on m.station_info_id = s.id and s.flag = 1
+        where m.station_info_id in
+        <foreach item="id" collection="ids" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getByIds" parameterType="string" resultType="com.zw.platform.domain.oilsubsidy.station.StationDO">
+        SELECT * from zw_m_oil_subsidy_station_info
+        WHERE flag = 1
+        and id in
+        <foreach item="id" collection="ids" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteBatch" parameterType="java.util.List">
+        UPDATE zw_m_oil_subsidy_station_info
+        set flag = 0
+        where flag = 1
+        and id in
+        <foreach item="id" collection="ids" open="(" separator=","
+                 close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getByKeyword" parameterType="string" resultType="com.zw.platform.domain.oilsubsidy.station.StationDTO">
+        SELECT `id`,`name`,`number`,`longitude`,`latitude`,`describe`,`remark`
+        from zw_m_oil_subsidy_station_info
+        where flag = 1
+        <if test="_parameter != null and _parameter != ''">
+            and (
+            name LIKE CONCAT('%',#{_parameter},'%') or number like CONCAT('%',#{_parameter},'%')
+            )
+        </if>
+        order by create_data_time desc
+    </select>
+</mapper>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.oilsubsidy.DirectionManageDao">
+
+    <insert id="add" parameterType="com.zw.platform.domain.oilsubsidy.line.DirectionDO">
+        insert into zw_m_oil_subsidy_direction_info
+        values(#{id},#{lineId},#{directionType},#{mile},#{distance},#{summerFirstTrainTime},#{summerLastTrainTime}
+              ,#{morningPeakStartTime},#{eveningPeakStartTime},#{morningPeakEndTime},#{eveningPeakEndTime},
+               #{peakDepartureInterval},#{offPeakDepartureInterval},#{winterFirstTrainTime},#{winterLastTrainTime}
+               ,#{firstStationId},#{lastStationId})
+    </insert>
+
+    <insert id="addBatch" parameterType="com.zw.platform.domain.oilsubsidy.line.DirectionDO">
+        insert into zw_m_oil_subsidy_direction_info
+        values
+        <foreach collection ="list" item="item" index= "index" separator =",">
+            (#{item.id},#{item.lineId},#{item.directionType},#{item.mile},#{item.distance},#{item.summerFirstTrainTime},#{item.summerLastTrainTime}
+            ,#{item.morningPeakStartTime},#{item.eveningPeakStartTime},#{item.morningPeakEndTime},#{item.eveningPeakEndTime},
+            #{item.peakDepartureInterval},#{item.offPeakDepartureInterval},#{item.winterFirstTrainTime},#{item.winterLastTrainTime},
+            #{item.firstStationId},#{item.lastStationId})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.oilsubsidy.line.DirectionDO">
+        update zw_m_oil_subsidy_direction_info
+        <set>
+            <if test="lineId != null and lineId !=''">
+                line_id = #{lineId},
+            </if>
+            <if test="directionType != null">
+                direction_type = #{directionType},
+            </if>
+            <if test="mile != null">
+                mile = #{mile},
+            </if>
+            <if test="distance != null">
+                distance = #{distance},
+            </if>
+            <if test="summerFirstTrainTime != null">
+                summer_first_train_time = #{summerFirstTrainTime},
+            </if>
+            <if test="summerLastTrainTime != null">
+                summer_last_train_time = #{summerLastTrainTime},
+            </if>
+            <if test="winterFirstTrainTime != null and winterFirstTrainTime != ''">
+                winter_first_train_time = #{winterFirstTrainTime},
+            </if>
+            <if test="winterLastTrainTime != null and winterLastTrainTime != ''">
+                winter_last_train_time = #{winterLastTrainTime},
+            </if>
+            <if test="morningPeakStartTime != null">
+                morning_peak_start_time = #{morningPeakStartTime},
+            </if>
+            <if test="eveningPeakStartTime != null">
+                evening_peak_start_time = #{eveningPeakStartTime},
+            </if>
+            <if test="morningPeakEndTime != null">
+                morning_peak_end_time = #{morningPeakEndTime},
+            </if>
+            <if test="eveningPeakEndTime != null">
+                evening_peak_end_time = #{eveningPeakEndTime},
+            </if>
+            <if test="peakDepartureInterval != null">
+                peak_departure_interval = #{peakDepartureInterval},
+            </if>
+            <if test="offPeakDepartureInterval != null">
+                off_peak_departure_interval = #{offPeakDepartureInterval},
+            </if>
+            <if test="firstStationId != null">
+                first_station_id = #{firstStationId},
+            </if>
+            <if test="lastStationId != null">
+                last_station_id = #{lastStationId},
+            </if>
+        </set>
+        where id =#{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        delete from  zw_m_oil_subsidy_direction_info  where id =#{id}
+    </delete>
+
+    <delete id="deleteBatch" parameterType="String">
+        delete from  zw_m_oil_subsidy_direction_info  where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getAllFieldById" resultType="com.zw.platform.domain.oilsubsidy.line.DirectionDO" parameterType="String">
+        select id,line_id,mile,distance,summer_first_train_time,summer_last_train_time,morning_peak_start_time,
+               evening_peak_start_time,morning_peak_end_time,evening_peak_end_time,peak_departure_interval,
+               off_peak_departure_interval,winter_first_train_time,winter_last_train_time,first_station_id,last_station_id
+        from zw_m_oil_subsidy_direction_info where id =#{id}
+    </select>
+
+    <select id="getListByLineId" resultType="com.zw.platform.domain.oilsubsidy.line.DirectionDO">
+        select id,line_id,direction_type,mile,distance,summer_first_train_time,summer_last_train_time,morning_peak_start_time,
+               evening_peak_start_time,morning_peak_end_time,evening_peak_end_time,peak_departure_interval,
+               off_peak_departure_interval,winter_first_train_time,winter_last_train_time
+        from zw_m_oil_subsidy_direction_info where line_id = #{lineId}
+    </select>
+
+    <select id="getIdsByLineId" resultType="String">
+        select id from zw_m_oil_subsidy_direction_info where line_id = #{lineId}
+    </select>
+
+    <select id="getIdsByLineIds" resultType="java.lang.String">
+        select id from zw_m_oil_subsidy_direction_info where line_id in
+        <foreach collection="ids"  separator="," open="(" item="id" close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

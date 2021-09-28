@@ -1,0 +1,122 @@
+<form th:action="@{/m/regionManagement/fenceManagement/addFenceType}" id="addFenceForm" role="form" action="#"
+  method="post" class="form-horizontal">
+  <div class="modal-header">
+    <button type="button" id="doXAdd" class="close" data-dismiss="modal"
+      aria-hidden="true">&times;
+    </button>
+    <h4 class="modal-title">新增围栏种类</h4>
+    <link rel="stylesheet" href="/clbs/resources/js/colorPick/colorpick.css" />
+    <style>
+      .rgbSpan {
+        float: left;
+        line-height: 36px;
+        padding-left: 15px;
+      }
+
+      #colorBg {
+        float: left;
+        display: inline-block;
+        width: 36px;
+        height: 36px;
+        border: 1px solid #d9d9d9
+      }
+
+      #addFenceForm .checkBox label {
+        text-align: left !important;
+      }
+
+      #addFenceForm .checkBox input {
+        vertical-align: -2px;
+      }
+    </style>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken">
+        <div class="form-group">
+          <label class="col-md-3 control-label"><label
+            class="text-danger">*</label> 种类名称： </label>
+          <div class="col-md-8">
+            <input name="fenceTypeName" id="fenceTypeName" maxlength="10" placeholder="请输入种类名称" type="text"
+              class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label"><label
+            class="text-danger">*</label> 颜色： </label>
+          <span class="rgbSpan">RGB #</span>
+          <div class="col-md-3">
+            <input name="colorCode" onkeyup="this.value=this.value.replace(/[^a-fA-F0-9]/g,'')" onpaste="this.value=this.value.replace(/[^a-fA-F0-9]/g,'')" id="fenceColor"
+              value="ffffff" placeholder="请选择颜色" type="text"
+              class="form-control" maxlength="6" />
+          </div>
+          <span id="colorBg"></span>
+          <div class="col-md-3">
+            <button id="settingColor" class="btn btn-primary" type="button">
+              <strong>设 置</strong>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 透明度：
+          </label>
+          <div class="col-md-3">
+            <input name="transparency" maxlength="3" placeholder="0-100" type="text"
+              class="form-control" />
+          </div>
+          <div class="col-md-3 noLeftPadding" style="line-height: 36px">%</div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 绘制方式：
+          </label>
+          <div class="col-md-8 checkBox">
+            <label class="col-md-3 control-label">
+              <input type="checkbox" class="drawWayCheck" value="1" /> 多边形
+            </label>
+            <label class="col-md-3 control-label">
+              <input type="checkbox" class="drawWayCheck" value="2" /> 圆
+            </label>
+            <label class="col-md-3 control-label">
+              <input type="checkbox" class="drawWayCheck" value="3" /> 路线
+            </label>
+            <label class="col-md-3 control-label">
+              <input type="checkbox" class="drawWayCheck" value="4" /> 标注
+            </label>
+            <input type="text" name="drawWay" id="drawWay" class="fakeHide" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">备注：</label>
+          <div class="col-md-8">
+						<textarea name="remark" rows="4" maxlength="100" class="form-control"
+              placeholder="最多输入100字"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button id="doSubmitAdd" class="btn btn-primary" type="button">
+      <strong>提 交</strong>
+    </button>
+    <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script th:inline="javascript">
+  var publicSize20 = [[#{public.size10.length}]];
+  var fenceNameNull = [[#{fenceManage.fenceName.null}]];
+  var fenceNameError = [[#{fenceManage.fenceName.error}]];
+  var fenceNameRepeat = [[#{fenceManage.drawWay.repeat}]];
+  var fenceColorNull = [[#{fenceManage.fenceColor.null}]];
+  var fenceTransparencyNull = [[#{fenceManage.transparency.null}]];
+  var fenceTransparencyError = [[#{fenceManage.transparency.error}]];
+  var fenceDrawWayNull = [[#{fenceManage.drawWay.null}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/colorPick/colorpick.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/fenceSpeciesAdd.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

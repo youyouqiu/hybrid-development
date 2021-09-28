@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.NetAccessProveForwardDao">
+    <insert id="addNetAccessProveForward">
+        insert into zw_m_net_access_prove_forward (vehicle_id, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" separator=",">
+            ( #{item.vehicleId}, #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+    <delete id="deleteNetAccessProveForward">
+        delete from zw_m_net_access_prove_forward
+        where vehicle_id in
+        <foreach collection="list" item="vehicleId" open="(" close=")" separator=",">
+            #{vehicleId}
+        </foreach>
+    </delete>
+
+    <select id="getAllVehicleIds" resultType="java.lang.String">
+        select vehicle_id
+        from zw_m_net_access_prove_forward
+    </select>
+
+    <select id="listByPage" parameterType="com.zw.platform.dto.netaccessproveforward.NetAccessProveForwardVehicleQuery"
+            resultType="com.zw.platform.dto.netaccessproveforward.NetAccessProveForwardVehicleDto">
+        select distinct zmnapf.vehicle_id, zmvi.brand
+        from zw_m_net_access_prove_forward zmnapf
+        inner join zw_m_vehicle_info zmvi on zmnapf.vehicle_id = zmvi.id and zmvi.flag = 1
+        inner join zw_m_assignment_vehicle zmav on zmav.vehicle_id = zmvi.id and zmav.flag = 1
+        inner join zw_m_assignment zma on zmav.assignment_id = zma.id and zma.flag = 1
+        inner join zw_m_assignment_user zmau on zma.id = zmau.assignment_id and zmau.flag = 1
+        where zmau.user_id = #{query.userId}
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+            and zmvi.brand like  CONCAT('%',#{query.simpleQueryParam},'%')
+        </if>
+        order by zmnapf.create_data_time desc
+    </select>
+</mapper>

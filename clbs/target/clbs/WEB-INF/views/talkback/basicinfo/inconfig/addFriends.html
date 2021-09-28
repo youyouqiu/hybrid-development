@@ -1,0 +1,150 @@
+<form th:action="@{/talkback/inconfig/intercomObject/addFriends}" id="friendsSetForm" role="form" action="#" method="post" class="form-horizontal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">好友设置: <span th:text="${monitorName}"></span></h4>
+    <style>
+      .colHeader {
+        margin: 0 0 15px;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .treeArea {
+        width: 100%;
+        height: 540px;
+        border: 1px solid #ccc;
+        overflow: auto;
+      }
+
+      #myTab {
+        margin: 0;
+        border: 1px solid #ccc;
+        border-bottom-color: transparent;
+      }
+
+      #myTab li {
+        float: left;
+        width: 50%;
+        padding: 8px 0;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      #myTab li a {
+        color: #5D5F63;
+      }
+
+      #intercomObj {
+        border-right: 1px solid #ccc;
+      }
+
+      #myTab li.active a {
+        color: #428bca;
+      }
+
+      .allMonitorLabel {
+        height: 38px;
+        margin: 0;
+        cursor: pointer;
+      }
+
+      .allMonitor {
+        vertical-align: -2px;
+        cursor: pointer;
+      }
+
+      .centerArea {
+        padding: 25% 0 0 7%;
+      }
+
+      .searchBox input.form-control {
+        border-radius: 0;
+        padding-right: 24px;
+      }
+
+      .searchBox .delIcon {
+        right: 5px;
+      }
+
+      .checkbox_true_disable + a, .checkbox_false_disable + a {
+        color: #ccc !important;
+      }
+
+      .ztree li span.button.peopleSkin_ico_docu {
+        /*display: none;*/
+      }
+    </style>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <form class="form-horizontal">
+          <input type="hidden" th:value="${friends}" id="friends" />
+          <input type="hidden" th:value="${maxFriendNum}" id="maxFriendNum" />
+          <input type="hidden" th:value="${userId}" id="userId" name="userId" />
+          <input type="hidden" th:value="${monitorName}" id="monitorName" name="monitorName" />
+          <input type="hidden" id="userForm" name="userForm" />
+
+          <div id="allAssignment" class="col-md-5">
+            <h3 class="colHeader">所有对象</h3>
+            <div id="resourceAll1">
+              <div class="has-feedback" style="margin-bottom: 10px">
+                <ul id="myTab" class="list-unstyled list-inline clearfix">
+                  <li class="active" id="intercomObj"><a href="#home1">对讲对象</a></li>
+                  <li id="dispatcher"><a href="#home2">调度员</a></li>
+                </ul>
+                <div class="has-feedback searchBox">
+                  <input id="searchAllVehicle" autocomplete="off"
+                    class="form-control" type="text" placeholder="请输入对象名称" />
+                </div>
+              </div>
+              <div id="allTree" class="treeArea">
+                <ul id="intercomTree" class="ztree"></ul>
+                <ul id="dispatcherTree" class="ztree" style="display: none"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 centerArea">
+            <span>加入</span>
+            <div class="add-button-right" id="addMoveBtn">
+              <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            </div>
+            <span>移出</span>
+            <div class="add-button-left" id="removeMoveBtn">
+              <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div id="currentAssignment" class="col-md-5">
+            <h3 class="colHeader">好友(<span id="checkedNum">6</span>/<span
+              id="maxcheckeNum" th:text="${maxFriendNum}">40</span>)</h3>
+            <label class="allMonitorLabel">全部 <input type="checkbox" class="allMonitor"></label>
+            <div id="resourceAll2">
+              <div class="has-feedback searchBox">
+                <input id="searchCurVehicle" class="Inlinesearch form-control"
+                  onkeyup="friendsSet.searchFriendTree(this)"
+                  style="margin-bottom:10px;width: 100%;" type="text" autocomplete="off"
+                  placeholder="请输入对象名称" />
+              </div>
+              <div class="treeArea">
+                <ul id="friendsTree" class="ztree"></ul>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <!--<div id="bindMsg" style="text-align:left;color:red;">
+        <p>注：分配监控对象到左侧时需要勾选分组</p>
+    </div>-->
+    <button id="friendDoSubmit" class="btn btn-primary" type="button">
+      <strong>提交</strong>
+    </button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/infoinputFriendsSetForDispatch.js"></script>

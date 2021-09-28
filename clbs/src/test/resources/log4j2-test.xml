@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status="OFF"，可以去掉，它的含义为是否记录log4j2本身的event信息，默认是OFF -->
+<Configuration monitorInterval="60">
+	<!-- ****************日志存放的路径等**************** -->
+	<Properties>
+		<!-- 应用名称 -->
+		<Property name="APPLICATION_NAME">clbs</Property>
+		<!-- 日志基本配置 -->
+		<Property name="ROOT_LEVEL">INFO</Property>
+		<Property name="LOG_DATEFORMAT_PATTERN">yyyy-MM-dd HH:mm:ss.SSS</Property>
+		<Property name="LOG_PATTERN">%d{${LOG_DATEFORMAT_PATTERN}} %5p --- [%t] %-40.40c{1.} : %m%n%xEx</Property>
+
+	</Properties>
+	<!-- ****************Appenders**************** -->
+	<Appenders>
+		<!-- ######日志输出到窗口 target可以是"SYSTEM_OUT"或者"SYSTEM_ERR".默认是"SYSTEM_ERR".###### -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}" />
+		</Console>
+
+	</Appenders>
+	<!-- ****************Loggers**************** -->
+	<Loggers>
+		<Logger name="com.zw" level="${ROOT_LEVEL}" additivity="false" includeLocation="true">
+			<AppenderRef ref="Console" />
+		</Logger>
+
+		<!-- 第三方日志 AsyncLogger暂时不能用 -->
+
+		<Logger name="org.apache.http" level="${ROOT_LEVEL}" additivity="false"/>
+		<Logger name="org.springframework" level="${ROOT_LEVEL}"/>
+		<Logger name="org.mybatis" level="${ROOT_LEVEL}"/>
+		<Logger name="org.quartz" level="${ROOT_LEVEL}" additivity="false"/>
+		<Logger name="org.apache.commons" level="${ROOT_LEVEL}" additivity="false"/>
+		<!-- 调试sql日志 -->
+		<Logger name="com.ibatis" level="${ROOT_LEVEL}"/>
+		<Logger name="com.ibatis.common.jdbc.SimpleDataSource" level="${ROOT_LEVEL}"/>
+		<Logger name="org.apache.ibatis.jdbc.ScriptRunner" level="${ROOT_LEVEL}"/>
+		<Logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.Connection" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.Statement" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.PreparedStatement" level="${ROOT_LEVEL}"/>
+
+		 <Root level="${ROOT_LEVEL}" includeLocation="false">
+			 <AppenderRef ref="Console"/>
+		 </Root>
+
+	</Loggers>
+</Configuration>

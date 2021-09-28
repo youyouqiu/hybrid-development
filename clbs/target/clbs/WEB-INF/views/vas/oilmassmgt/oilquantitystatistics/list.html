@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>油量报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}"/>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">传感器报表</li>
+                        <li class="active">油量报表</li>
+                    </ul>
+                    <h1 class="h1 ">油量报表</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <input id="vehicleList" th:value="${vehicleList}" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label class="col-md-3 control-label">组织：</label>
+                                        <div class="has-feedback fastClear col-md-9">
+                                            <select name="queryType" id="queryType"
+                                                    class="Inlinesearch form-control treeSelect">
+                                                <option value="vehicle">监控对象</option>
+                                                <option value="group">企业</option>
+                                                <option value="assignment">分组</option>
+                                            </select>
+                                            <input type="text" style="cursor: pointer; background-color: #fafafa;"
+                                                   autocomplete="off" placeholder="请选择" name="groupSelect"
+                                                   class="form-control moreQueryGroup" id="groupSelect"/>
+                                            <span class="fa fa-chevron-down form-control-feedback"
+                                                  style="top: 0; right: 15px;" aria-hidden="true"
+                                                  id="groupSelectSpan"></span>
+                                            <div id="menuContent" class="menuContent">
+                                                <ul id="treeDemo" class="ztree"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 noPadding">
+                                        <label class="col-md-3 control-label searchListSelect">监控对象：</label> <input
+                                            class="form-control hidden"/>
+                                        <div class="col-md-9 searchListSelect">
+                                            <div style="position:relative;">
+                                                <div class="input-group">
+                                                    <input autocomplete="off" name="charSelect" type="text"
+                                                           class="form-control sixRightPadding" maxlength="20"
+                                                           id="charSelect" placeholder="已绑传感器的监控对象">
+                                                    <label id="charSelect-error" class="error" for="charSelect"
+                                                           style="display: none">请至少选择一个监控对象</label>
+                                                    <div class="input-group-btn">
+                                                        <button type="button" id="button"
+                                                                class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                                data-toggle="dropdown">
+                                                            <i class="fa fa-spinner loading-state"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 noPadding">
+                                        <label class="col-md-2 control-label searchListSelect">时间：</label>
+                                        <div class="col-md-10 searchListSelect">
+                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                   class="form-control layer-date laydate-icon"
+                                                   id="timeInterval" name="timeInterval" readonly/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <button id="todayClick" type="button" class="btn btn-primary">今天</button>
+                                        <button id="yesterdayClick" type="button"
+                                                class="btn btn-primary">前一天
+                                        </button>
+                                        <button id="nearlyThreeDays" type="button"
+                                                class="btn btn-primary">前三天
+                                        </button>
+                                        <button id="nearlySevenDays" type="button"
+                                                class="btn btn-primary">前七天
+                                        </button>
+                                        <button id="inquireClick" type="button"
+                                                class="btn btn-primary search-btn"><i
+                                                class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                        <button id="exportBtn"
+                                                type="button" class="btn btn-purple" disabled>
+                                            <i class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default" id="graphArea">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb" style="position:reative">图形展示
+                                <div class="carName"><i class="toopTip-btn-left"
+                                                        onclick="oilstatiscal.left_arrow()"><img data-toggle="tooltip"
+                                                                                                 data-placement="left"
+                                                                                                 title="上一辆"
+                                                                                                 src="../../../../clbs/resources/img/car-left.svg"
+                                                                                                 width="16px"/></i>&nbsp;&nbsp;&nbsp;<span
+                                        id="carName" data-toggle="tooltip" data-placement="top" title="车牌号"></span>&nbsp;&nbsp;&nbsp;<i
+                                        class="toopTip-btn-right" onclick="oilstatiscal.right_arrow()"><img
+                                        data-toggle="tooltip" data-placement="right" title="下一辆"
+                                        src="../../../../clbs/resources/img/car-right.svg" width="16px"/></i></div>
+                            </h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-up" id="showClick"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="display:none;" id="graphShow">
+                            <div class="container-area">
+                                <div id="sjcontainer" style="height: 600px;width:95%; margin: 0 auto"></div>
+                                <i class="left-btn" id="right-arrow"></i>
+                                <i class="right-btn" id="left-arrow"></i>
+                            </div>
+                            <div class="col-md-12 item-title">
+                                <ul>
+                                    <li>行驶时长：<span id="travelTime">0小时0分0秒</span></li>
+                                    <li>怠速时长：<span id="idleTime">0小时0分0秒</span></li>
+                                    <li>行驶里程：<span id="mileage">0公里</span></li>
+                                    <li>加油：<span id="fuel">0升</span></li>
+                                    <li>漏油：<span id="hundredFuel">0升</span></li>
+                                    <li>用油量：<span id="userFuel">0升</span></li>
+                                    <li>百公里油耗：<span id="userFuel100">0L/100km</span></li>
+                                    <li>最大环境温差：<span id="averageVelocity">0°C</span></li>
+                                    <li>最大燃油温差：<span id="difference">0°C</span></li>
+                                    <li>空调时长：<span id="airTime">0小时0分0秒</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs dataTableShow">
+                                <li class="active" id="allReport" data-index="1"><a href="javascript:void(0);"
+                                                                     data-toggle="tab">全部数据</a>
+                                </li>
+                                <li id="amountReport" data-index="2"><a href="javascript:void(0);" data-toggle="tab">加油数据</a></li>
+                                <li id="spillReport" data-index="3"><a href="javascript:void(0);" data-toggle="tab">漏油数据</a></li>
+                            </ul>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body form-horizontal">
+                            <div class="ToolPanel">
+                                <div class="bars pull-left">
+                                </div>
+                            </div>
+                            <div style="overflow:auto">
+                                <table id="oilTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                       cellspacing="0"
+                                       width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>监控对象</th>
+                                        <th>时间</th>
+                                        <th>ACC</th>
+                                        <th>总油量</th>
+                                        <th>主油箱油量</th>
+                                        <th>副油箱油量</th>
+                                        <th>主油箱液位高度</th>
+                                        <th>副油箱液位高度</th>
+                                        <th>主油箱加油量</th>
+                                        <th>副油箱加油量</th>
+                                        <th>主油箱漏油量</th>
+                                        <th>副油箱漏油量</th>
+                                        <th>主油箱燃油温度</th>
+                                        <th>主油箱环境温度</th>
+                                        <th>副油箱燃油温度</th>
+                                        <th>副油箱环境温度</th>
+                                        <th>总里程</th>
+                                        <th>速度</th>
+                                        <th>位置</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var selectMonitoringObjec = [[#{select.monitoring.objec}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var publicError = [[#{public.error}]];
+    var systemLoadingTimout = [[#{system.loading.timout}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+<script src="resources/js/dataTables/js/dataTablesBootstrap.js"
+        th:src="@{/resources/js/dataTables/js/dataTablesBootstrap.js}"></script>
+<!-- <script type="text/javascript" src="/wro/oilquantitystatistics.js" th:src="@{/wro/oilquantitystatistics.js}"></script> -->
+<script type="text/javascript" src="/resources/js/oilquantitystatistics.js"
+        th:src="@{/resources/js/oilquantitystatistics.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+</html>
+<style>
+    #oilTable tr td {
+        cursor: pointer;
+    }
+</style>

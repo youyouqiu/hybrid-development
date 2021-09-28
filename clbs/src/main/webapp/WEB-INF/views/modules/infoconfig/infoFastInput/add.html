@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>快速录入</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #speedEntryContent {
+            height: 471px;
+        }
+
+        .seizeAseat {
+            height: 150px;
+        }
+
+        .terminalAreaDetail {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">信息配置</li>
+                        <li class="active">信息列表</li>
+                        <li class="active">快速录入</li>
+                    </ul>
+                    <h1 class="h1 ">快速录入</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div id="funGuideModal"
+                             style="display: none; position: absolute;top: 0;left: 0px;background: rgba(0, 0, 0, 0.5);width: 100%;height: 100%;z-index: 999;margin: 0 15px;">
+                            <div id="referenceInfo"
+                                 style="width: 300px;height: 400px;position: relative;top: 123px;left: 95px;color: #ffffff;opacity: 0;">
+                                <div>
+                                    <h3 style="text-align: center;"><span
+                                            style="font-style: italic; color: #e4bb2d">重要！</span><span
+                                            style="font-size: 18px;">录入前请看这里</span></h3>
+                                    <div>
+                                        <p style="padding: 5px 10px;background: #535353;border: 2px dashed #ffffff; border-radius: 5px;">
+                                            必须提前设置终端与F3平台的连接的IP，如：<span style="color: #e4bb2d">112.126.64.32</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 style="text-align: center;">
+                                        端口如下
+                                    </h4>
+                                    <div style="background: #535353; height: 224px; border: 2px dashed #ffffff; border-radius: 5px;">
+                                        <div style="float: left; margin-left: 30px;">
+                                            <h6>通讯类型</h6>
+                                            <ul style="padding: 0;">
+                                                <li>交通部JT/T808-2013</li>
+                                                <li>交通部JT/T808-2011</li>
+                                                <li>天禾</li>
+                                                <li>移为</li>
+                                                <li>BDTD-SM</li>
+                                                <li>KKS</li>
+                                                <li>BSJ-A5</li>
+                                                <li>ASO</li>
+                                                <li>F3-超长待机</li>
+                                            </ul>
+                                        </div>
+                                        <div style="float: left; margin-left: 47px;">
+                                            <h6>F3端口</h6>
+                                            <ul style="padding: 0; color: #e4bb2d">
+                                                <li>6975</li>
+                                                <li>6976</li>
+                                                <li>6978</li>
+                                                <li>6979</li>
+                                                <li>6981</li>
+                                                <li>6990</li>
+                                                <li>6991</li>
+                                                <li>6992</li>
+                                                <li>6993</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 第1步 -->
+                            <div id="oneStep"
+                                 style="position: absolute;top: -300px;right: 200px;width: 370px;z-index: 999; color: #ffffff; opacity: 0;">
+                                <div style="float: left; width: 50px; margin-top:72px;height: 2px;border: 1px dashed #ffffff;"></div>
+                                <div style="float: left;width: 320px;">
+                                    <h4 style="text-align: center; font-size: 16px;">第<span
+                                            style="color: #e4bb2d;font-style: italic; font-size: 24px;">1 </span>步</h4>
+                                    <div>
+                                        <p style="background: #535353;padding: 5px 10px;border: 2px dashed #ffffff; border-radius: 5px;">
+                                            点击下拉框，如果发现未注册设备信息（如终端ID、终端手机号等），说明终端和平台连接设置正确，否则看左侧说明。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 第2步 -->
+                            <div id="twoStep"
+                                 style="position: absolute;top: -300px;right: 200px;width: 370px;z-index: 999; color: #ffffff; opacity: 0;">
+                                <div style="float: left; width: 50px; margin-top:102px;height: 2px;border: 1px dashed #ffffff;"></div>
+                                <div style="float: left;width: 320px;">
+                                    <h4 style="text-align: center;font-size: 16px;">第<span
+                                            style="color: #e4bb2d;font-style: italic; font-size: 24px;">2 </span>步</h4>
+                                    <div style="background: #535353;padding: 5px 10px 0 10px;border: 2px dashed #ffffff; border-radius: 5px;">
+                                        <p>确认未注册设备的终端号、终端手机号、监控对象是否正确，支持修改或新增。</p>
+                                        <h6 style="text-align: center;">相关说明</h6>
+                                        <p style="font-size: 12px;">1、移为、天禾、KKS协议的终端需要手动选择或新增终端手机号和监控对象；</p>
+                                        <p style="font-size: 12px;">2、BSJ-A5、ASO和F3超待协议的终端不允许修改终端手机号；</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 第3步 -->
+                            <div id="threeStep"
+                                 style="position: absolute;top: -300px;right: 112px;width: 384px;z-index: 999; color: #ffffff; opacity: 0;">
+                                <div style="float: left;width: 250px;">
+                                    <h4 style="text-align: center; font-size: 16px;">第<span
+                                            style="color: #e4bb2d;font-style: italic; font-size: 24px;">3 </span>步</h4>
+                                    <div>
+                                        <p style="background: #535353;padding: 5px 10px;border: 2px dashed #ffffff; border-radius: 5px;">
+                                            点击保存完成录入，终端即可上线。</p>
+                                    </div>
+                                </div>
+                                <div style="float: left; width: 50px; margin-top:61px;height: 2px;border: 1px dashed #ffffff;"></div>
+                                <div id="saveBtnIcon" style="float: left; margin-top: 34px; opacity: 0">
+                                    <img width="84px" height="56px" src="../../../resources/img/save.png"/>
+                                </div>
+                            </div>
+                            <div id="closeBackLayer"
+                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;z-index: 99999;"></div>
+                        </div>
+                        <div class="panel-heading">
+                            <div class="dropdown panel-title fwb">
+                                <ul class="nav nav-tabs">
+                                    <li class="active" id="quickEntryLi"><a href="#quickEntry"
+                                                                            aria-controls="quickEntry" role="tab"
+                                                                            data-toggle="tab">快速录入</a></li>
+                                    <li id="speedEntryLi"><a href="#speedEntry" aria-controls="speedEntry" role="tab"
+                                                             data-toggle="tab">极速录入</a></li>
+                                </ul>
+                            </div>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content entry-content">
+                                <!-- 快速录入 -->
+                                <div class="tab-pane active" id="quickEntry">
+                                    <div class="step-content stepContent" style="min-height: 455px">
+                                        <div class="step-pane active" id="step1">
+                                            <form th:action="@{/m/infoconfig/infoFastInput/submits}"
+                                                  class="form-horizontal"
+                                                  id="addForm1" action="#" method="post" role="form"
+                                                  style="padding-top: 19px;display: none">
+                                                <div class="form-group charRedio">
+                                                    <div class="col-md-6 col-md-offset-2">
+                                                        <div class="form-group">
+                                                            <div class="col-md-2 col-md-offset-5">
+                                                                <input type="radio" name="monitorType" checked="checked"
+                                                                       value="0" class="monitoringSelect chooseCar"/>
+                                                                <label class="monitoringSelect selectCar chooseCarLab activeIcon"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="车"></label>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input type="radio" name="monitorType" value="1"
+                                                                       class="monitoringSelect choosePeople"/>
+                                                                <label class="monitoringSelect selectPeople choosePeopleLab"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="人"></label>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input type="radio" name="monitorType" value="2"
+                                                                       class="monitoringSelect chooseThing"/>
+                                                                <label class="monitoringSelect selectThing chooseThingLab"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="物"></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-group-list">
+                                                            <label class="col-md-5 control-label"><label
+                                                                    class="text-danger">*</label> 监控对象：</label>
+                                                            <div class="col-md-7">
+                                                                <div style="position:relative;">
+                                                                    <div class="input-group">
+                                                                        <input name="brands" type="text" maxlength="20"
+                                                                               placeholder="请新增或选择监控对象"
+                                                                               class="form-control brands" disabled
+                                                                               id="brands">
+                                                                        <div class="input-group-btn">
+                                                                            <button id="objButton" type="button"
+                                                                                    class="btn btn-white dropdown-toggle"
+                                                                                    data-toggle="dropdown">
+                                                                                <i class="fa fa-spinner loading-state"></i>
+                                                                            </button>
+                                                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                                                role="menu"
+                                                                                style="width:100%!important;min-width:100%;max-width:100%;">
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <input id="brandVal" name="brandID" class="hidden">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="hideGroup">
+                                                            <div class="form-group form-group-list">
+                                                                <label class="col-md-5 control-label"><label
+                                                                        class="text-danger">*</label> 终端号：</label>
+                                                                <div class="col-md-7">
+                                                                    <div style="position:relative;">
+                                                                        <div class="input-group">
+                                                                            <input name="devices" type="text"
+                                                                                   placeholder="请新增或选择终端号"
+                                                                                   class="form-control" maxlength="20"
+                                                                                   id="devices" disabled>
+                                                                            <div class="input-group-btn">
+                                                                                <button type="button"
+                                                                                        class="btn btn-white dropdown-toggle"
+                                                                                        data-toggle="dropdown">
+                                                                                    <i class="fa fa-spinner loading-state"></i>
+                                                                                </button>
+                                                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                                                    role="menu"
+                                                                                    style="width:100%!important">
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                        <input id="deviceVal" name="deviceID"
+                                                                               class="hidden">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-group-list"
+                                                                 style="display: none" id="deviceTypeDiv">
+                                                                <label class="col-md-5 control-label"><label
+                                                                        class="text-danger">*</label> 通讯类型：</label>
+                                                                <div class="col-md-7">
+                                                                    <select name="deviceType" id="deviceType" class="form-control">
+                                                                        <option value="1">交通部JT/T808-2013</option>
+                                                                        <option value="0">交通部JT/T808-2011(扩展)</option>
+                                                                        <option value="2">移为</option>
+                                                                        <option value="3">天禾</option>
+                                                                        <option value="5">BDTD-SM</option>
+                                                                        <option value="6">KKS</option>
+                                                                        <option value="8">BSJ-A5</option>
+                                                                        <option value="9">ASO</option>
+                                                                        <option value="10">F3超长待机</option>
+                                                                    </select>
+
+                                                                    <!--<div class="input-group select">
+                                                                        <input id="deviceTypeList"
+                                                                               class="form-control"/>
+                                                                        <div class="input-group-btn">
+                                                                            <button type="button"
+                                                                                    class="btn btn-white dropdown-toggle"
+                                                                                    data-toggle="dropdown">
+                                                                                <i class="fa fa-spinner loading-state"></i>
+                                                                            </button>
+                                                                            <ul class="dropdown-menu dropdown-menu-right"
+                                                                                style="width:100%!important;">
+
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>-->
+                                                                    <!--<input type="hidden" id="deviceType"
+                                                                           name="deviceType" value="1"/>-->
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-group-list">
+                                                                <label class="col-md-5 control-label"><label
+                                                                        class="text-danger">*</label> 终端手机号：</label>
+                                                                <div class="col-md-7">
+                                                                    <div style="position:relative;">
+                                                                        <div class="input-group">
+                                                                            <input name="sims" type="text"
+                                                                                   maxlength="13"
+                                                                                   placeholder="请新增或选择终端手机号"
+                                                                                   class="form-control" id="sims"
+                                                                                   disabled>
+                                                                            <div class="input-group-btn">
+                                                                                <button type="button"
+                                                                                        class="btn btn-white dropdown-toggle"
+                                                                                        data-toggle="dropdown">
+                                                                                    <i class="fa fa-spinner loading-state"></i>
+                                                                                </button>
+                                                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                                                    role="menu"
+                                                                                    style="width:100%!important">
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                        <input id="simVal" name="simID" class="hidden">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-group-list group_select">
+                                                                <label class="col-md-5 control-label"><label
+                                                                        class="text-danger">*</label> 分组：</label>
+                                                                <div class="has-feedback col-md-7">
+                                                                    <input class="form-control groupZtree" id="groupid"
+                                                                           name="groupid" type="text"
+                                                                           readonly="readonly"
+                                                                           style="background-color: #fafafa; cursor: pointer;"
+                                                                           value=""/>
+                                                                    <span class="fa fa-chevron-down form-control-feedback groupZtree"
+                                                                          aria-hidden="true"
+                                                                          style="cursor: pointer;"></span>
+                                                                    <input id="citySelidVal" name="citySelID"
+                                                                           class="form-control hidden">
+                                                                    <div id="menuContent" class="menuContent"
+                                                                         style="top:36px;">
+                                                                        <ul id="treeDemo" class="ztree"></ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div th:if="${hasRole}">
+                                                        <div class="col-sm-7 col-md-7" style="padding-top:25px;">
+                                                            <i class="info-isCompany"></i>&nbsp;&nbsp;:&nbsp;&nbsp;企业<br>
+                                                            <i class="info-isGroup"></i>&nbsp;&nbsp;:&nbsp;&nbsp;分组，在分组管理中创建
+                                                        </div>
+                                                        <div class="col-sm-5 col-md-5 control-label">
+                                                            <button type="button" id="submits"
+                                                                    class="btn btn-primary nextBtn btnAlignment"
+                                                                    data-dismiss="modal">保&nbsp;存
+                                                            </button>
+                                                            <button type="button" class="btn btn-default"
+                                                                    onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'">
+                                                                取&nbsp;消
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 极速录入 -->
+                                <div class="tab-pane" id="speedEntry">
+                                    <div class="step-content stepContent">
+                                        <div class="step-pane active" id="step1">
+                                            <form th:action="@{/m/infoconfig/infoFastInput/saveTopspeed}"
+                                                  class="form-horizontal"
+                                                  id="speedAddForm1" action="#" method="post" role="form"
+                                                  style="padding-top:0px;">
+                                                <div class="form-group charRedio">
+                                                    <div class="col-sm-12 control-label" style="height: 25px;">
+                                                        <img id="startGuide"
+                                                             style="width:25px;height:25px;cursor: pointer;"
+                                                             src="../../../resources/img/help.svg"/>
+                                                    </div>
+                                                    <div class="col-md-5 col-md-offset-3" id="speedEntryContent">
+                                                        <div class="form-group form-group-list" style="margin:0px;">
+                                                            <!-- 		                                                <div id="switchbutton" class="col-md-5 control-label" style="position:relative;top:100px;"><img style="width:35px;height:35px;" src="../../../resources/img/switch.svg"></div> -->
+                                                        </div>
+                                                        <div class="seizeAseat"></div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-2 col-md-offset-4">
+                                                                <input type="radio" name="monitorType" checked="checked"
+                                                                       value="0" class="monitoringSelect chooseCar"/>
+                                                                <label class="monitoringSelect selectCar chooseCarLab activeIcon"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="车"></label>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input type="radio" name="monitorType" value="1"
+                                                                       class="monitoringSelect choosePeople"/>
+                                                                <label class="monitoringSelect selectPeople choosePeopleLab"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="人"></label>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <input type="radio" name="monitorType" value="2"
+                                                                       class="monitoringSelect chooseThing"/>
+                                                                <label class="monitoringSelect selectThing chooseThingLab"
+                                                                       data-toggle="tooltip" data-placement="top"
+                                                                       title="物"></label>
+                                                            </div>
+                                                        </div>
+                                                        <div id="terminalArea" class="form-group"
+                                                             style="position: static;z-index: 9999;background: #ffffff;padding: 5px;border-radius: 5px;">
+                                                            <label class="col-md-3 control-label"><label
+                                                                    class="text-danger">*</label> 未注册设备：</label>
+                                                            <div class="col-md-9">
+                                                                <div id="onlyLogo" style="position:relative;">
+                                                                    <div class="input-group">
+                                                                        <input autocomplete="off"
+                                                                               placeholder="请选择平台接收到的未注册设备信息"
+                                                                               type="text" class="form-control"
+                                                                               maxlength="50" id="speedDevices" name="uniqueNumber">
+                                                                        <div class="input-group-btn searchDevices-div">
+                                                                            <button id="searchDevices" type="button"
+                                                                                    class="btn btn-white dropdown-toggle"
+                                                                                    data-toggle="dropdown">
+                                                                                <span class="caret"></span>
+                                                                            </button>
+                                                                            <ul id="searchDevices-id"
+                                                                                class="dropdown-menu dropdown-menu-right"
+                                                                                role="menu"
+                                                                                style="max-height:276px;overflow:auto;padding:0 !important">
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="back-layer"
+                                                                 style="display:none; position: absolute;width: 100%;height: 100%;top: 0;left: 0;background: rgba(0,0,0,0.2);z-index: 999;"></div>
+                                                        </div>
+                                                        <div class="terminalAreaDetail">
+                                                            <div id="searchOneDevicesBox" class="form-group"
+                                                                 style="position: static;z-index: 9999;background: #ffffff;padding: 5px;border-radius: 5px;">
+                                                                <label class="col-md-3 control-label"><label
+                                                                        class="text-danger">*</label> 终端号：</label>
+                                                                <div class="col-md-9">
+                                                                    <div style="position:relative;">
+                                                                        <div class="input-group">
+                                                                            <input type="text" class="form-control"
+                                                                                   maxlength="20" id="oneDevices"
+                                                                                   onkeyup="this.value=this.value.replace(/(^\s+)|(\s+$)/g,'')">
+                                                                            <div class="input-group-btn">
+                                                                                <button id="searchOneDevices"
+                                                                                        type="button"
+                                                                                        class="btn btn-white dropdown-toggle"
+                                                                                        data-toggle="dropdown">
+                                                                                    <span class="caret"></span>
+                                                                                </button>
+                                                                                <ul id="searchOneDevices-id"
+                                                                                    class="dropdown-menu dropdown-menu-right"
+                                                                                    role="menu"
+                                                                                    style="max-height:276px;overflow:auto;padding:0 !important">
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                        <input id="oneDevicesName" name="devices"
+                                                                               class="hidden">
+                                                                        <input id="speedDeviceVal" name="deviceID"
+                                                                               class="hidden">
+                                                                        <input id="manufacturerId" name="manufacturerId"
+                                                                               class="hidden">
+                                                                        <input id="deviceModelNumber" name="deviceModelNumber"
+                                                                               class="hidden">
+                                                                        <input id="provinceId" name="provinceId"
+                                                                               class="hidden">
+                                                                        <input id="cityId" name="cityId"
+                                                                               class="hidden">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="back-layer"
+                                                                     style="display:none; position: absolute;width: 100%;height: 100%;top: 0;left: 0;background: rgba(0,0,0,0.2);z-index: 999;"></div>
+                                                            </div>
+                                                            <div id="twoArea" class="form-group"
+                                                                 style="position: static;z-index: 9999;background: #ffffff;padding: 5px; border-radius: 5px;">
+                                                                <div class="form-group" style="margin: 10px 0">
+                                                                    <label class="col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 终端手机号：</label>
+                                                                    <div class="col-md-9">
+                                                                        <div style="position:relative;">
+                                                                            <div class="input-group">
+                                                                                <input type="text" maxlength="14"
+                                                                                       name="sims" class="form-control"
+                                                                                       id="speedSims"/>
+                                                                                <div class="input-group-btn">
+                                                                                    <button type="button"
+                                                                                            class="btn btn-white dropdown-toggle"
+                                                                                            data-toggle="dropdown"
+                                                                                            id="sim_searchDevice">
+                                                                                        <i class="fa fa-spinner loading-state"></i>
+                                                                                    </button>
+                                                                                    <ul class="dropdown-menu dropdown-menu-right"
+                                                                                        role="menu"
+                                                                                        aria-labelledby="dropdownMenu1"
+                                                                                        id="sim-searchDevices-id"
+                                                                                        style="max-height:276px;overflow:auto;padding:0 !important">
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                            <input id="speedSimVal" name="simID"
+                                                                                   class="hidden">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" id="speedDeviceTypeDiv"
+                                                                     style="margin: 30px 0">
+                                                                    <label class="col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 通讯类型：</label>
+                                                                    <div class="col-md-9">
+                                                                        <div class="input-group select">
+                                                                            <input disabled style="cursor: not-allowed;"
+                                                                                   id="messagetype"
+                                                                                   class="form-control"/>
+                                                                            <input type="hidden" id="speedDeviceType"
+                                                                                   name="deviceType" value="1"/>
+                                                                            <div class="input-group-btn">
+                                                                                <button disabled="disabled"
+                                                                                        type="button"
+                                                                                        class="btn btn-white btn-width-select">
+                                                                                    <span class="caret"></span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <!-- <ul class="select-list" id="speedDeviceTypeList">
+                                                                                <li value="0">交通部JT/T808-2011(扩展)</li>
+                                                                                <li value="1">交通部JT/T808-2013</li>
+                                                                                <li value="2">移为</li>
+                                                                                <li value="3">天禾</li>
+                                                                                <li value="6">KKS</li>
+                                                                                <li value="8">BSJ-A5</li>
+                                                                                <li value="9">ASO</li>
+                                                                                <li value="10">F3超长待机</li>
+                                                                            </ul> -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group form-group-list"
+                                                                     style="margin: 15px 0">
+                                                                    <label class="col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 监控对象：</label>
+                                                                    <div class="col-md-9">
+                                                                        <div style="position:relative;">
+                                                                            <div class="input-group">
+                                                                                <input name="brands" type="text"
+                                                                                       maxlength="20"
+                                                                                       class="form-control"
+                                                                                       id="speedBrands" style="background: #fff !important;">
+                                                                                <div class="input-group-btn">
+                                                                                    <button type="button"
+                                                                                            id="speedBrandsBtn"
+                                                                                            class="btn btn-white dropdown-toggle"
+                                                                                            data-toggle="dropdown">
+                                                                                        <i class="fa fa-spinner loading-state"></i>
+                                                                                    </button>
+                                                                                    <ul class="dropdown-menu dropdown-menu-right"
+                                                                                        role="menu">
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                            <input id="speedBrandVal" name="brandID"
+                                                                                   class="hidden">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="back-layer"
+                                                                     style="display:none; position: absolute;width: 100%;height: 100%;top: 0;left: 0;background: rgba(0,0,0,0.2);z-index: 999;"></div>
+                                                            </div>
+
+                                                            <div class="form-group group_select" style="padding: 5px;">
+                                                                <label class="col-md-3 control-label"><label
+                                                                        class="text-danger">*</label> 分组：</label>
+                                                                <div class="has-feedback col-md-9">
+                                                                    <input class="form-control speedGroupZtree"
+                                                                           id="speedGroupid" name="groupid" type="text"
+                                                                           readonly="readonly"
+                                                                           style="background-color: #fafafa; cursor: pointer;"
+                                                                           value=""/>
+                                                                    <span class="fa fa-chevron-down form-control-feedback speedGroupZtree"
+                                                                          aria-hidden="true"
+                                                                          style="cursor: pointer;"></span>
+                                                                    <input id="speedCitySelidVal" name="citySelID"
+                                                                           class="form-control hidden">
+                                                                    <div id="speedMenuContent" class="menuContent"
+                                                                         style="top:36px!important;">
+                                                                        <ul id="speedTreeDemo" class="ztree"></ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div th:if="${hasRole}">
+                                                        <div class="col-sm-7 col-md-7" style="padding-top:25px;">
+                                                            <i style="vertical-align:sub;display: inline-block;width:25px;height:15px;background:#fff8b0;border-radius:2px;"></i>&nbsp;&nbsp;:&nbsp;&nbsp;新设备
+                                                            <br>
+                                                            <i style="vertical-align:sub;display: inline-block;width:25px;height:15px;background:#dcf5ff;border-radius:2px;"></i>&nbsp;&nbsp;:&nbsp;&nbsp;平台已录入
+
+                                                        </div>
+                                                        <div class="col-sm-5 col-md-5 control-label">
+                                                            <button type="button" id="speedSubmits"
+                                                                    class="btn btn-primary nextBtn btnAlignment"
+                                                                    data-dismiss="modal">保&nbsp;存
+                                                            </button>
+                                                            <button type="button" class="btn btn-default"
+                                                                    onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'">
+                                                                取&nbsp;消
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<label id="error_label" class='error' style='display: none;'></label>
+<script th:inline="javascript">
+    // var assignmentMaxCarNum = [[#{infoinput.assignment.maxCarNum}]];
+    var systemErrorFlag = false; // 系统错误标识
+    var systemError = [[#{system.error}]];
+    var vehicleBrandSelect = [[#{vehicle.brand.select}]];
+    var deviceNumberSelect = [[#{device.number.select}]];
+    var simNumberSelect = [[#{sim.number.select}]];
+
+    var simNumberChoose = [[#{sim.number.choose}]]; //请选择终端手机号
+    var deviceNumberChoose = '请选择已有的未注册设备';//请选择未注册设备
+    var vehicleNumberChoose = [[#{vehicle.number.choose}]];//请选择监控对象
+
+    var deviceDeviceTypeNull = [[#{device.deviceType.null}]];
+    var assignmentNameNull = [[#{assignment.name.null}]];
+    var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+    var thingExists = [[#{vehicle.thing.exists}]];
+    var deviceNumberExists = [[#{device.number.exists}]];
+    var simNumberExists = [[#{sim.number.exists}]];
+    var vehicleBrandError = [[#{vehicle.brand.error}]];
+    var vehicleBrandNull = [[#{vehicle.brand.null}]];
+    var vehicleBrandMaxlength = [[#{vehicle.brand.maxlength}]];
+
+    var personnelNumberNull = [[#{personnel.number.null}]];
+    var personnelNumberError = [[#{personnel.number.error}]];
+    var personnelNumberExists = [[#{personnel.number.exists}]];
+    var publicSize8Length = [[#{public.size8.length}]];
+
+    var deviceNumberNull = [[#{device.number.null}]];
+    var deviceNumberMaxlength = [[#{device.number.maxlength}]];
+    var deviceNumberError = [[#{device.number.error}]];
+    var deviceSpeedNumberError = [[#{device.speedNumber.error}]];
+    var simNumberNull = [[#{sim.number.null}]]
+    var simNumberMaxlength = [[#{sim.number.maxlength}]];
+    var simNumberError = [[#{sim.number.error}]];
+
+    var publicMonitorNull = [[#{public.monitor.null}]];
+</script>
+<script src="/resources/js/inputGroupSelect.js" th:src="@{/resources/js/inputGroupSelect.js}"></script>
+<script src="/resources/js/infoFastInputAdd.js" th:src="@{/resources/js/infoFastInputAdd.js}"></script>
+<script>
+    (function ($, window) {
+        var terminal_client_top;
+        var terminal_client_left;
+        var terminal_width;
+        var terminal_height;
+        var twoArea_client_top;
+        var twoArea_client_left;
+        var twoArea_width;
+        var twoArea_height;
+        var speedSubmits_client_top;
+        var speedSubmits_client_left;
+        var speedSubmits_width;
+        var speedSubmits_height;
+
+        var backLayer = {
+            init: function () {
+                $('#closeBackLayer').off('click').on('click', backLayer.closeFun)
+                terminal_client_top = $('#terminalArea').offset().top;
+                terminal_client_left = $('#terminalArea').offset().left;
+                terminal_width = $('#terminalArea').width();
+                terminal_height = $('#terminalArea').height();
+
+                $('#referenceInfo').css({
+                    'top': (terminal_client_top - 192 - 18) + 'px',
+                    'left': (terminal_client_left - 255 - 50 - 300) + 'px',
+                });
+                if($(".terminalAreaDetail").is(':hidden')){
+                    $('#referenceInfo').css({
+                        'top': (terminal_client_top - 350) + 'px'
+                    });
+                }
+
+                $('#oneStep').css('left', (terminal_client_left + terminal_width - 255) + 'px');
+
+
+                twoArea_client_top = $('#twoArea').offset().top;
+                twoArea_client_left = $('#twoArea').offset().left;
+                twoArea_width = $('#twoArea').width();
+                twoArea_height = $('#twoArea').height();
+
+                $('#twoStep').css('left', (twoArea_client_left + twoArea_width - 255) + 'px');
+
+
+                speedSubmits_client_top = $('#speedSubmits').offset().top;
+                speedSubmits_client_left = $('#speedSubmits').offset().left;
+                speedSubmits_width = $('#speedSubmits').width();
+                speedSubmits_height = $('#speedSubmits').height();
+                $('#threeStep').css('left', (speedSubmits_client_left + speedSubmits_width - 450 - 255 + 25 + 10 + 70) + 'px');
+                var width = $(window).width();
+                if (width < 1365) {
+                    $('#startGuide').hide();
+                }
+            },
+            startGuideFun: function () {
+                $('.back-layer').show();
+                $('#terminalArea, #twoArea').css('position', 'relative');
+                $('#funGuideModal').show();
+                $('#referenceInfo').animate({opacity: 1}, 400);
+
+                $('#oneStep').animate({top: (terminal_client_top - 192 - 72 + terminal_height / 2) + 'px', opacity: 1});
+                setTimeout(function () {
+                    $('#twoStep').animate({
+                        top: (twoArea_client_top + twoArea_height / 2 - 192 - 102) + 'px',
+                        opacity: 1
+                    });
+                }, 400);
+                setTimeout(function () {
+                    $('#threeStep').animate({
+                        top: (speedSubmits_client_top + speedSubmits_height / 2 - 192 - 61 + 10) + 'px',
+                        opacity: 1
+                    });
+                    setTimeout(function () {
+                        $('#saveBtnIcon').animate({opacity: 1});
+                    }, 400)
+                }, 700);
+            },
+            toggleBtnFun: function () {
+                $('#closeBackLayer').off('click').on('click', backLayer.closeFun)
+                terminal_client_top = $('#terminalArea').offset().top;
+                terminal_client_left = $('#terminalArea').offset().left;
+                terminal_width = $('#terminalArea').width();
+                terminal_height = $('#terminalArea').height();
+
+                $('#referenceInfo').css({
+                    'top': (terminal_client_top - 192 - 18) + 'px',
+                    'left': (terminal_client_left - 50 - 300) + 'px',
+                });
+                if($(".terminalAreaDetail").is(':hidden')){
+                    $('#referenceInfo').css({
+                        'top': (terminal_client_top - 350) + 'px'
+                    });
+                }
+
+                $('#oneStep').css('left', (terminal_client_left + terminal_width) + 'px');
+
+
+                twoArea_client_top = $('#twoArea').offset().top;
+                twoArea_client_left = $('#twoArea').offset().left;
+                twoArea_width = $('#twoArea').width();
+                twoArea_height = $('#twoArea').height();
+
+                $('#twoStep').css('left', (twoArea_client_left + twoArea_width) + 'px');
+
+
+                speedSubmits_client_top = $('#speedSubmits').offset().top;
+                speedSubmits_client_left = $('#speedSubmits').offset().left;
+                speedSubmits_width = $('#speedSubmits').width();
+                speedSubmits_height = $('#speedSubmits').height();
+                $('#threeStep').css('left', (speedSubmits_client_left + speedSubmits_width - 400 + 25 + 10) + 'px');
+                var width = $(window).width();
+                if (width < 1365) {
+                    $('#startGuide').hide();
+                }
+            },
+            closeFun: function () {
+                $('.back-layer').hide();
+                $('#terminalArea, #twoArea').css('position', 'static');
+                $('#funGuideModal').hide();
+                $('#referenceInfo').css('opacity', 0);
+                $('#oneStep, #twoStep, #threeStep').css({top: '-300px', opacity: 0});
+                $('#saveBtnIcon').css('opacity', 0);
+            },
+        }
+
+        $(function () {
+            backLayer.init();
+            $('#startGuide').on('click', function () {
+                var terminalAreaDetail = $(".terminalAreaDetail");
+                if (terminalAreaDetail.is(':hidden')) {
+                    $("#twoStep").hide();
+                    $("#threeStep").hide();
+                }else{
+                    $("#twoStep").show();
+                    $("#threeStep").show();
+                }
+                if (!$('.sidebar').hasClass('sidebar-toggle')) {
+                    backLayer.init();
+                } else {
+                    backLayer.toggleBtnFun();
+                }
+                backLayer.startGuideFun();
+            });
+            $(window).resize(function () {
+                var width = $(window).width();
+                if (width > 1365) {
+                    $('#startGuide').show();
+                    backLayer.init();
+                } else {
+                    $('.back-layer').hide();
+                    $('#funGuideModal').hide();
+                    $('#startGuide').hide();
+                    backLayer.closeFun();
+                }
+            });
+            $('#toggle-left').on('click', function () {
+                if (!$('.sidebar').hasClass('sidebar-toggle')) {
+                    setTimeout(function () {
+                        backLayer.init();
+                    }, 400)
+                } else {
+                    setTimeout(function () {
+                        backLayer.toggleBtnFun();
+                    }, 400)
+                }
+            })
+        })
+
+    })($, window);
+</script>
+</body>
+</html>
+<style>
+    #sim-searchDevices-id li {
+        height: 35px;
+        line-height: 35px;
+        border-bottom: 1px solid #c4c4c4;
+        font-size: 16px;
+        padding-left: 12px;
+        cursor: pointer;
+    }</style>

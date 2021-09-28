@@ -1,0 +1,4 @@
+UPDATE `zw_c_resource` SET `resource_name`='808管理' WHERE (`id`='f9c660e4-f40e-11e6-bc64-92361f002671');
+UPDATE `zw_c_resource` SET `resource_name`='809管理' WHERE (`id`='f9c6629c-f40e-11e6-bc64-92368f002671');
+UPDATE `zw_c_resource` SET `resource_name`='809查岗督办处理', `parent_id`='f9c6629c-f40e-11e6-bc64-92368f002671', `sort_order`='1124',`code_num`='110026' WHERE (`id`='62470d1d-c13f-11e8-a9e8-0026b93f6999');
+INSERT INTO `zw_c_resource` (`id`, `icon_cls`, `resource_name`, `type`, `code`, `permission`, `perm_value`, `description`, `parent_id`, `sort_order`, `editable`, `enabled`, `create_data_time`, `create_data_username`, `update_data_time`, `update_data_username`, `domain`, `code_num`, `flag`) VALUES ('c39af797-9973-4588-bb31-0dc38fc1dbb1', NULL, '809查岗督办报表', '0', NULL, 'gangSupervisionReport', '/m/reportManagement/inspectionAndSupervision/list', NULL, 'f9c65d06-f40e-11e6-bc64-92361f006689', '146', '1', '1', NULL, NULL, NULL, NULL, NULL, '90035', '1');

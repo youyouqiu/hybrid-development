@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.OnlineTimeDao">
+    <!-- 添加用户上线记录 -->
+    <insert id = "addUserTopAndBottomLine" parameterType="com.cb.platform.domain.UserOnline">
+        insert into zw_m_user_online(id,user_id,group_id,online_time,flag,create_data_time,create_data_username)
+        value (#{id},#{userId},#{groupId},
+        #{onlineTime},#{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <!--  根据记录id查询用户上线时间 -->
+    <select id = "findOnlineTimeById" resultType="com.cb.platform.domain.UserOnline">
+        select * from zw_m_user_online where id = #{id} and flag = 1
+    </select>
+
+    <!-- 更新下线时间和在线时长 -->
+    <update id = "updateOffLineTime" parameterType="com.cb.platform.domain.UserOnline">
+        update zw_m_user_online set offline_time = #{offlineTime},
+        online_duration = #{onlineDuration},update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername} where id = #{id} and flag =1
+    </update>
+
+    <!-- 添加用户在线时长记录-->
+    <insert id="addUserOnlineTime" parameterType="com.cb.platform.domain.UserOnlineTime">
+        insert into zw_m_user_onine_time(
+        id,user_id,group_id,online_date,online_duration,flag,create_data_time,create_data_username)
+        value (#{id},#{userId},#{groupId},#{onlineDate},#{onlineDuration},#{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <!-- 更新用户在线时长记录 -->
+    <update id = "updateUserOnlineTime" parameterType="com.cb.platform.domain.UserOnlineTime">
+        update zw_m_user_onine_time set online_duration = #{onlineDuration},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername} where user_id = #{userId} and
+        online_date = #{onlineDate} and flag = 1
+    </update>
+
+    <!-- 查询用户当天在线时长 -->
+    <select id = "findOnlineDuration" resultType="string">
+        SELECT online_duration
+        FROM zw_m_user_onine_time
+        WHERE user_id = #{userId}
+        AND online_date = #{onlineDate}
+        AND flag = 1 LIMIT 1
+    </select>
+
+    <!-- 根据道路运输企业和月份查询道路运输企业月在线时长 -->
+    <select id = "getMonthGroupOnlineTime" resultType="com.cb.platform.domain.UserOnlineTime">
+        SELECT
+        group_id,
+        DATE_FORMAT(online_date, '%Y-%m-%d') AS onlineDate,
+        MAX(online_duration) AS onlineDuration
+        FROM
+        zw_m_user_onine_time
+        WHERE
+        group_id = #{groupId}
+        AND online_date &gt;= #{day1} AND online_date &lt; #{day2} GROUP BY  onlineDate
+    </select>
+
+    <!-- 根据道路运输企业和月份查询道路运输企业下用户当月在线时长 -->
+    <select id = "getMonthGroupUserOnlineTime" resultType="com.cb.platform.domain.UserOnlineTime">
+        SELECT
+        user_id,
+        group_id,
+        DATE_FORMAT(online_date, '%Y-%m-%d') AS onlineDate,
+        online_duration
+        FROM
+        zw_m_user_onine_time
+        WHERE
+        user_id IN
+        <foreach item="item" collection="userIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND online_date &gt;= #{day1} and online_date &lt; #{day2}
+    </select>
+
+    <!-- 根据用户id查询用户上下线明细 -->
+    <select id = "getOnlineDataByIds" resultType="com.cb.platform.domain.UserLogin">
+        SELECT
+        user_id,
+        group_id,
+        online_time,
+        offline_time AS offlineTime,
+        online_duration AS onlineDuration
+        FROM
+        zw_m_user_online
+        WHERE
+        user_id IN
+        <foreach item = "item" collection = "userIds" separator= "," open = "(" close = ")" >
+        #{item}
+        </foreach>
+        AND ((
+        online_time &gt;= #{startTime}
+        AND online_time &lt;= #{endTime})
+        or (offline_time &gt; #{startTime}
+        AND offline_time &lt;= #{endTime}))
+        AND offline_time >= online_time
+        AND flag = 1
+        ORDER BY
+        online_time DESC
+    </select>
+
+    <!-- 查询企业下所有用户的登录明细 -->
+    <select id = "getGroupUserOnlineData" resultType="com.cb.platform.domain.UserLogin">
+         select
+         online_time,
+         offline_time,
+         group_id
+         from zw_m_user_online
+         where group_id IN
+         <foreach item = "item" collection = "groupIds" separator= "," open = "(" close = ")" >
+            #{item}
+         </foreach>
+         AND (
+             (online_time &gt;= #{startTime}
+             AND online_time &lt;= #{endTime})
+             or (offline_time &gt; #{startTime}
+             AND offline_time &lt;= #{endTime})
+         ) AND flag = 1 ORDER BY online_time ASC
+    </select>
+
+    <!-- 查询企业下所有用户的登录明细 -->
+    <select id = "getUserOnlineData" resultType="com.cb.platform.domain.UserLogin">
+        select
+        online_time,
+        offline_time,
+        group_id,
+        user_id
+        from zw_m_user_online
+        where user_id IN
+        <foreach item = "item" collection = "userIds" separator= "," open = "(" close = ")" >
+            #{item}
+        </foreach>
+        AND (
+        (online_time &gt;= #{startTime}
+        AND online_time &lt;= #{endTime})
+        or (offline_time &gt; #{startTime}
+        AND offline_time &lt;= #{endTime})
+        ) AND flag = 1 ORDER BY online_time ASC
+    </select>
+
+    <select id = "findOfflineIsNullData" resultType="com.cb.platform.domain.UserOnline">
+        select * from zw_m_user_online where offline_time IS NULL AND flag = 1
+    </select>
+    <select id="getUserOnlineTimeRange" resultType="com.cb.platform.domain.UserOnline">
+        SELECT
+        group_id AS groupId,
+        user_id AS userId,
+        online_time AS onlineTime,
+        offline_time AS offlineTime
+        FROM zw_m_user_online
+        WHERE flag = 1
+        AND user_id IN
+        <foreach item = "item" collection = "userIdList" separator= "," open = "(" close = ")" >
+            #{item}
+        </foreach>
+        AND (offline_time IS NOT NULL OR online_time IS NOT NULL)
+        AND (
+            (
+                online_time &gt;= #{startTime}
+                AND online_time &lt;= #{endTime}
+            ) OR (
+                offline_time &gt;= #{startTime}
+                AND offline_time &lt;= #{endTime}
+            ) OR (
+                online_time &lt;= #{startTime}
+                AND (offline_time &gt;= #{endTime} OR offline_time IS NULL)
+            ) OR (
+                offline_time &gt;= #{endTime}
+                AND (online_time &lt;= #{startTime} OR online_time IS NULL)
+            )
+        )
+    </select>
+</mapper>

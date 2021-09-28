@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.driverDiscernManage.DriverDiscernManageDao">
+
+    <select id="findDriverDiscernManageInfo" resultType="com.zw.platform.domain.basicinfo.driverDiscernManage.DriverDiscernManageInfo">
+        SELECT
+        vi.id AS monitorId,
+        vi.brand AS monitorName,
+        vi.plate_color AS plateColor,
+        vi.group_id AS orgId,
+        COUNT(vdd.face_id) AS driverNum,
+        ddm.latest_query_time,
+        ddm.query_success_time,
+        ddm.latest_issue_time,
+        ddm.issue_status,
+        ddm.issue_result,
+        ddm.query_result,
+        ddm.issue_username
+        FROM zw_m_vehicle_info vi
+        LEFT JOIN zw_m_vehicle_device_driver vdd  ON vi.id = vdd.vehicle_id
+        LEFT JOIN zw_m_device_driver_discern_manage ddm ON vi.id = ddm.vehicle_id AND ddm.flag = 1
+        WHERE vi.flag = 1
+        AND vi.id IN
+        <foreach collection="vehicleIds" open="(" separator="," close=")" item="item">
+             #{item}
+        </foreach>
+        GROUP BY vi.id ORDER BY vi.id
+    </select>
+
+    <select id="findDriverDetail" resultType="com.zw.platform.domain.basicinfo.driverDiscernManage.DeviceDriverInfo">
+        SELECT
+        vdd.professionals_id,
+        vdd.face_id,
+        pi.name,
+        pi.card_number,
+        pi.org_id AS groupId,
+        pi.photograph
+        FROM zw_m_vehicle_device_driver vdd
+        LEFT JOIN zw_m_professionals_info pi ON vdd.professionals_id = pi.id AND pi.flag = 1
+        WHERE vdd.vehicle_id = #{vehicleId}
+    </select>
+
+    <insert id="insert"
+    parameterType="com.zw.platform.domain.basicinfo.driverDiscernManage.DriverDiscernManageInfo">
+        INSERT INTO zw_m_device_driver_discern_manage
+        (
+            id,
+            vehicle_id,
+            latest_query_time,
+            query_success_time,
+            latest_issue_time,
+            issue_status,
+            issue_result,
+            query_result,
+            issue_username
+        )
+        VALUES (
+            #{id},
+            #{monitorId},
+            #{latestQueryTime},
+            #{querySuccessTime},
+            #{latestIssueTime},
+            #{issueStatus},
+            #{issueResult},
+            #{queryResult},
+            #{issueUsername}
+        )
+    </insert>
+
+    <select id="findByVid"
+    resultType="com.zw.platform.domain.basicinfo.driverDiscernManage.DriverDiscernManageInfo">
+        SELECT
+        id,
+        vehicle_id as monitorId,
+        latest_issue_time,
+        latest_query_time,
+        query_success_time,
+        issue_result,
+        issue_status,
+        query_result,
+        issue_username
+        FROM zw_m_device_driver_discern_manage
+        WHERE vehicle_id = #{vehicleId} AND flag = 1
+    </select>
+
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.driverDiscernManage.DriverDiscernManageInfo">
+        UPDATE zw_m_device_driver_discern_manage
+        <set>
+            <if test='null != latestQueryTime'>
+                latest_query_time = #{latestQueryTime},
+            </if>
+            <if test='null != querySuccessTime'>
+                query_success_time = #{querySuccessTime},
+            </if>
+            <if test='null != latestIssueTime'>
+                latest_issue_time = #{latestIssueTime},
+            </if>
+            <if test='null != issueStatus'>
+                issue_status = #{issueStatus},
+            </if>
+            <if test='null != issueResult'>
+                issue_result = #{issueResult},
+            </if>
+            <if test='null != queryResult'>
+                query_result = #{queryResult},
+            </if>
+            <if test='null != issueUsername'>
+                issue_username = #{issueUsername}
+            </if>
+        </set>
+        WHERE vehicle_id = #{monitorId} AND flag = 1
+    </update>
+
+    <delete id="deleteDriverAndPro">
+        DELETE FROM zw_m_vehicle_device_driver WHERE vehicle_id = #{vehicleId}
+    </delete>
+
+    <insert id="insertDriverAndPro">
+        INSERT INTO zw_m_vehicle_device_driver
+        (vehicle_id, professionals_id, face_id)
+        VALUES
+        <foreach collection="vehicleDeviceDriverDos" item="item" separator=",">
+            (#{item.vehicleId},#{item.professionalsId},#{item.faceId})
+        </foreach>
+    </insert>
+</mapper>

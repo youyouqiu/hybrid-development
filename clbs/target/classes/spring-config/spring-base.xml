@@ -1,0 +1,156 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd">
+
+    <description>spring主配置文件</description>
+
+    <task:annotation-driven scheduler="scheduler"/>
+    <task:scheduler id="scheduler" pool-size="5"/>
+
+    <!-- 属性和配置文件读入 ,多个用逗号隔开 数据库参数和系统参数 -->
+    <!--<util:properties id="applicationProperties" location="classpath:application.properties,classpath:messages/message.properties" />-->
+    <!--<context:property-placeholder properties-ref="applicationProperties" ignore-resource-not-found="true" />-->
+
+    <!--	1.9个固定线程 com.zw.platform.push.common.MessageAsyncTaskExecutor-->
+    <!--	2.ZMQServer 2个线程-->
+    <!--	3.ZmqFenceQueue 一个线程-->
+    <!--	4.QueueDelayedEventtrigger 一个线程-->
+    <!--	5.AdasZmqServer 一个线程-->
+    <!--    6.AlarmLinkageTaskExecutor 1个-->
+    <bean id="longTaskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 线程池维护线程的最少数量 -->
+        <property name="corePoolSize" value="20"/>
+        <!-- 允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="200"/>
+        <!-- 线程池维护线程的最大数量 -->
+        <property name="maxPoolSize" value="30"/>
+        <!-- 缓存队列 -->
+        <property name="queueCapacity" value="0"/>
+        <!-- 对拒绝task的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+        <property name="threadNamePrefix" value="longTaskExecutor"/>
+    </bean>
+
+    <bean id="taskExecutor"
+          class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" primary="true">
+        <!-- 线程池维护线程的最少数量 -->
+        <property name="corePoolSize" value="20"/>
+        <!-- 允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="30"/>
+        <!-- 线程池维护线程的最大数量 -->
+        <property name="maxPoolSize" value="200"/>
+        <!-- 缓存队列 -->
+        <property name="queueCapacity" value="0"/>
+        <!-- 对拒绝task的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+        <property name="threadNamePrefix" value="defaultTaskExecutor"/>
+    </bean>
+    <!-- 扫描注解@Component , @Service , @Repository。 要把 controller去除，controller是在spring-servlet.xml中配置的，如果不去除会影响事务管理的。 -->
+    <context:component-scan
+            base-package="com.zw.platform.task,com.cb.platform.task,com.zw.platform.commons,com.zw.platform.repository.core,
+		com.cb.platform.service,com.sx.platform.service.**.sxReportManagement,com.zw.platform.repository.modules,
+		com.zw.platform.repository.oil,com.sx.platform.repository.sxReport,com.zw.platform.repository.vas,
+		com.zw.platform.service.**,com.zw.ws.impl,com.zw.ws.common,com.zw.ws.client,com.zw.ws.server,,com.zw.ws.entity.adas.paramSetting,
+		com.zw.protocol.netty,com.zw.api.config,com.zw.platform.push.config,com.zw.platform.push.factory,
+		com.zw.platform.push.common,com.zw.platform.push.handler,com.zw.platform.push.redis,com.zw.platform.util,
+		com.zw.platform.push.handler.common,com.zw.platform.push.mqserver,com.zw.platform.push.cache,com.zw.app.service,com.zw.app.sm,
+        com.zw.app.annotation,com.zw.platform.repository.jdbc,com.zw.config,com.zw.api.service,com.zw.platform.basic.service.**,
+        com.zw.platform.basic.core,com.zw.platform.basic.ldap.operator,com.zw.platform.push.command,com.zw.platform.basic.util.common">
+        <context:include-filter type="annotation"
+                                expression="org.aspectj.lang.annotation.Aspect"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.RestController"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+
+    <bean id="accessServer1" class="com.zw.protocol.netty.common.ApplicationEntity">
+        <property name="id" value="accessServer1"/>
+        <property name="host" value="${protocol.host}"/>
+        <property name="port" value="${protocol.port}"/>
+        <property name="type" value="protocol"/>
+    </bean>
+    <bean id="accessServer2" class="com.zw.protocol.netty.common.ApplicationEntity">
+        <property name="id" value="accessServer2"/>
+        <property name="host" value="${mediaServer.host.local}"/>
+        <property name="port" value="${mediaServer.port.command.video}"/>
+        <property name="type" value="video"/>
+    </bean>
+    <bean id="accessServer3" class="com.zw.protocol.netty.common.ApplicationEntity">
+        <property name="id" value="accessServer3"/>
+        <property name="host" value="${mediaServer.host.local}"/>
+        <property name="port" value="${mediaServer.port.command.audio}"/>
+        <property name="type" value="video"/>
+    </bean>
+    <bean id="accessServer4" class="com.zw.protocol.netty.common.ApplicationEntity">
+        <property name="id" value="accessServer4"/>
+        <property name="host" value="${mediaServer.host.local}"/>
+        <property name="port" value="${mediaServer.port.command.resource}"/>
+        <property name="type" value="video"/>
+    </bean>
+    <bean id="serverParamList" class="com.zw.platform.domain.netty.ServerParamList">
+        <property name="list">
+            <list>
+                <ref bean="accessServer1"/>
+                <ref bean="accessServer2"/>
+                <ref bean="accessServer3"/>
+                <ref bean="accessServer4"/>
+            </list>
+        </property>
+        <property name="serverId809" value="accessServer1"/>
+        <property name="accessServerAddress" value="${protocol.address.origin}"/>
+        <!--<property name="clientId" value="zwclbs_01"/>-->
+    </bean>
+
+    <!--启用JMX-->
+    <context:mbean-export/>
+
+
+    <!--aop 注解风格支持 proxy-targer-class默认false,用jdk动态代理,true是cglib .expose-proxy当前代理是否为可暴露状态,值是"ture",则为可访问。 -->
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+    <!--aop xml风格支持 -->
+    <aop:config expose-proxy="true" proxy-target-class="false"/>
+
+    <!-- enable autowire自动注入。 当使用 <context:component-scan/> 后，就可以将 <context:annotation-config/>移除了 -->
+    <!-- <context:annotation-config /> -->
+
+    <!-- 导入其它spring配置文件 -->
+    <import resource="classpath:spring-config/spring-profiles.xml"/>
+    <import resource="classpath:spring-config/spring-filters.xml"/>
+    <import resource="classpath:spring-config/spring-ds.xml"/>
+    <import resource="classpath:spring-config/spring-aop.xml"/>
+    <import resource="classpath:spring-config/spring-mybatis.xml"/>
+    <import resource="classpath:spring-config/spring-tx.xml"/>
+    <import resource="classpath:spring-config/spring-cache.xml"/>
+    <import resource="classpath:spring-config/spring-i18n.xml"/>
+    <import resource="classpath:spring-config/spring-json.xml"/>
+    <import resource="classpath:spring-config/spring-security.xml"/>
+    <import resource="classpath:spring-config/spring-exception.xml"/>
+    <import resource="classpath:spring-config/spring-validator.xml"/>
+    <import resource="classpath:spring-config/spring-quartz.xml"/>
+    <import resource="classpath:spring-config/spring-socket-servlet.xml"/>
+    <import resource="classpath:spring-config/spring-ws-servlet.xml"/>
+    <import resource="classpath:spring-config/spring-talkback.xml"/>
+    <!--主动安全配置文件-->
+    <import resource="classpath:spring-config/spring-adas-component.xml"/>
+    <import resource="classpath:spring-config/spring-adas-mybatis.xml"/>
+    <!--两客一危配置文件-->
+    <import resource="classpath:spring-config/spring-lkyw-component.xml"/>
+    <import resource="classpath:spring-config/spring-lkyw-mybatis.xml"/>
+</beans>

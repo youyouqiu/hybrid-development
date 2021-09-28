@@ -1,0 +1,111 @@
+<!-- 右键菜单  文本信息下发 -->
+<form id="batchForm" role="form" action="#" method="post" class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+    <div class="modal-header">
+        <button id="modalClose" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">文本信息下发</h4>
+        <style>
+            .hasMargin{margin-top: 10px}
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- 搜索 -->
+                <form class="form-inline">
+                    <input type="text" id="batchCondition" class="form-control" placeholder="请输入关键字" autocomplete="off">
+                </form>
+                <!-- 车辆树 -->
+                <div id="broadTree" class="ztree" style="max-height:574px;overflow-y:auto">
+                    <ul id="treeDemo"></ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="deviceTypeVal" th:value="${deviceType}" hidden>
+                <div class="form-group" th:if="${deviceType=='11' || deviceType=='20' || deviceType=='21' || deviceType=='24' || deviceType=='25' || deviceType=='26' || deviceType=='28'}">
+                    <div class="col-md-12" id="textType">
+                        <label class="radio-inline"><input type="radio" name="textType" value="1" checked="checked"> 通知</label>
+                        <label class="radio-inline"><input type="radio" name="textType" value="2"> 服务</label>
+                    </div>
+                </div>
+                <form id="txtSend">
+                    <div class="form-group">
+                        <!--<label class="col-md-3 control-label" style="text-align: left;padding-right: 0">文本内容：</label>-->
+                        <div class="col-md-12">
+                            <textarea id="sendTextContent" placeholder="请输入文本内容" class="form-control" maxlength="512" name="sendTextContent"
+                                      rows="3"></textarea>
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <div class="col-md-6" th:if="${deviceType=='11' || deviceType=='20' || deviceType=='21' || deviceType=='24' || deviceType=='25' || deviceType=='26' || deviceType=='28'}">
+                        <select id="messageTypeOne" name="messageTypeOne" class="form-control">
+                            <option value="1">服务</option>
+                            <option value="2">紧急</option>
+                            <option value="3">通知</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" th:if="${deviceType=='11' || deviceType=='20' || deviceType=='21' || deviceType=='24' || deviceType=='25' || deviceType=='26' || deviceType=='28'}">
+                        <select id="messageTypeTwo" name="messageTypeTwo" class="form-control">
+                            <option value="0">中心导航信息</option>
+                            <option value="1">CAN故障码信息</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 oldDeviceInfo" th:if="${deviceType!='11' && deviceType!='20' && deviceType!='21' && deviceType!='24' && deviceType!='25' && deviceType!='26' && deviceType!='28'}">
+                        <div class="checkbox">
+                            <label><input name="marks" value="1" type="checkbox">紧急</label>
+                        </div>
+                    </div>
+                    <!--<div class="col-md-7">
+                        <div class="checkbox">
+                            <label><input name="marks" value="1" id="emergency" type="checkbox"/>紧急</label>
+                        </div>
+                    </div>-->
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label><input name="marks" value="3" checked="checked"
+                                          id="terminalDisplay" type="checkbox"/>终端显示器显示</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label><input name="marks" value="4" checked="checked" id="terminalTtsPlay"
+                                          type="checkbox"/>终端TTS读播</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6" th:if="${deviceType!='11' && deviceType!='20' && deviceType!='21' && deviceType!='24' && deviceType!='25' && deviceType!='26' && deviceType!='28'}">
+                        <div class="checkbox">
+                            <label><input name="marks" value="5" checked="checked" id="advertisingDisplay"
+                                          type="checkbox"/>广告屏显示</label>
+                        </div>
+                    </div>
+                </div>
+                <table id="broadDataTable" class="table table-striped table-bordered table-hover" cellspacing="0"
+                       width="100%">
+                    <thead>
+                    <tr>
+                        <th>监控对象</th>
+                        <th>下发状态</th>
+                    </tr>
+                    </thead>
+                    <tbody id="batchSendTbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="sendBatchButton">
+            <strong>下 发</strong>
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" id="sendModalClose">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var textNull = [[#{dataTableOperation.text.null}]];
+    var sendCommandComplete = [[#{send.command.complete}]];
+</script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script src="/clbs/resources/js/batchSendTxt.js"></script>

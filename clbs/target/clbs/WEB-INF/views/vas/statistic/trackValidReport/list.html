@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>轨迹有效性报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}" />
+    <style>
+        .jk-box .delIcon{
+            right: 45px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">部标监管报表</li>
+                        <li class="active">轨迹有效性报表</li>
+                    </ul>
+                    <h1 class="h1">轨迹有效性报表</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch2-body">
+                            <form id="oilist" class="form-horizontal alarmSearchToolPanel" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <label class="col-md-4 col-sm-3 control-label">监控对象：</label>
+                                        <input id="charSelect" class="form-control hidden"/>
+                                        <div class="has-feedback fastClear jk-box col-sm-8">
+                                            <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                <option value="vehicle" selected="">监控对象</option>
+                                                <option value="group">企业</option>
+                                                <option value="assignment">分组</option>
+                                            </select>
+                                            <input type="text" style="cursor: pointer; background-color: #fafafa;" name="objName"  placeholder="请选择监控对象" class="form-control moreQueryGroup"
+                                                   id="groupSelect" autocomplete="off"/>
+                                            <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;" aria-hidden="true" id="groupSelectSpan"></span>
+                                            <div id="menuContent" class="menuContent">
+                                                <ul id="treeDemo" class="ztree"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="col-md-2 col-sm-3 control-label searchListSelect">时间：</label>
+                                        <div class="col-sm-10 searchListSelect">
+                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                   class="form-control layer-date laydate-icon"
+                                                   id="timeInterval" name="timeInterval" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label" id="dateSearchData">
+                                        <button id="todayClick" type="button"
+                                                class="btn btn-primary fixed-width" name="0">今天
+                                        </button>
+                                        <button id="yesterdayClick" type="button"
+                                                class="btn btn-primary fixed-width"
+                                                name="-1">前一天
+                                        </button>
+                                        <button  type="button"
+                                                 class="btn btn-primary search-btn fixed-width"
+                                                 id="inquireClick">
+                                            <i class="glyphicon glyphicon-search"></i> 查询
+                                        </button>
+                                        <button disabled id="exportData" type="button"
+                                                class="btn btn-purple export-btn fixed-width"><i
+                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch1">
+                            <h3 class="panel-title fwb">图形展示</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch1-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="fixed-table-body tableFEStyle" id="stretch1-body" style="overflow:auto;" >
+                            <div id="amapArea" style="height: 400px">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">数据列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body tableFEStyle" style="overflow:auto;" id="stretch-body">
+                            <table id="shieldTable" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0"
+                                   width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>监控对象</th>
+                                    <th>所属企业</th>
+                                    <th>分组</th>
+                                    <th>标识颜色</th>
+                                    <th>对象类型</th>
+                                    <th>异常位置点</th>
+                                </tr>
+                                </thead>
+                                <tbody style="cursor: pointer">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+</script>
+<script src="https://webapi.amap.com/maps?v=1.4.0&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor"></script>
+<script src="resources/js/dataTables/js/dataTablesBootstrap.js" th:src="@{/resources/js/dataTables/js/dataTablesBootstrap.js}"></script>
+<!--<script src="/wro/Fuel-Consumption-Statistics.js" th:src="@{/wro/Fuel-Consumption-Statistics.js}"></script>-->
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/trackValidReport.js"></script>
+</html>

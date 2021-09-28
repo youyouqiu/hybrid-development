@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.lkyw.repository.mysql.historicalSnapshot.HistoricalSnapshotDao">
+    <select id="getHistoricalSnapshot" parameterType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotQuery"
+            resultType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotInfo">
+        select *
+        from zw_m_media
+        where flag = 1
+        and vehicle_id in
+        <foreach collection="query.vids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and create_data_time  between #{query.startTime} and #{query.endTime}
+        <if test="query.type == 0">
+         and (type = 0  or  type = 2)
+         </if>
+        <if test="query.type == 1">
+            and type = 0
+        </if>
+        <if test="query.type == 2">
+            and type = 2
+        </if>
+        and event_code = 0
+        order by monitor_name asc,create_data_time desc
+    </select>
+
+    <select id="getAllHistoricalSnapshot" parameterType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotQuery"
+            resultType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotInfo">
+        select vehicle_id,id,monitor_name,speed,latitude,longitude,create_data_time,type,media_url_new
+        from zw_m_media
+        where
+         vehicle_id in
+        <foreach collection="query.vids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and create_data_time  between #{query.startTime} and #{query.endTime}
+        and (type = 0  or  type = 2)
+        and event_code = 0
+        and flag = 1
+    </select>
+
+    <select id="getHistoricalSnapshotMapData" parameterType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotQuery"
+            resultType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotInfo">
+        select *
+        from zw_m_media
+        where
+        vehicle_id  = #{query.vehicleIds}
+        and create_data_time  between #{query.startTime} and #{query.endTime}
+        and flag = 1
+        and type = #{query.type}
+        <choose>
+            <when test="query.latitude == 0.0">
+                and (latitude = 0.0  or  latitude is Null)
+            </when>
+            <otherwise>
+                and latitude = #{query.latitude}
+            </otherwise>
+        </choose>
+
+        <choose>
+            <when test="query.longitude == 0.0">
+                and (longitude = 0.0  or  longitude is Null)
+            </when>
+            <otherwise>
+                and longitude = #{query.longitude}
+            </otherwise>
+        </choose>
+        and event_code = 0
+    </select>
+
+    <select id="getHistoricalSnapshotOfMap" parameterType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotQuery"
+            resultType="com.zw.lkyw.domain.historicalSnapshot.HistoricalSnapshotMapData">
+        select vehicle_id as vehicleId,latitude as latitude,longitude as longitude,`type` as `type`
+        from zw_m_media
+        where
+        vehicle_id in
+        <foreach collection="query.vids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and create_data_time  between #{query.startTime} and #{query.endTime}
+        and (type = 0  or  type = 2)
+        and event_code = 0
+        and flag = 1
+    </select>
+
+
+
+</mapper>

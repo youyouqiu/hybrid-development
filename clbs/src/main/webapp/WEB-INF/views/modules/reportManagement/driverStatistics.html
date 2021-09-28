@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>驾驶员统计</title>
+    <style>
+        .glyphicon.glyphicon-log-out::before{
+            content: "";
+            background-image: url(/clbs/resources/img/export.svg);
+            width: 14px;
+            height: 14px;
+            display: block;
+            position: absolute;
+            top: -13px;
+            left: -14px;
+            background-size: 14px 14px;
+        }
+    </style>
+    <link rel="stylesheet" href="/clbs/resources/css/driverStatistics.css">
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">驾驶员统计</li>
+                    </ul>
+                    <h1 class="h1">驾驶员统计</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                        <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                            <option value="vehicle" selected="">监控对象</option>
+                                            <option value="name">驾驶员</option>
+                                        </select>
+                                        <input type="text" autocomplete="off" style="cursor: pointer; background-color: #fafafa;" placeholder="请选择" name="groupSelect" class="form-control moreQueryGroup" id="groupSelect"/>
+                                        <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;" aria-hidden="true" id="groupSelectSpan"></span>
+                                        <div id="menuContent" class="menuContent">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                    <div class="col-md-4 col-sm-8 searchListSelect">
+                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                               class="form-control layer-date laydate-icon"
+                                               id="timeInterval" name="timeInterval" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+
+                                        <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                onclick="itineraryReportList.inquireClick(0)">今天
+                                        </button>
+                                        <button id="yesterdayClick" type="button" class="btn btn-primary" name="-1"
+                                                onclick="itineraryReportList.inquireClick(-1)">前一天
+                                        </button>
+                                        <button id="nearlyThreeDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="itineraryReportList.inquireClick(-3)">前三天
+                                        </button>
+                                        <button id="nearlySevenDays" type="button" class="btn btn-primary" name="-3"
+                                                onclick="itineraryReportList.inquireClick(-7)">前七天
+                                        </button>
+                                        <button id="inquireClick" type="button" class="btn btn-primary search-btn"
+                                                         name="1" onclick="itineraryReportList.inquireClick(1)"><i
+                                            class="glyphicon glyphicon-search"></i> 查询
+                                    </button>
+                                        <button id="batchExportClick" type="button" class="btn btn-primary search-btn"
+                                                name="1" onclick="itineraryReportList.batchExport(1)"><i
+                                                class="glyphicon glyphicon-log-out"></i> 批量导出明细
+                                        </button>
+                                        <button id="exportRisk" disabled="disabled" type="button" class="btn btn-purple export-btn"><i
+                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">数据列表</h3>
+                            <div class="actions pull-right listActions">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch2-body">
+                            <div class="ToolPanel" style="">
+                                <div class="bars pull-left">
+                                    <div class="btn-group pull-left barsMargin" role="group">
+                                        <form role="form">
+                                            <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                          id="simpleQueryParam" name="simpleQueryParam"
+                                                          style="width:300px" placeholder="请输入从业资格证号"></label>
+                                            <button  onclick="itineraryReportList.searchTable()" type="button" id="search_button"
+                                                     class="btn btn-outline btn-default">搜索
+                                            </button>
+                                            <input id="hiddenText" type="text" style="display:none"/>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="columns btn-group pull-right fuelConsumptionS">
+                                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                            title="刷新">
+                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                    </button>
+                                    <div class="keep-open btn-group" title="定制显示列">
+                                        <button id="customizeColumns" type="button"
+                                                class="btn btn-default dropdown-toggle btn-border-radius"
+                                                data-toggle="dropdown">
+                                            <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="dataTable"
+                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>司机名称</th>
+                                    <th>监控对象</th>
+                                    <th>所属企业</th>
+                                    <th>从业资格证号</th>
+                                    <th>插卡时间</th>
+                                    <th>拔卡时间</th>
+                                    <th>休息次数</th>
+                                    <th>行驶时长</th>
+                                    <th>行驶里程</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<div id="detail" class="right-panel">
+    <div class="panel panel-default">
+        <div class="panel-heading" >
+            <h3 class="panel-title fwb">驾驶员统计明细</h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close" onclick="itineraryReportList.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="detail-table">
+                <tr>
+                    <td rowspan="6" class="detail-img-td"><img src="#" id="detailPhoto"></td>
+                    <td class="detail-name">司机姓名</td>
+                    <td id="detailDriverName">...</td>
+                    <td class="detail-name">岗位类型</td>
+                    <td id="detailJobType">...</td>
+                </tr>
+                <tr>
+                    <td class="detail-name">所属企业</td>
+                    <td id="detailEnperprise">...</td>
+                    <td rowspan="5"></td>
+                    <td rowspan="5"></td>
+                </tr>
+                <tr>
+                    <td class="detail-name">从业资格<br/>证&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号</td>
+                    <td id="detailIndustryID">...</td>
+                </tr>
+                <tr>
+                    <td class="detail-name">从业资格<br/>类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别</td>
+                    <td id="detailIndustryType">...</td>
+                </tr>
+                <tr>
+                    <td class="detail-name">发证机关</td>
+                    <td id="detailDispatcher">...</td>
+                </tr>
+                <tr>
+                    <td class="detail-name">有效期至</td>
+                    <td id="detailValidTo">...</td>
+                </tr>
+            </table>
+            <hr/>
+            <table class="detail-table">
+                <tr>
+                    <td class="detail-name">插卡时间</td>
+                    <td id="detailInsertTime">...</td>
+                    <td class="detail-name">拔卡时间</td>
+                    <td id="detailOutTime">...</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="detail-name">监控对象</td>
+                    <td id="detailMonitor">...</td>
+                    <td class="detail-name">车牌颜色</td>
+                    <td id="detailPlateColor">...</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="detail-name">所属企业</td>
+                    <td id="detailMonitorEnterprise" colspan="4">...</td>
+                </tr>
+            </table>
+            <br/>
+            <div class="detail-panel-heading">
+                <h3 class="panel-title fwb">数据列表</h3>
+            </div>
+            <hr/>
+            <div class="" style="height:calc(100vh - 530px);overflow: auto">
+                <table id="detailDataTable"
+                       class="table table-striped table-bordered table-hover noCheckTable"
+                       cellspacing="0" width="100%" style="margin-bottom: 0px;">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>开始行驶时间</th>
+                        <th>结束行驶时间</th>
+                        <th>行驶时长</th>
+                        <th>休息开始时间</th>
+                        <th>休息结束时间</th>
+                        <th>休息时长</th>
+                        <th>行驶里程</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detailTbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <a id="detailExport"  type="button" class="btn btn-primary export-btn">
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </a>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px" onclick="itineraryReportList.closeDetail()">关 &nbsp;闭</button>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var vehicleSelectDriver = [[#{Vehicle.select.driver}]];
+</script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+    <script type="text/javascript" src="/clbs/resources/js/jquery.slidereveal.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/driverStatistics.js"></script>
+</html>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.WorkHourSensorDao">
+
+    <!--分页查询-->
+    <select id="findByPage" parameterType="com.zw.platform.domain.vas.workhourmgt.query.WorkHourSensorQuery"
+                                resultType="com.zw.platform.domain.vas.workhourmgt.WorkHourSensorInfo">
+        select
+        id,sensor_number as sensorNumber,detection_mode as detectionMode,
+        filter_factor as filterFactor,baud_rate as baudRate,
+        odd_even_check as oddEvenCheck,compensate,remark
+        from zw_m_sensor_info
+        where flag = 1 and sensor_type = 4
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and sensor_number like BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        order by create_data_time DESC
+    </select>
+
+    <!--新增工时传感器-->
+    <insert id="addWorkHourSensor" parameterType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+      insert into zw_m_sensor_info
+      (id, sensor_number, baud_rate, odd_even_check, compensate, filter_factor,
+      auto_time, sensor_type, remark, flag, create_data_time, create_data_username,
+      detection_mode)
+      values (#{id}, #{sensorNumber}, #{baudRate}, #{oddEvenCheck}, #{compensate}, #{filterFactor},
+      #{autoTime}, #{sensorType}, #{remark}, #{flag}, #{createDataTime}, #{createDataUsername},
+      #{detectionMode})
+    </insert>
+
+    <!--根据id查询传感器信息-->
+    <select id="findWorkHourSensorById" parameterType="java.lang.String" resultType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+      select
+        id,sensor_number as sensorNumber,detection_mode as detectionMode,
+        filter_factor as filterFactor,baud_rate as baudRate,
+        odd_even_check as oddEvenCheck,compensate,remark
+        from zw_m_sensor_info
+        where flag = 1 and id = #{id}
+    </select>
+
+    <!--修改工时传感器-->
+    <update id="updateWorkHourSensor" parameterType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+        update zw_m_sensor_info
+        set
+        sensor_number = #{sensorNumber},
+        baud_rate = #{baudRate},
+        odd_even_check = #{oddEvenCheck},
+        compensate = #{compensate},
+        filter_factor = #{filterFactor},
+        remark = #{remark},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        detection_mode = #{detectionMode}
+        where id = #{id}
+    </update>
+
+    <!--删除工时传感起-->
+    <update id="deleteWorkHourSensor" parameterType="java.lang.String">
+        update zw_m_sensor_info
+        set flag = 0
+        where id = #{id}
+    </update>
+
+    <!--批量删除-->
+    <update id="deleteMore" parameterType="java.lang.String">
+        update zw_m_sensor_info
+        set flag = 0
+        where
+        id in 
+        <foreach collection="array" item="id" open="(" separator="," close=")" >
+            #{id}
+        </foreach>
+    </update>
+
+    <!--型号校验（按名字查询）-->
+    <select id="findWorkHourSensorByName" parameterType="java.lang.String"
+                    resultType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+        select
+        id,sensor_number as sensorNumber,detection_mode as detectionMode,
+        filter_factor as filterFactor,baud_rate as baudRate,
+        odd_even_check as oddEvenCheck,compensate,remark
+        from zw_m_sensor_info
+        where flag = 1 and sensor_number = BINARY #{sensorName} and sensor_type = 4
+    </select>
+
+    <!--导出excel表（查询所有工时传感器）-->
+    <select id="exportWorkHourSensor" resultType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+        select
+        id,sensor_number as sensorNumber,detection_mode as detectionMode,
+        filter_factor as filterFactor,baud_rate as baudRate,
+        odd_even_check as oddEvenCheck,compensate,remark
+        from zw_m_sensor_info
+        where flag = 1 and sensor_type = 4
+        order by create_data_time DESC
+    </select>
+
+    <!--批量导入-->
+    <insert id="addWorkHourSensorByBatch" parameterType="com.zw.platform.domain.vas.workhourmgt.form.WorkHourSensorForm">
+      insert into zw_m_sensor_info
+      (id, sensor_number, baud_rate, odd_even_check, compensate, filter_factor,
+      auto_time, sensor_type, remark, flag, create_data_time, create_data_username,
+      detection_mode)
+      values <foreach collection="list" item="item" index="index"
+                      separator=",">
+      (#{item.id}, #{item.sensorNumber}, #{item.baudRate}, #{item.oddEvenCheck},
+      #{item.compensate}, #{item.filterFactor},#{item.autoTime}, #{item.sensorType},
+      #{item.remark}, #{item.flag}, #{item.createDataTime}, #{item.createDataUsername},
+      #{item.detectionMode})
+    </foreach>
+    </insert>
+</mapper>

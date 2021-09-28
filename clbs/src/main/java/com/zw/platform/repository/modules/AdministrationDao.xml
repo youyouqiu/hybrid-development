@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.AdministrationDao">
+
+    <select id="getAdministrationByID" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.Administration">
+        SELECT
+        *
+        FROM
+        zw_m_polygon_content
+        WHERE flag=1 and
+        polygon_id = #{id} 
+       ORDER BY region_count ,sort_order 
+    </select>
+    <!-- 根据行政区域id查询行政区域主表信息 -->
+    <select id="findAdministrationByIds" resultType="com.zw.platform.domain.functionconfig.Administration">
+    	SELECT * FROM zw_m_administration WHERE flag=1 and id =#{id}
+    </select>
+
+    <!-- 根据多边形id查询多边形主表信息 -->
+    <select id="findAdministrationByName" resultType="com.zw.platform.domain.functionconfig.Administration">
+    	SELECT * FROM zw_m_administration WHERE flag=1 and name =#{name}
+    </select>
+
+    <!-- 新增行政区域 -->
+    <insert id="administration" parameterType="com.zw.platform.domain.functionconfig.form.AdministrationForm">
+        INSERT INTO zw_m_administration (id, name, province,city,district,description, group_id, create_data_time, create_data_username)
+        VALUES(
+        #{id}, #{name},#{province},#{city},#{district},#{description},#{groupId},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+    <!-- 批量新增线路点信息 -->
+    <insert id="administrationContent" parameterType="com.zw.platform.domain.functionconfig.form.AdministrationForm">
+        INSERT INTO zw_m_polygon_content (
+        polygon_id, sort_order, longitude, latitude,region_count, flag, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.sortOrder}, #{item.longitude}, #{item.latitude},
+            #{item.regionCount}, #{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+    <!-- 新增电子围栏总表 -->
+    <insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.FenceInfoForm">
+        INSERT INTO zw_m_fence_info (
+        id, type, shape, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{type}, #{shape}, #{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 根据行政区域id删除行政区域点数据-修改多边形时先删点再加点信息 -->
+    <delete id="deleteAdministrationContent"
+            parameterType="com.zw.platform.domain.functionconfig.form.AdministrationForm">
+    	DELETE FROM zw_m_polygon_content WHERE polygon_id = #{polygonId}
+    </delete>
+
+    <!-- 更新多边形区域 -->
+    <update id="updateAdministration" parameterType="com.zw.platform.domain.functionconfig.form.AdministrationForm">
+    update zw_m_administration
+       set name = #{name},
+           province = #{province},
+           city = #{city},
+           district = #{district},
+           description = #{description},
+           update_data_time = #{updateDataTime},
+           update_data_username = #{updateDataUsername}
+    where  id = #{polygonId}
+    </update>
+
+    <update id="deleteAdministration">
+        update zw_m_administration
+        set flag = 0
+        where id = #{fenceId}
+    </update>
+
+    <select id="getAdministrationById" resultType="com.zw.platform.domain.functionconfig.Administration">
+        SELECT zmpc.*, zmft.color_code, zmft.transparency, zmp.name, zmp.description,zmp.province,zmp.city,zmp.district,zmp.street
+        FROM zw_m_polygon_content zmpc
+        left join zw_m_administration zmp on zmpc.polygon_id = zmp.id and zmp.flag = 1
+        left join zw_m_fence_info zmfi on zmfi.shape = zmpc.polygon_id and zmfi.flag = 1
+        left join zw_m_fence_type zmft on zmft.id = zmfi.fence_type_id and zmft.flag = 1
+        WHERE zmpc.flag = 1
+        AND zmpc.polygon_id = #{id}
+        ORDER BY zmpc.sort_order
+    </select>
+</mapper>

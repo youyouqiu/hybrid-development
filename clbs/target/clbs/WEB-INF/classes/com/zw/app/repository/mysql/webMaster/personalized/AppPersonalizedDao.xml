@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.webMaster.personalized.AppPersonalizedDao">
+	<!--获取app信息配置 -->
+    <select id="find" resultType="com.zw.app.domain.webMaster.personalized.AppPersonalized">
+		SELECT * FROM zw_app_personalized_config
+		WHERE group_id = #{groupId}
+		AND group_default = #{groupdefault}
+		AND flag = 1
+	</select>
+	<!-- 插入组织的默认配置-->
+	<insert id="addGroupData" parameterType="com.zw.app.domain.webMaster.personalized.AppPersonalized">
+        INSERT INTO zw_app_personalized_config (id,login_logo,login_title,website_name,login_prompt,password_prompt,about_platform,group_avatar,aggregation_number,history_time_limit,alarm_time_limit,max_objectnumber,group_id,group_default,flag,create_data_time,create_data_username,adas_flag)
+		VALUES(#{id},#{loginLogo},#{loginTitle},#{websiteName},#{loginPrompt},#{passwordPrompt},#{aboutPlatform},#{groupAvatar},#{aggregationNumber},#{historyTimeLimit},#{alarmTimeLimit},#{maxObjectnumber},#{groupId},#{groupDefault},#{flag},#{createDataTime},#{createDataUsername},#{adasFlag})
+    </insert>
+	<!--修改登录标题 -->
+	<update id="updateAppPersonalized" parameterType="com.zw.app.domain.webMaster.personalized.AppPersonalized">
+		UPDATE zw_app_personalized_config
+		<set>
+			<if test="loginLogo != null">
+				login_logo = #{loginLogo},
+			</if>
+			<if test="loginTitle != null">
+				login_title = #{loginTitle},
+			</if>
+			<if test="websiteName!=null">
+				website_name =#{websiteName},
+			</if>
+			<if test="loginPrompt != null">
+				login_prompt = #{loginPrompt},
+			</if>
+			<if test="passwordPrompt != null">
+				password_prompt = #{passwordPrompt},
+			</if>
+			<if test="aboutPlatform != null">
+				about_platform = #{aboutPlatform},
+			</if>
+			<if test="groupAvatar != null">
+				group_avatar = #{groupAvatar},
+			</if>
+			<if test="aggregationNumber != null and aggregationNumber != 0">
+				aggregation_number = #{aggregationNumber},
+			</if>
+			<if test="historyTimeLimit != null and historyTimeLimit != 0">
+				history_time_limit = #{historyTimeLimit},
+			</if>
+			<if test="alarmTimeLimit != null and alarmTimeLimit != 0">
+				alarm_time_limit = #{alarmTimeLimit},
+			</if>
+			<if test="maxObjectnumber != null and maxObjectnumber != 0">
+				max_objectnumber = #{maxObjectnumber},
+			</if>
+			<if test="updateDataTime != null">
+				update_data_Time = #{updateDataTime},
+			</if>
+			<if test="updateDataUsername != null">
+				update_data_username = #{updateDataUsername},
+			</if>
+			<if test="createDataTime != null">
+				create_data_Time = #{createDataTime},
+			</if>
+			<if test="createDataUsername != null">
+				create_data_username = #{createDataUsername},
+			</if>
+			<if test="adasFlag != null">
+				adas_flag = #{adasFlag},
+			</if>
+		</set>
+		WHERE group_id = #{groupId}
+		 AND group_default = #{groupDefault}
+		 AND flag = 1
+	</update>
+	<select id="getSameLoginLogo" resultType="java.lang.Integer">
+		SELECT count(*) FROM zw_app_personalized_config
+		WHERE login_logo = #{login_logo}
+		AND flag = 1
+		AND id != #{id}
+	</select>
+	<select id="getSameGroupAvatar" resultType="java.lang.Integer">
+		SELECT count(*) FROM zw_app_personalized_config
+		WHERE group_avatar = #{group_avatar}
+		AND flag = 1
+		AND id != #{id}
+	</select>
+
+
+	<select id="getloginLogo" resultType="java.lang.String">
+		SELECT login_logo FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getGroupAvatar" resultType="java.lang.String">
+		SELECT group_avatar FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getWebsiteName" resultType="java.lang.String">
+		SELECT website_name FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getloginTitle" resultType="java.lang.String">
+		SELECT login_title FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getAboutPlatform" resultType="java.lang.String">
+		SELECT about_platform FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getPasswordPrompt" resultType="java.lang.String">
+		SELECT password_prompt FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getLoginPrompt" resultType="java.lang.String">
+		SELECT login_prompt FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+
+	<select id="getMaxObjectnumber" resultType="java.lang.String">
+		SELECT max_objectnumber FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getAlarmTimeLimit" resultType="java.lang.String">
+		SELECT alarm_time_limit FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getHistoryTimeLimit" resultType="java.lang.String">
+		SELECT history_time_limit FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getAggregationNumber" resultType="java.lang.String">
+		SELECT aggregation_number FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+	<select id="getAdasFlag" resultType="java.lang.String">
+		SELECT adas_flag FROM zw_app_personalized_config
+		WHERE  flag = 1
+		AND group_default = 0
+		AND group_id = #{groupId}
+	</select>
+</mapper>

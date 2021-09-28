@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewProfessionalsDao">
+
+    <sql id="allField">
+        id, name, position_type, identity, job_number, card_number, gender, birthday, photograph, phone, email,
+        emergency_contact, emergency_contact_phone, flag, create_data_time, create_data_username, update_data_time,
+        update_data_username, hiredate, state, phone_two, phone_three, landline, driving_license_no, driving_agencies,
+        operation_number, operation_agencies, driving_type, driving_start_date, driving_end_date, remind_days,
+        ic_card_agencies, ic_card_end_date, service_company, qualification_category, issue_certificate_date, address,
+        native_place, regional, identity_card_photo, driver_license_photo, qualification_certificate_photo, lock_type
+    </sql>
+
+    <select id="getByIds" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT
+        <include refid="allField"/>
+        from zw_m_professionals_info where flag = 1 and id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findAllProfessionals" resultType="com.zw.platform.basic.dto.ProfessionalDTO">
+    SELECT p.*,(SELECT professionals_type from zw_m_professionals_type where id=p.position_type and flag=1) type  FROM zw_m_professionals_info p
+    WHERE p.flag = 1 ORDER BY p.create_data_time DESC
+    </select>
+
+
+    <!-- 新增从业人员 -->
+    <insert id="addProfessionals"
+            parameterType="com.zw.platform.basic.domain.ProfessionalDO">
+		insert into zw_m_professionals_info (id, name, org_id,
+		position_type, identity, job_number, card_number,
+		gender, birthday,
+		lock_type,
+		photograph, phone,emergency_contact,emergency_contact_phone, email, flag, create_data_time,
+		create_data_username,hiredate,state,phone_two,phone_three,landline,driving_license_no,
+		driving_agencies,operation_number,operation_agencies,driving_type,driving_start_date,driving_end_date,remind_days,ic_card_end_date,
+		ic_card_agencies,service_company,qualification_category,issue_certificate_date,address,native_place,regional, identity_card_photo, nation_id, education_id)
+		values (#{id}, #{name}, #{orgId}, #{positionType},
+		#{identity},
+		#{jobNumber}, #{cardNumber},
+		#{gender}, #{birthday},
+		#{lockType},
+		#{photograph}, #{phone},#{emergencyContact},#{emergencyContactPhone}, #{email}, 1,
+		#{createDataTime},
+		#{createDataUsername},#{hiredate},#{state},#{phoneTwo},#{phoneThree},#{landline},#{drivingLicenseNo},#{drivingAgencies},
+		#{operationNumber},#{operationAgencies},#{drivingType},#{drivingStartDate},#{drivingEndDate},#{remindDays},#{icCardEndDate},
+		#{icCardAgencies},#{serviceCompany},#{qualificationCategory},#{issueCertificateDate},#{address},#{nativePlace},#{regional}, #{identityCardPhoto}, #{nationId}, #{educationId})
+	</insert>
+
+    <!-- 根据ID查询岗位类型 -->
+    <select id="getProfessionalsType" parameterType="string"
+            resultType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        SELECT * FROM zw_m_professionals_type WHERE id = #{id} and flag = 1
+    </select>
+
+
+    <!-- 根据id查询从业人员 -->
+    <select id="getProfessionalById" parameterType="string"
+            resultType="com.zw.platform.basic.dto.ProfessionalDTO">
+        SELECT zi.*,zt.professionals_type as type FROM zw_m_professionals_info zi left join zw_m_professionals_type zt
+        on zi.position_type = zt.id
+        WHERE zi.flag = 1
+        <if test="id != null and id != ''">
+            AND zi.id = #{id}
+        </if>
+    </select>
+
+    <!-- 根据id查询从业人员 -->
+    <select id="findProfessionalsByIds" parameterType="string"
+            resultType="com.zw.platform.basic.dto.ProfessionalDTO">
+        SELECT p.*,pt.professionals_type type
+        FROM zw_m_professionals_info p
+        left join zw_m_professionals_type pt on pt.id = p.position_type and pt.flag = 1
+        WHERE p.flag = 1
+        and p.id in
+        <foreach item="idItem" collection="ids" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+        ORDER BY p.create_data_time DESC
+    </select>
+
+    <!-- 根据id删除一个从业人员 -->
+    <update id="deleteProfessionalsById">
+		update zw_m_professionals_info set flag = 0 WHERE id = #{id}
+	</update>
+
+    <!-- 根据id批量删除从业人员 -->
+    <update id="deleteProfessionalsByBatch">
+        update zw_m_professionals_info set flag = 0 WHERE id in
+        <foreach item="idItem" collection="list" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <update id="deleteProfessionalsTypeByBatch">
+        update zw_m_professionals_type set flag = 0 WHERE id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--判断从业人员是否绑定组织-->
+    <select id="getBindVehicleIds" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT zc.vehicle_id from zw_m_config_professionals zp
+        left join zw_m_config zc on zp.config_id = zc.id
+        WHERE
+        zp.flag=1
+        and
+        zp.professionals_id = #{id}
+    </select>
+
+    <!--判断从业人员是否绑定组织-->
+    <select id="getBindIds" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT distinct professionals_id from zw_m_config_professionals
+        WHERE
+        flag = 1
+        and professionals_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- 根据id批量删除从业人员绑定关系 -->
+    <update id="deleteBindInfos">
+        update zw_m_config_professionals set flag = 0 WHERE professionals_id = #{id}
+    </update>
+
+    <select id="getDeviceIdByPid" resultType="map" parameterType="string">
+        SELECT zc.device_id deviceId ,zc.vehicle_id vehicleId, zd.device_type deviceType, zs.simcard_number simCardNumber FROM zw_m_config_professionals zp
+                LEFT JOIN zw_m_config zc ON zp.config_id = zc.id
+                        LEFT JOIN zw_m_sim_card_info zs ON zs.id = zc.sim_card_id AND zs.flag = 1
+                        LEFT JOIN zw_m_device_info zd ON zd.id = zc.device_id AND zd.flag = 1
+                WHERE
+                zp.flag=1
+                AND
+                zp.professionals_id = #{pid}
+    </select>
+
+    <!-- 修改从业人员 -->
+    <update id="updateProfessionals"
+            parameterType="com.zw.platform.basic.domain.ProfessionalDO">
+        update zw_m_professionals_info
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="orgId != null">
+                org_id = #{orgId},
+            </if>
+            <if test="positionType != null">
+                position_type = #{positionType},
+            </if>
+            <if test="identity != null">
+                identity = #{identity},
+            </if>
+            <if test="jobNumber != null">
+                job_number = #{jobNumber},
+            </if>
+            <if test="cardNumber != null">
+                card_number = #{cardNumber},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <!-- <if test="birthday != null"> -->
+            birthday = #{birthday},
+            hiredate = #{hiredate},
+            <!-- </if> -->
+            <if test="photograph != null">
+                photograph = #{photograph},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="emergencyContact != null">
+                emergency_contact = #{emergencyContact},
+            </if>
+            <if test="emergencyContactPhone != null">
+                emergency_contact_phone = #{emergencyContactPhone},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+
+            <if test="state != null">
+                state = #{state},
+            </if>
+
+            <if test="phoneTwo != null">
+                phone_two = #{phoneTwo},
+            </if>
+            <if test="phoneThree != null">
+                phone_three = #{phoneThree},
+            </if>
+            <if test="landline != null">
+                landline = #{landline},
+            </if>
+            <if test="drivingLicenseNo != null">
+                driving_license_no = #{drivingLicenseNo},
+            </if>
+            <if test="drivingAgencies != null">
+                driving_agencies = #{drivingAgencies},
+            </if>
+            <if test="operationNumber != null">
+                operation_number = #{operationNumber},
+            </if>
+            <if test="operationAgencies != null">
+                operation_agencies = #{operationAgencies},
+            </if>
+            <if test="drivingType != null">
+                driving_type = #{drivingType},
+            </if>
+            <if test="icCardAgencies != null">
+                ic_card_agencies = #{icCardAgencies},
+            </if>
+            <if test="icCardEndDate != null">
+                ic_card_end_date = #{icCardEndDate},
+            </if>
+            <if test="serviceCompany != null">
+                service_company = #{serviceCompany},
+            </if>
+            <if test="qualificationCategory != null">
+                qualification_category = #{qualificationCategory},
+            </if>
+            <if test="issueCertificateDate != null">
+                issue_certificate_date = #{issueCertificateDate},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="nativePlace != null">
+                native_place = #{nativePlace},
+            </if>
+            <if test="regional != null">
+                regional = #{regional},
+            </if>
+            <if test="nationId != null">
+                nation_id = #{nationId},
+            </if>
+            <if test="educationId != null">
+                education_id = #{educationId},
+            </if>
+            driving_start_date = #{drivingStartDate},
+            driving_end_date = #{drivingEndDate},
+            remind_days = #{remindDays},
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="findBandMonitorIdByProfessionalId" resultType="java.lang.String">
+        select distinct zmc.vehicle_id from zw_m_professionals_info zmpi
+        inner join zw_m_config_professionals zmcp on zmpi.id = zmcp.professionals_id and zmcp.flag = 1
+        inner join zw_m_config zmc on zmcp.config_id = zmc.id and zmc.flag = 1
+        where zmpi.flag = 1 and zmpi.id = #{id}
+    </select>
+
+    <select id="getProfessionalsTypes"
+            resultType="com.zw.platform.domain.basicinfo.form.ProfessionalsTypeForm">
+        SELECT *
+        FROM zw_m_professionals_type
+        where flag = 1
+        and BINARY professionals_type in
+        <foreach item="type" collection="types" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+    </select>
+
+    <select id="getProfessionalsByNames" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT id,name, identity FROM zw_m_professionals_info
+        WHERE flag = 1
+        <if test="names != null and names.size > 0">
+            AND BINARY name in
+            <foreach item="name" collection="names" open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getAlreadyExistIdentitySet" resultType="java.lang.String">
+        SELECT identity FROM zw_m_professionals_info
+        WHERE flag = 1
+        <if test="list != null and list.size > 0">
+            AND identity IN
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 批量新增从业人员 -->
+    <insert id="addProfessionalsByBatch" parameterType="com.zw.platform.basic.domain.ProfessionalDO">
+        insert into zw_m_professionals_info (id, name, org_id,
+        position_type, identity, job_number, card_number,
+        gender, birthday,
+        photograph, phone,emergency_contact,emergency_contact_phone, email, flag, create_data_time,
+        create_data_username,hiredate,state,phone_two,phone_three,landline,driving_license_no,
+        driving_agencies,operation_number,operation_agencies,driving_type,driving_start_date,driving_end_date,remind_days,
+        ic_card_end_date,ic_card_agencies,service_company,qualification_category,issue_certificate_date,address,native_place,regional,
+        nation_id, education_id)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.name}, #{item.orgId}, #{item.positionType},
+            #{item.identity},
+            #{item.jobNumber}, #{item.cardNumber},
+            #{item.gender}, #{item.birthday},
+            #{item.photograph}, #{item.phone}, #{item.emergencyContact},#{item.emergencyContactPhone},#{item.email},
+            #{item.flag},
+            #{item.createDataTime},
+            #{item.createDataUsername},#{item.hiredate},#{item.state},#{item.phoneTwo},#{item.phoneThree},#{item.landline},
+            #{item.drivingLicenseNo},#{item.drivingAgencies},
+            #{item.operationNumber},#{item.operationAgencies},#{item.drivingType},#{item.drivingStartDate},#{item.drivingEndDate},#{item.remindDays},
+            #{item.icCardEndDate},#{item.icCardAgencies},
+            #{item.serviceCompany},#{item.qualificationCategory},#{item.issueCertificateDate},#{item.address},#{item.nativePlace},#{item.regional},
+            #{item.nationId}, #{item.educationId})
+        </foreach>
+    </insert>
+
+    <insert id="addProfessionalsTypeByBatch" parameterType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        INSERT INTO zw_m_professionals_type ( id, professionals_type, description,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="professionalsTypes" item="item" separator=",">
+            (#{item.id}, #{item.professionalstype}, #{item.description},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <insert id="addProfessionalsType" parameterType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        INSERT INTO zw_m_professionals_type (id, professionals_type, description, create_data_time,
+                                             create_data_username)
+        VALUES (#{id}, #{professionalstype}, #{description}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <select id="getExportProfessionalData" resultType="com.zw.platform.basic.dto.export.ProfessionalsExportDTO">
+        SELECT
+        p.org_id AS orgId, p.id AS id, p.name, p.position_type AS
+        positionType,
+        p.identity AS identity,
+        p.job_number AS jobNumber,
+        p.card_number AS cardNumber,p.gender AS gender,
+        p.birthday AS birthday,
+        p.hiredate AS hiredate,
+        p.state,
+        p.photograph AS photograph, p.phone AS phone, p.emergency_contact AS emergencyContact, p.emergency_contact_phone
+        AS emergencyContactPhone, p.email AS email,
+        p.phone_two as phoneTwo,p.phone_three as phoneThree,p.landline,p.driving_license_no as drivingLicenseNo,
+        p.driving_agencies as drivingAgencies,p.operation_number as operationNumber,p.operation_agencies as
+        operationAgencies,
+        p.driving_type as drivingType,p.driving_start_date as drivingStartDate,p.driving_end_date as
+        drivingEndDate,p.remind_days as remindDays,
+        p.ic_card_end_date as icCardEndDate,p.ic_card_agencies as icCardAgencies,p.service_company as serviceCompany,
+        p.qualification_category as qualificationCategory,p.issue_certificate_date as issueCertificateDate,p.address,
+        p.nation_id as nationId, p.education_id as educationId,
+        (SELECT professionals_type from zw_m_professionals_type where id=p.position_type and flag=1) type,p.native_place
+        as nativePlace,p.regional as regional
+        FROM
+        zw_m_professionals_info p
+        WHERE p.flag = 1
+        AND p.flag = 1
+        AND p.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY p.create_data_time DESC
+    </select>
+
+    <!-- 根据id查询从业人员 -->
+    <select id="getProfessionalsByOrgId" parameterType="string"
+            resultType="com.zw.platform.basic.domain.ProfessionalDO">
+		SELECT * FROM zw_m_professionals_info
+		WHERE flag = 1
+		and org_id = #{orgId}
+	</select>
+
+    <select id="findAllProfessionalsType" resultType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        SELECT professionalstype.* FROM zw_m_professionals_type professionalstype where flag=1
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据名称查询从业人员 -->
+    <select id="findByNameExistIdentity" parameterType="string"
+            resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT professionalsInfo.* FROM zw_m_professionals_info
+        professionalsInfo
+        WHERE professionalsInfo.flag = 1
+        AND professionalsInfo.name = BINARY #{name}
+        <choose>
+            <when test="identity != null and identity != ''">
+                AND professionalsInfo.identity = #{identity}
+            </when>
+            <otherwise>
+                AND (professionalsInfo.identity = '' or professionalsInfo.identity is null)
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <!--   只根据身份证去查找从业人员   -->
+    <select id="getProfessionalsByIdentity" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT name, identity FROM zw_m_professionals_info
+        WHERE flag = 1
+        <if test="identity != null and identity != ''">
+            AND identity = #{identity}
+        </if>
+
+    </select>
+
+    <!--   只根据姓名去查找从业人员   -->
+    <select id="getProfessionalsByName" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT name, identity FROM zw_m_professionals_info
+        WHERE flag = 1
+        <if test="name != null and name != ''">
+            AND name = BINARY #{name}
+        </if>
+    </select>
+
+    <select id="findAllIcCarDriver" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT pro.id as id,pro.name as name,pro.card_number as cardNumber,pro.org_id as orgId, pro.photograph as photograph,identity
+        from zw_m_professionals_info pro where pro.id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and pro.lock_type=1 and pro.flag =1
+        <if test="name != null and name != ''">
+            and pro.name like CONCAT('%',#{name},'%')
+        </if>
+
+    </select>
+
+    <select id="findAllDriver" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT
+        pro.id as id,
+        pro.name as name,
+        pro.card_number as cardNumber,
+        pro.identity as identity,
+        pro.org_id as orgId,
+        pro.photograph as photograph
+        from zw_m_professionals_info pro where pro.id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and pro.flag =1
+        <if test="name != null and name != ''">
+            and pro.name like CONCAT('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="getIcCardDriverIdByIdentityAndName" resultType="string">
+        select  id from zw_m_professionals_info where
+        identity=#{identity}
+        and name=#{name}
+        and flag =1
+        and lock_type=1
+        order by create_data_time
+        limit 1
+    </select>
+
+    <update id="updateIcCardPhotoGraph">
+        UPDATE zw_m_professionals_info SET photograph = #{photograph}
+        WHERE flag = 1 and id =#{id}
+    </update>
+
+    <select id="getPhotoByCardNumberAndNameAndVersion" resultType="string" parameterType="string">
+        SELECT photograph FROM zw_m_professionals_info
+        WHERE flag = 1
+          AND identity = BINARY #{identity}
+          AND `name` = BINARY #{name}
+    </select>
+
+    <select id="getProfessionalsByNameAndCardNum"
+            resultType="com.zw.platform.basic.dto.ProfessionalDTO">
+        SELECT * FROM zw_m_professionals_info
+        <where>
+            flag = 1
+            <if test="cardNumber != null and cardNumber != ''">
+                AND card_number = BINARY #{cardNumber}
+            </if>
+            <if test="name != null and name != ''">
+                AND name = BINARY #{name}
+            </if>
+        </where>
+        order by create_data_time asc
+    </select>
+
+    <select id="getProByCardNumberAndCreateTime" resultType="java.lang.String">
+        SELECT id FROM zw_m_professionals_info
+        WHERE flag = 1  and  card_number = #{cardNumber} and create_data_time = #{createTime}
+    </select>
+
+    <!-- 修改从业人员 -->
+    <update id="updateProfessionalsOCRIdentity"
+            parameterType="com.zw.platform.basic.dto.ProfessionalDTO">
+        update zw_m_professionals_info
+        set
+        name = #{name},
+        gender = #{gender},
+        identity = #{identity},
+        identity_card_photo = #{identityCardPhoto}
+        where id = #{id}
+    </update>
+
+    <!-- 修改从业人员 -->
+    <update id="updateProfessionalsOCRDriver"
+            parameterType="com.zw.platform.basic.dto.ProfessionalDTO">
+        update zw_m_professionals_info
+        set
+        driving_license_no = #{drivingLicenseNo},
+        driving_type = #{drivingType},
+        driving_start_date = #{drivingStartDate},
+        driving_end_date = #{drivingEndDate},
+        driver_license_photo = #{driverLicensePhoto}
+        where id = #{id}
+    </update>
+
+    <!-- 修改从业人员 -->
+    <update id="updateProfessionalsOCRQualification"
+            parameterType="com.zw.platform.basic.dto.ProfessionalDTO">
+        update zw_m_professionals_info
+        set
+        card_number = #{cardNumber},
+        qualification_certificate_photo = #{qualificationCertificatePhoto}
+        where id = #{id}
+    </update>
+
+
+    <select id="getIcCardDriverInfos" resultType="com.zw.platform.basic.domain.ProfessionalShowDTO">
+        SELECT
+        p.id,
+        p.name as name,
+        (SELECT professionals_type from zw_m_professionals_type where id=p.position_type) type,
+        p.card_number AS cardNumber,
+        p.org_id ,
+        p.qualification_category as qualificationCategory,
+        p.ic_card_agencies as icCardAgencies,
+        p.ic_card_end_date as icCardEndDate,
+        p.photograph AS photograph,
+        p.address as address,
+        p.phone AS phone,
+        p.identity AS identity,
+        p.driving_license_no
+        FROM
+        zw_m_professionals_info p
+        WHERE p.flag = 1
+        and (p.name,p.identity) in
+        <foreach collection="icCardDriverQueryList" item="item" separator="," open="(" close=")">
+            (#{item.name},#{item.cardNumber})
+        </foreach>
+    </select>
+
+    <select id="getIcCardDriverInfoByIds" resultType="com.zw.platform.basic.domain.ProfessionalShowDTO">
+        SELECT
+        id,
+        p.name as name,
+        (SELECT professionals_type from zw_m_professionals_type where id=p.position_type) type,
+        p.card_number AS cardNumber,
+        p.org_id ,
+        p.qualification_category as qualificationCategory,
+        p.ic_card_agencies as icCardAgencies,
+        p.ic_card_end_date as icCardEndDate,
+        p.photograph AS photograph,
+        p.address as address,
+        p.phone AS phone,
+        p.identity AS identity
+        FROM
+        zw_m_professionals_info p
+        WHERE p.flag = 1
+        and p.id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            (#{item)
+        </foreach>
+    </select>
+
+    <select id="getBindMonitorIdsByKeyword" resultType="string" parameterType="string">
+        SELECT DISTINCT c.vehicle_id
+        from zw_m_professionals_info  p
+        INNER JOIN zw_m_config_professionals pc on p.id = pc.professionals_id and pc.flag = 1
+        INNER JOIN zw_m_config c on pc.config_id = c.id and c.flag = 1
+        where p.flag = 1
+        and p.name LIKE BINARY CONCAT('%',#{keyword},'%')
+    </select>
+
+    <select id="fuzzySearchByName" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        select zmpi.id, zmpi.name, zmpi.identity
+        from zw_m_professionals_info zmpi
+        where zmpi.flag = 1
+          and zmpi.name LIKE BINARY CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <select id="findByVehicleId" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        select zmpi.id, zmpi.name, zmpi.identity, zmpi.phone
+        from zw_m_config zmc
+                 left join zw_m_config_professionals zmcp on zmc.id = zmcp.config_id and zmcp.flag = 1
+                 left join zw_m_professionals_info zmpi on zmcp.professionals_id = zmpi.id and zmpi.flag = 1
+        where zmc.flag = 1
+          and zmc.vehicle_id = #{vehicleId}
+    </select>
+
+    <select id="getIcTypeId" resultType="java.lang.String">
+        SELECT id FROM zw_m_professionals_type  WHERE professionals_type = '驾驶员(IC卡)' AND flag = 1
+    </select>
+
+    <select id="findByCarNumberNameAndPositionType" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT id,
+               card_number            as cardNumber,
+               name,
+               ic_card_agencies       as icCardAgencies,
+               address,
+               qualification_category as qualificationCategory,
+               ic_card_end_date       as icCardEndDate,
+               photograph,
+               lock_type
+        from zw_m_professionals_info
+        where name = #{name}
+          and card_number = #{cardNumber}
+          and position_type = #{positionType}
+          and flag = 1
+          and lock_type = 1
+        order by create_data_time
+        limit 1
+    </select>
+
+    <select id="getIcProfessionalNum" resultType="java.lang.Integer">
+        SELECT count(id)
+        from zw_m_professionals_info
+        where flag = 1
+          and card_number = #{cardNumber}
+          and ic_card_agencies = #{icCardAgencies}
+          and position_type = #{positionType};
+    </select>
+
+    <select id="getIcErrorName" resultType="java.lang.String">
+        SELECT name
+        from zw_m_professionals_info
+        where name like '%IC异常卡%'
+          and position_type = #{positionType}
+        order by name desc
+        limit 1
+    </select>
+
+    <select id="findByIdentityOrDrivingLicenseNo" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT <include refid="allField"/> FROM zw_m_professionals_info
+        WHERE  (identity = #{identityOrDrivingLicenseNo}
+            OR driving_license_no = #{identityOrDrivingLicenseNo})
+          AND flag = 1
+    </select>
+
+    <select id="findByNameAndPositionType" resultType="com.zw.platform.basic.domain.ProfessionalDO">
+        SELECT zmpi.* FROM zw_m_professionals_info zmpi
+        WHERE zmpi.flag = 1
+        <if test="name != null and name != ''">
+            AND zmpi.name = BINARY #{name}
+        </if>
+        AND zmpi.position_type <![CDATA[ <> ]]> #{positionType}
+    </select>
+
+    <select id="findProfessionalsTypeDO" resultType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        SELECT zmpt.*
+        FROM zw_m_professionals_type zmpt
+        where flag = 1
+          AND professionals_type LIKE BINARY
+            CONCAT('%', #{professionalstype}, '%')
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="findProfessionalIdByJobType" resultType="java.lang.String">
+        SELECT id from zw_m_professionals_info where position_type = #{typeId} and flag = 1;
+    </select>
+
+    <select id="findProfessionalsTypeByType" resultType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        SELECT *
+        FROM zw_m_professionals_type
+        where flag = 1
+          and professionals_type = BINARY #{professionalstype}
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="getMonitorBindProfessionalList" resultType="com.zw.platform.domain.basicinfo.MonitorBindProfessionalDo">
+        SELECT zmc.vehicle_id moId,
+        zmpi.id professionalId,
+        zmpi.`name` professionalName,
+        zmpi.phone phone
+        FROM zw_m_config zmc
+        LEFT JOIN zw_m_config_professionals zmcp ON zmc.id = zmcp.config_id
+        AND zmcp.flag = 1
+        left join zw_m_professionals_info zmpi ON zmcp.professionals_id = zmpi.id and zmpi.flag = 1
+        where zmc.flag = 1
+        and zmc.vehicle_id in
+        <foreach collection="moIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateFaceId">
+        update zw_m_professionals_info set face_id = #{faceId} WHERE id = #{id}
+    </update>
+
+    <update id="updateProfessionalsType" parameterType="com.zw.platform.basic.domain.ProfessionalsTypeDO">
+        UPDATE zw_m_professionals_type
+        SET professionals_type   = #{professionalstype},
+            description          = #{description},
+            update_data_time     = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateProfessionPositionType">
+        UPDATE zw_m_professionals_info SET position_type = null
+        WHERE id IN
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND flag = 1;
+    </update>
+</mapper>

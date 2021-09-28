@@ -1,0 +1,458 @@
+<form th:object="${vehicleWorkHourSetting}"
+      id="detailForm" role="form" action="#"
+      method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXDetail" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">工时管理设置详情</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">监控对象：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{plateNumber}" class="form-control inputStyleHide" readonly/>
+                        <input th:field="*{sensorSequenceType}" type="hidden"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-heading">
+                    <div class="dropdown panel-title fwb">
+                        <ul class="nav nav-tabs">
+                            <li class="active" id="egine1Title"><a href="#egine1" data-toggle="tab">1#发动机</a></li>
+                            <li id="egine2Title"><a href="#egine2" data-toggle="tab">2#发动机</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content">
+                        <!-- 油箱1 -->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                传感器基本参数
+                            </label>
+                        </div>
+                        <div class="tab-pane active" id="egine1">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 传感器型号：
+                                </label>
+                                <div class="col-md-4">
+                                    <input th:field="*{sensorNumber}" class="form-control inputStyleHide" readonly/>
+                                </div>
+                                <label class="col-md-2 control-label"> 检测方式：
+                                </label>
+                                <div class="col-md-4">
+                                    <select disabled id="detectionMode" th:field="*{detectionMode}"
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="1">电压比较式</option>
+                                        <option value="2">油耗阈值式</option>
+                                        <option value="3">油耗波动式</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+
+                                <label class="col-md-2 control-label"> 补偿使能：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="shape" id="shape" th:field="*{compensate}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="2">禁用</option>
+                                        <option value="1">使能</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"> 奇偶校验：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="oddEvenCheck" th:field="*{oddEvenCheck}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="3">无校验</option>
+                                        <option value="1">奇校验</option>
+                                        <option value="2">偶校验</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> 波特率：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="baudRate" th:field="*{baudRate}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="1">2400</option>
+                                        <option value="2">4800</option>
+                                        <option value="3">9600</option>
+                                        <option value="4">19200</option>
+                                        <option value="5">38400</option>
+                                        <option value="6">57600</option>
+                                        <option value="7">115200</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"> 滤波系数：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="filterFactor" th:field="*{filterFactor}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="2">平滑</option>
+                                        <option value="3">平稳</option>
+                                        <option value="1">实时</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <hr/>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">
+                                    个性参数
+                                </label>
+                            </div>
+                            <div id="yaPerson1">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="lastTimeYa" name="lastTime" th:field="*{lastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                    <label class="col-md-2 control-label"> 工作阈值（V）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="thresholdVoltage" name="thresholdVoltage"
+                                               th:field="*{thresholdVoltage}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--2.油耗阈值式-->
+                            <div id="wfPerson1" style="display:none;">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="lastTimeWf" th:field="*{lastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 阈值（L/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{threshold}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 平滑系数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{smoothingFactor}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="liuPerson1" style="display:none;">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="lastTimeLiu" name="lastTime" th:field="*{lastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 波动计算个数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{baudRateCalculateNumber}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 平滑系数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{smoothingFactor}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 波动阈值（L/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{baudRateThreshold}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 波动计算时段（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select th:field="*{baudRateCalculateTimeScope}" disabled
+                                                class="form-control inputStyleHide">
+                                            <option value="1">10</option>
+                                            <option value="2">15</option>
+                                            <option value="3">20</option>
+                                            <option value="4" selected>30</option>
+                                            <option value="5">60</option>
+                                        </select>
+                                    </div>
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 速度阈值（km/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{speedThreshold}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 油箱2 -->
+                        <div class="tab-pane" id="egine2">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 传感器型号：
+                                </label>
+                                <div class="col-md-4">
+                                    <input th:field="*{twoSensorNumber}" class="form-control inputStyleHide" readonly/>
+                                </div>
+                                <label class="col-md-2 control-label"> 检测方式：
+                                </label>
+                                <div class="col-md-4">
+                                    <select disabled id="twoDetectionMode" th:field="*{twoDetectionMode}"
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="1">电压比较式</option>
+                                        <option value="2">油耗阈值式</option>
+                                        <option value="3">油耗波动式</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+
+                                <label class="col-md-2 control-label"> 补偿使能：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="shape" id="shape" th:field="*{twoCompensate}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="2">禁用</option>
+                                        <option value="1">使能</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"> 奇偶校验：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="oddEvenCheck" th:field="*{twoOddEvenCheck}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="3">无校验</option>
+                                        <option value="1">奇校验</option>
+                                        <option value="2">偶校验</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> 波特率：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="baudRate" th:field="*{twoBaudRate}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="1">2400</option>
+                                        <option value="2">4800</option>
+                                        <option value="3">9600</option>
+                                        <option value="4">19200</option>
+                                        <option value="5">38400</option>
+                                        <option value="6">57600</option>
+                                        <option value="7">115200</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"> 滤波系数：
+                                </label>
+                                <div class="col-md-4">
+                                    <select name="filterFactor" th:field="*{twoFilterFactor}" disabled
+                                            class="form-control inputStyleHide">
+                                        <option value="0" selected></option>
+                                        <option value="2">平滑</option>
+                                        <option value="3">平稳</option>
+                                        <option value="1">实时</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <hr/>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">
+                                    个性参数
+                                </label>
+                            </div>
+                            <div id="yaPerson2">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="twoLastTimeYa" th:field="*{twoLastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                    <label class="col-md-2 control-label"> 工作阈值（V）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoThresholdVoltage}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--油耗阈值式-->
+                            <div id="wfPerson2" style="display:none;">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="twoLastTimeWf" th:field="*{twoLastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                    <!--<label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 工作阈值（L/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoThresholdWorkFlow}" disabled class="form-control inputStyleHide"/>
+                                    </div>-->
+                                </div>
+                            </div>
+                            <div id="liuPerson2" style="display:none;">
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> 持续时长阈值（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="twoLastTimeLiu" th:field="*{twoLastTime}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 波动计算个数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoBaudRateCalculateNumber}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> 平滑系数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoSmoothingFactor}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 波动阈值（L/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoBaudRateThreshold}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"> <label
+                                            class="text-danger"></label> 波动计算时段（s）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <select th:field="*{baudRateCalculateTimeScope}" disabled
+                                                class="form-control inputStyleHide">
+                                            <option value="1">10</option>
+                                            <option value="2">15</option>
+                                            <option value="3">20</option>
+                                            <option value="4" selected>30</option>
+                                            <option value="5">60</option>
+                                        </select>
+                                    </div>
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger"></label> 速度阈值（km/h）：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input th:field="*{twoSpeedThreshold}" disabled
+                                               class="form-control inputStyleHide"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doCloseDetail" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<style>
+    select::-ms-expand {
+        display: none;
+    }
+
+    select {
+        background: none !important;
+    }
+</style>
+<script th:inline="javascript">
+    (function (window, $) {
+
+        $(function () {
+            var detectionMode = $('#detectionMode').val();
+            if (detectionMode == "1") { // 电压比较式
+                $('#yaPerson1').show();
+                $('#liuPerson1').hide();
+                $('#wfPerson1').hide();
+            } else if (detectionMode == "2") { //油耗阈值式
+                $('#wfPerson1').show();
+                $('#yaPerson1').hide();
+                $('#liuPerson1').hide();
+            } else { // 油耗波动式
+                $('#wfPerson1').hide();
+                $('#yaPerson1').hide();
+                $('#liuPerson1').show();
+            }
+
+            // 如果没有设置2#发动机的，详情中默认调整成以电压比较式的内容展示
+            var twoDetectionMode = $('#twoDetectionMode').val();
+            if (twoDetectionMode == "3") { // 油耗波动式
+                $('#wfPerson2').hide();
+                $('#yaPerson2').hide();
+                $('#liuPerson2').show();
+            } else if (twoDetectionMode == "2") { //油耗阈值式
+                $('#wfPerson2').show();
+                $('#yaPerson2').hide();
+                $('#liuPerson2').hide();
+            } else { // 电压比较式
+                $('#yaPerson2').show();
+                $('#liuPerson2').hide();
+                $('#wfPerson2').hide();
+            }
+
+            var sensorSequenceType = $("#sensorSequenceType").val();
+            if (sensorSequenceType == 1) {
+                $('#egine1Title').removeClass('active');
+                $('#egine1').removeClass('active');
+                $('#egine2Title').addClass('active');
+                $('#egine2').addClass('active');
+            }
+        })
+    })(window, $)
+</script>

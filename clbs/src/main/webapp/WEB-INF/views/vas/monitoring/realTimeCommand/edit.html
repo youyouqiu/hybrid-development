@@ -1,0 +1,1597 @@
+<input th:value="${commandType}" type="hidden" id="commandTypeVal"/>
+<input id="refer" th:value="${referVehicleList}" type="hidden" />
+<!-- 指令参数弹窗 -->
+<!-- 通讯参数 -->
+<div th:if="${commParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${commParam}"
+	id="editCommForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="editReportModal">
+  		<div class="modal-header">
+    		<button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    		<h4 class="modal-title">通讯参数修改</h4>
+  		</div>
+     	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="col-md-3 control-label">监控对象：</label>
+					<div class="col-md-3">
+						<input type="text" id="reportObject" class="form-control" th:value="${brand}" readonly/>
+					</div>
+					<label class="col-md-3 control-label">参考对象：</label>
+					<div class="col-md-3">
+						<div class="input-group">
+							<input name="brands" type="text" class="form-control" id="reportPlate">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">
+						<i
+							class="fa fa-question-circle fa-lg" 
+							data-toggle="tooltip" 
+							data-placement="top" 
+							title="无线通信拨号访问点。如网络制式为CDMA则该处为PPP拨号号码">
+						</i>主服务器APN：</label>
+					<div class="col-md-3 inp-inline-flex">
+						<input type="text" id="UreportMainApn" name="mainServerAPN" th:field="*{mainServerAPN}" class="form-control" />
+					</div>
+					<label class="col-md-3 control-label">
+						<i 
+							class="fa fa-question-circle fa-lg" 
+							data-toggle="tooltip" 
+							data-placement="top" 
+							title="IP或域名">
+						</i>主服务器地址：</label>
+					<div class="col-md-3 inp-inline-flex">
+						<input type="text" id="UreportMainAddress" name="mainServerAddress" th:field="*{mainServerAddress}" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">
+						<i 
+							class="fa fa-question-circle fa-lg" 
+							data-toggle="tooltip" 
+							data-placement="top" 
+							title="无线通信拨号访问点">
+						</i>备份服务器APN：</label>
+					<div class="col-md-3 inp-inline-flex">
+						<input type="text" id="UreportBackupApn" name="backupsServerAPN" th:field="*{backupsServerAPN}" class="form-control" />
+					</div>
+					<label class="col-md-3 control-label">
+						<i 
+							class="fa fa-question-circle fa-lg" 
+							data-toggle="tooltip" 
+							data-placement="top" 
+							title="IP或域名">
+						</i>备份服务器地址：</label>
+					<div class="col-md-3 inp-inline-flex">
+						<input type="text" id="UreportBackupAddress" name="backupsServerAddress" th:field="*{backupsServerAddress}" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">服务器TCP端口：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportServerTcp" name="serverTCPPort" th:field="*{serverTCPPort}" class="form-control" />
+					</div>
+					<label class="col-md-3 control-label">服务器UDP端口：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportServerUdp" name="serverUDPPort" th:field="*{serverUDPPort}" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">主服务器无线通信拨号用户名：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportServerAccound" name="mainServerCallUserName" th:field="*{mainServerCallUserName}" class="form-control" />
+					</div>
+					<label class="col-md-3 control-label">主服务器无线通信拨号密码：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportServerPwd" name="mainServerCallUserPwd" th:field="*{mainServerCallUserPwd}" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">备份服务器无线通信拨号用户名：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportBackupAccound" name="backupsServerCallUserName" th:field="*{backupsServerCallUserName}" class="form-control" />
+					</div>
+					<label class="col-md-3 control-label">备份服务器无线通信拨号密码：</label>
+					<div class="col-md-3">
+						<input type="text" id="UreportBackupPwd" name="backupsServerCallUserPwd" th:field="*{backupsServerCallUserPwd}" class="form-control" />
+					</div>
+				</div>
+			</div>
+		</div>
+     	</div>
+  		<div class="modal-footer">
+    		<button id="commButton" type="button" class="btn btn-primary">提交</button>
+    		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+  		</div>
+  		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+</form> 
+</div>
+<!-- 终端参数弹窗 -->
+<div th:if="${deviceParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${deviceParam}"
+	id="editDeviceForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="terminalParametersModal">
+   		<div class="modal-header">
+     		<button id="doXEditTwo" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">终端参数修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-2 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="terminalObject" class="form-control" th:value="${brand}" readonly/>
+						</div>
+						<label class="col-md-3 control-label"> 参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="terminalPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">终端心跳发送间隔(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalSendTime" name="heartSpace" th:field="*{heartSpace}" class="form-control" />
+						</div>
+						<label class="col-md-3 control-label">TCP消息应答超时时间(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalAnswerTime" name="tcpAckTimeOut" th:field="*{tcpAckTimeOut}" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">TCP消息重传次数：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalAnswerTcp" name="tcpReUpTimes" th:field="*{tcpReUpTimes}" class="form-control" />
+						</div>
+						<label class="col-md-3 control-label">UDP消息应答超时时间(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalAnswerUdp" name="udpAckTimeOut" th:field="*{udpAckTimeOut}" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">UDP消息重传次数：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalUdpNum" name="udpReUpTimes" th:field="*{udpReUpTimes}" class="form-control" />
+						</div>
+						<label class="col-md-3 control-label">SMS消息应答超时时间(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalAnswerSms" name="smsAckTimeOut" th:field="*{smsAckTimeOut}" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">SMS消息重传次数：</label>
+						<div class="col-md-3">
+							<input type="text" id="UterminalSmsNum" name="smsReUpTimes" th:field="*{smsReUpTimes}" class="form-control" />
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="deviceButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditTwo" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+</form>
+</div>
+<!-- 无限升级 -->
+<div th:if="${wirelessUpdateParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${wirelessUpdateParam}"
+	id="editWireForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="unlimitedUpgradeModal">
+   		<div class="modal-header">
+     		<button id="doXEditThree" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">无限升级修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="UpgradeObject" class="form-control" th:value="${brand}" readonly/>
+						</div>
+						<label class="col-md-2 control-label"> 参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="UpgradePlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+							</i>拨号点名称：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UUpgradeDial" class="form-control" th:field="*{wDailName}" name="wDailName" />
+						</div>
+						<label class="col-md-2 control-label">拨号用户名：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeDialName" placeholder="服务器无线通信拨号用户名" th:field="*{wDailUserName}" name="wDailUserName" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">拨号密码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeDialPwd" placeholder="服务器无线通信拨号密码" th:field="*{wDailPwd}" name="wDailPwd" class="form-control" />
+						</div>
+						<label class="col-md-2 control-label">地址：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeAddress" placeholder="服务器地址 IP或域名" th:field="*{wAddress}" name="wAddress" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">TCP端口：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeTcpTort" placeholder="服务器 TCP 端口" th:field="*{wTcpPort}" name="wTcpPort" class="form-control" />
+						</div>
+						<label class="col-md-2 control-label">UDP端口：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeUdpTort" placeholder="服务器 UDP 端口" th:field="*{wUdpPort}" name="wUdpPort" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">制造商ID：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeManufacturer" placeholder="终端制造商编码"  th:field="*{manufactorId}" name="manufactorId" class="form-control" />
+						</div>
+						<label class="col-md-2 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="终端的硬件版本号，由制造商自定">
+							</i>硬件版本：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UUpgradeHardware"  class="form-control" th:field="*{hardwareVersion}" name="hardwareVersion"  />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="终端的固件版本号，由制造商自定">
+							</i>固件版本：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UUpgradeFirmware"  class="form-control" th:field="*{firmwareVersion}" name="firmwareVersion"  />
+						</div>
+						<label class="col-md-2 control-label">URL地址：</label>
+						<div class="col-md-3">
+							<input type="text" id="UUpgradeUrlAddress" placeholder="完整 URL地址" class="form-control" th:field="*{url}" name="url" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+							</i>连接到指定服务器时限：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UUpgradeTimeLimit" class="form-control" th:field="*{wTimeLimit}" name="wTimeLimit" />
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="wireButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditThree" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+</form>
+</div>
+<!-- 控制终端链接指定服务器 -->
+<div th:if="${deviceConnectServerParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${deviceConnectServerParam}"
+	id="editConnectForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="connectSpecifyServerModal">
+   		<div class="modal-header">
+     		<button id="doXEditFour" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">控制终端链接指定服务器修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-2 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="specifyServerObject" class="form-control" th:value="${brand}" readonly/>
+						</div>
+						<label class="col-md-3 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="specifyServerPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">连接控制：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<select id="UspecifyServerConnect" name="cAccessControl" class="form-control" th:field="*{cAccessControl}" >
+								<option value="0">切换到指定监控平台服务器</option>
+								<option value="1">切换回原缺省监控平台服务器</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+							</i>拨号点名称：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UspecifyServerDial" class="form-control" name="cDailName" th:field="*{cDailName}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">拨号用户名：</label>
+						<div class="col-md-3">
+							<input type="text" id="UspecifyServerDialName" placeholder="服务器无线通信拨号用户名" class="form-control" name="cDailUserName" th:field="*{cDailUserName}" />
+						</div>
+						<label class="col-md-3 control-label">拨号密码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UspecifyServerDialPwd" placeholder="服务器无线通信拨号密码" class="form-control" name="cDailPwd" th:field="*{cDailPwd}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">地址：</label>
+						<div class="col-md-3">
+							<input type="text" id="UspecifyServerAddress" placeholder="服务器地址,IP或域名" class="form-control" name="cAddress" th:field="*{cAddress}" />
+						</div>
+						<label class="col-md-3 control-label">TCP端口：</label>
+						<div class="col-md-3">
+							<input type="text" id="UspecifyServerTcpPort" placeholder="服务器 TCP 端口" class="form-control" name="cTcpPort" th:field="*{cTcpPort}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">UDP端口：</label>
+						<div class="col-md-3">
+							<input type="text" id="UspecifyServerUdpPort" placeholder="服务器 UDP 端口" class="form-control" name="cUdpPort" th:field="*{cUdpPort}" />
+						</div>
+						<label class="col-md-3 control-label">
+							<i 
+								class="fa fa-question-circle fa-lg" 
+								data-toggle="tooltip" 
+								data-placement="top" 
+								title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+							</i>连接到指定服务器时限：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UspecifyServerTimeLimit" class="form-control" name="cTimeLimit" th:field="*{cTimeLimit}" />
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="connButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditFour" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+</form>
+</div>
+<div th:if="${positionParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${positionParam}"
+	id="editPositionForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<!-- 位置汇报参数 -->
+<div class="form-horizontal" id="locationReportingModal">
+   		<div class="modal-header">
+     		<button id="doXEditFive" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">位置汇报参数修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					 <div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="locationObject" class="form-control" th:value="${brand}" readonly/>
+						</div>
+						<label class="col-md-3 control-label"> 参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="locationPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">位置汇报策略：</label>
+						<div class="col-md-3">
+							<select id="UlocationTactics" name="positionUpTactics" class="form-control" th:field="*{positionUpTactics}" onchange="editRealTimeCommand.connectionControlSH();">
+								<option value="0">定时汇报</option>
+								<option value="1">定距汇报</option>
+								<option value="2">定时和定距汇报</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">位置汇报方案：</label>
+						<div class="col-md-3">
+							<select id="UlocationProgram" name="positionUpScheme" class="form-control" th:field="*{positionUpScheme}" >
+								<option value="0">根据ACC状态</option>
+								<option value="1">根据登录状态和ACC状态</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationNoLogin" name="driverLoggingOutUpTimeSpace" class="form-control"  th:field="*{driverLoggingOutUpTimeSpace}"/>
+						</div>
+						<label class="col-md-3 control-label">休眠时汇报时间间隔(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationSleep" name="dormancyUpTimeSpace" class="form-control"  th:field="*{dormancyUpTimeSpace}"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">紧急报警时汇报时间间隔(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationAlarmTime" name="emergencyAlarmUpTimeSpace" class="form-control"  th:field="*{emergencyAlarmUpTimeSpace}"/>
+						</div>
+						<label class="col-md-3 control-label">缺省时间汇报间隔(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationDefaultTime" name="defaultTimeUpSpace" class="form-control"  th:field="*{defaultTimeUpSpace}"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">缺省距离汇报间隔(米)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationDefaultDistance" name="defaultDistanceUpSpace" class="form-control"  th:field="*{defaultDistanceUpSpace}"/>
+						</div>
+						<label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(米)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationNoLoginDistance" name="driverLoggingOutUpDistanceSpace" class="form-control"  th:field="*{driverLoggingOutUpDistanceSpace}"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">休眠时汇报距离间隔(米)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationSleepDistance" name="dormancyUpDistanceSpace" class="form-control"  th:field="*{dormancyUpDistanceSpace}"/>
+						</div>
+						<label class="col-md-3 control-label">紧急报警时汇报距离间隔(米)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UlocationAlarmDistance" name="emergencyAlarmUpDistanceSpace" class="form-control"  th:field="*{emergencyAlarmUpDistanceSpace}"/>
+						</div>
+					</div>					
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="posButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditFive" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+</form>
+</div>
+<!-- 电话参数 -->
+<div th:if="${phoneParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${phoneParam}"
+	id="editPhoneForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="telephoneParametersModal">
+   		<div class="modal-header">
+     		<button id="doXEditSix" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">电话参数修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="telephoneObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-3 control-label"> 参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="telephonePlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控平台电话号码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneNumber" name="platformPhoneNumber" class="form-control"  th:field="*{platformPhoneNumber}">
+						</div>
+						<label class="col-md-3 control-label">
+							<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="可采用此电话号码拨打终端电话让终端复位">
+							</i>复位电话号码：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UtelephoneResetNumber" name="resetPhoneNumber" class="form-control"  th:field="*{resetPhoneNumber}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">
+							<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="可采用此电话号码拨打终端电话让终端恢复出厂设置">
+							</i>恢复出厂设置电话号码：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UtelephoneSetNumber" name="reInitialPhoneNumber" class="form-control"  th:field="*{reInitialPhoneNumber}">
+						</div>
+						<label class="col-md-3 control-label">监控平台SMS电话号码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneSnsNumber" name="platformSMSPhoneNumber" class="form-control"  th:field="*{platformSMSPhoneNumber}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">接收终端SMS文本报警号码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneSnsAlarm" name="receiveDeviceSMSTxtAlarmPhoneNumber" class="form-control"  th:field="*{receiveDeviceSMSTxtAlarmPhoneNumber}">
+						</div>
+						<label class="col-md-3 control-label">终端电话接听策略：</label>
+						<div class="col-md-3">
+							<select name="deviceAnswerPhoneType" class="form-control"  th:field="*{deviceAnswerPhoneType}">
+								<option value="0">自动接听</option>
+								<option value="1">根据ACC状态</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">每次最长通话时间(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneMaxTime" name="timesMaxCallTime" class="form-control"  th:field="*{timesMaxCallTime}">
+						</div>
+						<label class="col-md-3 control-label">当月最长通话时间(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneMonthTime" name="monthlyMaxCallTime" class="form-control"  th:field="*{monthlyMaxCallTime}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">监听电话号码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UtelephoneMonitor" name="listenPhoneNumber" class="form-control"  th:field="*{listenPhoneNumber}">
+						</div>
+						<label class="col-md-3 control-label">监管平台特权短信号码：</label>
+						<div class="col-md-3">
+							<input type="text" id="UmonitorPrivilege" name="platformPrivilegeSMSNumber" class="form-control"  th:field="*{platformPrivilegeSMSNumber}">
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="telButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditSix" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+    </form>
+</div>
+<!-- 视频拍照参数 -->
+<div th:if="${cameraParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${cameraParam}"
+	id="editCameraForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="videoCameraParametersModal">
+   		<div class="modal-header">
+      		<button id="doXEditSeven" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      		<h4 class="modal-title">视频拍照参数修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="videoCameraObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-3 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="videoCameraPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道1定时拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchOne" name="cameraTimerOpenFlag1" class="form-control"  th:field="*{cameraTimerOpenFlag1}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道1定时拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageOne" name="cameraTimerSaveFlag1" class="form-control"  th:field="*{cameraTimerSaveFlag1}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道2定时拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchTwo" name="cameraTimerOpenFlag2" class="form-control"  th:field="*{cameraTimerOpenFlag2}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道2定时拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageTwo" name="cameraTimerSaveFlag2" class="form-control"  th:field="*{cameraTimerSaveFlag2}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道3定时拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchThree" name="cameraTimerOpenFlag3" class="form-control"  th:field="*{cameraTimerOpenFlag3}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道3定时拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageThree" name="cameraTimerSaveFlag3" class="form-control"  th:field="*{cameraTimerSaveFlag3}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道4定时拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchFour" name="cameraTimerOpenFlag4" class="form-control"  th:field="*{cameraTimerOpenFlag4}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道4定时拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageFour" name="cameraTimerSaveFlag4" class="form-control"  th:field="*{cameraTimerSaveFlag4}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道5定时拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchFive" name="cameraTimerOpenFlag5" class="form-control"  th:field="*{cameraTimerOpenFlag5}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道5定时拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageFive" name="cameraTimerSaveFlag5" class="form-control"  th:field="*{cameraTimerSaveFlag5}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">定时时间单位：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraTimeUnit" name="timingUnit" class="form-control"  th:field="*{timingUnit}">
+								<option value="0">秒</option>
+								<option value="1">分</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">定时时间间隔：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UvideoCameraTimeInterval" name="timingSpace" class="form-control"  th:field="*{timingSpace}">
+							<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="收到参数设置或重新启动后执行">
+							</i>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道1定距拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchMarkOne" name="cameraDistanceOpenFlag1" class="form-control"  th:field="*{cameraDistanceOpenFlag1}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道1定距拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageMarkOne" name="cameraDistanceSaveFlag1" class="form-control"  th:field="*{cameraDistanceSaveFlag1}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道2定距拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchMarkTwo" name="cameraDistanceOpenFlag2" class="form-control"  th:field="*{cameraDistanceOpenFlag2}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道2定距拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageMarkTwo" name="cameraDistanceSaveFlag2" class="form-control"  th:field="*{cameraDistanceSaveFlag2}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道3定距拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchMarkThree" name="cameraDistanceOpenFlag3" class="form-control"  th:field="*{cameraDistanceOpenFlag3}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道3定距拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageMarkThree" name="cameraDistanceSaveFlag3" class="form-control"  th:field="*{cameraDistanceSaveFlag3}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道4定距拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchMarkFour" name="cameraDistanceOpenFlag4" class="form-control"  th:field="*{cameraDistanceOpenFlag4}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道4定距拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageMarkFour" name="cameraDistanceSaveFlag4" class="form-control"  th:field="*{cameraDistanceSaveFlag4}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">摄像通道5定距拍照开关标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraSwitchMarkFive" name="cameraDistanceOpenFlag5" class="form-control"  th:field="*{cameraDistanceOpenFlag5}">
+								<option value="0">不允许</option>
+								<option value="1">允许</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">摄像通道5定距拍照存储标志：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraStorageMarkFive" name="cameraDistanceSaveFlag5" class="form-control"  th:field="*{cameraDistanceSaveFlag5}">
+								<option value="0">储存</option>
+								<option value="1">上传</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">定距距离单位：</label>
+						<div class="col-md-3">
+							<select id="UvideoCameraDistanceUnit" name="distanceUnit" class="form-control"  th:field="*{distanceUnit}">
+								<option value="0">米</option>
+								<option value="1">公里</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">定距距离间隔：</label>
+						<div class="col-md-3 inp-inline-flex">
+							<input type="text" id="UvideoCameraDistanceInterval" name="distanceSpace" class="form-control"  th:field="*{distanceSpace}">
+							<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="收到参数设置或重新启动后执行">
+							</i>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">图像/视频质量：</label>
+						<div class="col-md-3">
+							<input type="text" id="UvideoCameraQuality" value="5" name="pictureQuality" class="form-control"  th:field="*{pictureQuality}">
+						</div>
+						<label class="col-md-3 control-label">亮度：</label>
+						<div class="col-md-3">
+							<input type="text" id="UvideoCameraBrightness" value="125" name="luminance" class="form-control"  th:field="*{luminance}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">对比度：</label>
+						<div class="col-md-3">
+							<input type="text" id="UvideoCameraContrast" value="60" name="contrast" class="form-control"  th:field="*{contrast}">
+						</div>
+						<label class="col-md-3 control-label">饱和度：</label>
+						<div class="col-md-3">
+							<input type="text" id="UvideoCameraSaturation" value="60" name="saturation" class="form-control"  th:field="*{saturation}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">色度：</label>
+						<div class="col-md-3">
+							<input type="text" id="UvideoCameraChroma" value="125" name="chroma" class="form-control"  th:field="*{chroma}">
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="cameraButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditSeven" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+    </form>
+</div>
+<!-- GNSS参数 -->
+<div th:if="${gnssParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}" th:object="${gnssParam}"
+	id="editGnssForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="gnssParametersModal">
+   		<div class="modal-header">
+     		<button id="doXEditEight" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title" id="myModalLabel">GNSS参数修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="gnssObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-3 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="gnssPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">GPS定位：</label>
+						<div class="col-md-3">
+							<select id="UGPSFlag" name="GPSFlag" class="form-control"  th:field="*{GPSFlag}">
+								<option value="0">禁用GPS定位</option>
+								<option value="1">启用GPS定位</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">北斗定位：</label>
+						<div class="col-md-3">
+							<select id="UbeidouFlag" name="beidouFlag" class="form-control"  th:field="*{beidouFlag}">
+								<option value="0">禁用北斗定位</option>
+								<option value="1">启用北斗定位</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">GLONASS定位：</label>
+						<div class="col-md-3">
+							<select id="UGLONASSFlag" name="GLONASSFlag" class="form-control"  th:field="*{GLONASSFlag}">
+								<option value="0">禁用GLONASS定位</option>
+								<option value="1">启用GLONASS定位</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">Galileo定位：</label>
+						<div class="col-md-3">
+							<select id="UGalileoFlag" name="GalileoFlag" class="form-control"  th:field="*{GalileoFlag}">
+								<option value="0">禁用Galileo定位</option>
+								<option value="1">启用Galileo定位</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">GNSS波特率：</label>
+						<div class="col-md-3">
+							<select id="UGNSSBaudRate" name="GNSSBaudRate" class="form-control"  th:field="*{GNSSBaudRate}">
+								<option value="0x00">4800</option>
+								<option value="0x01">9600</option>
+								<option value="0x02">19200</option>
+								<option value="0x03">38400</option>
+								<option value="0x04">57600</option>
+								<option value="0x05">115200</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label">GNSS模块详细定位数据输出频率：</label>
+						<div class="col-md-3">
+							<select id="UGNSSPositionOutputRate" name="GNSSPositionOutputRate" class="form-control"  th:field="*{GNSSPositionOutputRate}">
+								<option value="0x01">1000ms</option>
+								<option value="0x00">500ms</option>
+								<option value="0x02">2000ms</option>
+								<option value="0x03">3000ms</option>
+								<option value="0x04">4000ms</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">GNSS模块详细定位数据采集频率(秒)：</label>
+						<div class="col-md-3">
+							<input type="text" id="UGNSSPositionCollectRate" name="GNSSPositionCollectRate" value="1" class="form-control"  th:field="*{GNSSPositionCollectRate}">
+						</div>
+						<label class="col-md-3 control-label">GNSS模块详细定位数据上传方式：</label>
+						<div class="col-md-3">
+							<select id="UGNSSPositionUploadType" name="GNSSPositionUploadType" class="form-control"  th:field="*{GNSSPositionUploadType}">
+								<option value="0x00">本地存储 不上传</option>
+								<option value="0x01">按时间间隔上传</option>
+								<option value="0x02">按距离间隔上传</option>
+								<option value="0x0B">按累计时间上传</option>
+								<option value="0x0C">按累计距离上传</option>
+								<option value="0x0D">按累计条数上传</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="gnssButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditEight" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+    </form>
+</div>
+<!-- 事件设置 -->
+<div th:if="${eventSetParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}"
+	id="editEventForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="eventSettingModal">
+   		<div class="modal-header">
+     		<button id="doXEditNine" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">事件设置修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="eventObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-2 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="eventPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">操作类型：</label>
+						<div class="col-md-3">
+						<input th:value="${eventSetParam[0].operationType}" type="hidden" id="eop"/>
+							<select id="eventOperateType" name="eOperationType" class="form-control" >
+								<option value="0">删除所有</option>
+								<option value="1">更新</option>
+								<option value="2">追加</option>
+								<option value="3">修改</option>
+								<option value="4">删除</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label"></label>
+						<div class="col-md-3"></div>
+					</div>
+					<ul class="widget-todo">
+					<li class="clearfix" th:each="event:${eventSetParam}">
+					<div class="form-group">
+						<label class="col-md-3 control-label">事件ID：</label>
+						<div class="col-md-3">
+							<input type="text" name="eventId"  class="form-control" th:value="*{event.eventId}">
+						</div>
+						<label class="col-md-2 control-label">事件内容：</label>
+						<div class="col-md-3">
+							<input type="text" name="eventContent" placeholder="请输入事件内容" class="form-control" th:value="*{event.eventContent}">
+						</div>
+						<div class="col-md-1">
+						</div>
+					</div>
+					</li>
+				</ul>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="eventButton" type="button" class="btn btn-primary">提交</button>
+     		<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+    </form>
+</div>
+<!-- 电话本设置 -->
+<div th:if="${phoneBookParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}"
+	id="editBookForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="phoneBookSettingModal">
+   		<div class="modal-header">
+     		<button id="doXEditTen" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">电话本设置修改</h4>
+   		</div>
+       	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="phoneBookObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-2 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="phoneBookPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">操作类型：</label>
+						<div class="col-md-3">
+						<input th:value="${phoneBookParam[0].operationType}" type="hidden" id="pop"/>
+							<select id="phoneOp" class="form-control" name="pOperationType" >
+								<option value="0">删除所有</option>
+								<option value="1">更新</option>
+								<option value="2">追加</option>
+								<option value="3">修改</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label"></label>
+						<div class="col-md-3"></div>
+					</div>
+					<ul class="widget-todo">
+					<li class="clearfix" th:each="book,bookStat:${phoneBookParam}">
+						<div class="form-group">
+							<label class="col-md-3 control-label">联系人ID：</label>
+							<div class="col-md-3">
+								<input type="text"  class="form-control" name="phoneBookId"  th:value="*{book.phoneBookId}">
+							</div>
+							<label class="col-md-2 control-label">联系人：</label>
+							<div class="col-md-3">
+								<input type="text" placeholder="请输入联系人" class="form-control" name="contact" th:value="*{book.contact}">
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-md-3 control-label">电话号码：</label>
+							<div class="col-md-3">
+								<input type="text" placeholder="请输入电话号码" class="form-control" name="phoneNo" th:value="*{book.phoneNo}">
+							</div>
+							<label class="col-md-2 control-label">呼叫类型：</label>
+							<div th:if ="${bookStat.current.callType}=='1'" class="col-md-3">
+								<select class="form-control" name="callType" th:value="*{book.callType}">
+									<option value="1" selected>呼入</option>
+									<option value="2">呼出</option>
+									<option value="3">呼入/呼出</option>
+								</select>
+							</div>
+							<div th:if ="${bookStat.current.callType}=='2'" class="col-md-3">
+								<select class="form-control" name="callType" th:value="*{book.callType}">
+									<option value="1" >呼入</option>
+									<option value="2" selected>呼出</option>
+									<option value="3">呼入/呼出</option>
+								</select>
+							</div>
+							<div th:if ="${bookStat.current.callType}=='3'" class="col-md-3">
+								<select class="form-control" name="callType" th:value="*{book.callType}">
+									<option value="1" >呼入</option>
+									<option value="2" >呼出</option>
+									<option value="3" selected>呼入/呼出</option>
+								</select>
+							</div>
+							<div class="col-md-1">
+							</div>
+						</div>
+					</li>
+				</ul>
+				</div>
+			</div>
+      	</div> 
+   		<div class="modal-footer">
+     		<button id="bookButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditTen" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+ </form>
+</div>
+<!--信息点播菜单-->
+<div th:if="${informationParam!=null}" >
+<form th:action="@{/v/monitoring/command/edit}"
+	id="editInfoForm" role="form" action="#" method="post"
+	class="form-horizontal">
+<div class="form-horizontal" id="infoDemandMenuModal">
+   		<div class="modal-header">
+     		<button id="doXEditEleven" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+     		<h4 class="modal-title">信息点播菜单修改</h4>
+   		</div>
+      	<div class="modal-body">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
+						<label class="col-md-3 control-label">监控对象：</label>
+						<div class="col-md-3">
+							<input type="text" id="infoDemandObject" class="form-control" th:value="${brand}" readonly>
+						</div>
+						<label class="col-md-2 control-label">参考对象：</label>
+						<div class="col-md-3">
+							<div class="input-group">
+								<input name="brands" type="text" class="form-control" id="infoDemandPlate">
+								<div class="input-group-btn">
+									<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-3 control-label">操作类型：</label>
+						<div class="col-md-3">
+						<input th:value="${informationParam[0].operationType}" type="hidden" id="iop"/>
+							<select id="infoop" class="form-control" name="iOperationType">
+								<option value="0">删除所有</option>
+								<option value="1">更新</option>
+								<option value="2">追加</option>
+								<option value="3">修改</option>
+							</select>
+						</div>
+						<label class="col-md-3 control-label"></label>
+						<div class="col-md-3"></div>
+					</div>
+					<ul class="widget-todo">
+					<li class="clearfix" th:each="info:${informationParam}">
+					<div class="form-group">
+						<label class="col-md-3 control-label">信息ID：</label>
+						<div class="col-md-3">
+							<input type="text"  class="form-control" name="infoId" th:value="*{info.infoId}">
+						</div>
+						<label class="col-md-2 control-label">信息名称：</label>
+						<div class="col-md-3">
+							<input type="text" placeholder="请输入信息名称" class="form-control" name="infoContent" th:value="*{info.infoContent}">
+						</div>
+						<div class="col-md-1">
+						</div>
+					</div>
+						</li>
+				</ul>
+				</div>
+			</div>
+      	</div>
+   		<div class="modal-footer">
+     		<button id="infoButton" type="button" class="btn btn-primary">提交</button>
+     		<button id="doCloseEditEleven" type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+   		</div>
+   		<input th:value="${commandType}" type="hidden" name="commandType"/>
+  		<input th:value="${vehicleId}" type="hidden" name="vid"/>
+</div>
+ </form>
+</div>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<!-- 模态框结束 -->
+<script>
+(function(window,$){
+	var cTypeVal = $("#commandTypeVal").val();
+	//参考车辆list  
+	var referVehicleList = JSON.parse($("#refer").attr("value"));	
+	editRealTimeCommand = {
+		
+		init: function(){
+            $("[data-toggle='tooltip']").tooltip();
+			//判断指令类型 显示当前指令类型修改参数
+			switch(cTypeVal){
+	        	//通讯参数
+	        	case "11":
+	        		$("#editReportModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal").hide();
+	        	break;
+	        	//终端参数
+	        	case "12":
+	        		$("#terminalParametersModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#editReportModal").hide();
+	        	break;
+	        	//无限升级
+	        	case "131":
+	        		$("#unlimitedUpgradeModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#terminalParametersModal,#editReportModal").hide();
+	        	break;
+	        	//控制终端连接指定服务器
+	        	case "132":
+	        		$("#connectSpecifyServerModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#terminalParametersModal,#editReportModal").hide();
+	        	break;
+	        	//位置汇报参数
+	        	case "14":
+	        		$("#locationReportingModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        		editRealTimeCommand.connectionControlSH();
+	        		break;
+	        	//电话参数
+	        	case "16":
+	        		$("#telephoneParametersModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        	break;
+	        	//视频拍照参数
+	        	case "17":
+	        		$("#videoCameraParametersModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        	break;
+	        	//GNSS参数
+	        	case "18":
+	        		$("#gnssParametersModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#eventSettingModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        	break;
+	        	//事件设置
+	        	case "19":
+	        		$("#eventSettingModal").show();
+	        		$("#infoDemandMenuModal,#phoneBookSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        		var op = $("#eop").val();
+	        		$("#eventOperateType option[value='"+op+"']").attr("selected","selected");
+	        	break;
+	        	//电话本设置
+	        	case "20":
+	        		$("#phoneBookSettingModal").show();
+	        		$("#infoDemandMenuModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+	        		var pop = $("#pop").val();
+	        		$("#phoneOp option[value='"+pop+"']").attr("selected","selected");
+	        		
+	        	break;
+            	//信息点播菜单
+	        	case "21":
+            		$("#infoDemandMenuModal").show()
+	        		$("#phoneBookSettingModal,#eventSettingModal,#gnssParametersModal,#videoCameraParametersModal,#telephoneParametersModal,#locationReportingModal,#connectSpecifyServerModal,#unlimitedUpgradeModal,#terminalParametersModal,#editReportModal").hide();
+            		var iop = $("#iop").val();
+	        		$("#infoop option[value='"+iop+"']").attr("selected","selected");
+            	break;
+			}
+			
+		},
+		initReferVehicleList: function(){
+			if(cTypeVal!=null&&cTypeVal!=""){
+		        var dataList = {value: []};
+		        if (referVehicleList != null && referVehicleList.length > 0) {
+		        	for (var i=0; i< referVehicleList.length; i++) {
+		            	var obj = {};
+		                obj.id = referVehicleList[i].vid;
+		                obj.name = referVehicleList[i].brand;
+		                dataList.value.push(obj);
+		            }
+		    	}
+		        $("#reportPlate,#terminalPlate,#UpgradePlate,#specifyServerPlate,#locationPlate,#telephonePlate,#videoCameraPlate,#gnssPlate,#eventPlate,#phoneBookPlate,#infoDemandPlate").bsSuggest({
+		            indexId: 1,  //data.value 的第几个数据，作为input输入框的内容
+		            indexKey: 0, //data.value 的第几个数据，作为input输入框的内容
+		            idField: "id",
+		            keyField: "name",
+		            effectiveFields: ["name"],
+		            searchFields:["id"],
+		            data: dataList
+		        }).on('onDataRequestSuccess', function (e, result) {
+		        }).on('onSetSelectValue', function (e, keyword, data) {
+			    	// 当选择参考车牌
+			       	var vuuid = keyword.id;
+			        var url="/clbs/v/monitoring/command/getCommandParam";
+		            var parameter={"vid": vuuid,"commandType":cTypeVal,"isRefer":true};
+		            json_ajax("POST",url,"json",true,parameter, editRealTimeCommand.setCommand);
+				}).on('onUnsetSelectValue', function () {
+				});
+			}
+		},
+		submitForm: function(formId){
+			$(formId).ajaxSubmit(function (data) {
+				data = JSON.parse(data);
+				if(data.success){
+					$("#commonWin").modal("hide");
+					/* 关闭弹窗 */
+					myTable.refresh()
+				}else{
+					if(data.msg.toString().indexOf("系统错误")>-1){
+						layer.msg(data.msg,{move:false});
+					}
+				}
+			});
+		},
+        connectionControlSH: function(){
+        	setTimeout(function(){
+        		if(!($("#locationReportingModal").is(":hidden"))){
+                	if($("#UlocationTactics").val() == 0){
+            			$("#UlocationDefaultDistance,#UlocationSleepDistance,#UlocationAlarmDistance,#UlocationNoLoginDistance").attr("readonly","readonly");
+            			$("#UlocationDefaultTime,#UlocationSleep,#UlocationAlarmTime,#UlocationNoLogin").removeAttr("readonly");
+            		}else if($("#UlocationTactics").val() == 1){
+            			$("#UlocationDefaultTime,#UlocationSleep,#UlocationAlarmTime,#UlocationNoLogin").attr("readonly","readonly");
+            			$("#UlocationDefaultDistance,#UlocationSleepDistance,#UlocationAlarmDistance,#UlocationNoLoginDistance").removeAttr("readonly");
+            		}else if($("#UlocationTactics").val() == 2){
+            			$("#UlocationDefaultTime,#UlocationSleep,#UlocationAlarmTime,#UlocationNoLogin").removeAttr("readonly");
+            			$("#UlocationDefaultDistance,#UlocationSleepDistance,#UlocationAlarmDistance,#UlocationNoLoginDistance").removeAttr("readonly");
+            		}
+        		}
+        	},100);
+        },
+		setCommand: function(data){
+        	if(data.success == true){
+        		if(data.msg == null&&data.obj.referVehicleList!= null){
+//        			$("#referVehicleList").val(data.obj.referVehicleList);
+        			realTimeCommand.initReferVehicleList(data.obj.referVehicleList);
+        		}
+        		if (data.msg == null&&data.obj.communicationParam!= null) {
+    			    var communicationParam = data.obj.communicationParam;
+        			$("#UreportMainApn").val(communicationParam.mainServerAPN);	
+        			$("#UreportMainAddress").val(communicationParam.mainServerAddress);
+        			$("#UreportBackupApn").val(communicationParam.backupsServerAPN);	
+        			$("#UreportBackupAddress").val(communicationParam.backupsServerAddress);
+        			$("#UreportServerTcp").val(communicationParam.serverTCPPort);	
+        			$("#UreportServerUdp").val(communicationParam.serverUDPPort);
+        			$("#UreportServerAccound").val(communicationParam.mainServerCallUserName);	
+        			$("#UreportServerPwd").val(communicationParam.mainServerCallUserPwd);
+        			$("#UreportBackupAccound").val(communicationParam.backupsServerCallUserName);	
+        			$("#UreportBackupPwd").val(communicationParam.backupsServerCallUserPwd);
+    			}
+	    		if(data.msg == null&&data.obj.deviceParam!= null){
+	    			var deviceParam = data.obj.deviceParam;
+	    			$("#UterminalSendTime").val(deviceParam.heartSpace);	
+	    			$("#UterminalAnswerTime").val(deviceParam.tcpAckTimeOut);
+	    			$("#UterminalAnswerTcp").val(deviceParam.tcpReUpTimes);
+	    			$("#UterminalAnswerUdp").val(deviceParam.udpAckTimeOut);
+	    			$("#UterminalUdpNum").val(deviceParam.udpReUpTimes);
+	    			$("#UterminalAnswerSms").val(deviceParam.smsAckTimeOut);
+	    			$("#UterminalSmsNum").val(deviceParam.smsReUpTimes);
+	    		}
+	    		if(data.msg == null&&data.obj.wirelessUpdateParam!= null){
+	    			var wirelessUpdateParam = data.obj.wirelessUpdateParam;
+	    			$("#UUpgradeDialName").val(wirelessUpdateParam.wDailUserName);	
+	    			$("#UUpgradeDialPwd").val(wirelessUpdateParam.wDailPwd);
+	    			$("#UUpgradeAddress").val(wirelessUpdateParam.wAddress);	
+	    			$("#UUpgradeTcpTort").val(wirelessUpdateParam.wTcpPort);
+	    			$("#UUpgradeUdpTort").val(wirelessUpdateParam.wUdpPort);	
+	    			$("#UUpgradeManufacturer").val(wirelessUpdateParam.manufactorId);
+	    			$("#UUpgradeHardware").val(wirelessUpdateParam.hardwareVersion);	
+	    			$("#UUpgradeFirmware").val(wirelessUpdateParam.firmwareVersion);
+	    			$("#UUpgradeUrlAddress").val(wirelessUpdateParam.url);	
+	    			$("#UUpgradeTimeLimit").val(wirelessUpdateParam.wTimeLimit);
+	    			$("#UUpgradeConnection").val(wirelessUpdateParam.wAccessControl);	
+	    			$("#UUpgradeDial").val(wirelessUpdateParam.wDailName);
+	    		}
+	    		if(data.msg == null&&data.obj.deviceConnectServerParam!= null){
+	    			var deviceConnectServerParam = data.obj.deviceConnectServerParam;
+	    			$("#UspecifyServerConnect").val(deviceConnectServerParam.cAccessControl);	
+	    			$("#UspecifyServerDial").val(deviceConnectServerParam.cDailName);
+	    			$("#UspecifyServerDialName").val(deviceConnectServerParam.cDailUserName);	
+	    			$("#UspecifyServerDialPwd").val(deviceConnectServerParam.cDailPwd);
+	    			$("#UspecifyServerAddress").val(deviceConnectServerParam.cAddress);	
+	    			$("#UspecifyServerTcpPort").val(deviceConnectServerParam.cTcpPort);
+	    			$("#UspecifyServerUdpPort").val(deviceConnectServerParam.cUdpPort);	
+	    			$("#UspecifyServerTimeLimit").val(deviceConnectServerParam.cTimeLimit);
+	    		}
+	    		if(data.msg == null&&data.obj.positionParam!= null){
+	    			var positionParam = data.obj.positionParam;
+	    			$("#UlocationTactics").val(positionParam.positionUpTactics);	
+	    			$("#UlocationProgram").val(positionParam.positionUpScheme);	
+	    			$("#UlocationNoLogin").val(positionParam.driverLoggingOutUpTimeSpace);	
+	    			$("#UlocationSleep").val(positionParam.dormancyUpTimeSpace);	
+	    			$("#UlocationAlarmTime").val(positionParam.emergencyAlarmUpTimeSpace);	
+	    			$("#UlocationDefaultTime").val(positionParam.defaultTimeUpSpace);	
+	    			$("#UlocationDefaultDistance").val(positionParam.defaultDistanceUpSpace);	
+	    			$("#UlocationNoLoginDistance").val(positionParam.driverLoggingOutUpDistanceSpace);	
+	    			$("#UlocationSleepDistance").val(positionParam.dormancyUpDistanceSpace);	
+	    			$("#UlocationAlarmDistance").val(positionParam.emergencyAlarmUpDistanceSpace);	
+	    		}
+	    		if(data.msg == null&&data.obj.phoneParam!= null){
+	    			var phoneParam = data.obj.phoneParam;
+	    			$("#UtelephoneNumber").val(phoneParam.platformPhoneNumber);	
+	    			$("#UtelephoneResetNumber").val(phoneParam.resetPhoneNumber);	
+	    			$("#UtelephoneSetNumber").val(phoneParam.reInitialPhoneNumber);	
+	    			$("#UtelephoneSnsNumber").val(phoneParam.platformSMSPhoneNumber);	
+	    			$("#UtelephoneSnsAlarm").val(phoneParam.receiveDeviceSMSTxtAlarmPhoneNumber);	
+	    			$("#UtelephoneStrategy").val(phoneParam.deviceAnswerPhoneType);	
+	    			$("#UtelephoneMaxTime").val(phoneParam.timesMaxCallTime);	
+	    			$("#UtelephoneMonthTime").val(phoneParam.monthlyMaxCallTime);	
+	    			$("#UtelephoneMonitor").val(phoneParam.listenPhoneNumber);	
+	    			$("#UmonitorPrivilege").val(phoneParam.platformPrivilegeSMSNumber);	
+	    		}
+	    		if(data.msg == null&&data.obj.cameraParam!= null){
+				    var cameraParam = data.obj.cameraParam;
+					$("#UvideoCameraSwitchOne").val(cameraParam.cameraTimerOpenFlag1);	
+	    			$("#UvideoCameraStorageOne").val(cameraParam.cameraTimerSaveFlag1);	
+	    			$("#UvideoCameraSwitchTwo").val(cameraParam.cameraTimerOpenFlag2);	
+	    			$("#UvideoCameraStorageTwo").val(cameraParam.cameraTimerSaveFlag2);	
+	    			$("#UvideoCameraSwitchThree").val(cameraParam.cameraTimerOpenFlag3);	
+	    			$("#UvideoCameraStorageThree").val(cameraParam.cameraTimerSaveFlag3);	
+	    			$("#UvideoCameraSwitchFour").val(cameraParam.cameraTimerOpenFlag4);	
+	    			$("#UvideoCameraStorageFour").val(cameraParam.cameraTimerSaveFlag4);	
+	    			$("#UvideoCameraSwitchFive").val(cameraParam.cameraTimerOpenFlag5);	
+	    			$("#UvideoCameraStorageFive").val(cameraParam.cameraTimerSaveFlag5);	
+	    			$("#UvideoCameraTimeUnit").val(cameraParam.timingUnit);	
+	    			$("#UvideoCameraTimeInterval").val(cameraParam.timingSpace);	
+	    			$("#UvideoCameraSwitchMarkOne").val(cameraParam.cameraDistanceOpenFlag1);	
+	    			$("#UvideoCameraStorageMarkOne").val(cameraParam.cameraDistanceSaveFlag1);	
+	    			$("#UvideoCameraSwitchMarkTwo").val(cameraParam.cameraDistanceOpenFlag2);		
+	    			$("#UvideoCameraStorageMarkTwo").val(cameraParam.cameraDistanceSaveFlag2);	
+	    			$("#UvideoCameraSwitchMarkThree").val(cameraParam.cameraDistanceOpenFlag3);	
+	    			$("#UvideoCameraStorageMarkThree").val(cameraParam.cameraDistanceSaveFlag3);	
+	    			$("#UvideoCameraSwitchMarkFour").val(cameraParam.cameraDistanceOpenFlag4);	
+	    			$("#UvideoCameraStorageMarkFour").val(cameraParam.cameraDistanceSaveFlag4);	
+	    			$("#UvideoCameraSwitchMarkFive").val(cameraParam.cameraDistanceOpenFlag5);	
+	    			$("#UvideoCameraStorageMarkFive").val(cameraParam.cameraDistanceSaveFlag5);	
+	    			$("#UvideoCameraDistanceUnit").val(cameraParam.distanceUnit);	
+	    			$("#UvideoCameraDistanceInterval").val(cameraParam.distanceSpace);	
+	    			$("#UvideoCameraQuality").val(cameraParam.pictureQuality);	
+	    			$("#UvideoCameraBrightness").val(cameraParam.luminance);	
+	    			$("#UvideoCameraContrast").val(cameraParam.contrast);	
+	    			$("#UvideoCameraSaturation").val(cameraParam.saturation);	
+	    			$("#UvideoCameraChroma").val(cameraParam.chroma);	
+	    		}
+	    		if(data.msg == null&&data.obj.gnssParam!= null){
+					var gnssParam = data.obj.gnssParam;
+	    			$("#UGPSFlag").val(gnssParam.GPSFlag);	
+	    			$("#UbeidouFlag").val(gnssParam.beidouFlag);	
+	    			$("#UGLONASSFlag").val(gnssParam.GLONASSFlag);	
+	    			$("#UGalileoFlag").val(gnssParam.GalileoFlag);	
+	    			$("#UGNSSBaudRate").val(gnssParam.GNSSBaudRate);	
+	    			$("#UGNSSPositionOutputRate").val(gnssParam.GNSSPositionOutputRate);	
+	    			$("#UGNSSPositionCollectRate").val(gnssParam.GNSSPositionCollectRate);	
+	    			$("#UGNSSPositionUploadType").val(gnssParam.GNSSPositionUploadType);	
+        		}
+        		if(data.msg == null&&data.obj.event!= null){
+        			var event = data.obj.event;
+        			var addEventIndex;
+        			//$("#eventOperateType").val(event[0].operationType);	
+        			for(var i=0;i<event.length;i++){
+        				if(i>0){
+        					addEventIndex = i+2;
+        					var html = "<div class='form-group' id='eventMain-container_"+ addEventIndex +"'><label class='col-md-3 control-label'>事件ID：</label><div class='col-md-3'><input type='text' name='eventId' id='eventId_"+ addEventIndex +"' value='"+ (addEventIndex-1) +"' class='form-control'></div>" +
+        					"<label class='col-md-2 control-label'>事件内容：</label><div class='col-md-3'><input type='text' name='eventContent' id='eventContent_"+ addEventIndex +"' placeholder='请输入事件内容' class='form-control'></div><div class='col-md-1'><button type='button' " +
+        					"class='btn btn-danger eventSettingDelete deleteIcon'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></div></div>";	
+        					$("#eventMain-container").append(html);
+        				}
+            		     $("#eventId_"+ (i+2)).val(event[i].eventId);	
+        				 $("#eventContent_"+ (i+2)).val(event[i].eventContent);	
+        			}
+        			
+        		}
+				if(data.msg == null&&data.obj.phone!= null){	
+					var phone = data.obj.phone; 
+					var addPhoneIndex;
+//					$("#phoneBookOperateType").val(phone[0].operationType);	
+					for(var i=0;i<phone.length;i++){
+						if(i>0){
+							addPhoneIndex = i+2;
+							var html = "<div id='phoneBook-MainContent_"+ addPhoneIndex +"'><div class='form-group'><label class='col-md-3 control-label'>电话本ID：</label><div class='col-md-3'><input type='text' id='phoneBookId_"+ addPhoneIndex +"' name='phoneBookId' value='"+ (addPhoneIndex-1) +"' class='form-control' /></div><label class='col-md-2 control-label'>联系人：</label><div class='col-md-3'><input type='text' id='phoneBookContact_"+ addPhoneIndex +"' name='contact' placeholder='请输入联系人' class='form-control' /></div></div><div class='form-group'><label class='col-md-3 control-label'>电话号码：</label><div class='col-md-3'><input type='text' id='phoneBookNumber_"+ addPhoneIndex +"' name='phoneNo' placeholder='请输入电话号码' class='form-control' /></div><label class='col-md-2 control-label'>呼叫类型：</label><div class='col-md-3'><select id='phoneBookOperateType_"+ addPhoneIndex +"' name='callType' class='form-control'><option value='1'>呼入</option><option value='2'>呼出</option><option value='3'>呼入/呼出</option></select></div><div class='col-md-1'><button type='button' class='btn btn-danger phoneBookDelete deleteIcon'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></div></div></div>";
+							$("#phoneBook-MainContent").append(html);
+						}
+						
+						 $("#phoneBookId_"+ (i+2)).val(phone[i].phoneBookId);	
+        				 $("#phoneBookContact_"+ (i+2)).val(phone[i].contact);	
+        				 $("#phoneBookNumber_"+ (i+2)).val(phone[i].phoneNo);	
+        				 $("#phoneBookOperateType_"+ (i+2)).val(phone[i].callType);	
+					    }
+				}
+				if(data.msg == null&&data.obj.info!= null){	
+					var info = data.obj.info;
+					var addInfoDemandIndex;
+//					$("#infoDemandOperateType").val(info[0].operationType);	
+					for(var i=0;i<info.length;i++){
+						if(i>0){
+							addInfoDemandIndex = i+2;
+							var html = "<div class='form-group' id='infoDemand-MainContent_"+ addInfoDemandIndex +"'><label class='col-md-3 control-label'>信息ID：</label><div class='col-md-3'><input type='text' id='infoDemandId_"+ addInfoDemandIndex +"' value='"+ (addInfoDemandIndex-1) +"'  name='infoId' class='form-control' /></div><label class='col-md-2 control-label'>信息名称：</label><div class='col-md-3'><input type='text' id='infoDemandName"+ addInfoDemandIndex +"'  name='infoContent' placeholder='请输入信息名称' class='form-control' /></div><div class='col-md-1'><button type='button' class='btn btn-danger infoDemandDelete deleteIcon'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></div></div>";
+							$("infoDemand-MainContent").append(html);
+						}
+						 $("#infoDemandId_"+ (i+2)).val(info[i].infoId);	
+        				 $("#infoDemandName_"+ (i+2)).val(info[i].infoContent);		
+					}
+				}
+        	}else{
+        		layer.msg(data.msg,{move:false});
+        	}
+        },
+	}
+
+	$(function(){
+		$('input').inputClear();
+		editRealTimeCommand.init();
+		editRealTimeCommand.initReferVehicleList();
+		$("#commButton").bind("click",function(){editRealTimeCommand.submitForm("#editCommForm")});
+		$("#deviceButton").bind("click",function(){editRealTimeCommand.submitForm("#editDeviceForm")});
+		$("#wireButton").bind("click",function(){editRealTimeCommand.submitForm("#editWireForm")});
+		$("#connButton").bind("click",function(){editRealTimeCommand.submitForm("#editConnectForm")});
+		$("#posButton").bind("click",function(){editRealTimeCommand.submitForm("#editPositionForm")});
+		$("#telButton").bind("click",function(){editRealTimeCommand.submitForm("#editPhoneForm")});
+		$("#cameraButton").bind("click",function(){editRealTimeCommand.submitForm("#editCameraForm")});
+		$("#gnssButton").bind("click",function(){editRealTimeCommand.submitForm("#editGnssForm")});
+		$("#eventButton").bind("click",function(){editRealTimeCommand.submitForm("#editEventForm")});
+		$("#bookButton").bind("click",function(){editRealTimeCommand.submitForm("#editBookForm")});
+		$("#infoButton").bind("click",function(){editRealTimeCommand.submitForm("#editInfoForm")});
+	})
+	
+})(window,$)
+</script>
+<style>
+	.tooltip{width:100%;}
+</style>

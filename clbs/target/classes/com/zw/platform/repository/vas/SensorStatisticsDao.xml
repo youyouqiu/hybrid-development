@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.SensorStatisticsDao">
+		<!-- 根据车辆id和时间查询车辆的总里程、速度、位置数据更新时间、位置、温度等信息-->
+		<select id="findVehicleDataByVehicleId" resultType="com.zw.platform.domain.vas.f3.TempStatistics">
+			select
+			vehicle_id vehicleId,
+			plate_number plateNumber,
+			gps_mile gpsMile,
+			speed speed,
+			address address,
+			vtime vTime,
+			temp_value_one tempValueOne,
+			temp_value_two tempValueTwo,
+			temp_value_three tempValueThree,
+			temp_value_four tempValueFour,
+			temp_value_five tempValueFive
+			from positional where vehicle_id=#{vehicleId}
+			and vtime &gt;= #{startTimes} and vtime &lt;= #{endTimes} order by vtime desc
+		</select>
+
+			<!-- 根据车辆id和时间查询车辆的总里程、速度、位置数据更新时间、位置、湿度度等信息-->
+		<select id="findWetnessDataByVehicleId" resultType="com.zw.platform.domain.vas.f3.HumidityStatisics">
+			select
+			vehicle_id vehicleId,
+			plate_number plateNumber,
+			gps_mile gpsMile,
+			speed speed,
+			address address,
+			vtime vTime,
+			wetness_value_one wetnessValueOne,
+			wetness_value_two wetnessValueTwo,
+			wetness_value_three wetnessValueThree,
+			wetness_value_four wetnessValueFour
+			from positional where vehicle_id=#{vehicleId}
+			and vtime &gt;= #{startTimes} and vtime &lt;= #{endTimes} order by vtime desc
+		</select>
+
+		<!-- 根据车辆id和时间查询车辆的总里程、速度、位置数据更新时间、位置、正反转等信息-->
+		<select id="findWinchDataByVehicleId" resultType="com.zw.platform.domain.vas.f3.WinchStatistics">
+			select
+			vehicle_id vehicleId,
+			plate_number plateNumber,
+			gps_mile gpsMile,
+			speed speed,
+			address address,
+			vtime vTime,
+			winch_status winchStatus,
+    		winch_orientation winchOrientation,
+    		winch_speed winchSpeed
+			from positional where vehicle_id=#{vehicleId}
+			and vtime &gt;= #{startTimes} and vtime &lt;= #{endTimes} order by vtime desc
+		</select>
+</mapper>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.JobManagementDao">
+    <update id="updateJobInfo">
+       update
+       zw_m_job_info
+       set
+       job_name = #{jobName},
+       job_icon_name=#{jobIconName},
+       remark=#{remark},
+       update_data_time=#{updateDataTime},
+       update_data_username=#{updateDataUsername}
+       where
+       id=#{id}
+    </update>
+
+    <update id="deleteJob">
+        UPDATE zw_m_job_info set flag = 0 where id=#{id}
+    </update>
+
+    <select id="find" resultType="com.zw.talkback.domain.basicinfo.form.JobInfoData">
+        select
+        id ,
+        job_name as jobName,
+        job_icon_name as jobIconName,
+        remark
+        from
+        zw_m_job_info
+        where
+        flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND BINARY job_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="findJobById" resultType="com.zw.talkback.domain.basicinfo.form.JobInfoData">
+        select
+        id ,
+        job_name as jobName,
+        job_icon_name as jobIconName,
+        remark
+        from
+        zw_m_job_info
+        where
+        id=#{id} and flag=1
+    </select>
+
+    <select id="findJobByPeopleId" resultType="java.lang.String">
+        select
+        job.job_icon_name
+        from
+        zw_m_job_info job
+        left join zw_m_people_info people on job.id =people.job_id
+        where
+        people.id=#{id} and job.flag=1 and people.flag=1
+    </select>
+
+    <insert id="addJobInfo" parameterType="com.zw.talkback.domain.basicinfo.form.JobManagementFromData">
+         INSERT INTO zw_m_job_info (
+        id,job_name,job_icon_name, remark,flag,create_data_time,create_data_username
+        )
+        VALUES(
+         #{id}, #{jobName}, #{jobIconName}, #{remark},#{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+    <select id="findAll" resultType="com.zw.talkback.domain.basicinfo.form.JobInfoData">
+         select
+        id ,
+        job_name as jobName,
+        job_icon_name as jobIconName,
+        remark
+        from
+        zw_m_job_info
+        where
+        flag=1
+    </select>
+
+    <select id="findJobCountByJobName" resultType="com.zw.talkback.domain.basicinfo.form.JobInfoData">
+        SELECT
+        id ,
+        job_name as jobName,
+        job_icon_name as jobIconName,
+        remark
+        from
+          zw_m_job_info
+        where
+        flag=1
+        and
+        job_name=#{jobName}
+    </select>
+    <select id="checkBinding" resultType="java.lang.Integer">
+         SELECT
+          count(1)
+        from
+          zw_m_job_info as j
+          left join zw_m_people_info as p on j.id=p.job_id
+        where
+        j.flag=1 and p.flag=1 and j.id=#{id}
+    </select>
+    <select id="getJobNameById" resultType="java.util.Map">
+        SELECT
+            j.job_name as name,
+            j.job_icon_name as icon,
+            p.phone as phone
+        FROM
+            zw_m_job_info j
+        LEFT JOIN zw_m_people_info p ON p.job_id = j.id
+        WHERE
+            p.flag = 1
+        AND j.flag = 1
+        AND p.id =#{id}
+    </select>
+
+
+    <select id="getJobIconByPids" resultType="java.util.Map">
+        SELECT
+        p.id ,
+        j.job_icon_name as icon
+        FROM
+        zw_m_job_info j
+        LEFT JOIN zw_m_people_info p ON p.job_id = j.id
+        WHERE
+        p.flag = 1
+        AND j.flag = 1
+        AND p.id in
+        <foreach item="item" collection="onlineIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="findAllIconName" resultType="java.lang.String">
+        select
+        job_icon_name as jobIconName
+        from
+        zw_m_job_info
+        where
+        flag=1
+    </select>
+
+    <select id="findJobMapList" resultType="java.util.Map">
+        select
+        id,
+        job_icon_name as jobIconName
+        from
+        zw_m_job_info
+        where
+        flag=1
+    </select>
+
+
+    <select id="findJobByMonitorId" resultType="com.zw.talkback.domain.basicinfo.form.JobInfoData">
+        select p.job_id as id,j.job_name as jobName,j.job_icon_name as jobIconName
+         from zw_m_people_info p
+        LEFT JOIN  zw_m_job_info j on  p.job_id = j.id
+        where p.id =  #{monitorId}
+    </select>
+
+    <update id="updateMonitorJobId">
+        UPDATE zw_m_people_info set is_incumbency = 2
+        <if test="jobId != null and jobId!=''">
+            ,job_id = #{jobId}
+        </if>
+        where flag = 1 AND  id =  #{monitorId}
+    </update>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.OilStatisticalDao">
+
+    <!--<select id="getOilInfo" parameterType="string"-->
+            <!--resultTycom.zw.platform.domain.oil.Positionalonal">-->
+        <!--SELECT-->
+        <!--speed,-->
+        <!--temperture,-->
+        <!--gps_mile,-->
+        <!--total_oilwear_one,-->
+        <!--oiltank_temperature_one,-->
+        <!--transient_oilwear_one,-->
+        <!--total_time_one-->
+        <!--FROM positional-->
+    <!--</select>-->
+    <select id="getVehiceInfo"
+            resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+        SELECT v.id as vId,v.brand brand FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        WHERE v.flag = 1
+        AND v.id IN (
+        SELECT uv.vehicle_id FROM zw_m_user_vehicle uv WHERE uv.flag = 1 AND uv.user_id = #{userId}
+        UNION
+        SELECT info.id FROM zw_m_vehicle_info info where info.flag = 1
+        AND info.group_id =#{groupId}
+        )
+    </select>
+</mapper>

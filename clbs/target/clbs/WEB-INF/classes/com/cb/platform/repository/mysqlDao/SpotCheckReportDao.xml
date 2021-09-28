@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.SpotCheckReportDao">
+
+
+    <select id="getVehicleSpotCheckDetailList" resultType="com.cb.platform.domain.VehicleSpotCheckInfo">
+        SELECT *,
+        date_format(location_time,'%Y-%m-%d %H:%i:%s') AS locationTimeStr ,
+        date_format(spot_check_time,'%Y-%m-%d %H:%i:%s') AS spotCheckTimeStr
+        FROM zw_m_vehicle_spot_check sc
+        WHERE spot_check_time &gt;= #{startTime}
+        AND spot_check_time &lt;= #{endTime}
+        AND vehicle_id IN
+        <foreach collection="vehicleIdList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY spot_check_time DESC
+    </select>
+
+    <!-- 根据车辆ID查询车辆超速报警参数设置 -->
+    <select id="findSpeedLimitByVid" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT ps.vehicle_id as vehicleId, ps.parameter_value as parameterValue
+        FROM zw_m_alarm_parameter_setting ps
+        INNER JOIN zw_m_alarm_parameter p ON p.id = ps.alarm_parameter_id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE ps.flag = 1
+        AND ps.vehicle_id = #{vid}
+        AND alt.pos = 76
+    </select>
+    <select id="getSpotCheckDetailListByUserIds" resultType="com.cb.platform.domain.VehicleSpotCheckInfo">
+        SELECT *
+        FROM zw_m_vehicle_spot_check sc
+        WHERE spot_check_time &gt;= #{startTime}
+        AND spot_check_time &lt;= #{endTime}
+        AND spot_check_user IN
+        <foreach collection="userNameList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY spot_check_time DESC
+    </select>
+
+    <insert id="addVehicleSpotCheckInfo" parameterType="com.cb.platform.domain.VehicleSpotCheckInfo">
+        INSERT INTO zw_m_vehicle_spot_check (id, vehicle_id, location_time, speed, speed_limit,
+        longtitude, latitude, spot_check_content, spot_check_user, spot_check_time,
+        actual_view_date) VALUES (#{id},#{vehicleId},#{locationTime},#{speed},#{speedLimit},
+        #{longtitude},#{latitude},#{spotCheckContent},#{spotCheckUser},#{spotCheckTime},#{actualViewDate})
+    </insert>
+    <insert id="addVehicleSpotCheckInfoByBatch" parameterType="com.cb.platform.domain.VehicleSpotCheckInfo">
+        INSERT INTO zw_m_vehicle_spot_check (id, vehicle_id, location_time, speed, speed_limit,
+        longtitude, latitude, spot_check_content, spot_check_user, spot_check_time,
+        actual_view_date) VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+            #{item.id},#{item.vehicleId},#{item.locationTime},#{item.speed},#{item.speedLimit},
+            #{item.longtitude},#{item.latitude},#{item.spotCheckContent},#{item.spotCheckUser},#{item.spotCheckTime},#{item.actualViewDate}
+            )
+        </foreach>
+    </insert>
+</mapper>

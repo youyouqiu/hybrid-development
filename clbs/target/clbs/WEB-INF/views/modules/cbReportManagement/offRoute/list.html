@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>路线偏离报警统计</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/overSpeed.css">
+
+</head>
+<style>
+    .layui-laydate {
+        z-index: 1030 !important;
+    }
+
+    .nav-tabs {
+        border-bottom: none;
+    }
+</style>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">四川监管报表</li>
+                        <li class="active">路线偏离报警统计</li>
+                    </ul>
+                    <h1 class="h1" style="float: none">路线偏离报警统计</h1>
+                    <div class="panel-default">
+                        <div class="panel-heading" style="padding-bottom:0px">
+                            <ul class="nav nav-tabs dataTableShow">
+                                <li class="active" id="amountReport">
+                                    <a href="#speedGroup" data-toggle="tab">路线偏离企业统计</a></li>
+                                <li id="spillReport"><a href="#speedMonitor" data-toggle="tab">路线偏离车辆统计</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="speedGroup">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="stretch-body">
+                                        <div class="col-md-12 alarmSearchToolPanel">
+                                            <form id="lifeCycleForm" class="form-horizontal" action="#"
+                                                  method="post" role="form">
+                                                <div class="form-group">
+                                                    <div class="col-md-4">
+                                                        <label class="col-md-2  control-label">组织：</label>
+                                                        <input class="form-control hidden"/>
+                                                        <div class="has-feedback fastClear col-md-10">
+                                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                                   autocomplete="off"
+                                                                   placeholder="请选择组织" class="form-control" type="text"
+                                                                   id="groupSelect" name="groupSelect"/>
+                                                            <span class="fa fa-chevron-down form-control-feedback"
+                                                                  style="top: 0; right: 15px;cursor:pointer;"
+                                                                  aria-hidden="true"
+                                                                  id="groupSelectSpan"></span>
+                                                            <div id="menuContent" class="menuContent">
+                                                                <ul id="treeDemo" class="ztree"></ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 noPadding">
+                                                        <label class="col-md-4 control-label searchListSelect">时间：</label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" id="month" name="month"
+                                                                   style="cursor: pointer; background-color: #fafafa;"
+                                                                   readonly
+                                                                   class="form-control layer-date laydate-icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 control-label" id="dateSearchData">
+                                                        <button id="inquireClick" type="button"
+                                                                class="btn btn-primary search-btn" name="1"
+                                                                onclick="overSpeedGroup.inquireClick(1)"><i
+                                                                class="glyphicon glyphicon-search"></i> 查询
+                                                        </button>
+                                                        <button id="exportAlarm" type="button" disabled
+                                                                class="btn btn-purple export-btn"><i
+                                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="stretch3">
+                                        <h3 class="panel-title fwb">图形统计</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="stretch3-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" id="stretch3-body" style="display: none;">
+                                        <div class="col-md-5">
+                                            <div id="accountedEchart"></div>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <div id="trendEchart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="stretch2">
+                                        <h3 class="panel-title fwb">数据列表</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body fixed-table-body" id="stretch2-body">
+                                        <div class="ToolPanel" style="">
+                                            <div class="bars pull-left">
+                                                <div class="btn-group pull-left barsMargin" role="group">
+                                                    <form role="form">
+                                                        <label><input type="text" class="Inlinesearch form-control"
+                                                                      id="simpleQueryParam" name="simpleQueryParam"
+                                                                      autocomplete="off"
+                                                                      style="width:300px"
+                                                                      placeholder="请输入企业名称"></label>
+                                                        <button type="button" id="search_button"
+                                                                class="btn btn-outline btn-default">搜索
+                                                        </button>
+                                                        <input id="hiddenText" type="text" style="display:none"/>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="columns btn-group pull-right fuelConsumptionS">
+                                                <button id="refreshTable" class="btn btn-default" type="button"
+                                                        name="refresh"
+                                                        title="刷新">
+                                                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                </button>
+                                                <div class="keep-open btn-group" title="定制显示列">
+                                                    <button id="customizeColumns" type="button"
+                                                            class="btn btn-default dropdown-toggle btn-border-radius"
+                                                            data-toggle="dropdown">
+                                                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                            class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table id="dataTable"
+                                               class="table table-striped table-bordered table-hover noCheckTable myDriverTable"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">序号</th>
+                                                <th class="text-center">道路运输企业</th>
+                                                <th class="text-center">路线偏离车辆数</th>
+                                                <th class="text-center">路线偏离报警数</th>
+                                                <th class="text-center">不按规定线路运行报警数</th>
+                                                <th class="text-center">合计</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                        <ul id="dropDown-q" class="dropdown-menu"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="speedMonitor">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="col-md-12 alarmSearchToolPanel">
+                                            <form id="speedlist" class="form-horizontal" action="#"
+                                                  method="post" role="form">
+                                                <div class="form-group">
+                                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                        <select name="queryType" id="queryType"
+                                                                class="Inlinesearch form-control treeSelect">
+                                                            <option value="vehicle">监控对象</option>
+                                                            <option value="group">企业</option>
+                                                            <option value="assignment">分组</option>
+                                                        </select>
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                               type="text"
+                                                               name="monitorGroupSelect" placeholder="请选择"
+                                                               class="form-control moreQueryGroup" autocomplete="off"
+                                                               id="monitorGroupSelect"/>
+                                                        <span class="fa fa-chevron-down form-control-feedback"
+                                                              style="top: 0; right: 15px;cursor:pointer;"
+                                                              aria-hidden="true"
+                                                              id="monitorGroupSelectSpan"></span>
+                                                        <div id="monitorMenuContent" class="menuContent">
+                                                            <ul id="monitorTreeDemo" class="ztree"></ul>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                    <div class="col-md-3 col-sm-8 searchListSelect">
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                               class="form-control layer-date laydate-icon"
+                                                               id="timeInterval" name="timeInterval" readonly/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 control-label">
+                                                        <button id="monitorInquireClick" type="button"
+                                                                class="btn btn-primary search-btn" name="1"
+                                                                onclick="speedingVehicle.inquireClick(1)"><i
+                                                                class="glyphicon glyphicon-search"></i> 查询
+                                                        </button>
+                                                        <button id="exportMonitor" type="button" disabled
+                                                                class="btn btn-purple export-btn"><i
+                                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="stretch1">
+                                        <h3 class="panel-title fwb">数据列表</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="stretch1-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body fixed-table-body" id="stretch1-body">
+                                        <div class="ToolPanel">
+                                            <div class="bars pull-left">
+                                                <div class="btn-group pull-left barsMargin" role="group">
+                                                    <form role="form">
+                                                        <label><input type="text"
+                                                                      class="Inlinesearch form-control"
+                                                                      id="monitorQueryParam"
+                                                                      name="monitorQueryParam"
+                                                                      placeholder="请输入监控对象" autocomplete="off"></label>
+                                                        <button type="button" id="monitorTableSearch"
+                                                                class="btn btn-outline btn-default">搜索
+                                                        </button>
+                                                        <input id="hiddenText2" type="text" style="display:none"/>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="columns btn-group pull-right personnelInformation">
+                                                <button id="refreshMonitorTable" class="btn btn-default" type="button"
+                                                        name="refresh"
+                                                        title="刷新">
+                                                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                </button>
+                                                <div class="keep-open1 btn-group" title="定制显示列">
+                                                    <button id="monitorCustomizeColumns" type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                            class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu"
+                                                        id="Ul-menu-text1"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table id="monitorDataTable"
+                                               class="table table-striped table-bordered table-hover noCheckTable"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">序号</th>
+                                                <th class="text-center">监控对象</th>
+                                                <th class="text-center">车牌颜色</th>
+                                                <th class="text-center">车辆类型</th>
+                                                <th class="text-center">路线偏离报警数</th>
+                                                <th class="text-center">不按规定线路运行报警数</th>
+                                                <th class="text-center">合计</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+
+<!--超速企业统计详情抽屉-->
+<div id="detail" class="right-panel detailContentBody">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title fwb">企业路线偏离报警明细
+                <div class="carName">
+<!--                    <i class="toopTip-btn-left" style="display: inline-block"-->
+<!--                       onclick="overSpeedGroup.left_arrow()">-->
+<!--                        <img data-toggle="tooltip" data-placement="left"-->
+<!--                             src="/clbs/resources/img/car-left.svg"-->
+<!--                             width="16px" data-original-title="上一月">-->
+<!--                    </i>-->
+                    <span id="detailMonth">-</span>
+<!--                    <i class="toopTip-btn-right" style="display: inline-block"-->
+<!--                       onclick="overSpeedGroup.right_arrow()">-->
+<!--                        <img data-toggle="tooltip" data-placement="right" title=""-->
+<!--                             src="/clbs/resources/img/car-right.svg" width="16px"-->
+<!--                             data-original-title="下一月">-->
+<!--                    </i>-->
+                </div>
+            </h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close" onclick="overSpeedGroup.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body" id="detailBody">
+            <div class="form-group clearfix">
+                <div class="col-md-5 noPadding driverInfo">
+                    <p><span class="detail-table-title">企业名称：</span> <span id="orgName">-</span></p>
+                    <p><span class="detail-table-title">当月路线偏离车辆数：</span> <span id="monitorNum">-</span></p>
+                    <p><span class="detail-table-title">当月路线偏离报警数：</span> <span id="totalNum">-</span></p>
+                    <p><span class="detail-table-title">当月不按规定线路运行报警数：</span> <span id="less20PerNum">-</span></p>
+                    <p><span class="detail-table-title">当月排名：</span> <span id="ranking">-</span></p>
+                </div>
+                <div class="col-md-7">
+                    <div id="accountedDetailEchart"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div id="trendDetailEchart"></div>
+            </div>
+            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title fwb">数据列表</h3>
+                    </div>
+                    <div class="panel-body fixed-table-body">
+<!--                        <div class="ToolPanel" style="">-->
+<!--                            <div class="bars pull-left">-->
+<!--                                <div class="btn-group pull-left barsMargin" role="group">-->
+<!--                                    <form role="form" onkeydown="if(event.keyCode==13)return false;">-->
+<!--                                        <label><input type="text" class="Inlinesearch form-control"-->
+<!--                                                      id="detailSimpleQueryParam" name="detailSimpleQueryParam"-->
+<!--                                                      autocomplete="off"-->
+<!--                                                      style="width:300px"-->
+<!--                                                      placeholder="请输入监控对象关键字"></label>-->
+<!--                                        <button type="button" id="searchDetailTable"-->
+<!--                                                class="btn btn-outline btn-default">搜索-->
+<!--                                        </button>-->
+<!--                                    </form>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <table id="detailTable"
+                               class="table table-striped table-bordered table-hover noCheckTable dataTable no-footer"
+                               cellspacing="0" width="100%" aria-describedby="dataTable_info">
+                            <thead>
+                            <tr role="row">
+                                <th class="text-center">序号</th>
+                                <th class="text-center">监控对象</th>
+                                <th class="text-center">车牌颜色</th>
+                                <th class="text-center">车辆类型</th>
+                                <th class="text-center">路线偏离报警数</th>
+                                <th class="text-center">不按规定线路运行报警数</th>
+                                <th class="text-center">合计</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <a id="detailExport" type="button" class="btn btn-purple export-btn" href="javascript:void(0);">
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </a>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px"
+                    onclick="overSpeedGroup.closeDetail()">关 &nbsp;闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--超速车辆统计详情抽屉-->
+<div id="monitorDetail" class="right-panel detailContentBody">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title fwb">车辆路线偏离报警明细
+                <div class="carName">
+<!--                    <i class="toopTip-btn-left" style="display: inline-block"-->
+<!--                       onclick="speedingVehicle.left_arrow()">-->
+<!--                        <img data-toggle="tooltip" data-placement="left"-->
+<!--                             src="/clbs/resources/img/car-left.svg"-->
+<!--                             width="16px" data-original-title="上一月">-->
+<!--                    </i>-->
+                    <span id="monitorDetailMonth">-</span>
+<!--                    <i class="toopTip-btn-right" style="display: inline-block"-->
+<!--                       onclick="speedingVehicle.right_arrow()">-->
+<!--                        <img data-toggle="tooltip" data-placement="right" title=""-->
+<!--                             src="/clbs/resources/img/car-right.svg" width="16px"-->
+<!--                             data-original-title="下一月">-->
+<!--                    </i>-->
+                </div>
+            </h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close" onclick="overSpeedGroup.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body" id="monitorDetailBody">
+            <div class="form-group clearfix">
+                <div class="col-md-5 noPadding driverInfo">
+                    <h4>基础信息</h4>
+                    <p><span class="detail-table-title">监控对象：</span> <span id="monitorName">-</span></p>
+                    <p><span class="detail-table-title">车牌颜色：</span> <span id="plateColor">-</span></p>
+                    <p><span class="detail-table-title">车辆类型：</span> <span id="objectType">-</span></p>
+                    <p><span class="detail-table-title">所属企业：</span> <span id="monitorOrg">-</span></p>
+                    <h4>报警信息</h4>
+                    <p><span class="detail-table-title">路线偏离报警：</span> <span id="monitorLess20PerUnder">-</span></p>
+                    <p><span class="detail-table-title">不按规定线路运行报警：</span> <span id="monitorCent20To50PerNum">-</span></p>
+                </div>
+                <div class="col-md-7">
+                    <div id="monitorAccountedEchart"></div>
+                </div>
+            </div>
+            <div class="form-group clearfix">
+                <div id="monitorTrendEchart"></div>
+            </div>
+            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title fwb">数据列表</h3>
+                    </div>
+                    <div class="panel-body fixed-table-body">
+                        <table id="monitorDetailTable"
+                               class="table table-striped table-bordered table-hover noCheckTable dataTable no-footer"
+                               cellspacing="0" width="100%" aria-describedby="dataTable_info">
+                            <thead>
+                            <tr role="row">
+                                <th class="text-center">序号</th>
+                                <th class="text-center">报警时间</th>
+                                <th class="text-center">规定运行线路</th>
+                                <th class="text-center">报警类型</th>
+                                <th class="text-center">报警位置</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <button id="monitorDetailExport" type="button" class="btn btn-purple export-btn" href="javascript:void(0);" disabled>
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </button>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px"
+                    onclick="overSpeedGroup.closeDetail()">关 &nbsp;闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectGroup = [[#{Vehicle.select.group}]];
+    var exportTitle = [[#{export.confirm.title}]];
+    var exportFail = [[#{export.fail}]];
+    var dateNumError = [[#{outArea.dateNum.error}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+</script>
+<script src="/clbs/resources/js/echarts-4.1.js"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<!--超速企业统计页签相关js-->
+<script src="/clbs/resources/js/overOffRouteList.js"></script>
+<!--超速车辆统计页签相关js-->
+<script src="/clbs/resources/js/offRouteVehicle.js"></script>
+</html>

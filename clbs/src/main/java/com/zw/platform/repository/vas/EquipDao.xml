@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.EquipDao">
+
+	<!-- 查询基准信息 -->
+	<select id="findBenchmark" resultType="com.zw.platform.domain.vas.carbonmgt.form.EquipForm">
+	 select  o.id as id,v.id as vehicleId,v.brand as brand,t.vehicle_type as vehicleType,v.fuel_type as fuelType,o.time_benchmark as timeBenchmark,o.mileage_benchmark as mileageBenchmark,
+	 o.idle_benchmark as idleBenchmark,o.work_hours_benchmark as workHoursBenchmark,GROUP_CONCAT(DISTINCT v.group_id SEPARATOR '#') as groupId from
+        zw_o_euipment o,zw_m_vehicle_info v,zw_m_vehicle_type t where o.vehicle_id = v.id  and v.vehicle_type = t.id
+        and v.flag = 1 and o.flag = 1 and t.flag = 1
+        and v.group_id in
+        <foreach item="item" collection="groupList" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+		<if test="param != null">
+			<if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+				AND ( v.brand LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+				OR t.vehicle_type LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+				OR v.fuel_type LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+				)
+			</if>
+		</if>
+        group by v.id
+        ORDER BY o.create_data_time DESC
+	</select>
+	<!-- 根据用户查询已绑定的车辆信息 -->
+	<select id="findVehicleByUser" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+	 select  distinct v.id,v.brand,t.vehicle_type,t.vehicle_category,v.fuel_type from 
+       zw_m_config m,zw_m_vehicle_info v,zw_m_vehicle_type t,
+       zw_m_assignment a,zw_m_assignment_vehicle av
+       where m.vehicle_id = v.id and v.vehicle_type = t.id
+        and v.id = av.vehicle_id and a.id = av.assignment_id
+        and v.flag = 1 and m.flag = 1 and t.flag = 1 
+        and a.flag = 1 and av.flag = 1
+        and a.org_id in
+        <foreach item="item" collection="groupList" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 根据用户查询已绑定的车辆信息 -->
+	<select id="findVehicleByAssign" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+	 select distinct  v.id,v.brand,t.vehicle_type,t.vehicle_category,v.fuel_type from 
+       zw_m_config m,zw_m_vehicle_info v,zw_m_vehicle_type t,
+       zw_m_assignment a,zw_m_assignment_vehicle av
+       where m.vehicle_id = v.id  and v.vehicle_type = t.id
+        and v.id = av.vehicle_id and a.id = av.assignment_id
+        and v.flag = 1 and m.flag = 1 and t.flag = 1 
+        and a.flag = 1 and av.flag = 1
+        and a.id in 
+        <foreach item="item" collection="groupList" separator=","
+			open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 新增基准信息 -->
+	<insert id="addBenchmark" parameterType="com.zw.platform.domain.vas.carbonmgt.form.EquipForm">
+		INSERT INTO
+		zw_o_euipment (
+		id, vehicle_id, time_benchmark,
+		idle_benchmark, work_hours_benchmark,
+		mileage_benchmark,flag, create_data_time,
+		create_data_username)
+		VALUES
+		(#{id}, #{vehicleId},#{timeBenchmark},#{idleBenchmark},
+		#{workHoursBenchmark},#{mileageBenchmark},#{flag},
+		#{createDataTime}, #{createDataUsername})
+	</insert>
+
+	<!-- 修改基准信息 -->
+	<update id="updateBenchmark" parameterType="com.zw.platform.domain.vas.carbonmgt.form.EquipForm">
+		update zw_o_euipment
+		<set>
+			<if test="timeBenchmark != null">
+				time_benchmark = #{timeBenchmark},
+			</if>
+			<if test="idleBenchmark != null">
+				idle_benchmark = #{idleBenchmark},
+			</if>
+			<if test="workHoursBenchmark != null">
+				work_hours_benchmark = #{workHoursBenchmark},
+			</if>
+			<if test="mileageBenchmark != null">
+				mileage_benchmark = #{mileageBenchmark},
+			</if>
+			<if test="flag != null">
+				flag = #{flag},
+			</if>
+			<if test="updateDataTime != null">
+				update_data_time = #{updateDataTime},
+			</if>
+			<if test="updateDataUsername != null">
+				update_data_username = #{updateDataUsername}
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+<!-- 根据id查询基准信息 -->
+	<select id="findBenchmarkById" resultType="com.zw.platform.domain.vas.carbonmgt.form.EquipForm">
+	select o.id as id,v.id as vehicleId,v.brand as brand,v.fuel_type as fuelType,t.vehicle_type as vehicleType,t.vehicle_category as vehicleCategory,v.fuel_type as fuleType,o.time_benchmark as timeBenchmark,
+	 o.idle_benchmark as idleBenchmark,o.work_hours_benchmark as workHoursBenchmark, o.mileage_benchmark as mileageBenchmark from 
+        zw_o_euipment o,zw_m_vehicle_info v,zw_m_vehicle_type t where o.vehicle_id = v.id  and v.vehicle_type = t.id
+        and v.flag = 1 and o.flag = 1 and t.flag = 1
+        and o.id = #{id}
+	</select>
+	
+	<!-- 根据车辆id查询基准信息 -->
+	<select id="findBenchmarkByVehicleId" resultType="com.zw.platform.domain.vas.carbonmgt.form.EquipForm">
+	select o.id as id,v.id as vehicleId,v.brand as brand,v.fuel_type as fuelType,t.vehicle_type as vehicleType,v.fuel_type as fuleType,o.time_benchmark as timeBenchmark,
+	 o.idle_benchmark as idleBenchmark,o.work_hours_benchmark as workHoursBenchmark, o.mileage_benchmark as mileageBenchmark from 
+        zw_o_euipment o,zw_m_vehicle_info v,zw_m_vehicle_type t where o.vehicle_id = v.id  and v.vehicle_type = t.id
+        and v.flag = 1 and o.flag = 1 and t.flag = 1
+        and o.vehicle_id = #{vehicleId}
+	</select>
+</mapper>

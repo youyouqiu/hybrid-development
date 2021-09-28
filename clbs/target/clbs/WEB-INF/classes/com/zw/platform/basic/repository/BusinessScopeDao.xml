@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.BusinessScopeDao">
+
+    <insert id="addBusinessScope" parameterType="com.zw.platform.basic.domain.BusinessScopeDO">
+        insert into zw_m_business_scope_config
+        (id, business_scope_id, `type`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.businessScopeId}, #{item.type})
+        </foreach>
+    </insert>
+
+    <insert id="bindBusinessScope">
+        insert into zw_m_business_scope_config
+        (id, business_scope_id, `type`)
+        values
+        <foreach collection="scopeIds" item="item" separator=",">
+            (#{id}, #{item} ,#{type})
+        </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        delete from  zw_m_business_scope_config where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from zw_m_business_scope_config where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getBusinessScope" parameterType="string" resultType="com.zw.platform.basic.dto.BusinessScopeDTO">
+        select b.id, b.business_scope_id,d.code as businessScopeCode,d.value as businessScope from zw_c_dictionary d
+        inner join zw_m_business_scope_config b on b.business_scope_id = d.id
+        where b.id = #{id}
+    </select>
+
+    <select id="getBusinessScopeByIds" resultType="com.zw.platform.basic.dto.BusinessScopeDTO">
+        select b.id, b.business_scope_id,d.code as businessScopeCode,d.value as businessScope from zw_c_dictionary d
+        inner join zw_m_business_scope_config b on b.business_scope_id = d.id
+        where b.id in
+        <foreach collection="ids" item="id"  open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

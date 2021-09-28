@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskEvidence.AdasRiskEvidenceDao">
+
+    <sql id="whereCondition1">
+        unix_timestamp(cam.warning_time) BETWEEN
+        unix_timestamp(#{startTime}) AND unix_timestamp(
+        #{endTime}) AND cam.flag = 1
+        <if test="vehicleIds != null and vehicleIds != ''">
+            AND cam.vehicle_id IN
+            <foreach collection="vehicleIds.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="riskNumber != null and riskNumber != ''">
+            AND cam.risk_number LIKE
+            CONCAT('%',#{riskNumber},'%')
+        </if>
+        <if test="riskType != null and riskType != ''">
+            AND cam.risk_type = #{riskType}
+        </if>
+        <if test="status != null and status != ''">
+            AND cam.status = #{status}
+        </if>
+        <if test="dealUser != null and dealUser != ''">
+            AND cam.deal_id LIKE CONCAT('%',#{dealUser},'%')
+        </if>
+        <if test="riskResult != null and riskResult != ''">
+            AND cam.risk_result = #{riskResult}
+        </if>
+        <if test="riskLevel != null and riskLevel != ''">
+            AND cam.risk_level = #{riskLevel}
+        </if>
+        <if test="driver != null and driver != ''">
+            AND vis.driver LIKE CONCAT('%',#{driver},'%')
+        </if>
+        <if test="visitTime != null and visitTime != ''">
+            AND vis.visitTime = #{visitTime}
+        </if>
+    </sql>
+
+    <sql id="whereCondition2">
+        INNER JOIN zw_m_media m force index(idx_risk_event_id) on m.risk_event_id = ra.id and m.risk_event_id is not null
+        <where>
+            m.flag = 1
+            <if test="riskEvent != '' and riskEvent !=null">
+                AND re.function_id =#{riskEvent}
+            </if>
+            <include refid="judgeMediaType"></include>
+        </where>
+        order by riskInfo.warTime DESC
+    </sql>
+
+    <sql id="whereCondition3">
+
+        INNER join zw_m_media m  on  m.risk_id = riskInfo.id and m.risk_id is not null
+        <where>
+            m.flag = 1
+            <include refid="judgeMediaType"></include>
+        </where>
+        order by riskInfo.warTime DESC
+    </sql>
+
+    <sql id="judgeMediaType">
+
+        <if test="evidenceType == '1'.toString() and evidenceType !=null">
+            AND substring_index(m.media_name,".",-1)='jpeg' AND m.media_id is not null
+        </if>
+        <if test="evidenceType == '2'.toString() and evidenceType !=null">
+            AND substring_index(m.media_name,".",-1)='mp4' AND m.media_id is not null
+        </if>
+
+        <if test="evidenceType == '3'.toString() and evidenceType !=null">
+            AND substring_index(m.media_name,".",-1)='wav' AND m.media_id is null
+        </if>
+        <if test="evidenceType == '4'.toString() and evidenceType !=null">
+            AND substring_index(m.media_name,".",-1)='mp4' AND m.media_id is null
+        </if>
+        <if test="deleteIds != null and deleteIds.length >0 ">
+            AND m.id NOT in
+            <foreach collection="deleteIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="queryDeviceRiskEvidence"
+            parameterType="com.zw.platform.domain.riskManagement.query.RiskDisposeRecordQuery"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskDisposeRecordForm">
+        SELECT
+        m.id as id,
+        ra.event_number AS eventNumber,
+        riskInfo.risk_type AS riskType,
+        riskInfo.address,
+        riskInfo.deal_id AS dealUser,
+        riskInfo.warning_time AS warTime,
+        riskInfo.risk_result AS riskResult,
+        rl.risk_level AS riskLevel,
+        riskInfo.formatted_address ,
+        riskInfo.driver,
+        riskInfo.vehicle_id,
+        m.media_name mediaName,
+        re.risk_event,
+        m.media_url_new as mediaUrlNew
+        FROM (
+        <include refid="queryRiskInfo"/>
+        ) AS riskInfo
+        INNER JOIN zw_m_risk_level AS rl ON riskInfo.risk_level = rl.risk_value and rl.flag = 1
+        INNER JOIN zw_m_risk_alarm ra on ra.risk_id = riskInfo.id and ra.flag = 1
+        INNER JOIN zw_m_risk_event re on re.function_id = ra.event_id and re.flag = 1
+        <include refid="whereCondition2"></include>
+    </select>
+
+    <sql id="queryDriverAndVisitTimes">
+        SELECT
+        rv.risk_id,
+        group_concat(DISTINCT(proi.name)) AS driver,
+        MAX(rv.visit_order) AS visitTime from zw_m_risk_visit rv force index(IDX_ORDER)
+        LEFT JOIN zw_m_professionals_info proi on rv.driver_id = proi.id and proi.flag=1
+        where rv.flag = 1 GROUP BY rv.risk_id
+    </sql>
+
+
+    <select id="queryDeviceRiskEvidenceBrands"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskDisposeRecordQuery"
+            resultType="string">
+        SELECT DISTINCT
+        riskInfo.vehicle_id as vehicleId
+        FROM (SELECT cam.vehicle_id,cam.id,cam.warning_time warTime FROM zw_m_risk_campaign cam
+        LEFT JOIN
+        (
+        <include refid="queryDriverAndVisitTimes" />
+        ) vis on vis.risk_id =cam.id
+        WHERE
+        <include refid="whereCondition1"></include>
+        ) AS riskInfo
+        INNER JOIN zw_m_risk_alarm ra on ra.risk_id = riskInfo.id and ra.flag = 1
+        INNER JOIN zw_m_risk_event re on re.function_id = ra.event_id and re.flag = 1
+        <include refid="whereCondition2"></include>
+    </select>
+
+    <sql id="queryRiskInfo">
+        SELECT
+        cam.id,
+        cam.vehicle_id,
+        cam.risk_number,
+        cam.risk_level,
+        cam.risk_type,
+        cam.address,
+        cam.deal_id,
+        DATE_FORMAT(cam.warning_time,'%Y-%m-%d
+        %H:%i:%s') AS
+        warning_time,
+        DATE_FORMAT(cam.file_time,'%Y-%m-%d
+        %H:%i:%s') AS file_time,
+        cam.risk_result,
+        vis.driver,
+        cam.formatted_address
+        FROM zw_m_risk_campaign cam
+        LEFT JOIN
+        (
+        <include refid="queryDriverAndVisitTimes" />
+        ) vis on vis.risk_id =cam.id
+        WHERE
+        <include refid="whereCondition1"></include>
+    </sql>
+
+    <select id="queryRiskEvidence"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskDisposeRecordQuery"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskDisposeRecordForm">
+        SELECT
+        m.id,
+        riskInfo.risk_number AS riskNumber,
+        riskInfo.risk_type AS riskType,
+        riskInfo.address,
+        riskInfo.deal_id AS dealUser,
+        riskInfo.warning_time AS warTime,
+        riskInfo.risk_result AS riskResult,
+        rl.risk_level AS riskLevel,
+        riskInfo.formatted_address,
+        riskInfo.driver,
+        riskInfo.vehicle_id,
+        m.media_name mediaName
+        FROM (
+        <include refid="queryRiskInfo"/>
+        ) AS riskInfo
+        INNER JOIN zw_m_risk_level AS rl ON riskInfo.risk_level = rl.risk_value and rl.flag=1
+        <include refid="whereCondition3"></include>
+
+    </select>
+
+
+    <select id="queryRiskEvidenceBrands"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskDisposeRecordQuery"
+            resultType="string">
+        SELECT DISTINCT
+        riskInfo.vehicle_id vehicleId
+        FROM (SELECT cam.vehicle_id,cam.id,cam.warning_time warTime
+        FROM zw_m_risk_campaign cam
+        LEFT JOIN
+        (
+        <include refid="queryDriverAndVisitTimes" />
+        ) vis on vis.risk_id =cam.id
+        WHERE
+        <include refid="whereCondition1"></include>
+        ) AS riskInfo
+        <include refid="whereCondition3"></include>
+    </select>
+
+    <update id="updateRiskIds" parameterType="map">
+        UPDATE  zw_m_media set
+        risk_id =#{riskId}
+        where id =#{id}
+    </update>
+
+    <select id="getRiskIds" resultType="map">
+        select m.id ,v.risk_id as riskId from zw_m_media m INNER JOIN
+        zw_m_risk_visit v on v.id = m.visit_id and m.flag=1 and v.flag=1
+    </select>
+
+    <update id="updateRiskEventIds" parameterType="map">
+        update  zw_m_media set risk_event_id = #{riskEventId} where id =#{id}
+    </update>
+
+
+    <select id="getMp4Medias" resultType="map">
+        select m.id ,r.media_id as mediaId from zw_m_media m  , zw_m_risk_alarm r where r.id = m.risk_event_id and m.flag =1 and r.flag=1
+        and  substring_index(m.media_name,".",-1)='mp4'
+    </select>
+
+    <update id="updateMediaIds">
+        update zw_m_media set media_id =#{mediaId} where id =#{id}
+    </update>
+
+    <!-- 将风控证据音频和视频进行转换，补上省份简称-->
+    <select id="findAllRiskEvidence" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT DISTINCT media_url from zw_m_media where visit_id is not null and flag = 1
+
+    </select>
+
+</mapper>

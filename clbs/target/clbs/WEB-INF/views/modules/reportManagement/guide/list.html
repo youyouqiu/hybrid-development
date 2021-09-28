@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>引导页</title>
+	<div th:replace="fragments/header">header</div>
+
+	<!--self css-->
+	<link rel="stylesheet" href="/clbs/resources/js/progress/jquery.easy-pie-chart.css" th:src="@{/clbs/resources/js/progress/jquery.easy-pie-chart.css}"/>
+	<link rel="stylesheet" href="/clbs/resources/css/guide-list.css" th:src="@{/clbs/resources/css/guide-list.css}"/>
+</head>
+<body>
+<input type="hidden" id="vehicleIds" th:value="${vehicleIds}">
+<input type="hidden" id="isarea" th:value="${session.isarea}">
+<section id="container">
+	<div th:replace="fragments/nav">nav</div>
+
+	<section class="main-content-wrapper  main-content-toggle-left" style="height:calc(100% - 80px);background: #fff;">
+		<div th:replace="fragments/menu">menu</div>
+
+		<!--main-content-->
+		<section id="main-content" class="h100">
+			<div class="row h100">
+				<!--aMapContainer start-->
+				<div class="col-md-9 h100">
+					<div id="aMapContainer" class="guide-aMap clearfix">
+						<!--模态框-->
+						<div class="aMapMadule-box">
+							<div class="aMapMadule"></div>
+
+							<div class="aMapMadule-body clearfix">
+								<div class="operation-chart pull-left">
+									<div id="operationChart" style="width:660px;height:200px;"></div>
+
+									<div style="position: absolute;top:20px;left:205px;">
+										<div class="line clearfix">
+											<p class="txt"><span id="greetings">下午好</span>！当前 <span id="onlineNum" class="blue"></span> 辆车处于监控中</p>
+											<button id="maduleHide" class="show-btn">点击显示地图</button>
+										</div>
+										<div id="operationLegend"></div>
+									</div>
+									<div id="legend_page" class="text-right">
+										<span class="tapIcon noClick" id="preIcon"></span>
+										<span id="page_text">0/0</span>
+										<span class="tapIcon noClick" id="nextIcon"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="aMap-data-box pull-left">
+							<!-- 实时报警数 -->
+							<div class="aMap-data left">
+								<div class="tit">实时报警数(主动安全)</div>
+								<div id="nowRiskNum" class="con">
+									<!--<span class="num">5</span>
+									<span>件</span>-->
+								</div>
+							</div>
+							<!-- 昨日报警数 -->
+							<div class="aMap-data left pull-left mt20">
+								<div class="tit">昨日整天报警数(主动安全)</div>
+								<div class="con">
+									<span id="yestodayRisk"></span>
+									<span>件</span>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="aMap-data-box pull-right">
+							<!-- 在线车辆 -->
+							<div class="aMap-data right pull-right">
+								<div class="tit">在线车辆</div>
+								<div id="onlineInfo" class="con">
+									<!--<span class="num">5</span>
+									<span>辆</span>-->
+								</div>
+							</div>
+
+							<!-- 工具条 start-->
+							<div class="pull-left" style="position: relative;">
+								<div class = "toolClickArea">
+									<div id="toolClick" class="toolClick">
+										<img alt="" src="../../../resources/img/tool.svg">
+									</div>
+									<div id="toolOperateClick" class="toolOperateClick">
+										<a class="fenceA" id="mapDropSetting"><i class="map-drop-sett"></i><span>地图设置</span></a>
+										<a class="fenceA" id="magnifyClick"><i class="map-magnify"></i><span class="mapToolClick">拉框放大</span></a>
+										<a class="fenceA" id="shrinkClick"><i class="map-shrink"></i><span class="mapToolClick">拉框缩小</span></a>
+										<a class="fenceA" id="countClick"><i class="map-count"></i><span class="mapToolClick">距离量算</span></a>
+										<a class="fenceA" id="displayClick"><i class="map-displaySetting"></i><span class="mapToolClick">显示设置</span></a>
+									</div>
+								</div>
+								<div class="mapDropSettingMenu" id="mapDropSettingMenu" style="left:0px;">
+									<p class="m-line">
+										<input type="checkbox" id="realTimeRC" class="monitoringSelect"/>
+										<label for="realTimeRC" id="realTimeRCLab" class="monitoringSelect">路况</label>
+									</p><hr>
+									<p>
+										<input type="checkbox" id="defaultMap" class="monitoringSelect"/>
+										<label for="defaultMap" id="defaultMapLab" class="monitoringSelect">卫星地图</label>
+									</p><hr>
+								</div>
+								<div class="disSetMenu" id="disSetMenu">
+									<p>
+										<input type="checkbox" checked="checked" id="logoDisplay" class="monitoringSelect"/>
+										<label for="logoDisplay" id="logoDisplayLab" class="monitoringSelect preBlue">标识显示</label>
+									</p><hr>
+									<p>
+										<input type="checkbox" id="weather" class="monitoringSelect"/>
+										<label for="weather" id="weatherLab" class="monitoringSelect">天气情况</label>
+									</p>
+									<!--<p>-->
+										<!--<input type="checkbox" id="areaAlarm" class="monitoringSelect"/>-->
+										<!--<label for="areaAlarm" id="areaAlarmLab" class="monitoringSelect">区域风险</label>-->
+									<!--</p>-->
+								</div>
+							</div>
+						</div>
+
+						<!--风险时间范围-->
+						<div id="alarmDate" class="alarmDate clearfix hide">
+							<div class="pull-left">
+								<div class="item">
+									<label class="radio-inline">
+										<input class="input" type="radio" value="1" name="alarmDate" checked>昨日
+									</label>
+								</div>
+								<div class="item">
+									<label class="radio-inline">
+										<input class="input" type="radio" value="2" name="alarmDate">上月
+									</label>
+								</div>
+								<div class="item">
+									<label class="radio-inline">
+										<input class="input" type="radio" value="3" name="alarmDate">去年
+									</label>
+								</div>
+							</div>
+							<div class="pull-right">
+								<span>高</span>
+								<div style="background:linear-gradient(to bottom,#a71414, #d7000a, #ff0c00, #ff7400, #ffdd00, #d9ff00, #9fff00, #30ff00,#00f106,#04cd0b,#3ab126,#299817);width:18px;height:100px;background-color: aquamarine;"></div>
+								<span>低</span>
+							</div>
+						</div>
+
+						<!-- 菜单 -->
+						<div class="menu-box clearfix">
+							<!--<div class="toggle-navigation toggle-left pull-right" id="menuBtn">
+								<button type="button" class="btn btn-default">
+									<i class="fa fa-bars"></i>
+								</button>
+							</div>-->
+
+							<div class="progress-container pull-left">
+								<div id="menuList" class="progress-box clearfix">
+									<!--<li class="chart">
+										<a href="#" class="circle-progress" data-percent="100">
+											出租车
+										</a>
+										&lt;!&ndash; tips &ndash;&gt;
+										<div class="tips">
+											<span class="green">23510</span>
+											<span class="red">70%</span>
+										</div>
+									</li>-->
+									<div class="chart">
+										<a th:if="${session.isarea}==1" th:href="@{/adas/lb/show/list}" class="circle-progress" data-percent="100">
+											全部
+										</a>
+										<a th:else th:href="@{/adas/lbOrg/show/list}" class="circle-progress" data-percent="100">
+											全部
+										</a>
+
+										<div class="tips">
+											<span id="cateTotal" class="green"></span>
+										</div>
+									</div>
+									<div id="chatItem" class="pull-left"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--aMapContainer end-->
+
+				<!--二期 start-->
+				<div class="col-md-3 h100" id="guideData">
+					<!--1服务器性能-->
+					<div class="panel panel-default">
+						<div class="panel-heading" id="stretch3">
+							<h3 class="panel-title">服务器性能</h3>
+							<div class="actions pull-right listActions">
+								<i class="fa chevron-down" id="stretch3-chevron"></i>
+							</div>
+						</div>
+						<div class="panel-body" id="stretch3-body">
+							<div class="row mt20">
+								<div class="col-md-3 item text-center noPadding">
+									<a data-value="服务器监控报表" href="#">
+										<p class="mt10"><img class="cpu-icon" alt="" src="../../../resources/img/cpu1.svg"></p>
+										<p>cpu</p>
+										<div class="cpuStatus"></div>
+									</a>
+								</div>
+								<div class="col-md-3 item text-center noPadding">
+									<a data-value="服务器监控报表" href="#">
+										<p class="mt10"><img class="cpu-icon" alt="" src="../../../resources/img/cpu2.svg"></p>
+										<p>内存</p>
+										<div class="cpuStatus"></div>
+									</a>
+								</div>
+								<div class="col-md-3 item text-center noPadding">
+									<a data-value="服务器监控报表" href="#">
+										<p class="mt10"><img class="cpu-icon" alt="" src="../../../resources/img/cpu3.svg"></p>
+										<p>存储空间</p>
+										<div class="cpuStatus"></div>
+									</a>
+								</div>
+								<div class="col-md-3 item text-center noPadding">
+									<a data-value="服务器监控报表" href="#">
+										<p class="mt10"><img class="cpu-icon" alt="" src="../../../resources/img/cpu4.svg"></p>
+										<p>网络</p>
+										<div>
+											<p class="kb" style="text-align: center;">
+												<i class="fa fa-long-arrow-left normal"></i>
+												<span id="networkOutflow"></span>
+											</p>
+											<p class="kb" style="text-align: center;">
+												<i class="fa fa-long-arrow-right abnormal1"></i>
+												<span id="networkStatus"></span>
+											</p>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!--一期-->
+					<div class="panel panel-default table-wrap" style="margin-bottom:0;">
+						<div class="panel-heading" id="stretch2">
+							<h3 class="panel-title">区域风险报警</h3>
+							<div class="actions pull-right listActions">
+								<i class="fa chevron-down" id="stretch2-chevron"></i>
+							</div>
+						</div>
+						<div class="panel-body" id="stretch2-body">
+							<div class="table-swiper">
+								<table class="base-table active">
+									<thead>
+									<tr>
+										<td width="20%">排行</td>
+										<td width="25%">区域</td>
+										<td width="25%">报警数</td>
+										<td width="20%">占比</td>
+									</tr>
+									</thead>
+									<tbody id="riskTbody">
+									<!--<tr>
+                                        <td>NO.1</td>
+                                        <td>哈尔滨市哈尔滨市哈尔滨市哈尔滨市哈尔滨市哈尔滨市</td>
+                                        <td>25487</td>
+                                        <td>20.21%</td>
+                                    </tr>-->
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<!--二期-->
+					<div class="panel panel-default table-wrap" style="margin-bottom:0;">
+						<div class="panel-heading" id="stretch4">
+							<h3 class="panel-title">排行榜</h3>
+							<div class="actions pull-right listActions">
+								<i class="fa chevron-down" id="stretch4-chevron"></i>
+							</div>
+						</div>
+						<div class="panel-body" id="stretch4-body">
+							<div class="panel-tab">
+								<a data-value="报警排行统计报表" href="#" class="btn btn-primary">驾驶员</a>
+								<a data-value="报警排行统计报表" href="#" class="btn btn-primary">监控对象</a>
+							</div>
+							<div class="table-swiper" id="table-swiper">
+								<!--1、企业-->
+								<table class="base-table">
+									<thead>
+									<tr>
+										<td>排行</td>
+										<td>驾驶员</td>
+										<td>报警数</td>
+										<td>占比</td>
+										<td>环比</td>
+									</tr>
+									</thead>
+									<tbody id="companyTbody">
+									<!--<tr>-->
+										<!--<td>NO.1</td>-->
+										<!--<td>张三</td>-->
+										<!--<td>94.3</td>-->
+										<!--<td>192</td>-->
+										<!--<td><i class="fa fa-window-minimize"></i></td>-->
+									<!--</tr>-->
+									</tbody>
+								</table>
+
+								<!--2、监控对象-->
+								<table class="base-table">
+									<thead>
+									<tr>
+										<td width="20%">排行</td>
+										<td width="25%">监控对象</td>
+										<td width="25%">报警数</td>
+										<td width="20%">占比</td>
+										<td width="10%">环比</td>
+									</tr>
+									</thead>
+									<tbody id="monitorTbody">
+									<!--<tr>
+										<td>NO.1</td>
+										<td>哈尔滨市哈尔滨市哈尔滨市哈尔滨市哈尔滨市哈尔滨市</td>
+										<td>25487</td>
+										<td>20.21%</td>
+										<td><i class="fa fa-arrow-up abnormal1"></i></td>
+									</tr>-->
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--二期 end-->
+			</div>
+			<div th:replace="common/common_chat_window::window(windowId=chatWin)">聊天窗口</div>
+		</section>
+	</section>
+</section>
+</body>
+<!--common start-->
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script  src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<!--common end-->
+
+<!--own-->
+<script src="/resources/js/echarts.min.js" th:src="@{/resources/js/echarts.min.js}"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor,AMap.MarkerClusterer,AMap.StyleObject"></script>
+<script src="/resources/js/progress/html5.js" th:src="@{/resources/js/progress/html5.js}"></script>
+<script src="/resources/js/progress/jquery.easy-pie-chart.js" th:src="@{/resources/js/progress/jquery.easy-pie-chart.js}"></script>
+<script src="/resources/js/mapWeather.js" th:src="@{/resources/js/mapWeather.js}"></script>
+<script src="/resources/js/guideList.js" th:src="@{/resources/js/guideList.js}"></script>
+</html>

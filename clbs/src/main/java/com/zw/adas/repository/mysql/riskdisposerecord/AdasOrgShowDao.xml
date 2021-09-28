@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasOrgShowDao">
+    <select id="getEventRanking" resultType="com.zw.adas.domain.riskManagement.bean.AdasOrgEvent">
+        SELECT
+        sum(vehicle_crash) as vehicleCrash,sum(left_offset) as leftOffset,sum(right_offset) as rightOffset,sum(distance)
+        as distance,sum(pedestrian_collisions) as pedestrianCollisions,sum(change_lanes) as changeLanes,
+        sum(obstacles) as obstacles,sum(accelerate) as accelerate,sum(slow_down) as slowDown,sum(turn) as turn,
+        sum(road_mark_transfinite) as roadMarkTransfinite,sum(phone) as phone,sum(smoke) as smoke,
+        sum(eye_close) as eyeClose,sum(yawning) as yawning,sum(abnormal_posture) as abnormalPosture,sum(distracted_driving)
+        as distractedDriving,
+        sum(inconformity_certificate) as inConformityCertificate,sum(no_driver_detected) as noDriverDetected,
+        sum(keep_out) as keepOut,sum(infrared_blocking) as infraredBlocking,
+        sum(fatigue_driving) as fatigueDriving,sum(driver_behavior_monitor_failure) as driverBehaviorMonitorFailure,
+        sum(driver_exception) as driverException,
+        sum(off_wheel) as offWheel,sum(not_wearing_seat_belt) as notWearingSeatBelt,
+        sum(assist_failure) as assistFailure,sum(idle_speed) as idleSpeed,
+        sum(abnormal_flame_out) as abnormalFlameOut,sum(neutral_taxiing) as neutralTaxiing,
+        sum(engine_overdrive) as engineOverdrive,
+
+        sum(timeout_driving) as timeoutDriving,
+        sum(quick_crossing) as quickCrossing,
+        sum(high_tire_pressure) as highTirePressure,
+        sum(low_tire_pressure) as lowTirePressure,
+        sum(high_tire_temperature) as highTireTemperature,
+        sum(sensor_anomaly) as sensorAnomaly ,
+        sum(imbalance_tire_pressure) as imbalanceTirePressure,
+        sum(slow_leak) as slowLeak,
+        sum(low_battery) as lowBattery,
+        sum(close_behind) as closeBehind,
+        sum(left_rear_approach) as leftRearApproach,
+        sum(right_rear_approach) as rightRearApproach,
+        sum(left_blind_alert) as leftBlindAlert,
+        sum(right_blind_alert) as rightBlindAlert,
+        sum(over_man) as overMan,
+        sum(abormal_load) as abormalLoad,
+        sum(peripheral_state_exception) as peripheralStateException,
+        sum(network_speed) as networkSpeed,
+        SUM(vehicle_offset) as  vehicleOffset,
+        SUM(blind_spot_monitoring) as  blindSpotMonitoring,
+        SUM(over_speed) as  overSpeed,
+        SUM(line_offset) as  lineOffset,
+        SUM(forbid) as  forbid,
+        SUM(equipment_abnormal) as  equipmentAbnormal,
+        SUM(left_offset_warning) as  leftOffsetWarning,
+        SUM(right_offset_warning) as  rightOffsetWarning,
+        SUM(other) as  other,
+        SUM(solid_line_change) as  solidLineChange
+        FROM
+        zw_m_vehicle_adas_event EVENT
+        WHERE
+        time &gt;= #{startTime} and time&lt;=#{endTime}
+        AND EVENT .vid IN (
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id and asu.user_id=#{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+    </select>
+
+
+    <select id="getVehOnlineTrend" resultType="com.zw.adas.domain.leardboard.AdasOrgVehOnline">
+        SELECT
+        result.time +1 as time,
+        sum(result.vidNum) AS total,
+        IF (
+        result. STATUS = 0,
+        '0',
+        result.vidNum
+        ) AS ONLINE
+        FROM
+        (
+        SELECT
+        time,
+        STATUS,
+        count(DISTINCT vid) AS vidNum
+        FROM
+        zw_m_vehicle_adas_online_time ONLINE
+        WHERE
+        time &gt;= #{startTime}
+        AND time &lt; #{endTime}
+        AND ONLINE .vid IN (
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id
+        AND asu.user_id = #{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+        GROUP BY
+        time,
+        STATUS
+        order by `status` desc
+        ) AS result
+        GROUP BY
+        result.time order by result.time
+    </select>
+
+
+    <select id="getRiskTrend" resultType="com.zw.adas.domain.leardboard.AdasOrgRiskEvent">
+
+        SELECT
+        time+1 as time ,sum(total) as total
+        FROM
+        zw_m_vehicle_adas_event_hour
+        WHERE
+        time &gt;= #{startTime}
+        AND time &lt; #{endTime}
+        AND vid IN (
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id
+        AND asu.user_id = #{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_Id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+        GROUP BY
+        time
+        order by time
+    </select>
+
+
+    <select id="getRiskTypeTrend" resultType="com.zw.adas.domain.leardboard.AdasOrgRiskType">
+
+        SELECT
+        time+1 as time,sum(tired) as tired,sum(crash) as crash,sum(exception) as exception,sum(distraction) as
+        distraction
+        ,sum(cluster) as cluster,sum(intense_driving) as intenseDriving,sum(total) as total FROM
+        zw_m_vehicle_adas_risk_hour
+        WHERE
+        time &gt;= #{startTime}
+        AND time &lt; #{endTime}
+        AND vid IN (
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id
+        AND asu.user_id = #{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+        GROUP BY
+        time
+        order by time
+    </select>
+
+    <select id="getRiskProportion" resultType="com.zw.platform.domain.leaderboard.RiskProportion">
+
+        SELECT
+        sum(tired) as tired,sum(crash) as crash,sum(exception) as exception,
+        sum(distraction) as distraction,sum(cluster) as cluster,sum(intense_driving) as intenseDriving,
+        sum(general) as general,sum(heavier) as heavier,sum(serious) as serious,sum(special_serious) as specialSerious,
+        sum(total) as total,time
+        FROM
+        zw_m_vehicle_adas_risk
+        WHERE
+        time &gt;= #{startTime} and time &lt;=#{endTime}
+        AND vid IN (
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id
+        AND asu.user_id = #{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        )
+    </select>
+
+    <select id="getUserVidByGroupId" resultType="string">
+        SELECT DISTINCT
+        asv.vehicle_id
+        FROM
+        zw_m_assignment_user asu,
+        zw_m_assignment_vehicle asv,
+        zw_m_assignment asg
+        WHERE
+        asu.flag = 1
+        AND asv.flag = 1
+        AND asg.flag = 1
+        AND asv.assignment_id = asu.assignment_id
+        AND asu.assignment_id = asg.id
+        AND asu.user_id = #{userId}
+        <if test="groupIds != null and groupIds.size() >0">
+            AND asg.org_id IN
+            <foreach collection="groupIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="getFieldNameMap" resultType="java.util.Map">
+    SELECT
+        event_common_field AS field,
+        event_common_name AS name
+    FROM
+        zw_m_risk_event
+    WHERE
+        event_common_field IS NOT NULL and event_common_name is not null
+    GROUP BY
+        event_common_field
+    </select>
+
+</mapper>

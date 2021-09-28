@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.FuelTankManageDao">
+	
+	<!-- 分页查询油箱列表 -->
+	<select id="findFuelTankByPage" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm" >
+		select ob.* from zw_m_oil_box ob
+		where ob.flag = 1 
+		<if test="simpleQueryParam != null and simpleQueryParam!=''">  
+            AND ob.type LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>  
+		order by ob.create_data_time desc
+	</select>
+	
+	<!-- 获取油杆传感器列表 -->
+	<select id="findRodSensorList" resultType="com.zw.platform.domain.basicinfo.RodSensor" parameterType="string">
+		select t.id, t.sensor_number from zw_m_oil_rod_sensor_info t
+		where t.flag = 1
+		<if test="boxHeight != null and boxHeight != ''">
+			and t.sensor_length &lt; #{boxHeight} + 0
+		</if>
+		order by t.create_data_time desc
+	</select>
+	
+	<!-- 根据传感器id查询传感器详细信息 -->
+	<select id="getSensorDetail" resultType="com.zw.platform.domain.basicinfo.form.RodSensorForm" parameterType="string">
+		select t.id, t.sensor_number, t.sensor_length, t.upper_blind_zone, t.lower_blind_area, t.measuring_range, t.filtering_factor, t.baud_rate, t.odd_even_check, t.compensation_can_make 
+		from zw_m_oil_rod_sensor_info t where t.flag = 1 and t.id = #{sensorId}
+		order by t.create_data_time desc
+	</select>
+	
+	<!-- 新增油箱 -->
+	<insert id="addFuelTank" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		INSERT INTO zw_m_oil_box (
+        	id, type, shape, box_length, width, height, thickness, theory_volume, real_volume, create_data_time, create_data_username,remark,buttom_radius,top_radius
+        )
+        VALUES(
+        	#{id}, #{type}, #{shape}, #{boxLength}, #{width}, #{height}, #{thickness}, #{theoryVolume}, #{realVolume}, #{createDataTime}, #{createDataUsername},#{remark},#{buttomRadius},#{topRadius}
+        )
+	</insert>
+	
+	<!-- 删除油箱：将flag置为0 -->
+	<update id="deleteFuelTankById" parameterType="string">
+		UPDATE zw_m_oil_box set flag = 0 where id = #{id}
+	</update>
+	
+	<!-- 查询油箱详细信息 -->
+	<select id="getFuelTankDetail" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		select ob.* from zw_m_oil_box ob
+		where ob.flag = 1 AND ob.id = #{id}
+	</select>
+	
+	<!-- 油箱管理：修改 -->
+	<update id="updateFuelTank" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		UPDATE zw_m_oil_box
+        <set>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="shape != null and shape !=''">
+                shape = #{shape},
+            </if>
+            <if test="boxLength != null and boxLength !=''">
+                box_length = #{boxLength},
+            </if>
+            <if test="width != null and width != ''">
+            	width = #{width}, 
+            </if>
+            <if test="height != null and height != ''">
+            	height = #{height}, 
+            </if>
+            <if test="thickness != null and thickness != ''">
+            	thickness = #{thickness}, 
+            </if>
+            <if test="theoryVolume != null and theoryVolume != ''">
+            	theory_volume = #{theoryVolume}, 
+            </if>
+            real_volume = #{realVolume}, 
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername}, 
+            </if>
+           	buttom_radius = #{buttomRadius}, 
+           	top_radius = #{topRadius}, 
+            remark=#{remark}
+        </set>
+        WHERE id = #{id}
+	</update>
+	
+	<!-- 新增油量标定表数据 -->
+	<insert id="addOilCalibration" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.OilCalibrationForm">
+		INSERT INTO zw_m_oil_calibration (
+        	id, oil_box_vehicle_id, oil_level_height, oil_value, create_data_time, create_data_username
+        )
+        VALUES(
+        	#{id}, #{oilBoxVehicleId}, #{oilLevelHeight}, #{oilValue}, #{createDataTime}, #{createDataUsername}
+        )
+	</insert>
+	
+	<!-- 删除油量标定表 -->
+	<delete id="deleteOilCalibration" parameterType="string">
+		update zw_m_oil_calibration set flag = 0 where oil_box_vehicle_id = #{vehicleId}
+		<!-- delete from zw_m_oil_calibration where oil_box_id = #{id} -->
+	</delete>
+	
+	<!-- 根据油量车辆绑定表id读取油箱标定表数据 -->
+	<select id="getOilCalibrationList" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.OilCalibrationForm">
+		select oil_box_vehicle_id oilBoxVehicleId, oil_level_height oilLevelHeight, oil_value oilValue 
+		from zw_m_oil_calibration where flag = 1 and oil_box_vehicle_id = #{oilBoxVehicleId} order by oil_level_height + 0
+	</select>
+	
+	<!-- 根据车辆id获取与车辆绑定的油箱的标定数据 -->
+	<select id="getOilCalibrationByVid" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		select vi.id vehicleId, vi.brand, 
+			ob.id oilBoxId, ob.type type, ob.shape shape, ob.box_length boxLength, ob.width width, ob.height height, ob.thickness thickness, obv.calibration_sets calibrationSets, obv.sensor_type sensorId,  
+			obv.oil_box_type tanktyp,
+			oc.id, oc.oil_level_height oilLevelHeight, oc.oil_value oilValue
+		from zw_m_oil_box_vehicle obv
+		inner join zw_m_vehicle_info vi on obv.vehicle_id = vi.id and vi.flag = 1
+		left join zw_m_oil_box ob on obv.oil_box_id = ob.id and ob.flag = 1
+		inner join zw_m_oil_calibration oc on oc.oil_box_vehicle_id = obv.id and oc.flag = 1
+		where obv.flag = 1 and obv.vehicle_id = #{vehicleId} order by oc.oil_level_height + 0
+	</select>
+	
+	<!-- 根据车辆与油箱绑定id获取与车辆绑定的油箱的标定数据 -->
+	<select id="getOilCalibrationByBindId" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		SELECT vi.id vehicleId, vi.brand, 
+			ob.id oilBoxId, ob.type TYPE, ob.shape shape, ob.box_length boxLength, ob.width width, ob.height height, ob.thickness thickness, obv.calibration_sets calibrationSets, obv.sensor_type sensorId,  
+			obv.oil_box_type tanktyp,
+			oc.id, oc.oil_level_height oilLevelHeight, oc.oil_value oilValue
+		FROM zw_m_oil_box_vehicle obv
+		INNER JOIN 
+			(SELECT car.id,car.brand FROM zw_m_vehicle_info car WHERE car.flag = 1
+			 UNION ALL 
+			 SELECT peo.id,peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag = 1
+			 UNION ALL 
+			 SELECT th.id,th.thing_number brand FROM zw_m_thing_info th WHERE th.flag = 1
+			) vi
+		ON obv.vehicle_id = vi.id 
+		LEFT JOIN zw_m_oil_box ob ON obv.oil_box_id = ob.id AND ob.flag = 1
+		INNER JOIN zw_m_oil_calibration oc ON oc.oil_box_vehicle_id = obv.id AND oc.flag = 1
+		WHERE obv.flag = 1 AND obv.id = #{id} ORDER BY oc.oil_level_height + 0
+	</select>
+		
+	<!-- 根据油箱型号查询油箱 -->
+	<select id="getOilBoxByType" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		select * from  zw_m_oil_box ob where ob.flag = 1 and ob.type = BINARY #{type}
+	</select>
+	
+	<!-- 批量新增油箱 -->
+	<insert id="addTankByBatch" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankImportForm">
+		INSERT INTO zw_m_oil_box (
+			id, type, shape, box_length, width, height, thickness, buttom_radius, top_radius, theory_volume, real_volume, 
+        	create_data_time, create_data_username,remark
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id}, #{item.type}, #{item.shape}, #{item.boxLength}, #{item.width}, #{item.height}, #{item.thickness},
+			 #{item.buttomRadius},#{item.topRadius},#{item.theoryVolume}, #{item.realVolume},
+        	 #{item.createDataTime}, #{item.createDataUsername},#{item.remark})
+		</foreach>
+	</insert>
+	
+	<!-- 根据油箱id查询油箱车辆绑定表数据 -->
+	<select id="findOilVehicleSettingByOilBoxId" parameterType="string" resultType="integer">
+		select count(1) from zw_m_oil_box_vehicle t where t.flag = 1 and t.oil_box_id = #{oilBoxId}
+	</select>
+	
+	<!-- 根据车辆id查询与其绑定的油箱信息 -->
+	<select id="getFuelTankDetailByVehicleId" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		select obv.oil_box_type tanktyp, ob.theory_volume theoryVolume, obv.vehicle_id vehicleId, vi.brand brand from zw_m_oil_box_vehicle obv
+		inner join zw_m_oil_box ob on obv.oil_box_id = ob.id and ob.flag = 1
+		inner join zw_m_vehicle_info vi on obv.vehicle_id = vi.id and vi.flag = 1
+		where obv.flag = 1 and obv.vehicle_id = #{vehicleId} order by vi.brand
+	</select>
+	
+	<!-- 校验油箱是否被绑定 -->
+	<select id="checkBoxBound" parameterType="string" resultType="integer">
+		select count(1) from zw_m_oil_box_vehicle obv
+		inner join zw_m_oil_box ob on obv.oil_box_id = ob.id and ob.flag = 1
+		inner join zw_m_vehicle_info vi on obv.vehicle_id = vi.id and vi.flag = 1
+		where obv.flag = 1 and obv.oil_box_id = #{oilBoxId}
+	</select>
+	<select id="isExist" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.FuelTankForm">
+		select * from  zw_m_oil_box ob where ob.flag = 1 and ob.type = #{type} and  id <![CDATA[ <> ]]> #{id}
+	</select>
+	
+	<select id="findFuelTankById" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.FuelTank">
+		select * from zw_m_oil_box 
+		where flag = 1 
+		and id = #{id}
+	</select>
+
+	<select id="findVehicleBindingOilBox" parameterType="string"
+			resultType="com.zw.platform.domain.vas.oilmassmgt.OilVehicleSetting">
+       SELECT obv.id ,ob.type ,v.id  as vehicleId FROM zw_m_oil_box ob
+	   INNER JOIN zw_m_oil_box_vehicle obv
+       ON obv.oil_box_id =ob.id AND obv.flag=1
+	   INNER JOIN zw_m_vehicle_info v on v.id = obv.vehicle_id AND v.flag=1
+       WHERE 1=1 AND ob.id = #{id}
+       AND ob.flag=1
+	</select>
+</mapper>

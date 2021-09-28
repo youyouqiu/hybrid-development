@@ -1,0 +1,97 @@
+<form th:action="@{/c/user/updateRolesByUser.gsp}" id="userRolesForm"
+	role="form" action="#" method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title" th:text="|分配角色 : ${result.username}|"></h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<input name="userId" th:value="${result.id}" type="hidden" /> <input
+				name="uid" th:value="${result.username}" type="hidden" />
+			<input type="text"  th:value="${roles}" hidden>
+			<div class="col-xs-12">
+				<ul class="widget-todo">
+					<li class="clearfix" th:each="role:${roles}">
+						<label class="checkbox-outline" th:if = "${role.readonly}">
+							<input type="checkbox"
+								name="roleNames" th:checked="${role.checked}" disabled
+								th:id="${role.name}" th:value="${role.cn}" />
+							<label readonly style="text-decoration: none;" th:text="${role.name}"></label>
+						</label> 
+					
+						<label class="checkbox-outline" th:if = "${!role.readonly}">
+							<input type="checkbox"
+								name="roleNames" th:checked="${role.checked}"
+								th:id="${role.name}" th:value="${role.cn}" />
+							<label style="text-decoration: none;" th:text="${role.name}" onclick = "checkValue(this)"></label>
+						</label> 
+						
+					</li>
+				</ul>
+				<input id="roleIds" name="roleIds" type="hidden" />
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button id="doSubmitRoles" class="btn btn-primary" type="button">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script th:inline="javascript">
+function checkValue(clickLable){
+    var checkbox = $(clickLable).parent().find('input')[0];
+    if (checkbox.checked == true) {
+        checkbox.checked = false;
+    }else {
+        checkbox.checked = true;
+    }
+}
+
+(function($,window){
+    var Ids;
+    var userRoles = {
+        doSubmit: function(){
+            var roleIds = [];
+            $("input[name='roleNames']:checked").each(function(index,item){
+                var roleName = $(this).attr("value");
+                roleIds.push(roleName);
+             });
+            if(roleIds.join(",") == "s"){
+                $("#commonSmWin").modal("hide");//关闭弹窗
+				return;
+			}else{
+                $("#roleIds").val(roleIds.join(","));
+//            	$("#userRolesForm").submit();
+				addHashCode($("#userRolesForm"));
+                $("#userRolesForm").ajaxSubmit(function (data) {
+                    if(typeof(data) == "object" &&
+                        Object.prototype.toString.call(data).toLowerCase() == "[object object]" && !data.length){//如果后台返回的数据是json数据,则直接过去msg
+                        layer.msg(data.msg,{move:false});
+                    }else{
+                        var dataset = $.parseJSON(data);//转为json对象
+                        layer.msg(dataset.msg,{move:false});
+                    }
+                    $("#commonSmWin").modal("hide");//关闭弹窗
+                    myTable.refresh();//刷新列表
+                });
+			}
+        },
+    }
+  
+    $(function(){
+        myTable.add('commonSmWin', 'userRolesForm', null, null);
+        $("#doSubmitRoles").on("click",userRoles.doSubmit);
+        var startRoleIds = [];//窗体加载时多选框的值
+        $("input[name='roleNames']:checked").each(function(index,item){
+            var roleName = $(this).attr("value");
+            startRoleIds.push(roleName);
+        });
+        Ids = startRoleIds.join(",");
+    })
+})($,window)
+</script>

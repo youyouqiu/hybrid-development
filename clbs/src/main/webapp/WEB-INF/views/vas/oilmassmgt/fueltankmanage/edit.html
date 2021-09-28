@@ -1,0 +1,125 @@
+<form th:action="@{/v/oilmassmgt/fueltankmgt/edit.gsp}" th:object="${result}" id="editForm" action="#" role="form" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改油箱</h4>
+        <style>
+            label.control-label{
+                padding-left: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 油箱型号： </label>
+                   	<input th:field="*{id}" id="oilBoxId"  type="hidden" />
+                    <input th:value="*{type}" id="oldType" type="hidden" />
+                    <div class="col-md-4">
+                        <input autocomplete="off" th:field="*{type}" placeholder="请输入油箱型号" maxlength="25" type="text" class="form-control"/>
+                    </div>     
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 油箱形状： </label>
+                   	<div class="col-md-4">
+                   		<input type="hidden" th:field="*{shape}" id="shapeValue" />
+                        <select id="shape" class="form-control">
+                        	<option value="1">长方体</option>
+                        	<option value="2">圆柱形</option>
+                        	<option value="3">D形</option>
+                        	<option value="4">椭圆形</option>
+                        </select>
+                    </div>               
+                </div>  
+               	<div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 长度(mm)： </label>
+                    <div class="col-md-4">
+                        <input autocomplete="off" th:field="*{boxLength}" placeholder="请输入数字，最多5位" maxlength="5" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control"  />
+                    </div>     
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 宽度(mm)： </label>
+                    <div class="col-md-4">
+                   	 	<input autocomplete="off" th:field="*{width}" placeholder="请输入数字，最多5位" maxlength="5" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control" />
+                    </div>               
+                </div>  
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 高度(mm)： </label>
+                    <div class="col-md-4">
+                        <input autocomplete="off" th:field="*{height}" placeholder="请输入数字，最多5位" maxlength="5" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control" />
+                    </div>     
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 壁厚(mm)： </label>
+                   	<div class="col-md-4">
+                        <input autocomplete="off" th:field="*{thickness}" placeholder="请输入1-10毫米之间的数" maxlength="2" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control" />
+                    </div>               
+                </div>
+                <div class="form-group" id="cuboidForm">
+                    <label class="col-md-2 control-label"><label class="text-danger" >*</label> 下圆角半径(mm)： </label>
+                    <div class="col-md-4">
+                        <input autocomplete="off" name="buttomRadius" th:field="*{buttomRadius}" id="buttomRadius" placeholder="请输入数字，最多5位" maxlength="5" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control" />
+                    </div>     
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 上圆角半径(mm)： </label>
+                   	<div class="col-md-4">
+                        <input autocomplete="off" name="topRadius" th:field="*{topRadius}" id="topRadius" placeholder="请输入数字，最多5位" maxlength="5" onkeyup="value=value.replace(/[^0-9]/g,'')" type="text" class="form-control" />
+                    </div>               
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 理论容积(L)： </label>
+                    <div class="col-md-4">
+                        <input th:field="*{theoryVolume}" value="500" readonly="readonly" placeholder="" type="text" class="form-control" />
+                    </div>     
+                    <label class="col-md-2 control-label"> 油箱容量(L)： </label>
+                   	<div class="col-md-4">
+                        <input autocomplete="off" th:field="*{realVolume}" placeholder="请输入数字，最多6位" maxlength="6" onkeyup="value=value.replace(/[^0-9.]/g,'') " type="text" class="form-control" />
+                    </div>               
+                </div>
+                <div class="form-group">
+					<label class="col-md-2 control-label">备注：</label>
+					<div class="col-md-4">
+						<input autocomplete="off" name="remark"  th:field="*{remark}" placeholder="请输入备注" maxlength="40" type="text" id= "remarks" class="form-control" />
+					</div>
+				</div> 
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+    	<span>
+    		<button class="btn btn-primary" id="boxSubmitBtn" type="button">
+            <strong>提 交</strong>
+	        </button>
+	        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal" style="margin: 0 0 3px 0;">
+	            <strong>关 闭</strong>
+	        </button>
+    	</span>
+    </div>
+    <label id="error_label" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+	var oilBoxLengthLegal = [[#{oilbox.length.legal}]];
+	var oilBoxWidthLegal = [[#{oilbox.width.legal}]];
+	var oilBoxHeightLegal = [[#{oilbox.height.legal}]];
+	var oilBoxWidthError = [[#{oil.boxwidth.error}]];
+	var oilButtomRadiusError = [[#{oil.buttomRadius.error}]];
+	var oilTopRadiusError = [[#{oil.topRadius.error}]];
+	var oilButtomThicknessError = [[#{oil.buttomThickness.error}]];
+	var oilTopThicknessError = [[#{oil.topThickness.error}]];
+	var oilRediusError = [[#{oil.redius.error}]];
+	var oilButtomThicknessNull = [[#{oil.buttomThickness.null}]];
+	var oilTopThicknessNull = [[#{oil.topThickness.null}]];
+	var systemError = [[#{system.error}]];
+	var oilTypeNull = [[#{oil.type.null}]];
+	var oilTypeError = [[#{oil.type.error}]];
+	var oilTypeMaxLength = [[#{oil.type.maxlength}]];
+	var oilTypeExists = [[#{oil.type.exists}]];
+	var oilShapeNull = [[#{oil.shape.null}]];
+	var oilBoxLengthNull = [[#{oil.boxlength.null}]];
+	var numberDoubleError = [[#{number.gtZero.error}]];
+	var oilBoxLengthMaxLength = [[#{oilbox.length.maxlength}]];
+	var oilBoxWidthNull = [[#{oil.boxwidth.null}]];
+	var oilBoxWidthMaxLength = [[#{oilbox.width.maxlength}]];
+	var oilBoxHeightNull = [[#{oil.boxheight.null}]];
+	var oilBoxHeightMaxLength = [[#{oilbox.height.maxlength}]];
+	var oilThickNessNull = [[#{oil.thickness.null}]];
+	var oilBoxThickNessMaxLength = [[#{oilbox.thickness.maxlength}]];
+	var oilBoxTheoryVolumeNull = [[#{oilbox.theoryVolume.null}]];
+	var oilBoxRealVolumeNull = [[#{oilbox.realVolume.null}]];
+	var oilBoxRealVolumeMaxLength = [[#{oilbox.realVolume.maxlength}]];
+</script>
+<script src="/wro/fuelTankManageEdit.js" th:src="@{/wro/fuelTankManageEdit.js}"></script>

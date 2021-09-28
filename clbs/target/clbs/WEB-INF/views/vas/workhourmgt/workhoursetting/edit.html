@@ -1,0 +1,397 @@
+<form th:action="@{/v/workhourmgt/workhoursetting/updateWorkHourSetting}"
+	  id="editForm" role="form" action="#"
+	  method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" id="closeModal" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;
+		</button>
+		<h4 class="modal-title">工时管理设置修改</h4>
+		<style>
+			label.control-label{
+				padding-left: 0;
+				padding-right: 0;
+			}
+		</style>
+	</div>
+	<div class="modal-body" style="padding: 20px 20px 0px 20px;">
+		<div class="row">
+			<div class="col-md-12">
+				<input id="vehicleList" th:value="${vehicleList}" type="hidden"/>
+				<input id="id" th:value="${vehicleWorkHourSetting.id}" type="hidden"/>
+				<input id="twoId" th:value="${vehicleWorkHourSetting.twoId}" type="hidden"/>
+				<input id="type" th:value="${type}" type="hidden"/>
+				<input id="monitorType" th:value="${monitorType}" type="hidden"/>
+				<input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+
+				<!-- curBox用于区分标定详情页面显示哪个油箱的数据 -->
+				<input id="curBox" type="hidden"/>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+							class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer" th:value="${vehicleInfo.brand}" name="vehicleBrand"
+							   placeholder="请输入监控对象" class="form-control" readonly id="vehicleBrand"/>
+						<input th:value="${vehicleInfo.id}" id="vehicleId" name="vehicleId" type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label"> 参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel-heading">
+					<div class="dropdown panel-title fwb">
+						<ul class="nav nav-tabs">
+							<li class="active" id="egine1Title"><a href="#egine1" id="engin1A" data-toggle="tab">1#发动机</a></li>
+							<li id="egine2Title"><a href="#egine2" id="engin2A" data-toggle="tab">2#发动机</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="tab-content">
+						<!-- 油箱1 -->
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								传感器基本参数
+							</label>
+						</div>
+						<div class="tab-pane active" id="egine1">
+							<div class="form-group">
+								<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+								</label>
+								<div class="col-md-4">
+									<input type="hidden" name="sensorId" id="formSensorId1" th:value="${vehicleWorkHourSetting.sensorId}"/>
+									<div class="input-group">
+										<input type="text" placeholder="请选择传感器型号" class="form-control" id="sensorId1">
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-white dropdown-toggle"
+													style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right" id="sensorDropdown1"
+												role="menu" style="width:340px;">
+											</ul>
+										</div>
+									</div>
+								</div>
+								<label class="col-md-2 control-label"> 检测方式：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" id="detectionMode" name="detectionMode" class="form-control"/>
+								</div>
+							</div>
+							<div class="form-group">
+
+								<label class="col-md-2 control-label"> 补偿使能：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="compensate" class="form-control"/>
+								</div>
+								<label class="col-md-2 control-label"> 奇偶校验：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="oddEvenCheck" class="form-control"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"> 波特率：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="baudRate" class="form-control"/>
+								</div>
+								<label class="col-md-2 control-label"> 滤波系数：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="filterFactor" class="form-control"/>
+								</div>
+							</div>
+
+
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">
+									个性参数
+								</label>
+							</div>
+							<div id="yaPerson1">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="lastTimeYa" name="lastTime" class="form-control" th:value="${vehicleWorkHourSetting.lastTime}" placeholder="请输入1-60正整数"/>
+									</div>
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 工作阈值(V)：
+									</label>
+									<div class="col-md-4">
+										<input id="thresholdVoltage" name="thresholdVoltage" class="form-control" th:value="${vehicleWorkHourSetting.thresholdVoltage}" placeholder="请输入1.0-6000数字"/>
+									</div>
+								</div>
+							</div>
+							<!--2.油耗阈值式-->
+							<div id="wfPerson1" style="display:none;">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="lastTimeWf" name="lastTime" class="form-control" th:value="${vehicleWorkHourSetting.lastTime}" value="10" placeholder="请输入1-60正整数"/>
+									</div>
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger">*</label> 阈值(L/h)：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="threshold1" name="threshold" class="form-control" th:value="${vehicleWorkHourSetting.threshold}" value="50" placeholder="输入范围1.00-600"/>
+                                    </div>
+									<!--<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 工作阈值(L/h)：
+									</label>
+									<div class="col-md-4">
+										<input id="thresholdWorkFlow" name="thresholdWorkFlow" class="form-control" th:value="${vehicleWorkHourSetting.thresholdWorkFlow}" value="60" placeholder="请输入1.0-600.0数字"/>
+									</div>-->
+								</div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger">*</label> 平滑系数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="smoothingFactor3" name="smoothingFactor" class="form-control" th:value="${vehicleWorkHourSetting.smoothingFactor}" value="15" placeholder="请输入5-100的整数"/>
+                                    </div>
+                                </div>
+							</div>
+							<div id="liuPerson1" style="display:none;">
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="lastTimeLiu" name="lastTime" class="form-control"  th:value="${vehicleWorkHourSetting.lastTime}" placeholder="请输入1-60正整数"/>
+									</div>
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 波动计算个数：
+									</label>
+									<div class="col-md-4">
+										<input id="baudRateCalculateNumber" name="baudRateCalculateNumber" class="form-control"  th:value="${vehicleWorkHourSetting.baudRateCalculateNumber}" placeholder="请输入4-12数字"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 平滑系数：
+									</label>
+									<div class="col-md-4">
+										<input id="smoothingFactor" name="smoothingFactor" class="form-control" th:value="${vehicleWorkHourSetting.smoothingFactor}" placeholder="请输入5-100正整数"/>
+									</div>
+
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 波动阈值(L/h)：
+									</label>
+									<div class="col-md-4">
+										<input id="baudRateThreshold" name="baudRateThreshold" class="form-control" th:value="${vehicleWorkHourSetting.baudRateThreshold}" placeholder="请输入1.0-600.0数字"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 波动计算时段(s)：
+									</label>
+									<div class="col-md-4">
+										<select id="baudRateCalculateTimeScope" name="baudRateCalculateTimeScope" th:field="*{vehicleWorkHourSetting.baudRateCalculateTimeScope}" class="form-control">
+											<option value="1">10</option>
+											<option value="2">15</option>
+											<option value="3">20</option>
+											<option value="4" selected>30</option>
+											<option value="5">60</option>
+										</select>
+									</div>
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 速度阈值(km/h)：
+									</label>
+									<div class="col-md-4">
+										<input id="speedThreshold" name="speedThreshold" class="form-control" th:value="${vehicleWorkHourSetting.speedThreshold}" value="6" placeholder="请输入1.0-200.0数字"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 油箱2 -->
+						<div class="tab-pane" id="egine2">
+							<div class="form-group">
+								<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+								</label>
+								<div class="col-md-4">
+									<input type="hidden" name="twoSensorId" id="formSensorId2" th:value="${vehicleWorkHourSetting.twoSensorId}"/>
+									<div class="input-group">
+										<input type="text" placeholder="请选择传感器型号" class="form-control" id="sensorId2">
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-white dropdown-toggle"
+													style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right" id="sensorDropdown2"
+												role="menu" style="width:340px;">
+											</ul>
+										</div>
+									</div>
+								</div>
+								<label class="col-md-2 control-label"> 检测方式：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" id="twoDetectionMode" name="twoDetectionMode" class="form-control"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"> 补偿使能：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="twoCompensate" class="form-control"/>
+								</div>
+								<label class="col-md-2 control-label"> 奇偶校验：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="twoOddEvenCheck" class="form-control"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"> 波特率：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="twoBaudRate" class="form-control"/>
+								</div>
+								<label class="col-md-2 control-label"> 滤波系数：
+								</label>
+								<div class="col-md-4">
+									<input readonly="readonly" name="twoFilterFactor" class="form-control"/>
+								</div>
+							</div>
+
+
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">
+									个性参数
+								</label>
+							</div>
+							<div id="yaPerson2">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoLastTimeYa" name="twoLastTime" class="form-control" th:value="${vehicleWorkHourSetting.twoLastTime == null?10:vehicleWorkHourSetting.twoLastTime}" placeholder="请输入1-60正整数"/>
+									</div>
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 工作阈值(V)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoThresholdVoltage" name="twoThresholdVoltage" class="form-control" th:value="${vehicleWorkHourSetting.twoThresholdVoltage== null?24.2:vehicleWorkHourSetting.twoThresholdVoltage}" placeholder="请输入1.0-6000数字"/>
+									</div>
+								</div>
+							</div>
+							<!--油耗阈值式-->
+							<div id="wfPerson2" style="display:none;">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoLastTimeWf" name="twoLastTime" class="form-control" th:value="${vehicleWorkHourSetting.twoLastTime}" value="10" placeholder="请输入1-60正整数"/>
+									</div>
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger">*</label> 阈值(L/h)：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="threshold" name="twoThreshold" class="form-control" th:value="${vehicleWorkHourSetting.twoThreshold}" value="50" placeholder="输入范围1.00-600"/>
+                                    </div>
+								</div>
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label"><label
+                                            class="text-danger">*</label> 平滑系数：
+                                    </label>
+                                    <div class="col-md-4">
+                                        <input id="smoothingFactor2" name="twoSmoothingFactor" class="form-control" th:value="${vehicleWorkHourSetting.twoSmoothingFactor}" value="15" placeholder="请输入5-100的整数"/>
+                                    </div>
+                                </div>
+							</div>
+							<div id="liuPerson2" style="display:none;">
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 持续时长阈值(s)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoLastTimeLiu" name="twoLastTime" class="form-control" th:value="${vehicleWorkHourSetting.twoLastTime}" placeholder="请输入1-60正整数"/>
+									</div>
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 波动计算个数：
+									</label>
+									<div class="col-md-4">
+										<input id="twoBaudRateCalculateNumber" name="twoBaudRateCalculateNumber" class="form-control" th:value="${vehicleWorkHourSetting.twoBaudRateCalculateNumber}" placeholder="请输入4-12数字"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 平滑系数：
+									</label>
+									<div class="col-md-4">
+										<input id="twoSmoothingFactor" name="twoSmoothingFactor" class="form-control" th:value="${vehicleWorkHourSetting.twoSmoothingFactor}" placeholder="请输入5-100正整数"/>
+									</div>
+
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 波动阈值(L/h)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoBaudRateThreshold" name="twoBaudRateThreshold" class="form-control" th:value="${vehicleWorkHourSetting.twoBaudRateThreshold}" placeholder="请输入1.0-600.0的数字"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+											class="text-danger">*</label> 波动计算时段(s)：
+									</label>
+									<div class="col-md-4">
+										<select id="twoBaudRateCalculateTimeScope" name="twoBaudRateCalculateTimeScope" th:field="*{vehicleWorkHourSetting.twoBaudRateCalculateTimeScope}" class="form-control">
+											<option value="1">10</option>
+											<option value="2">15</option>
+											<option value="3">20</option>
+											<option value="4" selected>30</option>
+											<option value="5">60</option>
+										</select>
+									</div>
+									<label class="col-md-2 control-label"><label
+											class="text-danger">*</label> 速度阈值(km/h)：
+									</label>
+									<div class="col-md-4">
+										<input id="twoSpeedThreshold" name="twoSpeedThreshold" class="form-control" th:value="${vehicleWorkHourSetting.twoSpeedThreshold}" value="6" placeholder="请输入1.0-200.0数字"/>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer" style="margin:0px;">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" id="closeWindow" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/workHourVehicleSettingEdit.js"></script>

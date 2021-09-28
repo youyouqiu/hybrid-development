@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.PlatformInspectionDao">
+    <insert id="insert"
+            parameterType="com.zw.platform.domain.platformInspection.PlatformInspectionDO">
+        INSERT INTO zw_m_platform_inspection
+        (
+            id,
+            vehicle_id,
+            inspection_type,
+            inspector,
+            inspection_time,
+            inspection_status,
+            inspection_result_id,
+            flag
+        )
+        values (
+            #{id},
+            #{vehicleId},
+            #{inspectionType},
+            #{inspector},
+            #{inspectionTime},
+            #{inspectionStatus},
+            #{inspectionResultId},
+            #{flag}
+        )
+    </insert>
+    <delete id="delete">
+        DELETE FROM zw_m_platform_inspection
+        WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zw.platform.domain.platformInspection.PlatformInspectionDO">
+        UPDATE zw_m_platform_inspection
+        <set>
+            <if test ='null != vehicleId'>vehicle_id = #{vehicleId},</if>
+            <if test ='null != inspectionType'>inspection_type = #{inspectionType},</if>
+            <if test ='null != inspector'>inspector = #{inspector},</if>
+            <if test ='null != inspectionTime'>inspection_time = #{inspectionTime},</if>
+            <if test ='null != inspectionStatus'>inspection_status = #{inspectionStatus},</if>
+            <if test ='null != inspectionResultId'>inspection_result_id = #{inspectionResultId},</if>
+            <if test ='null != flag'>flag = #{flag},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="getById" resultType="com.zw.platform.domain.platformInspection.PlatformInspectionDO">
+        SELECT
+        *
+        FROM zw_m_platform_inspection
+        WHERE id = #{id}
+    </select>
+
+    <select id="get0706Inspection" resultType="java.lang.String">
+        SELECT
+        id
+        FROM zw_m_platform_inspection
+        WHERE inspection_type = 3 and inspection_time >= #{time} and vehicle_id = #{vehicleId}
+        and inspection_result_id is NULL and flag = 1
+    </select>
+
+
+    <update id="setInspectionResult" >
+        UPDATE zw_m_platform_inspection
+        set inspection_result_id = #{inspectionResultId}, inspection_status = 2
+        WHERE id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+           #{item}
+        </foreach>
+    </update>
+
+    <update id="updateInspectionStatus" >
+        UPDATE zw_m_platform_inspection
+        set inspection_status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getOverTimeInspection" resultType="java.lang.String">
+        SELECT
+        id
+        FROM zw_m_platform_inspection
+        WHERE id in
+        <foreach collection="platformInspectionParams" item="item" open="(" separator=","
+                 close=")">
+            #{item.inspectionId}
+        </foreach>
+        and inspection_status = 1
+    </select>
+
+    <select id="getListByKeyword" resultType="com.zw.adas.domain.platforminspection.PlatformInspectionDTO">
+      select id,vehicle_id,inspection_type,inspector,inspection_time,inspection_status,inspection_result_id
+      from zw_m_platform_inspection where flag =1 and vehicle_id in
+      <foreach collection="query.vehicleIds" item="vehicleId" separator="," open="(" close=")">
+          #{vehicleId}
+      </foreach>
+        and inspection_time between  #{query.startTime} and #{query.endTime}
+        <if test="query.inspectionType != null">
+        and
+            <choose>
+                <when test="query.inspectionType == -1">
+                    inspection_type in (1,2,3)
+                </when>
+                <otherwise>
+                    inspection_type = #{query.inspectionType}
+                </otherwise>
+            </choose>
+        </if>
+      order by inspection_time desc
+    </select>
+
+    <update id="batchUpdateInspectionStatus" >
+        UPDATE zw_m_platform_inspection
+        set inspection_status = #{status}
+        WHERE id in
+        <foreach collection="platformInspectionIds"  item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </update>
+
+</mapper>

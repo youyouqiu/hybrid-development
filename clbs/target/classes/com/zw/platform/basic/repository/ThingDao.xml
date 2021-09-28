@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.ThingDao">
+
+    <select id="getAll"
+            resultType="com.zw.platform.basic.dto.ThingDTO">
+		SELECT id,thing_number as `name`
+		FROM zw_m_thing_info WHERE flag = 1
+	</select>
+
+    <select id="getSortList" resultType="string">
+        SELECT id from zw_m_thing_info where flag = 1 ORDER BY create_data_time
+     </select>
+    <select id="initCacheList" resultType="com.zw.platform.basic.dto.ThingDTO">
+        SELECT thing.id,thing.thing_number as `name`, thing.name as alias,thing.group_id as orgId, '2' as
+        monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,
+        GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,GROUP_CONCAT(DISTINCT asm.`name`) groupName,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date, cofig.service_lifecycle_id,cofig.intercom_info_id, device.org_id
+        deviceOrgId,simcard.org_id simCardOrgId,simcard.auth_code, cofig.vehicle_password,
+        intercom.intercom_device_id intercomDeviceNumber, intercom.user_id,intercom.number,terminal.support_video_flag
+        isVideo,device.manufacturer_id
+        from zw_m_thing_info thing
+        LEFT JOIN zw_m_config cofig on thing.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on thing.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_assignment asm on assign.assignment_id = asm.id and asm.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id
+        where thing.flag = 1
+        and thing.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by thing.id
+    </select>
+
+    <select id="getIconList" resultType="com.zw.platform.basic.domain.BaseKvtDo">
+        SELECT v.id keyName,icon.ico_name firstValue,v.thing_number secondVal
+        from zw_m_thing_info v
+        LEFT JOIN zw_c_ico_config icon on v.thing_icon = icon.id
+        where v.flag = 1
+        and v.thing_icon<![CDATA[<>]]>''
+    </select>
+    <select id="getDetailById" resultType="com.zw.platform.basic.dto.ThingDTO">
+        SELECT thing.id as id,thing.thing_number as `name`, thing.name as alias,thing.group_id as orgId,
+        thing.label,thing.model,thing.model,thing.material,thing.weight,thing.spec,
+        thing.manufacture,thing.dealer,thing.place,thing.thing_photo,thing.product_date,
+        DATE_FORMAT(thing.product_date,'%Y-%m-%d') AS productDateStr,thing.remark,
+
+        '2' as monitorType,case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber, simcard.auth_code,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id)
+        groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date, thing.category,thing.type,thing.create_data_time,
+        thing.update_data_time
+        from zw_m_thing_info thing
+        LEFT JOIN zw_m_config cofig on thing.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on thing.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        where thing.flag = 1
+        and thing.id= #{id}
+        group by thing.id
+    </select>
+
+    <select id="getDetailByNumber" resultType="com.zw.platform.basic.dto.ThingDTO">
+        SELECT thing.id,thing.thing_number as `name`, thing.name as alias,thing.group_id as orgId,
+        thing.label,thing.model,thing.model,thing.material,thing.weight,thing.spec,
+        thing.manufacture,thing.dealer,thing.place,thing.thing_photo,thing.product_date,
+        DATE_FORMAT(thing.product_date,'%Y-%m-%d') AS productDateStr,thing.remark,
+
+        '2' as monitorType,case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id)
+        groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date, thing.category,thing.type,thing.create_data_time,
+        thing.update_data_time
+        from zw_m_thing_info thing
+        LEFT JOIN zw_m_config cofig on thing.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on thing.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        where thing.flag = 1
+        and thing.thing_number = BINARY #{number}
+        group by thing.id
+    </select>
+
+    <select id="getDetailByIds" resultType="com.zw.platform.basic.dto.ThingDTO">
+        SELECT thing.id,thing.thing_number as `name`, thing.name as alias,thing.group_id as orgId,
+        thing.label,thing.model,thing.model,thing.material,thing.weight,thing.spec,
+        thing.manufacture,thing.dealer,thing.place,thing.thing_photo,thing.product_date,
+        DATE_FORMAT(thing.product_date,'%Y-%m-%d') AS productDateStr,thing.remark,
+
+        '2' as monitorType,case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber, simcard.auth_code, device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT
+        assign.assignment_id)
+        groupId,GROUP_CONCAT(DISTINCT assign.assignment_id)
+        groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date, thing.category,thing.type,thing.create_data_time,
+        thing.update_data_time
+        from zw_m_thing_info thing
+        LEFT JOIN zw_m_config cofig on thing.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on thing.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        where thing.flag = 1
+        and thing.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by thing.id
+    </select>
+
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.ThingDO">
+        INSERT INTO zw_m_thing_info (
+		id, name, thing_number,group_id,category,type,label,model,material, weight,spec,manufacture,dealer,place,product_date,thing_photo,remark,create_data_time,
+		create_data_username
+		)
+		VALUES(
+		#{id}, #{name}, #{thingNumber},#{orgId},#{category},#{type},#{label},#{model},#{material}, #{weight},#{spec},#{manufacture},#{dealer},#{place},
+		#{productDate},#{thingPhoto},#{remark},#{createDataTime},
+		#{createDataUsername}
+		)
+    </insert>
+
+    <select id="getById" resultType="com.zw.platform.basic.domain.ThingDO">
+        SELECT
+        *,group_id as orgId
+        FROM zw_m_thing_info
+        WHERE id = #{id}
+    </select>
+
+    <select id="getByBrand" resultType="com.zw.platform.basic.domain.ThingDO">
+         SELECT
+        *,group_id as orgId
+        FROM zw_m_thing_info
+        WHERE flag = 1
+        and thing_number = BINARY #{brand}
+        ORDER BY create_data_time desc limit 1
+    </select>
+    <select id="getExportList" resultType="com.zw.platform.basic.dto.export.ThingExportDTO">
+        SELECT thing.id,thing.thing_number as `name`, thing.name as alias,thing.group_id as orgId, '2' as
+        monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT
+        assign.assignment_id)
+        groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date,thing.plate_color,thing.category,thing.type
+        from zw_m_thing_info thing
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        where thing.flag = 1
+        and thing.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by thing.id
+    </select>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.ThingDO">
+        UPDATE zw_m_thing_info
+        <set>
+            name = #{name},
+            thing_number = #{thingNumber},
+            group_id = #{orgId},
+            category = #{category},
+            type = #{type},
+            label = #{label},
+            model = #{model},
+            material = #{material},
+            weight = #{weight},
+            spec = #{spec},
+            manufacture = #{manufacture},
+            dealer = #{dealer},
+            place = #{place},
+            product_date = #{productDate},
+            thing_photo = #{thingPhoto},
+            remark = #{remark},
+            flag = #{flag},
+            update_data_time = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete" parameterType="string">
+        UPDATE zw_m_thing_info
+        SET flag = 0
+        where id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateIcon">
+        UPDATE zw_m_thing_info
+        set thing_icon =
+        <choose>
+            <when test="iconId != null and iconId !=''">
+                #{iconId}
+            </when>
+            <otherwise>
+                ''
+            </otherwise>
+        </choose>
+        where flag = 1
+        and id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量新增物品 -->
+    <insert id="addThingInfoByBatch" parameterType="com.zw.platform.basic.domain.ThingDO">
+        INSERT INTO zw_m_thing_info (
+        id,
+        name,
+        thing_number,
+        group_id,
+        category,
+        type,
+        label,
+        model,
+        material,
+        weight,
+        spec,
+        manufacture,
+        dealer,
+        place,
+        product_date,
+        thing_photo,
+        remark,
+        create_data_time,
+        create_data_username
+        )
+        VALUES
+        <foreach collection="importList" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.name}, #{item.thingNumber},
+            #{item.orgId},
+            #{item.category},#{item.type},#{item.label},#{item.model},
+            #{item.material}, #{item.weight}
+            , #{item.spec}
+            , #{item.manufacture}
+            , #{item.dealer}
+            , #{item.place}
+            , #{item.productDate}
+            , #{item.thingPhoto}
+            , #{item.remark}
+            , #{item.createDataTime}
+            , #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="getByNumbers" resultType="com.zw.platform.basic.dto.MonitorBaseDTO">
+        SELECT t.id,t.`name` as alias,t.group_id orgId,t.thing_number as `name`,case when c.vehicle_id <![CDATA[<>]]> ''
+        then '1' else '0' end as bindType,case when c.intercom_info_id <![CDATA[<>]]> '' then
+        '1' else '0' end as intercomBindType
+        from zw_m_thing_info t
+        left join zw_m_config c ON t.id = c.vehicle_id and c.flag = 1
+        where t.flag = 1
+        <if test="thingNumList!=null and thingNumList.size() > 0">
+            and t.thing_number in
+            <foreach collection="thingNumList" item="thingNum" open="(" close=")" separator=",">
+                #{thingNum}
+            </foreach>
+        </if>
+    </select>
+    <update id="updateNumber">
+        update zw_m_thing_info
+        set thing_number = #{number}
+        where id = #{id}
+    </update>
+
+    <select id="getThingIdByNumberAndId" resultType="string">
+        select id from zw_m_thing_info where thing_number = BINARY #{number} and flag =1
+        <if test="id != null and id != ''">
+            and id <![CDATA[ <> ]]>
+            #{id}
+        </if>
+    </select>
+
+    <select id="getScanByNumber" resultType="string" parameterType="string">
+        SELECT thing_number FROM zw_m_thing_info
+         WHERE thing_number LIKE CONCAT('扫_',#{number}) AND flag=1
+    </select>
+
+    <select id="getByIds" resultType="com.zw.platform.domain.basicinfo.ThingInfo">
+        select id, name, thing_number, group_id, category, type, label, model, material, weight, spec, manufacture,
+        dealer, place, product_date, thing_photo, remark, thing_icon
+        from zw_m_thing_info
+        where flag = 1
+        and id in
+        <foreach collection="ids" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<style>
+    #modal-body{max-height: 898px;overflow: hidden;overflow-y: auto;}
+    .schedule-list{border:1px solid #eee;padding:0 20px;margin-bottom:20px;}
+    .zw-title{background:#eee;padding:5px;height:38px;margin-top:20px;}
+    .zw-title .btn{padding:4px 8px;margin-bottom:0;}
+    .zw-title .btn-danger{margin-right:10px;}
+    .zw-title .control-label{padding-top:0;height:28px;line-height:28px;}
+    .del-hide .del-btn{display:none;}
+</style>
+<form id="addForm"
+      role="form"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;</button>
+        <h4 class="modal-title">新增任务</h4>
+    </div>
+
+    <div id="modal-body" class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 任务名称： </label>
+                    <div class="col-md-4">
+                        <input name="name" maxlength="20" type="text"
+                               class="form-control" id="taskName" placeholder="请输入任务名称"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注： </label>
+                    <div class="col-md-10">
+                        <input name="remark" maxlength="100" type="text"
+                               class="form-control" id="remarks" />
+                    </div>
+                </div>
+
+                <ul id="schedule-list" class="schedule-list del-hide">
+                    <li class="item">
+                        <div class="zw-title clearfix">
+                            <label class="control-label pull-left"><label
+                                    class="text-danger">*</label> 任务项 </label>
+                            <button type="button"
+                                    class="btn btn-primary pull-right add-btn">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger pull-right del-btn">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 控制类别： </label>
+                            <div class="col-md-10">
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="1" checked>围栏</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="2" disabled>RFID</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="3" disabled>NFC</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="4" disabled>二维码</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 围栏： </label>
+                            <div class="col-md-4 has-feedback">
+                                <!--组织树复选框-->
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       placeholder="请选择任务围栏" class="form-control"
+                                       id="groupSelect0" name="fenceInfoId" readonly/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      id="groupSelectSpan0"></span>
+                                <div id="menuContent0" class="menuContent">
+                                    <ul id="treeTypeDemo0" class="ztree"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 开始时间： </label>
+                            <div class="col-md-4">
+                                <input id="startTime0" readonly="readonly" name="startDate" placeholder="请选择任务开始时间" type="text"
+                                       class="form-control layer-date laydate-icon startTime" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                            </div>
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 结束时间： </label>
+                            <div class="col-md-4">
+                                <input id="endTime0" readonly="readonly" name="endDate" placeholder="请选择任务结束时间" type="text"
+                                       class="form-control layer-date laydate-icon endTime" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 关联报警： </label>
+                            <div class="col-md-10">
+                                <label class="checkbox-inline"><input class="relationAlarm" name="relationAlarm0" value="1" type="checkbox" checked/> 任务未到岗</label>
+                                <label class="checkbox-inline"><input class="relationAlarm" name="relationAlarm0" value="2" type="checkbox" checked/> 任务离岗</label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var simCompareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+    var nameNull = [[#{taskManage.name.null}]];
+    var peopleIdsNull = [[#{taskManage.peopleIds.null}]];
+    var startDateStrNull = [[#{taskManage.startDateStr.null}]];
+    var endDateStrNull = [[#{taskManage.endDateStr.null}]];
+    var fenceInfoIdNull = [[#{taskManage.fenceInfoId.null}]];
+    var startDateNull = [[#{taskManage.startDate.null}]];
+    var endDateNull = [[#{taskManage.endDate.null}]];
+    var residenceTimeNull = [[#{taskManage.residenceTime.null}]];
+    var nameExists = [[#{taskManage.name.exists}]];
+    var nameError = [[#{taskManage.name.error}]];
+    var endDateError = [[#{taskManage.endDate.error}]];
+    var timeExists = [[#{taskManage.time.exists}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/taskAdd.js"></script>

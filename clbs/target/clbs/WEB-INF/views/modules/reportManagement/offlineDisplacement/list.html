@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>离线位移日报表</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #monitorTable table{
+            width: 100%;
+        }
+        #monitorTable tr {
+            height: 50px;
+            border: 1px solid #dedede;
+        }
+        #monitorTable th {
+            text-align: center;
+            font-weight: normal;
+        }
+        #monitorTable th:nth-child(1) {
+            width: 60px;
+            border-right: 1px solid #dedede;
+        }
+        #monitorTable th:nth-child(2) {
+            width: 60px;
+            border-right: 1px solid #dedede;
+        }
+
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">位置报表</li>
+                        <li class="active">离线位移日报表</li>
+                    </ul>
+                    <h1 class="h1 ">离线位移日报表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="queryParamsForm" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                            <input class="form-control hidden"/>
+                                            <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                    <option value="vehicle">监控对象</option>
+                                                    <option value="group">企业</option>
+                                                    <option value="assignment">分组</option>
+                                                </select>
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       placeholder="请选择" class="form-control moreQueryGroup" type="text"
+                                                       id="groupSelect" name="groupSelect" autocomplete="off" maxlength="20" />
+                                                <span class="fa fa-chevron-down form-control-feedback"
+                                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                      id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="treeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-2 col-sm-3 control-label">位移公里(km)≥：</label>
+                                            <div class="col-md-2 col-sm-8">
+                                                <input autocomplete="off" id="offsetDistance" class="form-control" name="offsetDistance" value="50" type="text">
+                                            </div>
+                                            <label class="col-md-2 col-sm-3 control-label">离线时长(小时)≥：</label>
+                                            <div class="col-md-2 col-sm-8">
+                                                <input autocomplete="off" id="offlineTime" class="form-control" name="offlineTime" value="1"  type="text">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect" style="margin-top: 30px;">时间：</label>
+                                            <div class="col-md-3 col-sm-8 searchListSelect" style="margin-top: 30px;">
+                                                <input autocomplete="off" style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="timeInterval" name="timeInterval" readonly/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 control-label" id="dateSearchData">
+                                                <button id="yesterdayClick" type="button"class="btn btn-primary" name="-1" onclick="offlineDisplacement.inquireClick(-1)">前一天  </button>
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="offlineDisplacement.inquireClick(1)"><i
+                                                        class="glyphicon glyphicon-search"></i> 查询
+                                                </button>
+                                                <button id="exportData" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">数据列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel" style="">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              style="width:300px" placeholder="请输入监控对象"></label>
+                                                <button type="button" id="search_button"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                        <div class="dropdown pull-left barsMargin">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width: 100%;cursor: pointer;">
+                                                <li>
+                                                    <a id="handleBatch">
+                                                        <i class="fa fa-check icoPaddingLeft" aria-hidden="true"></i>批量处理
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <input autocomplete="off" id="transValue" type="hidden" />
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle btn-border-radius"
+                                                    data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTable"
+                                       class="table table-striped table-bordered table-hover noCheckTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th><input type="checkbox" id="checkAll"></th>
+                                        <th>监控对象</th>
+                                        <th>离线时间</th>
+                                        <th>启动时间</th>
+                                        <th>级别</th>
+                                        <th>数据状态</th>
+                                        <th>速度</th>
+                                        <th>位移公里</th>
+                                        <th>离线位置</th>
+                                        <th>启动位置</th>
+                                        <th>监控处理</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="odd">
+                                            <td valign="top" colspan="13" class="dataTables_empty">我本将心向明月，奈何明月照沟渠，不行您再用其他方式查一下？</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row" id="fakeInfo" style="margin: 0">
+                                    <div class="col-md-2 col-sm-12 col-xs-12 noPadding">
+                                        <div class="dataTables_length" id="dataTable_length">
+                                            <label>每页 <select name="dataTable_length" aria-controls="dataTable" class="">
+                                                <option value="5">5</option>
+                                                <option value="10" selected="selected">10</option>
+                                                <option value="20">20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="200">200</option>
+                                            </select> 条记录
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xs-12 noPadding" style="position: relative;left: -64px;">
+                                        <div class="dataTables_info" id="dataTable_info" role="alert" aria-live="polite" aria-relevant="all">当前显示0到0条，共0条记录</div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+
+<div class="modal fade" id="monitorHandleModal" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                <h4 class="modal-title" >监控处理</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="padding: 15px;height: 343px;overflow: auto;padding-bottom: 0;">
+                    <div id="monitorTable">
+                        <table style="font-size: 16px;font-weight: normal;">
+                            <tbody>
+                            <tr style="height: 50px;">
+                                <th><input type="checkbox" value="1" /></th>
+                                <th>①</th>
+                                <th style="text-align: left;padding: 7px;">车机已告知驾驶员</th>
+                            </tr>
+                            <tr>
+                                <th><input type="checkbox" value="2" /></th>
+                                <th>②</th>
+                                <th style="text-align: left;padding: 7px;">已通知企业安全负责人</th>
+                            </tr>
+                            <tr>
+                                <th><input type="checkbox" value="3" /></th>
+                                <th>③</th>
+                                <th style="text-align: left;padding: 7px;">已告知该车已触发道路交通安全法实施条例</th>
+                            </tr>
+                            <tr>
+                                <th><input type="checkbox" value="4" /></th>
+                                <th>④</th>
+                                <th style="text-align: left;padding: 7px;">无效报警已排除</th>
+                            </tr>
+                            </tbody>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="row" style="margin-top: 21px;">
+                        <p class="col-md-2">备注：</p>
+                        <p class="col-md-10">
+                            <textarea name="comment" id="comment" cols="30" rows="4" value="">已加入月统计名单</textarea>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="submitBtn" class="btn btn-primary">提交</button>
+                <button type="button" data-dismiss="modal" class="btn">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="/clbs/resources/js/offlineDisplacement.js"></script>
+<script src="/clbs/resources/js/zTree/js/ztreeSearch.js"></script>
+</html>

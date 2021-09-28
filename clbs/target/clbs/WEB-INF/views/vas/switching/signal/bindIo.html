@@ -1,0 +1,358 @@
+<style>
+    .signal-high {
+        width: 20px;
+        height: 20px;
+        border-radius: 25px;
+        background: #fff;
+        float: right;
+        border: 6px solid #dbdbdb;
+    }
+
+    .signal-low {
+        width: 20px;
+        height: 20px;
+        border-radius: 25px;
+        background: #fff;
+        float: right;
+        border: 6px solid #90dd5e;
+    }
+
+    .signal-text {
+        position: relative;
+        float: right;
+        left: 11px;
+        padding-bottom: 10px;
+    }
+
+    .signal-text div {
+        position: relative;
+        left: 19px;
+        top: 7px;
+        width: 1px;
+        height: 7px;
+        background: #000;
+    }
+
+    .form-group .fa {
+        font-size: 14px;
+        color: #fff;
+        padding: 11px 13px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .remove-io {
+        background: red;
+    }
+
+    .plus-io {
+        background: #6dcff6;
+    }
+
+    .tab-pane {
+        max-height: 500px;
+        overflow: auto;
+    }
+
+    .overShow {
+        overflow: visible;
+    }
+    label.control-label{
+        padding-right: 16px;
+    }
+</style>
+<form id="bindForm" th:action="@{/m/io/config/binds}" action="#" role="form" method="post" class="form-horizontal">
+    <input type="hidden" name="ioVehicleConfigStr" id="ioVehicleConfigStr">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">I/O参数设置</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">监控对象：</label>
+                    <div class="col-md-4">
+                        <input type="hidden" id="referVehicleList" th:value="${referVehicleList}">
+                        <input name="" type="text" class="form-control" th:field="*{vehicle.brand}" readonly>
+                        <input type="hidden" th:value="${vehicle.id}" id="vehicleId" name="vehicleId">
+                        <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken">
+                    </div>
+                    <label class="col-md-2 control-label">参考对象：</label>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input name="referBrands" type="text" class="form-control" id="referBrands">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-white dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-heading">
+                    <div class="dropdown panel-title fwb">
+                        <ul class="nav nav-tabs">
+                            <li class="active" id="TabFenceBox"><a href="#home1" data-toggle="tab">终端I/O</a></li>
+                            <li id="TabCarBox"><a href="#profile1" data-toggle="tab">I/O采集1</a></li>
+                            <li id="TabCarBox1"><a href="#profile2" data-toggle="tab">I/O采集2</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding-top: 0px;">
+                    <div class="tab-content">
+                        <div class="tab-pane overShow active" id="home1">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="signal-text">高电平
+                                        <div></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="signal-text" style="position: relative;left: 19px;">低电平
+                                        <div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <li>
+                                        <input class="io-site" name='ioSite' value="0" type="hidden">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">I/O 0：<input name="signalZero"
+                                                                                               type="hidden"></label>
+                                            <div class="col-md-3">
+                                                <div class="input-group">
+                                                    <input type="hidden" name="functionId">
+                                                    <input type="text" placeholder="请选择检测功能类型！"
+                                                           class="form-control sensorType">
+                                                    <div class="input-group-btn">
+                                                        <button type="button" class="btn btn-white dropdown-toggle"
+                                                                data-toggle="dropdown">
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu"
+                                                            style="width:100%!important">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="highSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="lowSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <input class="io-site" name='ioSite' value="1" type="hidden">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">
+                                                I/O 1：
+                                                <input name="signalOne" type="hidden">
+                                            </label>
+                                            <div class="col-md-3">
+                                                <div class="input-group">
+                                                    <input type="hidden" name="functionId">
+                                                    <input type="text" placeholder="请选择检测功能类型！"
+                                                           class="form-control sensorType">
+                                                    <div class="input-group-btn">
+                                                        <button type="button" class="btn btn-white dropdown-toggle"
+                                                                data-toggle="dropdown">
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="highSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="lowSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <input class="io-site" name='ioSite' value="2" type="hidden">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">
+                                                I/O 2：
+                                                <input name="signalTwo" type="hidden">
+                                            </label>
+                                            <div class="col-md-3">
+                                                <div class="input-group">
+                                                    <input type="hidden" name="functionId">
+                                                    <input type="text" placeholder="请选择检测功能类型！"
+                                                           class="form-control sensorType">
+                                                    <div class="input-group-btn">
+                                                        <button type="button" class="btn btn-white dropdown-toggle"
+                                                                data-toggle="dropdown">
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="highSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="lowSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <input class="io-site" name='ioSite' value="3" type="hidden">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">
+                                                I/O 3：
+                                                <input name="signalThree" type="hidden">
+                                            </label>
+                                            <div class="col-md-3">
+                                                <div class="input-group">
+                                                    <input type="hidden" name="functionId">
+                                                    <input name="" type="text" placeholder="请选择检测功能类型！"
+                                                           class="form-control sensorType">
+                                                    <div class="input-group-btn">
+                                                        <button type="button" class="btn btn-white dropdown-toggle"
+                                                                data-toggle="dropdown">
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="highSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 control-label">
+                                                <div class="signal-high"></div>
+                                            </label>
+                                            <div class="col-md-2" style="padding-left: 0px;padding-right: 0px;">
+                                                <select class="form-control" name="lowSignalType"
+                                                        onchange="ioBindParSetting.IOTypeChangeFn(this)">
+                                                    <option value="">--状态--</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="profile1">
+                            <div class="col-md-12 overShow">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="signal-text">高电平
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="signal-text" style="position: relative;left: 25.5px;">低电平
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="widget-todo">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="profile2">
+                            <div class="col-md-12 overShow">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="signal-text">高电平
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="signal-text" style="position: relative;left: 25.5px;">低电平
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="widget-todo">
+                                </ul>
+                            </div>
+                        </div>
+                        <input id="checkedParams" name="checkedParams" type="hidden"/>
+                        <input id="deviceType" name="deviceType" type="hidden"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="ioParSettingRefresh">
+            <strong>刷 新</strong>
+        </button>
+        <button class="btn btn-primary" type="button" id="doSubmits" style="margin: 0 0 3px 0;">
+            <strong>提 交</strong>
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script th:inline="javascript">
+  var systemError = [[#{system.error}]];
+</script>
+<script src="/resources/js/switchingSignalBindIo.js" th:src="@{/wro/switchingSignalBindIo.js}"></script>

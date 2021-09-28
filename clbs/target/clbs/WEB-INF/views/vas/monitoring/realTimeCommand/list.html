@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>实时指令</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        .form-control[readonly] {
+            cursor: auto;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <!--main content start-->
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">监控管理</li>
+                        <li class="active">实时指令</li>
+                    </ul>
+                    <h1 class="h1 ">实时指令</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-2 fuelConsumption" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">组织架构</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-9">
+                                        <input id="search_condition" name="search" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" placeholder="请输入监控对象"/>
+                                    </div>
+                                    <div class="col-md-3 btnPadding">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group" title="定制显示列">
+                                                <button id="customizeColumns" style="padding-top:8px" type="button"
+                                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text-v">
+                                                    <div class="checkbox">
+                                                        <label id="showJtbVehicle">
+                                                            <input id="jiaoTong_jtb" type="checkbox" value="" disabled>
+                                                            交通部JTB808
+                                                        </label>
+                                                    </div>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px;height:659px !important;">
+                                    <ul id="treeDemo" class="ztreee"
+                                        style="overflow:auto;height:644px !important;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10" style="padding-right: 0px;padding-left: 10px;">
+                        <input id="referVehicleList" type="hidden"/>
+                        <!-- 指令参数 -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">指令参数设置<span class="caret"></span></h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-up" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch-body"
+                                 style="padding:0px;display:none;">
+                                <!-- 指令类型 -->
+                                <div class="col-md-3 panel-body fixed-table-body" style="padding:15px;">
+                                    <ul id="commandTreeDemo" class="ztreee"
+                                        style="height:335px !important;overflow:auto;"></ul>
+                                </div>
+                                <div class="col-md-9 panel-right-border">
+                                    <form id="saveCommandForm" th:action="@{/v/monitoring/command/saveCommand}"
+                                          role="form" action="" method="post" class="form-horizontal">
+                                        <!-- 通讯参数 -->
+                                        <div class="modal-body" id="reportParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportObject" class="form-control" readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="reportPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="无线通信拨号访问点。如网络制式为CDMA则该处为PPP拨号号码">
+                                                    </i>
+                                                    主服务器APN：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="reportMainApn" name="mainServerAPN"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="IP或域名">
+                                                    </i>
+                                                    主服务器地址：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="reportMainAddress" name="mainServerAddress"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="无线通信拨号访问点">
+                                                    </i>
+                                                    备份服务器APN：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="reportBackupApn" name="backupsServerAPN"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="IP或域名">
+                                                    </i>
+                                                    备份服务器地址：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="reportBackupAddress"
+                                                           name="backupsServerAddress" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">服务器TCP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportServerTcp" name="serverTCPPort"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">服务器UDP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportServerUdp" name="serverUDPPort"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">主服务器无线通信拨号用户名：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportServerAccound"
+                                                           name="mainServerCallUserName" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">主服务器无线通信拨号密码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportServerPwd" name="mainServerCallUserPwd"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">备份服务器无线通信拨号用户名：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportBackupAccound"
+                                                           name="backupsServerCallUserName" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">备份服务器无线通信拨号密码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="reportBackupPwd"
+                                                           name="backupsServerCallUserPwd" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 终端参数 -->
+                                        <div class="modal-body" id="terminalParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label"> 参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="terminalPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">终端心跳发送间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalSendTime" name="heartSpace" value="5"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">TCP消息应答超时时间(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalAnswerTime" name="tcpAckTimeOut"
+                                                           value="10" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">TCP消息重传次数：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalAnswerTcp" name="tcpReUpTimes"
+                                                           value="10" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">UDP消息应答超时时间(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalAnswerUdp" name="udpAckTimeOut"
+                                                           value="10" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">UDP消息重传次数：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalUdpNum" name="udpReUpTimes"
+                                                           value="50" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">SMS消息应答超时时间(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalAnswerSms" name="smsAckTimeOut"
+                                                           value="20" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">SMS消息重传次数：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="terminalSmsNum" name="smsReUpTimes"
+                                                           value="10" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 终端控制 -->
+                                        <div class="modal-body" id="terminalControl">
+                                            <div class="form-group">
+                                                <div class="col-md-5 text-right">
+                                                    <button class="btn btn-primary btn-tc-wid" disabled="disabled">
+                                                        终端关机
+                                                    </button>
+                                                </div>
+                                                <label class="col-md-5 control-label tc-cl-align">点击后下发终端关机</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-5 text-right">
+                                                    <button class="btn btn-primary btn-tc-wid" disabled="disabled">
+                                                        终端复位
+                                                    </button>
+                                                </div>
+                                                <label class="col-md-5 control-label tc-cl-align">点击后下发终端复位</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-5 text-right">
+                                                    <button class="btn btn-primary btn-tc-wid" disabled="disabled">
+                                                        恢复出厂设置
+                                                    </button>
+                                                </div>
+                                                <label class="col-md-5 control-label tc-cl-align">点击后下发终端恢复出厂设置</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-5 text-right">
+                                                    <button class="btn btn-primary btn-tc-wid" disabled="disabled">
+                                                        关闭数据通信
+                                                    </button>
+                                                </div>
+                                                <label class="col-md-5 control-label tc-cl-align">点击后下发终端关闭数据通信</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-5 text-right">
+                                                    <button class="btn btn-primary btn-tc-wid" disabled="disabled">
+                                                        关闭所有无线通信
+                                                    </button>
+                                                </div>
+                                                <label class="col-md-5 control-label tc-cl-align">点击后下发终端关闭所有无线通信</label>
+                                            </div>
+                                        </div>
+                                        <!-- 无线升级 -->
+                                        <div class="modal-body" id="unlimitedUpgrade">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label"> 参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="UpgradePlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+                                                    </i>
+                                                    拨号点名称：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="UpgradeDial" name="wDailName"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">拨号用户名：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeDialName" name="wDailUserName"
+                                                           placeholder="服务器无线通信拨号用户名" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">拨号密码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeDialPwd" name="wDailPwd"
+                                                           placeholder="服务器无线通信拨号密码" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">地址：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeAddress" name="wAddress"
+                                                           placeholder="服务器地址 IP或域名" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">TCP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeTcpTort" name="wTcpPort"
+                                                           placeholder="服务器 TCP 端口" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">UDP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeUdpTort" name="wUdpPort"
+                                                           placeholder="服务器 UDP 端口" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">制造商ID：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeManufacturer" name="manufactorId"
+                                                           placeholder="终端制造商编码" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="终端的硬件版本号，由制造商自定">
+                                                    </i>
+                                                    硬件版本：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="UpgradeHardware" name="hardwareVersion"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="终端的固件版本号，由制造商自定">
+                                                    </i>
+                                                    固件版本：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="UpgradeFirmware" name="firmwareVersion"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">URL地址：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="UpgradeUrlAddress" name="url"
+                                                           placeholder="完整 URL地址" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+                                                    </i>
+                                                    连接到指定服务器时限：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="UpgradeTimeLimit" name="wTimeLimit"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 控制终端连接指定服务器 -->
+                                        <div class="modal-body udddd" id="connectSpecifyServer">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="specifyServerPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i class="fa fa-question-circle fa-lg"
+                                                       data-toggle="tooltip"
+                                                       data-placement="top"
+                                                       title="0：切换到指定监管平台服务器，连接到该服务器后即进入应急状态，此状态下仅有下发控制指令的监管平台可发送包括短信在内的控制指令；1：切换回原缺省监控平台服务器，并恢复正常状态">
+                                                    </i>
+                                                    连接控制：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <select id="specifyServerConnect"
+                                                            onchange="realTimeCommand.connectionControlSH();"
+                                                            name="cAccessControl" class="form-control">
+                                                        <option value="0">切换到指定监控平台服务器</option>
+                                                        <option value="1">切换回原缺省监控平台服务器</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="一般为服务器 APN，无线通信拨号访问点，若网络制式为 CDMA，则该值为 PPP 连接拨号号码">
+                                                    </i>
+                                                    拨号点名称：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="specifyServerDial" name="cDailName"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">拨号用户名：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerDialName" name="cDailUserName"
+                                                           placeholder="服务器无线通信拨号用户名" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">拨号密码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerDialPwd" name="cDailPwd"
+                                                           placeholder="服务器无线通信拨号密码" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">地址：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerAddress" name="cAddress"
+                                                           placeholder="服务器地址,IP或域名" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">TCP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerTcpPort" name="cTcpPort"
+                                                           placeholder="服务器 TCP 端口" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">UDP端口：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="specifyServerUdpPort" name="cUdpPort"
+                                                           placeholder="服务器 UDP 端口" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="单位：分（min），值非 0 表示在终端接收到升级或连接指定服务器指令后的有效期截止前，终端应连回原地址。若值为 0，则表示一直连接指定服务器">
+                                                    </i>
+                                                    连接到指定服务器时限：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="specifyServerTimeLimit" name="cTimeLimit"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 位置汇报参数 -->
+                                        <div class="modal-body" id="locationReporting">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label"> 参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="locationPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">位置汇报策略：</label>
+                                                <div class="col-md-3">
+                                                    <select id="locationTactics"
+                                                            onchange="realTimeCommand.connectionControlSH();"
+                                                            name="positionUpTactics" class="form-control">
+                                                        <option value="0">定时汇报</option>
+                                                        <option value="1">定距汇报</option>
+                                                        <option value="2">定时和定距汇报</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">位置汇报方案：</label>
+                                                <div class="col-md-3">
+                                                    <select id="locationProgram" name="positionUpScheme"
+                                                            class="form-control">
+                                                        <option value="0">根据ACC状态</option>
+                                                        <option value="1">根据登录状态和ACC状态</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">缺省距离汇报间隔(m)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationDefaultDistance" value="500"
+                                                           name="defaultDistanceUpSpace" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">缺省时间汇报间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationDefaultTime" value="100"
+                                                           name="defaultTimeUpSpace" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">休眠时汇报距离间隔(m)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationSleepDistance" value="30"
+                                                           name="dormancyUpDistanceSpace" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">休眠时汇报时间间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationSleep" value="15"
+                                                           name="dormancyUpTimeSpace" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">紧急报警时汇报距离间隔(m)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationAlarmDistance" value="20000"
+                                                           name="emergencyAlarmUpDistanceSpace" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">紧急报警时汇报时间间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationAlarmTime"
+                                                           name="emergencyAlarmUpTimeSpace" value="200"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(m)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationNoLoginDistance" value="120"
+                                                           name="driverLoggingOutUpDistanceSpace" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="locationNoLogin" value="30"
+                                                           name="driverLoggingOutUpTimeSpace" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 终端查询 -->
+                                        <div class="modal-body" id="terminalSearch">
+                                            终端查询
+                                        </div>
+                                        <!-- 电话参数 -->
+                                        <div class="modal-body" id="telephoneParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label"> 参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="telephonePlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控平台电话号码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneNumber" name="platformPhoneNumber"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="可采用此电话号码拨打终端电话让终端复位">
+                                                    </i>
+                                                    复位电话号码：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="telephoneResetNumber" name="resetPhoneNumber"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="可采用此电话号码拨打终端电话让终端恢复出厂设置">
+                                                    </i>
+                                                    恢复出厂设置电话号码：
+                                                </label>
+                                                <div class="col-md-3 inp-inline-flex">
+                                                    <input type="text" id="telephoneSetNumber"
+                                                           name="reInitialPhoneNumber" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">监控平台SMS电话号码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneSnsNumber"
+                                                           name="platformSMSPhoneNumber" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">接收终端SMS文本报警号码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneSnsAlarm"
+                                                           name="receiveDeviceSMSTxtAlarmPhoneNumber"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">终端电话接听策略：</label>
+                                                <div class="col-md-3">
+                                                    <select id="telephoneStrategy" name="deviceAnswerPhoneType"
+                                                            class="form-control">
+                                                        <option value="0">自动接听</option>
+                                                        <option value="1">根据ACC状态</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">每次最长通话时间(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneMaxTime" name="timesMaxCallTime"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">当月最长通话时间(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneMonthTime" name="monthlyMaxCallTime"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监听电话号码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="telephoneMonitor" name="listenPhoneNumber"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">监管平台特权短信号码：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="monitorPrivilege"
+                                                           name="platformPrivilegeSMSNumber" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 视频拍照参数 -->
+                                        <div class="modal-body" id="videoCameraParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="videoCameraPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道1定时拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchOne" name="cameraTimerOpenFlag1"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道1定时拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageOne" name="cameraTimerSaveFlag1"
+                                                            class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道2定时拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchTwo" name="cameraTimerOpenFlag2"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道2定时拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageTwo" name="cameraTimerSaveFlag2"
+                                                            class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道3定时拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchThree" name="cameraTimerOpenFlag3"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道3定时拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageThree" name="cameraTimerSaveFlag3"
+                                                            class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道4定时拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchFour" name="cameraTimerOpenFlag4"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道4定时拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageFour" name="cameraTimerSaveFlag4"
+                                                            class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道5定时拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchFive" name="cameraTimerOpenFlag5"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道5定时拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageFive" name="cameraTimerSaveFlag5"
+                                                            class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">定时时间单位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraTimeUnit" name="timingUnit"
+                                                            class="form-control">
+                                                        <option value="0">秒</option>
+                                                        <option value="1">分</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="收到参数设置或重新启动后执行">
+                                                    </i>
+                                                    定时时间间隔:
+                                                </label>
+                                                <div class="col-md-3 ">
+                                                    <input type="text" id="videoCameraTimeInterval" name="timingSpace"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道1定距拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchMarkOne" name="cameraDistanceOpenFlag1"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道1定距拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageMarkOne"
+                                                            name="cameraDistanceSaveFlag1" class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道2定距拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchMarkTwo" name="cameraDistanceOpenFlag2"
+                                                            class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道2定距拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageMarkTwo"
+                                                            name="cameraDistanceSaveFlag2" class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道3定距拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchMarkThree"
+                                                            name="cameraDistanceOpenFlag3" class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道3定距拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageMarkThree"
+                                                            name="cameraDistanceSaveFlag3" class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道4定距拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchMarkFour"
+                                                            name="cameraDistanceOpenFlag4" class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道4定距拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageMarkFour"
+                                                            name="cameraDistanceSaveFlag4" class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">摄像通道5定距拍照开关标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraSwitchMarkFive"
+                                                            name="cameraDistanceOpenFlag5" class="form-control">
+                                                        <option value="0">不允许</option>
+                                                        <option value="1">允许</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">摄像通道5定距拍照存储标志：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraStorageMarkFive"
+                                                            name="cameraDistanceSaveFlag5" class="form-control">
+                                                        <option value="0">储存</option>
+                                                        <option value="1">上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">定距距离单位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="videoCameraDistanceUnit" name="distanceUnit"
+                                                            class="form-control">
+                                                        <option value="0">米</option>
+                                                        <option value="1">公里</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">
+                                                    <i
+                                                            class="fa fa-question-circle fa-lg"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="收到参数设置或重新启动后执行">
+                                                    </i>
+                                                    定距距离间隔：
+                                                </label>
+                                                <div class="col-md-3 "><!-- inp-inline-flex -->
+                                                    <input type="text" id="videoCameraDistanceInterval"
+                                                           name="distanceSpace" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">图像/视频质量：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraQuality" value="5"
+                                                           name="pictureQuality" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">亮度：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraBrightness" value="125"
+                                                           name="luminance" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">对比度：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraContrast" value="60"
+                                                           name="contrast" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">饱和度：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraSaturation" value="60"
+                                                           name="saturation" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">色度：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="videoCameraChroma" value="125" name="chroma"
+                                                           class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- GNSS参数 -->
+                                        <div class="modal-body" id="gnssParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="gnssObject" class="form-control" readonly/>
+                                                </div>
+                                                <label class="col-md-3 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="gnssPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">GPS定位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="GPSFlag" name="GPSFlag" class="form-control">
+                                                        <option value="0">禁用GPS定位</option>
+                                                        <option value="1">启用GPS定位</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">北斗定位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="beidouFlag" name="beidouFlag" class="form-control">
+                                                        <option value="0">禁用北斗定位</option>
+                                                        <option value="1">启用北斗定位</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">GLONASS定位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="GLONASSFlag" name="GLONASSFlag" class="form-control">
+                                                        <option value="0">禁用GLONASS定位</option>
+                                                        <option value="1">启用GLONASS定位</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">Galileo定位：</label>
+                                                <div class="col-md-3">
+                                                    <select id="GalileoFlag" name="GalileoFlag" class="form-control">
+                                                        <option value="0">禁用Galileo定位</option>
+                                                        <option value="1">启用Galileo定位</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">GNSS波特率：</label>
+                                                <div class="col-md-3">
+                                                    <select id="GNSSBaudRate" name="GNSSBaudRate" class="form-control">
+                                                        <option value="0">4800</option>
+                                                        <option value="1">9600</option>
+                                                        <option value="2">19200</option>
+                                                        <option value="3">38400</option>
+                                                        <option value="4">57600</option>
+                                                        <option value="5">115200</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label">GNSS模块详细定位数据输出频率：</label>
+                                                <div class="col-md-3">
+                                                    <select id="GNSSPositionOutputRate" name="GNSSPositionOutputRate"
+                                                            class="form-control">
+                                                        <option value="1">1000ms</option>
+                                                        <option value="0">500ms</option>
+                                                        <option value="2">2000ms</option>
+                                                        <option value="3">3000ms</option>
+                                                        <option value="4">4000ms</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">GNSS模块详细定位数据采集频率(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="GNSSPositionCollectRate"
+                                                           name="GNSSPositionCollectRate" value="1"
+                                                           class="form-control"/>
+                                                </div>
+                                                <label class="col-md-3 control-label">GNSS模块详细定位数据上传方式：</label>
+                                                <div class="col-md-3">
+                                                    <select id="gnss" name="GNSSPositionUploadType"
+                                                            class="form-control">
+                                                        <option value="0">本地存储 不上传</option>
+                                                        <option value="1">按时间间隔上传</option>
+                                                        <option value="2">按距离间隔上传</option>
+                                                        <option value="11">按累计时间上传</option>
+                                                        <option value="12">按累计距离上传</option>
+                                                        <option value="13">按累计条数上传</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 事件设置 -->
+                                        <div class="modal-body" id="eventSetting">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="eventObject" class="form-control" readonly/>
+                                                </div>
+                                                <label class="col-md-2 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="eventPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">操作类型：</label>
+                                                <div class="col-md-3">
+                                                    <select id="eventOperateType" name="eOperationType"
+                                                            class="form-control"
+                                                            onchange="realTimeCommand.eventSettingOperateType()">
+                                                        <option value="0">删除所有</option>
+                                                        <option value="1">更新</option>
+                                                        <option value="2">追加</option>
+                                                        <option value="3">修改</option>
+                                                        <option value="4">删除</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-3"></div>
+                                            </div>
+                                            <div id="eventMain-container">
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">事件ID：</label>
+                                                    <div class="col-md-3 eventIdInfo">
+                                                        <input id="eventId_2" type="text" name="eventId" value="1"
+                                                               class="form-control"
+                                                               onblur="realTimeCommand.inputBlur();"/>
+                                                    </div>
+                                                    <label class="col-md-2 control-label">事件内容：</label>
+                                                    <div class="col-md-3">
+                                                        <input type="text" id="eventContent_2" name="eventContent"
+                                                               placeholder="请输入事件内容" class="form-control"
+                                                               onblur="realTimeCommand.inputBlur();"/>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button id="event-add-btn" type="button"
+                                                                class="btn btn-primary addIcon">
+                                                            <span class="glyphicon glyphiconPlus"
+                                                                  aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 电话本设置 -->
+                                        <div class="modal-body" id="phoneBookSetting">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="phoneBookObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-2 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="phoneBookPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">操作类型：</label>
+                                                <div class="col-md-3">
+                                                    <select id="phoneBookOperateType" name="pOperationType"
+                                                            class="form-control"
+                                                            onchange="realTimeCommand.phoneBookSettingOperateType()">
+                                                        <option value="0">删除所有</option>
+                                                        <option value="1">更新</option>
+                                                        <option value="2">追加</option>
+                                                        <option value="3">修改</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-3"></div>
+                                            </div>
+                                            <div id="phoneBook-MainContent">
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">联系人ID：</label>
+                                                    <div class="col-md-3 phoneBookIdInfo">
+                                                        <input type="text" id="phoneBookId_2" name="phoneBookId"
+                                                               value="1" class="form-control"
+                                                               onblur="realTimeCommand.inputBlur();"/>
+                                                    </div>
+                                                    <label class="col-md-2 control-label">联系人：</label>
+                                                    <div class="col-md-3">
+                                                        <input type="text" id="phoneBookContact_2" name="contact"
+                                                               placeholder="请输入联系人" class="form-control"
+                                                               onblur="realTimeCommand.inputBlur();"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">电话号码：</label>
+                                                    <div class="col-md-3">
+                                                        <input type="text" id="phoneBookNumber_2" name="phoneNo"
+                                                               placeholder="请输入电话号码" class="form-control"
+                                                               onblur="realTimeCommand.inputBlur();"/>
+                                                    </div>
+                                                    <label class="col-md-2 control-label">呼叫类型：</label>
+                                                    <div class="col-md-3">
+                                                        <select id="phoneBookOperateType_2" name="callType"
+                                                                class="form-control">
+                                                            <option value="1">呼入</option>
+                                                            <option value="2">呼出</option>
+                                                            <option value="3">呼入/呼出</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button id="phoneBook-add-btn" type="button"
+                                                                class="btn btn-primary addIcon">
+                                                            <span class="glyphicon glyphiconPlus"
+                                                                  aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 信息点播菜单 -->
+                                        <div class="modal-body" id="infoDemandMenu">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="infoDemandObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-2 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="infoDemandPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">操作类型：</label>
+                                                <div class="col-md-3">
+                                                    <select id="infoDemandOperateType" name="iOperationType"
+                                                            class="form-control"
+                                                            onchange="realTimeCommand.infoDemandMenuSettingOperateType()">
+                                                        <option value="0">删除所有</option>
+                                                        <option value="1">更新</option>
+                                                        <option value="2">追加</option>
+                                                        <option value="3">修改</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-3"></div>
+                                            </div>
+                                            <div class="form-group" id="infoDemand-MainContent">
+                                                <label class="col-md-3 control-label">信息ID：</label>
+                                                <div class="col-md-3 infoDemandMenuId">
+                                                    <input type="text" id="infoDemandId_2" name="infoId" value="1"
+                                                           class="form-control" onblur="realTimeCommand.inputBlur();"/>
+                                                </div>
+                                                <label class="col-md-2 control-label">信息名称：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="infoDemandName_2" name="infoContent"
+                                                           placeholder="请输入信息名称" class="form-control"
+                                                           onblur="realTimeCommand.inputBlur();"/>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <button id="infoDemand-add-btn" type="button"
+                                                            class="btn btn-primary addIcon">
+                                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 基站参数设置 -->
+                                        <div class="modal-body" id="baseStationParameters">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">监控对象：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="baseStationObject" class="form-control"
+                                                           readonly/>
+                                                </div>
+                                                <label class="col-md-2 control-label">参考对象：</label>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input name="brands" type="text" class="form-control"
+                                                               id="baseStationPlate">
+                                                        <div class="input-group-btn">
+                                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">上报模式：</label>
+                                                <div class="col-md-3">
+                                                    <select id="baseStationReportMode" name="baseStationReportMode"
+                                                            class="form-control"
+                                                            onchange="realTimeCommand.baseStationReportModeCheckFn()">
+                                                        <option value="0">按频率上报</option>
+                                                        <option value="1">按定点上报</option>
+                                                    </select>
+                                                </div>
+                                                <label class="col-md-2 control-label">定位模式：</label>
+                                                <div class="col-md-3">
+                                                    <select id="baseStationpositioningMode"
+                                                            name="baseStationpositioningMode" class="form-control">
+                                                        <option value="00">卫星+LBS定位</option>
+                                                        <option value="01">LBS定位</option>
+                                                        <option value="02">卫星定位</option>
+                                                        <option value="03">WIFI+LBS定位</option>
+                                                        <option value="04">卫星+WIFI+LBS定位</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label">上报起始时间点：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="baseStationStartTimePoint"
+                                                           name="baseStationStartTimePoint" class="form-control"/>
+                                                </div>
+                                                <label class="col-md-2 control-label">上报间隔(s)：</label>
+                                                <div class="col-md-3">
+                                                    <input type="text" id="baseStationReportInterval"
+                                                           name="baseStationReportInterval" class="form-control"/>
+                                                </div>
+                                            </div>
+                                            <div id="baseStation-MainContent">
+                                                <div class="form-group">
+                                                    <label class="col-md-3 control-label">定点时间：</label>
+                                                    <div class="col-md-3">
+                                                        <input type="text" id="baseStationFixedTime"
+                                                               name="baseStationFixedTime" class="form-control"/>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button id="baseStation-add-btn" type="button"
+                                                                class="btn btn-primary addIcon">
+                                                            <span class="glyphicon glyphiconPlus"
+                                                                  aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-5"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 提交生成 -->
+                                        <div th:if="${hasRole}">
+                                            <div class="modal-footer report-para-footer-control">
+                                                <button type="button" class="btn btn-primary" id="generateListBtn">生成
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div th:if="${hasRole}">
+                                            <div class="modal-footer report-para-footer-control-1">
+                                                <button type="button" class="btn btn-primary" id="generateDeviceSearch">
+                                                    生成
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div th:if="${hasRole}">
+                                            <div class="modal-footer report-para-footer">
+                                                <input id="vid" name="vid" type="text" hidden="true"/>
+                                                <input id="commandNodes" name="commandNodes" type="text" hidden="true"/>
+                                                <button type="button" id="saveCommand" class="btn btn-primary">提交
+                                                </button>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 指令设置列表 -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">指令设置列表 </h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              style="width:300px" placeholder="请输入下发指令类型关键字"></label>
+                                                <button type="button" id="search_button"
+                                                        onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <li><a href="javascript:void(0);" id="send_model"><i
+                                                        class="glyphicon glyphicon-circle-arrow-down icoPaddingLeft"></i>批量下发</a>
+                                                </li>
+                                                <li><a href="javascript:void(0);" id="del_model"><i
+                                                        class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumnsTwo" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover checkTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th><input
+                                                    type="checkbox" id="checkAll"></th>
+                                            <th>操作</th>
+                                            <th>下发状态</th>
+                                            <th>下发指令类型</th>
+                                            <th>车牌号</th>
+                                            <th>所属分组</th>
+                                            <th>下发时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </section>
+</section>
+<!-- 应答 -->
+<div class="modal fade" id="goTraceResponse" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameterResponse"><span id="msgTitle"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question"></span></label>
+                        <div class=" col-md-7">
+                            <input type="hidden" id="infoId">
+                            <input type="hidden" id="msgDataType">
+                            <input type="hidden" id="objectType">
+                            <input type="hidden" id="objectId">
+                            <input type="text" placeholder="请输入应答" class="form-control" name="interval"
+                                   id="answer"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="parametersResponse" class="btn btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<label id="error_label" class='error' style='display: none;'></label>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script src="/wro/realTime-Instructions.js" th:src="@{/wro/realTime-Instructions.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script th:inline="javascript">
+    var treeMaxLength5000 = [[#{tree.maxLength5000}]];
+
+    var publicIssuedSuccess = [[#{public.Issued.success}]];
+
+    var commandIncidentIdNull = [[#{command.incident.id.null}]];
+    var commandIncidentDataNull = [[#{command.incident.data.null}]];
+    var commandContactIdNull = [[#{command.contact.id.null}]];
+    var commandContactNameNull = [[#{command.contact.name.null}]];
+    var commandContactPhoneNull = [[#{command.contact.phone.null}]];
+    var commandMessageIdNull = [[#{command.message.id.null}]];
+    var commandMessageNameNull = [[#{command.message.name.null}]];
+    var commandIntervalNull = [[#{command.interval.null}]];
+    var commandDistanceNull = [[#{command.distance.null}]];
+    var commandVehicleNull = [[#{command.vehicle.null}]];
+    var commandSettingValueNull = [[#{command.settingValue.null}]];
+    var commandDeviceNull = [[#{command.device.null}]];
+    var commandSelectNull = [[#{command.select.null}]];
+    var commandDesignatedTimeError = [[#{command.designatedTime.error}]];
+</script>
+</html>

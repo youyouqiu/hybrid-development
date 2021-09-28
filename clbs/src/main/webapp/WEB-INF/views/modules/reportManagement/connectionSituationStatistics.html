@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>连接情况统计</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">连接情况统计</li>
+                    </ul>
+                    <h1 class="h1 ">连接情况统计</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12 noPadding">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="active" noTrigger><a href="#government" data-toggle="tab">与政府监管平台连接情况</a></li>
+                                    <li noTrigger><a href="#terminal" data-toggle="tab">与车载终端连接情况</a></li>
+                                </ul>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="government">
+                                            <form id="alarmForm1" class="form-horizontal" action="#" method="post" role="form">
+                                                <div class="form-group ">
+                                                    <label class="col-md-1 col-sm-3 control-label paddingRight">809转发平台：</label>
+                                                    <div class="col-md-3 col-sm-8">
+                                                        <div class="input-group" style="margin-right:15px;">
+                                                            <input name="platformNum" type="text" class="form-control" id="platformNum" style="min-height:36px;" placeholder="请选择809转发平台">
+                                                            <div class="input-group-btn">
+                                                                <button type="button" class="btn btn-white">
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-right" role="menu" style="max-width:300px"></ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-md-1 col-sm-3 control-label paddingRight">月：</label>
+                                                    <div class="col-md-3 col-sm-8 searchListSelect">
+                                                        <input id="month1" name="month1" class="form-control laydate-icon" style="background-color: #fafafa;" readonly  placeholder="请输入月">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 control-label btn-alarmRep">
+                                                        <button type="button" class="btn btn-primary" onclick="connectionStatistics.query1(-1)">上个月 </button>
+                                                        <button type="button" class="btn btn-primary" onclick="connectionStatistics.query1(0)">本月 </button>
+                                                        <button type="button" class="btn btn-primary search-btn" name="1" onclick="connectionStatistics.query1()">
+                                                            <i class="glyphicon glyphicon-search"></i>  查询
+                                                        </button>
+                                                        <button id="exportAlarm1" type="button" disabled="disabled" class="btn btn-purple export-btn" onclick="connectionStatistics.exportAlarm1()">
+                                                            <i class="glyphicon glyphicon-log-out"></i>  导出
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane" id="terminal">
+                                            <div>
+                                                <form id="alarmForm2" class="form-horizontal" action="#" method="post" role="form">
+                                                    <div class="form-group">
+                                                        <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                                        <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                            <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                                <option value="vehicle">监控对象</option>
+                                                                <option value="group">企业</option>
+                                                                <option value="assignment">分组</option>
+                                                            </select>
+                                                            <input type="text" autocomplete="off" style="cursor: pointer; background-color: #fafafa;" placeholder="请选择" class="form-control moreQueryGroup" id="groupSelect" name="groupSelect">
+                                                            <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true" id="groupSelectSpan"></span>
+                                                            <div id="menuContent" class="menuContent">
+                                                                <ul id="treeDemo" class="ztree"></ul>
+                                                            </div>
+                                                        </div>
+                                                        <label class="col-md-1 col-sm-3 control-label paddingRight">月：</label>
+                                                        <div class="col-md-3 col-sm-8 searchListSelect">
+                                                            <input id="month2" name="month2" class="form-control laydate-icon" style="background-color: #fafafa;" readonly placeholder="请输入月">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-12 control-label btn-alarmRep" id="dateSearchData">
+                                                            <button type="button" class="btn btn-primary" onclick="connectionStatistics.query2(-1)">上个月 </button>
+                                                            <button type="button" class="btn btn-primary" onclick="connectionStatistics.query2(0)">本月 </button>
+                                                            <button type="button" class="btn btn-primary search-btn" name="1" onclick="connectionStatistics.query2()">
+                                                                <i class="glyphicon glyphicon-search"></i>  查询
+                                                            </button>
+                                                            <button id="exportAlarm2" disabled="disabled" type="button" class="btn btn-purple export-btn" onclick="connectionStatistics.exportAlarm2()">
+                                                                <i class="glyphicon glyphicon-log-out"></i>  导出
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 noPadding">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">数据列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div id="governmentData">
+                                    <div class="ToolPanel">
+                                        <div class="columns btn-group pull-right InformationList">
+                                            <button class="btn btn-default" type="button" name="refresh" title="刷新" onclick="connectionStatistics.refreshTable1()">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="btn-group" title="定制显示列">
+                                                <button id="customizeColumns1" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text1">
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="1" checked="checked" disabled="">序号</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="1" checked="checked">809转发平台</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="2" checked="checked">连接建立日期</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="3" checked="checked">统计天数</label></li><li>
+                                                    <label><input type="checkbox" class="toggle-vis-1" data-column="4" checked="checked">在线时长</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="5" checked="checked">中断次数</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="6" checked="checked">中断时长</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-1" data-column="7" checked="checked">在线率</label></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="dataTable1" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">809转发平台</th>
+                                            <th class="text-center">连接建立日期</th>
+                                            <th class="text-center">统计天数</th>
+                                            <th class="text-center">在线时长</th>
+                                            <th class="text-center">中断次数</th>
+                                            <th class="text-center">中断时长</th>
+                                            <th class="text-center">在线率</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div id="terminalData" style="display: none">
+                                    <div class="ToolPanel">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form">
+                                                    <label><input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam2" name="simpleQueryParam2" style="width:300px" placeholder="请输入监控对象"></label>
+                                                    <button type="button" id="search_button2" class="btn btn-outline btn-default">搜索
+                                                    </button>
+                                                    <input id="hiddenText2" type="text" style="display:none">
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="columns btn-group pull-right InformationList">
+                                            <button class="btn btn-default" type="button" name="refresh" title="刷新" onclick="connectionStatistics.refreshTable2()">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group open" title="定制显示列">
+                                                <button id="customizeColumns2" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text2">
+                                                    <li><label><input type="checkbox" class="toggle-vis-2" data-column="1" checked="checked" disabled="">序号</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-2" data-column="1" checked="checked">监控对象</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-2" data-column="2" checked="checked">统计天数</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-2" data-column="3" checked="checked">在线时长</label></li><li>
+                                                    <label><input type="checkbox" class="toggle-vis-2" data-column="4" checked="checked">离线时长</label></li>
+                                                    <li><label><input type="checkbox" class="toggle-vis-2" data-column="5" checked="checked">在线率</label></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="dataTable2" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">监控对象</th>
+                                            <th class="text-center">统计天数</th>
+                                            <th class="text-center">在线时长</th>
+                                            <th class="text-center">离线时长</th>
+                                            <th class="text-center">在线率</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 与政府监管平台接情况每日明细弹窗 -->
+            <div class="modal fade" id="governmentModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                 role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog  modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                            <h4 class="modal-title" >政府监管平台连接情况每日明细</h4>
+                        </div>
+                        <div class="modal-body" style="overflow: auto;">
+                            <div class="row" style="padding: 15px;">
+                                <div>
+                                    <table id="governmentDetail" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>日期</th>
+                                            <th>在线时长</th>
+                                            <th>中断次数</th>
+                                            <th>中断时长</th>
+                                            <th>日在线率</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="exportDetail1" disabled="disable" type="button" class="btn btn-purple export-btn" onclick="connectionStatistics.exportDetail1()">
+                                <i class="glyphicon glyphicon-log-out"></i>  导出
+                            </button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 与车载终端连接情况每日明细弹窗 -->
+            <div class="modal fade" id="terminalModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                 role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog  modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                            <h4 class="modal-title" >车载终端连接情况每日明细</h4>
+                        </div>
+                        <div class="modal-body" style="overflow: auto;">
+                            <div class="row" style="padding: 15px">
+                                <div>
+                                    <table id="terminalDetail" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>日期</th>
+                                            <th>在线时长</th>
+                                            <th>离线时长</th>
+                                            <th>日在线率</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="exportDetail2" disabled="disable" type="button" class="btn btn-purple export-btn"  onclick="connectionStatistics.exportDetail2()">
+                                <i class="glyphicon glyphicon-log-out"></i>  导出
+                            </button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="/clbs/resources/js/zTree/js/ztreeSearch.js"></script>
+<script src="/clbs/resources/js/connectionSituationStatistics.js"></script>
+</html>

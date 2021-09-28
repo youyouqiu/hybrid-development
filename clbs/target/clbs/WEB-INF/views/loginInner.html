@@ -1,0 +1,395 @@
+<body th:fragment="loginInner" id="loginInner" th:if="${session.loginBackground=='bg.jpg'}">
+<link rel="stylesheet" type="text/css" href="resources/assets/css/login_allnew.css"
+      th:href="@{/resources/css/login_allnew.css}">
+<input id="enableDecryption" type="hidden" th:value="${enableDecryption}"/>
+<script th:src="@{/resources/js/login_allnew.js}" charset="utf-8"></script>
+<noscript class="col-md-6 col-md-offset-5">您的浏览器不支持脚本运行！请开启您的脚本！</noscript>
+<script type="text/template" id="mobile-tpl">
+    <div class="mobile-bg" style="box-sizing:border-box">
+        <img src="img/logo (2).png" id="loginLogo" class="logo" alt="中位科技" style="margin-left:30px">
+        <div class="login-outer-border">
+            <div class="login-inner-bg">
+                <br/><br/><br/>
+                <p class="login-title color-white">登录平台</p>
+                <form id="loginForm" class="" action="/clbs/j_spring_security_check" method="post"
+                      autocomplete="off" onsubmit="return JPlaceHolder.loginSubmit()">
+                    <input type="hidden" class="form-control inputW100"
+                           id="captchaCode" name="captchaCode" autocomplete="off" value="">
+                    <input id="isAdmin" th:value="${session.isAdmin}" type="text" hidden="true"/>
+                    <div class="login-control-wraper border-black">
+                        <span class="login-control-icon icon-username"></span>
+                        <input type="text" name="username" value autofocus placeholder="请输入用户名" tabindex="1"
+                               autocomplete="new-password" id="username">
+                    </div>
+                    <div class="login-control-wraper border-black">
+                        <span class="login-control-icon icon-pwd"></span>
+                        <input type="hidden" id="key" name="key" th:value="${key}"/>
+                        <input type="hidden" id="pwdSubmit" name="password"/>
+                        <input type="password" value placeholder="请输入密码" tabindex="2"
+                               autocomplete="new-password" id="tg_password">
+                    </div>
+                    <div class="login-control-wraper">
+                        <div id="slider" class="slide-code">
+                            <div id="slider_bg" class="slide-code-bg"></div>
+                            <div id="label" class="slide-code-label"></div>
+                            <div id="labelTip" class="slide-code-labeltip">把我滑到右边试试?</div>
+                        </div>
+                    </div>
+
+                    <div id="failureInfo" class="login-control-wraper"
+                         style="height:40px;margin-bottom:0px">
+                        <p class="error-info"
+                           th:if="${#httpServletRequest.getAttribute('errorMsg') != null}">
+                                                            <span
+                                                                    th:text="${#httpServletRequest.getAttribute('errorMsg')}">登录失败，请重新登录！
+                                                            </span>
+                        </p>
+                    </div>
+                    <div class="login-control-wraper login-button">
+                        <button type="button" class="" name="button" tabindex="3" id="login_ok">登 录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="pc-tpl">
+    <span style="display: none" id="isFirst" th:text="${#httpServletRequest.getAttribute('isFirst')}"></span>
+    <!--预加载层-->
+    <div class="preloader-mask">
+        <canvas id="c"></canvas>
+        <!-- <div class="preloader-container">
+          <div class="preloader-progress-bg">
+            <div class="preloader-progress" >
+            </div>
+          </div>
+          <div class="preloader-text">
+            正在加载中(<i><span class="preloader-finished">0</span>/<span class="preloader-total">0</span></i>)......
+
+          </div>
+        </div> -->
+    </div>
+
+    <!--内容层-->
+
+    <div class="corner corner-has-show android" data-src="/clbs/resources/img/qr-android.png"></div>
+    <div class="corner corner-has-show ios" data-src="/clbs/resources/img/qr-ios.png"></div>
+    <div class="corner gotop hidden"></div>
+    <div class="corner-show hidden">
+        <div class="corner-show-rec">
+            <img src="/clbs/resources/img/qr-ios.png"/>
+        </div>
+        <div class="corner-show-triag">
+
+        </div>
+    </div>
+    <!--第一屏-->
+    <div class="section1">
+        <div class="contain">
+            <div class="firstpage-container">
+
+                <div class="">
+                    <video class="firstpage-bg  animation video-bg" src="/clbs/resources/img/6698.mp4"
+                           poster="/clbs/resources/img/bg (2).jpg" autoplay loop preload>
+
+                    </video>
+                    <div class="firstpage-bg fadeIn animation hidden"
+                         style="background-image:url(/clbs/resources/img/bg2.jpg)">
+
+                    </div>
+                    <div class="firstpage-bg fadeIn animation hidden"
+                         style="background-image:url(/clbs/resources/img/bg3.jpg)">
+
+                    </div>
+                </div>
+                <div class="slide-indicator-container">
+                    <div class="slide-indicator active">
+
+                    </div>
+                    <div class="slide-indicator">
+
+                    </div>
+                    <div class="slide-indicator">
+
+                    </div>
+                </div>
+                <div class="nav-arrow nav-arrow-left"></div>
+                <div class="nav-arrow nav-arrow-right"></div>
+                <div class="video-line-cutter"></div><!--视频下面有条线，把他挡住-->
+                <img src="" th:name="${session.loginLogo}" id="loginLogo" class="logo" alt="中位科技">
+                <div class="firstpage-content">
+                    <div class="left">
+                        <div class="text-container">
+                            <div class="bounceInLeft animation firstpage-slide">
+                                <br>
+                                <h1 class="color-white" style="margin-bottom:78px;"><span class="color-orange">F3</span>物联网监控平台
+                                </h1>
+                                <h4 class="color-white" style="margin-bottom:42px;">F3平台作为国内标准化位置服务的开拓者，<br/>开创和引领了多项行业标准，<br/>并牵头联合制定了行业<span
+                                        class="color-orange">“F3”标准协议</span>。</h4>
+
+                                <h5 class="color-white" style="margin-bottom:52px;">F3监控平台<span
+                                        class="color-orange">基于</span>监控对象、终端及各类传感器的管理，<span
+                                        class="color-orange">结合</span>实时监控，<br/>
+                                    轨迹回放和报警中心等功能，为用户<span class="color-orange">提供</span>位置行业最后一公里的服务标准 。</h5>
+
+                            </div>
+                            <div class="animation firstpage-slide hidden">
+                                <br>
+                                <h1 class="color-white" style="margin-bottom:78px;"><span
+                                        class="color-orange">物联卡</span>管理平台</h1>
+                                <h4 class="color-white" style="margin-bottom:42px;">物联卡是<span class="color-orange">IoT物联网</span>的重要组成部分。
+                                </h4>
+
+                                <h5 class="color-white" style="margin-bottom:42px;">物联卡管理平台满足了智能硬件和物联网行业对设备联网的管理需求，
+                                    <br/>包括卡状态管理、预警和报警设置、收发短信、充值等功能，以及多维<br/>度数据报表，真正做到<span
+                                            class="color-orange">数据实时</span>
+                                    、<span class="color-orange">消费透明</span>和<span class="color-orange">全方位管理</span>。
+                                </h5>
+                            </div>
+
+                            <div class="animation firstpage-slide hidden">
+                                <br/>
+                                <h1 class="color-white" style="margin-bottom:78px;">舒服<span
+                                        class="color-orange">运维</span>助手APP</h1>
+                                <h4 class="color-white" style="margin-bottom:42px;">维护有啥难的？<br/>“<span
+                                        class="color-orange">舒服一下</span>”就啥都会了！</h4>
+
+                                <h5 class="color-white" style="margin-bottom:42px;">舒服运维助手是为各大运营商、维护和监控等人员，
+                                    <br/>提供从物联卡到设备，再到车的<span class="color-orange">三位合一</span>的安全、便捷，
+                                    <br/>精准的监督、查验、定位和维护等功能的APP工具。</h5>
+
+                            </div>
+                        </div>
+                        <br>
+                        <a href="javascript:goDetail()" class="detail-button fadeInUp animation" tabindex="4">查看更多 &gt;&gt;</a>
+                    </div>
+                    <div class="right">
+                        <div class="login-outer-border slideInDown animation">
+                            <div class="login-inner-bg">
+                                <p class="login-title color-white">登录平台</p>
+                                <form id="loginForm" class="" action="/clbs/j_spring_security_check" method="post"
+                                      autocomplete="off" onsubmit="return JPlaceHolder.loginSubmit()">
+                                    <input type="hidden" class="form-control inputW100"
+                                           id="captchaCode" name="captchaCode" autocomplete="off" value="">
+                                    <input id="isAdmin" th:value="${session.isAdmin}" type="hidden" hidden="true"/>
+                                    <div class="login-control-wraper border-black">
+                                        <span class="login-control-icon icon-username"></span>
+                                        <input type="text" name="username" value autofocus placeholder="请输入用户名"
+                                               tabindex="1" autocomplete="new-password" id="username">
+                                    </div>
+                                    <div class="login-control-wraper border-black">
+                                        <span class="login-control-icon icon-pwd"></span>
+                                        <input type="hidden" id="key" name="key" th:value="${key}"/>
+                                        <input type="hidden" id="pwdSubmit" name="password"/>
+                                        <input type="password" value placeholder="请输入密码" tabindex="2"
+                                               autocomplete="new-password" id="tg_password">
+                                    </div>
+                                    <div class="login-control-wraper">
+                                        <div id="slider" class="slide-code">
+                                            <div id="slider_bg" class="slide-code-bg"></div>
+                                            <div id="label" class="slide-code-label"></div>
+                                            <div id="labelTip" class="slide-code-labeltip">把我滑到右边试试?</div>
+                                        </div>
+                                    </div>
+
+                                    <div id="failureInfo" class="login-control-wraper"
+                                         style="height:40px;margin-bottom:0px">
+                                        <p class="error-info"
+                                           th:if="${#httpServletRequest.getAttribute('errorMsg') != null}">
+                                                            <span
+                                                                    th:text="${#httpServletRequest.getAttribute('errorMsg')}">登录失败，请重新登录！
+                                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="login-control-wraper login-button">
+                                        <button type="button" class="" name="button" tabindex="3" id="login_ok">登 录
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--第二屏-->
+    <div class="page">
+        <div class="section2">
+            <br>
+            <h2 class="center-h fadeInDown animation" id="view-detail">F3物联网监控平台</h2>
+            <br>
+            <div class="">
+                <div class="contain">
+                    <div class="left">
+                        <img src="/clbs/resources/img/computer.jpg" class="flipInY animation" alt="">
+                    </div>
+                    <div class="right">
+                        <!-- <p class="computer-text">F3平台提供了传感器 - 终端 - 平台的全套解决方案，为用户提供位置行业最后一公里的服务标准，并以此为基础实现了行业更多细分市场的业务需求，使得整个行业的增值服务可以快速孵化和成长。
+                        </p> -->
+                        <div class="computer-grid">
+                            <div class="computer-grid-item fadeInUp animation">
+                                <div class="icon-icon icon-big"></div>
+                                <div class="icon-text">大数据平台</div>
+                            </div>
+                            <div class="computer-grid-item fadeInUp animation">
+                                <div class="icon-icon icon-open"></div>
+                                <div class="icon-text">开源代码</div>
+                            </div>
+                            <div class="computer-grid-item fadeInUp animation">
+                                <div class="icon-icon icon-independent"></div>
+                                <div class="icon-text">完全独立部署</div>
+                            </div>
+                        </div>
+                        <p class="computer-text fadeInUp animation">
+                            F3平台提供了传感器 - 终端 - 平台的<span class="color-orange">全套解决方案</span>，为用户提供位置行业最后一公里的服务标准，并以此<br/>为基础实现了行业更多细分市场的业务需求，使得整<br/>个行业的增值服务可以快速孵化和成长。
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <br>
+
+        </div>
+    </div>
+
+    <!--第三屏-->
+    <div class="page section3" id="section3">
+
+        <h2 class="center-h fadeInDown animation">物联卡管理平台</h2>
+        <br>
+        <div class="contain">
+            <div class="content">
+                <div class="demo fadeInDown animation">
+
+                </div>
+                <div class="demobig fadeInDown animation">
+
+                </div>
+                <div class="icon-grid">
+                    <div class="icon-grid-item fadeInUp animation">
+                        <div class="icon-icon icon-mail"></div>
+                        <div class="icon-text">短信群发<br/>
+                            <div class="icon-text-underline"></div>
+                        </div>
+                    </div>
+                    <div class="icon-grid-item fadeInUp animation">
+                        <div class="icon-icon icon-sim"></div>
+                        <div class="icon-text" style="margin-left:35px">卡状态查询<br/>
+                            <div class="icon-text-underline"></div>
+                        </div>
+                    </div>
+                    <div class="icon-grid-item fadeInUp animation">
+                        <div class="icon-icon icon-data"></div>
+                        <div class="icon-text">数据报表<br/>
+                            <div class="icon-text-underline"></div>
+                        </div>
+                    </div>
+                    <div class="icon-grid-item fadeInUp animation">
+                        <div class="icon-icon icon-trend"></div>
+                        <div class="icon-text">数据分析<br/>
+                            <div class="icon-text-underline"></div>
+                        </div>
+                    </div>
+                    <div class="icon-grid-item fadeInUp animation">
+                        <div class="icon-icon icon-computer"></div>
+                        <div class="icon-text">状态管理<br/>
+                            <div class="icon-text-underline"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--第四屏-->
+    <div class="page section4" id="section4">
+        <h2 class="center-h fadeInDown animation" style="padding-top:30px;margin-bottom:60px">舒服运维助手APP</h2>
+        <div class="phone-grid">
+            <div class="left">
+                <div class="phone-grid-item fadeInUp animation">
+                    <div class="icon-icon icon-yidi"></div>
+                    <div class="icon-text">异地维护</div>
+                </div>
+                <div class="phone-grid-item fadeInUp animation">
+                    <div class="icon-icon icon-pingtai"></div>
+                    <div class="icon-text">平台互通</div>
+                </div>
+                <div class="phone-grid-item fadeInUp animation">
+                    <div class="icon-icon icon-liucheng"></div>
+                    <div class="icon-text">流程透明</div>
+                </div>
+                <div style="height:80px;width:100%;float:left"></div>
+                <div>
+                    <div class="phone-grid-item-second fadeInUp animation" style="height:40px;">
+
+                    </div>
+                    <div class="phone-grid-item-second fadeInUp animation" style="margin-left:-28px">
+                        <div class="icon-icon icon-zhiling"></div>
+                        <div class="icon-text" style="margin-left:10px">指令大全</div>
+                    </div>
+                    <div class="phone-grid-item-second fadeInUp animation" style="margin-left:41px;">
+                        <div class="icon-icon icon-duanxin"></div>
+                        <div class="icon-text" style="margin-left:11px;">短信工具</div>
+                    </div>
+                    <div class="phone-grid-item-second fadeInUp animation" style="height:40px;">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="right">
+                <div class="three-phone">
+                    <img class="flipInY animation" src="/clbs/resources/img/phone1.png" style="width:250px;top:80px;"/>
+                    <img class="flipInY animation" src="/clbs/resources/img/phone2.png"
+                         style="width:360px;left:200px;z-index:999"/>
+                    <img class="flipInY animation" src="/clbs/resources/img/phone3.png"
+                         style="width:250px;top:80px;left:475px;"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="height:140px;">
+
+    </div>
+
+    <footer class="footer">
+
+        <span>版本：<label th:text="#{web.version}" style="font-weight:normal"></label></span>
+        <p>
+            <span id="copyRight" th:name="${session.copyright}"></span>
+            <a href="" id="website" th:name="${session.websiteName}" target="_blank"></a>
+            <br>
+            <a href="https://beian.miit.gov.cn/" id="record" th:name="${session.recordNumber}"></a>
+        </p>
+    </footer>
+</script>
+
+
+<script th:src="@{/resources/js/crypto-js.js}" charset="UTF-8"></script>
+<script type="text/javascript">
+
+    var sources = [
+        '/clbs/resources/img/bg (2).jpg',
+        '/clbs/resources/img/logo (2).png',
+        '/clbs/resources/img/login_button.png',
+        '/clbs/resources/img/sprite.png',
+        '/clbs/resources/img/computer.jpg',
+        '/clbs/resources/img/demo.png',
+        '/clbs/resources/img/demobig.png',
+        '/clbs/resources/img/bg2.jpg',
+        '/clbs/resources/img/bg3.jpg'
+    ]
+
+    //preload(sources)
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        $('body').prepend($('#mobile-tpl').html())
+    } else {
+        $('body').prepend($('#pc-tpl').html())
+        var isFirst = $("#isFirst").text();
+        preload(sources, isFirst)
+    }
+    init()
+</script>
+<script th:src="@{/resources/js/slideCode.js}" charset="utf-8"></script>
+</body>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.CardReaderInfoDao">
+
+    <!-- 查询  -->
+    <select id="find" parameterType="com.zw.platform.domain.basicinfo.query.CardReaderInfoQuery" resultType="com.zw.platform.domain.basicinfo.CardReaderInfo">
+        SELECT * FROM zw_m_card_reader_info WHERE flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and (
+            	card_reader_number LIKE CONCAT('%',#{simpleQueryParam},'%') 
+            	or card_reader_type LIKE CONCAT('%',#{simpleQueryParam},'%') 
+            )
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+    
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.CardReaderInfoForm">
+        INSERT INTO zw_m_card_reader_info (
+        	id, card_reader_number, card_reader_type, is_start, manu_facturer, factory_date, description,create_data_time,create_data_username
+        )
+        VALUES(
+        	#{id}, #{cardReaderNumber}, #{cardReaderType}, #{isStart}, #{manuFacturer}, #{factoryDate},
+        	#{description},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    
+    <!-- 批量新增 -->
+    <insert id="addByBatch" parameterType="com.zw.platform.domain.basicinfo.form.CardReaderInfoForm">
+        INSERT INTO zw_m_card_reader_info (
+        	id, card_reader_number, card_reader_type, is_start, manu_facturer, factory_date, description,create_data_time,create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.cardReaderNumber}, #{item.cardReaderType}, #{item.isStart}, #{item.manuFacturer}, #{item.factoryDate},
+        	#{item.description},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+    
+    <!-- 通过id得到一个 CardReaderInfo-->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.basicinfo.CardReaderInfo">
+        SELECT * FROM zw_m_card_reader_info WHERE flag = 1 AND id = #{id}
+    </select>
+    
+    <!-- 根据读卡器编号得到CardReaderInfo -->
+    <select id="findByCardReaderNumber" parameterType="string" resultType="com.zw.platform.domain.basicinfo.CardReaderInfo">
+        SELECT * FROM zw_m_card_reader_info WHERE flag = 1 AND card_reader_number = #{cardReaderNumber}
+    </select>
+    
+    <!-- 修改 CardReaderInfo -->
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.form.CardReaderInfoForm">
+        UPDATE zw_m_card_reader_info SET
+        card_reader_number = #{cardReaderNumber}, card_reader_type = #{cardReaderType}, is_start = #{isStart},
+        manu_facturer = #{manuFacturer}, factory_date = #{factoryDate}, description = #{description},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 根据id删除一个 CardReaderInfo -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_card_reader_info set flag=0 WHERE id = #{id}
+    </delete>
+    
+     <!-- 去重 -->
+	<select id="findByCardReaderInfo" parameterType="string" resultType="com.zw.platform.domain.basicinfo.CardReaderInfo">
+        SELECT * FROM zw_m_card_reader_info WHERE flag = 1 and card_reader_number = #{cardReaderNumber}
+    </select>
+</mapper>

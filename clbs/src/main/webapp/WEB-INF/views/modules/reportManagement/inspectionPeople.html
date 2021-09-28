@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>监管平台巡检监控人员</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        .trueBtn{
+            padding-left: 12px!important;
+        }
+        .trueBtn img{
+            width: 16px;
+            vertical-align: -2px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">监管平台巡检监控人员</li>
+                    </ul>
+                    <h1 class="h1">监管平台巡检监控人员</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="hourslist" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect">巡检时间：</label>
+                                            <div class="col-md-3 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon" id="timeInterval"
+                                                       name="timeInterval" readonly/>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label">应答状态：</label>
+                                            <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                                <select id="answerStatusParam" class="form-control">
+                                                    <option value="-1">全部</option>
+                                                    <option value="1">正常应答</option>
+                                                    <option value="2">已过期</option>
+                                                    <option value="0">未应答</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label">应答人：</label>
+                                            <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                                <input autocomplete="off"
+                                                       placeholder="请输入应答人" class="form-control" type="text"
+                                                       id="answerUserParam" name="answerUser" maxlength="20"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 control-label btn-alarmRep" id="dateSearchData">
+                                                <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                        onclick="inspectionPeople.inquireClick(0)">今天
+                                                </button>
+                                                <button id="yesterdayClick" type="button" class="btn btn-primary"
+                                                        name="-1"
+                                                        onclick="inspectionPeople.inquireClick(-1)">前一天
+                                                </button>
+                                                <button id="nearlyThreeDays" type="button" class="btn btn-primary"
+                                                        name="-3"
+                                                        onclick="inspectionPeople.inquireClick(-3)">前三天
+                                                </button>
+                                                <button id="nearlySevenDays" type="button" class="btn btn-primary"
+                                                        name="-7"
+                                                        onclick="inspectionPeople.inquireClick(-7)">前七天
+                                                </button>
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="inspectionPeople.inquireClick(1)"><i
+                                                        class="glyphicon glyphicon-search"></i> 查询
+                                                </button>
+                                                <button id="exportAlarm" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">监管平台巡检监控人员列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel" style="">
+                                    <!--<div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form" onkeydown="if(event.keyCode==13)return false;">
+                                                <label>
+                                                    <input type="text" class="Inlinesearch form-control"
+                                                           id="simpleQueryParam" name="simpleQueryParam"
+                                                           style="width:300px" placeholder="请输入应答人" autocomplete="off"></label>
+                                                <button type="button" id="search_button" onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>-->
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle btn-border-radius"
+                                                    data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="overflow:auto" id="dataTableContainer">
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">应答状态</th>
+                                            <th class="text-center">巡检对象类型</th>
+                                            <th class="text-center">巡检对象ID</th>
+                                            <th class="text-center">巡检时间</th>
+                                            <th class="text-center">应答时限</th>
+                                            <th class="text-center">应答时间</th>
+                                            <th class="text-center">应答人</th>
+                                            <th class="text-center">联系电话</th>
+                                            <th class="text-center">身份证号码</th>
+                                            <th class="text-center">社会保险号</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{export.fail}]];
+    var exportTitle = [[#{export.confirm.title}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var vehicleSelectGroup = [[#{Vehicle.select.group}]];
+</script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/inspectionPeople.js"></script>
+</html>

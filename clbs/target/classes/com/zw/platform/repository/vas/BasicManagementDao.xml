@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.BasicManagementDao">
+
+    <!-- 油价查询 -->
+    <select id="oilPricesQuery" parameterType="string" resultType="com.zw.platform.domain.vas.carbonmgt.TimingStored">
+		SELECT * FROM zw_m_oil_price WHERE  day_time &gt;= #{timeStart} and day_time &lt;= #{timeEnd} and province = #{district} and oil_type = #{oiltype}
+		ORDER BY day_time desc
+	</select>
+
+    <!-- 查询车辆：1、信息列表绑定的数据；2、非工程车辆 -->
+    <select id="find" parameterType="com.zw.platform.domain.vas.carbonmgt.query.BasicManagementQuery"
+            resultType="com.zw.platform.domain.vas.carbonmgt.form.BasicManagementForm">
+        SELECT distinct v.brand brand, v.id vehicleId, v.group_id groupId,
+        GROUP_CONCAT(distinct a.name SEPARATOR ',') assignmentName, GROUP_CONCAT(distinct a.id SEPARATOR ',')
+        assignmentId,
+        vt.id vehicleTypeId, vt.vehicle_type vehicleType, v.fuel_type fuelType, di.device_number deviceNumber, di.id
+        deviceId,
+        si.simcard_number simcardNumber, si.id simcardId, msb.*
+        FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON c.device_id = di.id AND di.flag = 1
+        INNER JOIN zw_m_sim_card_info si ON c.sim_card_id = si.id AND si.flag = 1
+        INNER JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1 and vt.vehicle_category != 4
+        LEFT JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        LEFT JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        LEFT JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        LEFT JOIN zw_m_mobile_source_baseinfo msb ON v.id = msb.vehicle_id AND msb.flag = 1
+        WHERE v.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+                AND (v.brand LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                OR di.device_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                OR si.simcard_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+        GROUP BY v.brand
+        ORDER BY v.brand
+    </select>
+
+    <!-- 新增移动源基础信息 -->
+    <insert id="addMobileSourceBaseInfo" parameterType="com.zw.platform.domain.vas.carbonmgt.form.BasicManagementForm">
+		INSERT INTO zw_m_mobile_source_baseinfo (
+			id, vehicle_id, running_time, running_mileage, energy_consumption, calculate_base_energy, estimates_base_energy, 
+			overhauled_time, overhauled_interval, saving_products_install_time, idle_threshold, 
+			flag, create_data_time, create_data_username)
+		VALUES
+			(#{id}, #{vehicleId},#{runningTime},#{runningMileage},#{energyConsumption},#{calculateBaseEnergy},#{estimatesBaseEnergy},
+			#{overhauledTime},#{overhauledInterval},#{savingProductsInstallTime},#{idleThreshold},#{flag},
+			#{createDataTime}, #{createDataUsername})
+	</insert>
+
+    <!-- 根据车辆id查询移动源基础信息表详情 -->
+    <select id="getBaseInfoByVehicleId" parameterType="string"
+            resultType="com.zw.platform.domain.vas.carbonmgt.form.BasicManagementForm">
+		SELECT * FROM zw_m_mobile_source_baseinfo msb WHERE msb.flag = 1 AND msb.vehicle_id = #{vehicleId}
+	</select>
+
+    <!-- 修改移动源基础信息 -->
+    <update id="editMobileSourceBaseinfo" parameterType="com.zw.platform.domain.vas.carbonmgt.form.BasicManagementForm">
+		UPDATE zw_m_mobile_source_baseinfo
+		SET
+			running_time = #{runningTime},
+			running_mileage = #{runningMileage},
+			energy_consumption = #{energyConsumption},
+			calculate_base_energy = #{calculateBaseEnergy},
+			estimates_base_energy = #{estimatesBaseEnergy},
+			overhauled_time = #{overhauledTime},
+			overhauled_interval = #{overhauledInterval},
+			saving_products_install_time = #{savingProductsInstallTime},
+			idle_threshold = #{idleThreshold},
+			update_data_time = #{updateDataTime},
+			update_data_username = #{updateDataUsername}
+		WHERE flag = 1 AND vehicle_id = #{vehicleId}
+	</update>
+
+    <!-- 删除移动源基础信息 -->
+    <delete id="deleteMobileSourceBaseinfo" parameterType="string">
+		UPDATE zw_m_mobile_source_baseinfo SET flag = 0 WHERE vehicle_id = #{vehicleId}
+	</delete>
+
+    <!-- 查询燃料类型信息 -->
+    <select id="findFuelTypeList" parameterType="com.zw.platform.domain.vas.carbonmgt.query.FuelTypeQuery"
+            resultType="com.zw.platform.domain.vas.carbonmgt.form.FuelTypeForm">
+	    select ft.*
+		from zw_m_fuel_type ft
+		where ft.flag=1
+		and ft.fuel_type like BINARY
+		concat('%',#{fuelType},'%')
+		order by create_data_time desc
+	</select>
+
+    <!-- 新增燃料类型 -->
+    <insert id="addFuelType" parameterType="com.zw.platform.domain.vas.carbonmgt.form.FuelTypeForm">
+	    insert into 
+	    zw_m_fuel_type(
+	    	id,fuel_type,fuel_category,describes,create_data_time,create_data_username)
+	    values(
+	    	#{id},#{fuelType},#{fuelCategory},#{describes},#{createDataTime},#{createDataUsername})
+	</insert>
+
+    <!-- 根据燃料类型查询燃料信息 -->
+    <select id="findFuelType" parameterType="string" resultType="com.zw.platform.domain.vas.carbonmgt.FuelType">
+	    select type.* from zw_m_fuel_type type where type.flag=1 and type.fuel_type = BINARY #{fuelType}
+	</select>
+
+    <!-- 根据id查询燃料类型 -->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.vas.carbonmgt.FuelType">
+	   select ft.* from zw_m_fuel_type ft where ft.flag=1 and ft.id=#{id}
+	</select>
+
+    <!-- 修改燃料类型 -->
+    <update id="updateFuelType" parameterType="com.zw.platform.domain.vas.carbonmgt.form.FuelTypeForm">
+	   update zw_m_fuel_type 
+	       set 
+	            fuel_category=#{fuelCategory},fuel_type=#{fuelType},describes=#{describes},update_data_time=#{updateDataTime},update_data_username=#{updateDataUsername} 
+	      where id=#{id}
+	</update>
+
+    <!-- 根据id删除燃料类型 -->
+    <update id="deleteFuel" parameterType="string">
+	   update zw_m_fuel_type
+	          set flag=0 where id=#{id}
+	</update>
+
+    <!-- 批量删除燃料类型 -->
+    <update id="deleteFuelTypeMuch">
+        update zw_m_fuel_type set flag=0 where id in
+        <foreach collection="list" item="idItem" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <!-- 根据燃料名称查询燃料Id -->
+    <select id="findFuelTypeIdByName" parameterType="string" resultType="string">
+	    select id from zw_m_fuel_type where flag=1 and fuel_type= BINARY #{fuelType}
+	</select>
+</mapper>

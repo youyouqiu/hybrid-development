@@ -1,0 +1,23 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+    <description>spring-adas主配置文件</description>
+
+    <!-- 扫描主动安全功能的注解@Component , @Service , @Repository。 要把 controller去除，controller是在spring-servlet.xml中配置的，如果不去除会影响事务管理的。 -->
+    <context:component-scan base-package="com.zw.talkback.repository.mysql,
+        com.zw.talkback.service.**,com.zw.talkback.common,com.zw.talkback.util,com.zw.talkback.util.common">
+        <context:include-filter type="annotation"
+                                expression="org.aspectj.lang.annotation.Aspect"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.RestController"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+    </context:component-scan>
+
+</beans>

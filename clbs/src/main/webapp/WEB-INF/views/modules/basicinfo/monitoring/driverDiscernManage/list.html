@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>驾驶员识别管理</title>
+    <style>
+        .labelAdjust{
+            font-size: 15px;
+            margin: 0;
+            padding-top: 8px;
+        }
+        .driverTree{
+            display: none;
+            z-index: 200;
+            position: absolute;
+            background: rgb(255, 255, 255);
+            width: calc(100% - 35px);
+            box-shadow: black 0px 0px 2px;
+            max-height: 320px;
+            left: 17px;
+            overflow: auto;
+        }
+        .laydate-btns-now{
+            display: none;
+        }
+        /*查询弹出table样式*/
+        #simpleDataBoxSearch table{
+            width:100%;
+        }
+        #simpleDataBoxSearch table tr th,td{
+            text-align: center;
+            border: 1px solid #ddd;
+            height: 34px;
+        }
+        #simpleDataBoxSearch table tbody tr:nth-child(odd){
+            background: #f9f9f9;
+        }
+        #simpleDataBoxSearch table tr th:nth-child(1),td:nth-child(1){
+            width:60px;
+        }
+        #simpleDataBoxSearch table tr th:nth-child(2),td:nth-child(2){
+            width:130px;
+        }
+        #simpleDataBoxSearch table tr th:nth-child(3),td:nth-child(3){
+            width:255px;
+        }
+
+        /*下发弹窗table样式*/
+        #simpleDataBox table{
+            width:100%;
+        }
+        #simpleDataBox table tr th,td{
+            text-align: center;
+            border: 1px solid #ddd;
+            height: 34px;
+        }
+        #simpleDataBox table tbody tr:nth-child(odd){
+            background: #f9f9f9;
+        }
+        #simpleDataBox table tr th:nth-child(1),td:nth-child(1){
+            width:60px;
+        }
+        #simpleDataBox table tr th:nth-child(2),td:nth-child(2){
+            width:130px;
+        }
+        #simpleDataBox table tr th:nth-child(3),td:nth-child(3){
+            width:255px;
+        }
+
+        /*驾驶人员table1111样式 */
+        #driverListBox table{
+            width:100%;
+        }
+        #driverListBox table tr th,td{
+            text-align: center;
+            border: 1px solid #ddd;
+            height: 34px;
+        }
+        #driverListBox table tbody tr:nth-child(odd){
+            background: #f9f9f9;
+        }
+        #driverListBox table tr th:nth-child(1),td:nth-child(1){
+            width:60px;
+        }
+        #driverListBox table tr th:nth-child(2),td:nth-child(3){
+            width:150px;
+        }
+        #driverListBox table tr th:nth-child(5),td:nth-child(5){
+            width:180px;
+        }
+        #driverListBox table tr th:nth-child(6),td:nth-child(6){
+            width:50px;
+        }
+        #driverListBox table tr td:nth-child(6) div{
+            display: none;
+        }
+        #driverListBox table tr td:nth-child(6):hover div{
+            display: block;
+        }
+        #driverListBox table tr td:nth-child(7) button{
+            border: navajowhite;
+            background: none;
+        }
+
+        /*驾驶人员table2222样式*/
+        #driverListBox22 table{
+            width:100%;
+        }
+        #driverListBox22 table tr th,td{
+            text-align: center;
+            border: 1px solid #ddd;
+            height: 34px;
+        }
+        #driverListBox22 table tr th:nth-child(1),td:nth-child(1){
+            width:60px;
+        }
+        #driverListBox22 table tr th:nth-child(4),td:nth-child(4){
+            width:120px;
+        }
+
+    </style>
+    <div th:replace="fragments/header">header</div>
+</head>
+
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">监控对象</li>
+                        <li class="active">车辆信息</li>
+                        <li class="active">驾驶员识别管理</li>
+                    </ul>
+                    <h1 class="h1 ">驾驶员识别管理</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="orgPannel">
+                                <h3 class="panel-title fwb">组织架构</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="orgPannel-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;" id="orgPannel-body">
+                                <div class="form-group" style="margin-top: 15px">
+                                    <div class="col-md-9" >
+                                        <input id="search_condition" name="search" class="form-control" autocomplete="off"
+                                               style="margin-bottom: 10px;" type="text" placeholder="请输入分组名称"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group">
+                                                <button style="padding-top:8px;border-radius:4px" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu protocol-dropdown-menu" role="menu" id="deviceType" style="width: 235px">
+                                                    <label class="radio-inline" style="margin-left:10px;"><input name="deviceType" value="15" type="radio" class="device"> 交通部JT/T808-2013(苏标)</label>
+                                                    <label class="radio-inline" style="margin-left:10px;"><input name="deviceType" value="17" type="radio"  checked class="device"> 交通部JT/T808-2013(吉标)</label>
+                                                    <label class="radio-inline" style="margin-left:10px;"><input name="deviceType" value="26" type="radio" class="device"> 交通部JT/T808-2019(鲁标)</label>
+                                                    <label class="radio-inline" style="margin-left:10px;"><input name="deviceType" value="27" type="radio"  class="device"> 交通部JT/T808-2013(湘标)</label>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px;height:699px !important;">
+                                    <div id="noData" style="display: none;position: absolute;text-align: center;width: 100%;height: 60px;line-height: 60px;"><p>暂无数据</p></div>
+                                    <ul id="treeDemo" class="ztreee" style="height:684px !important;overflow:auto;">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">驾驶人员身份识别下发列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              autocomplete="off" placeholder="请输入车牌号" oninput="driverIdentification.validateInputValue()"></label>
+                                                <button type="button" id="search_button"
+                                                        onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left barsMargin">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" style="min-width: 100%;cursor: pointer;">
+                                                <li>
+                                                    <a id="searchBatch">
+                                                        <i class="fa fa-search icoPaddingLeft" aria-hidden="true"></i>批量查询
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a id="dispatchBatch">
+                                                        <i class="fa fa-arrow-circle-down icoPaddingLeft" aria-hidden="true"></i>批量下发
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                            <input id="transValue" type="hidden" />
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right vehicleManagement">
+                                        <button id="refreshTable" class="btn btn-default" type="button"
+                                                name="refresh" title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="overflow:auto">
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover checkTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th><input type="checkbox" id="checkAll"
+                                                       onclick="driverIdentification.checkAll(this)"></th>
+                                            <th>操作</th>
+                                            <th>车牌号</th>
+                                            <th>车牌颜色</th>
+                                            <th>所属企业</th>
+                                            <th>分组</th>
+                                            <th>驾驶人员个数</th>
+                                            <th>查询成功时间</th>
+                                            <th>最近下发时间</th>
+                                            <th>下发状态</th>
+                                            <th>下发结果</th>
+                                            <th>下发人</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="photoDiv" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">查看照片</h4>
+                        </div>
+                        <div class="modal-body">
+                            <img id="photoImg" class="img-rounded" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 驾驶人员批量查询 -->
+            <div class="modal fade" id="searchBatchModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                 role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog  modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                            <h4 class="modal-title" >驾驶人员批量查询</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row" style="padding: 15px;height: 405px;overflow: auto;">
+                                <div id="simpleDataBoxSearch">
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>车牌号</th>
+                                            <th>状态</th>
+                                            <th>结果</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="doSearch" class="btn btn-primary">下发查询指令</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 驾驶人员批量下发 -->
+            <div class="modal fade" id="dispatchBatchModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                 role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close">×</button>
+                            <h4 class="modal-title" >驾驶人员批量下发</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="col-md-12 noPadding">
+                                        <label class="col-md-4 control-label labelAdjust">选择类型：</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="actionType" id='actionType'>
+                                                <option value='0' selected>增加(全替换)</option>
+                                                <option value='1'>删除(全删除)</option>
+                                                <option value='2'>删除指定条目</option>
+                                                <option value='3'>修改</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8" id="driverBox">
+                                    <div class="col-md-12 noPadding">
+                                        <label class="col-md-2 control-label labelAdjust">选择驾驶员：</label>
+                                        <div class="has-feedback col-md-10 fastClear" >
+                                            <input name="groupName" style="background-color: #fafafa; cursor: pointer;"  class="form-control" id="driverListInput" type="text"  autocomplete="off" placeholder="请选择驾驶员">
+                                            <span style="top: 0px;right: 14px;" class="fa fa-chevron-down form-control-feedback" aria-hidden="true"></span>
+                                            <input class="form-control hidden" id="groupId">
+                                            <div id="driverListTreeBox" class="driverTree">
+                                                <ul id="driverListTree" class="ztree"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="padding: 15px;height: 405px;overflow: auto;">
+                                <div id="simpleDataBox">
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>车牌号</th>
+                                            <th>状态</th>
+                                            <th>结果</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col-md-10" style="text-align: left">
+                                    <p style="margin: 0">删除指定条目说明：需要选择驾驶员，终端驾驶人员有该人员则删除，无则忽略;</p>
+                                    <p style="margin: 0">修改说明：需要选择驾驶员，终端驾驶人员有该人员则修改，无则新增;</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" id="doDispatch" class="btn btn-primary">下发</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 驾驶人员列表 -->
+            <div class="modal fade" id="driverListModal" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                 role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog  modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+                            <h4 class="modal-title" >驾驶人员列表</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row" style="padding: 15px;height: 405px;overflow: auto;">
+                                <div id="driverListBox">
+                                    <table style="margin-bottom: 150px;">
+                                        <thead>
+                                        <tr>
+                                            <th>序号</th>
+                                            <th>人脸ID</th>
+                                            <th>姓名</th>
+                                            <th>所属企业</th>
+                                            <th>从业资格证号</th>
+                                            <th>照片预览</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="col-md-10" style="text-align: left">
+                                <div id="driverListBox22">
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>车牌号</th>
+                                            <th>查询成功时间</th>
+                                            <th>最近查询时间</th>
+                                            <th>查询结果</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" id="doDriverListDispatch" class="btn btn-primary">下发查询指令</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<script src="/clbs/resources/js/ungzip/ungzip.js"></script>
+<script src="/clbs/resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/driverDiscernManage.js"></script>
+</body>
+
+</html>

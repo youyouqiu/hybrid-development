@@ -1,0 +1,314 @@
+<form th:action="@{/m/basicinfo/monitoring/vehicle/batchEdit.gsp}" id="batchEditForm"
+      role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改车辆信息</h4>
+        <style>
+            label.control-label{
+                padding-left: 0;
+                padding-right: 0;
+            }
+            #batchEditForm input[type='checkbox']{
+                vertical-align: -2px;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        基本信息
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        车牌号：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="brand" placeholder="请输入车牌号" type="text" id="brand" disabled
+                               class="form-control"/>
+                        <input name="id" type="hidden" id="vehicleIds"/>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        <input type="checkbox"> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input name="groupName" disabled class="form-control" id="zTreeCitySel"
+                               placeholder="请选择所属企业" type="text" autocomplete="off"/>
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true"></span>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <input id="selectGroup" disabled name="groupId" type="text" hidden="true"/>
+                        <label id="error_label_add" class="error" style="display: none;"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 别名：</label>
+                    <div class="col-md-4">
+                        <input name="aliases" disabled placeholder="请输入车辆别名" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车主：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleOwner" disabled placeholder="请输入车主名称" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        <input type="checkbox" class="categoryCheck" data-edit="category"> 车辆类别：
+                    </label>
+                    <div class="col-md-4">
+                        <select name="vehicleCategory" disabled placeholder="其他车辆" id="vehicleCategory"
+                                class="form-control category">
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        <input type="checkbox" class="categoryCheck" data-edit="category"> 车辆类型：
+                    </label>
+                    <div class="col-md-4">
+                        <select name="vehicleType" disabled placeholder="其他车辆" id="vehicleType"
+                                class="form-control category">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车主电话：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleOwnerPhone" disabled placeholder="请输入车主电话" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 电话是否校验：</label>
+                    <div class="col-md-4">
+                        <select name="phoneCheck" disabled placeholder="请输入车辆类型" id="phoneCheck"
+                                class="form-control">
+                            <option value="-1" selected>-请选择校验状态-</option>
+                            <option value="0">未校验</option>
+                            <option value="1">已校验</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车辆颜色：</label>
+                    <div class="col-md-4">
+                        <select name="vehicleColor" disabled placeholder="请选择车辆颜色"
+                                class="form-control">
+                            <option selected="selected" value="0">黑色</option>
+                            <option value="1">白色</option>
+                            <option value="2">红色</option>
+                            <option value="3">蓝色</option>
+                            <option value="4">紫色</option>
+                            <option value="5">黄色</option>
+                            <option value="6">绿色</option>
+                            <option value="7">粉色</option>
+                            <option value="8">棕色</option>
+                            <option value="9">灰色</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车牌颜色：</label>
+                    <div class="col-md-4">
+                        <select name="plateColor" disabled placeholder="请选择车牌颜色"
+                                class="form-control plateColorSelect"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 燃料类型：</label>
+                    <div class="col-md-4">
+                        <select name="fuelType" disabled class="form-control" id="fuelType" placeholder="请输入燃料类型">
+                            <optgroup label="柴油" id="dieselOil">
+                            </optgroup>
+                            <optgroup label="汽油" id="gasoline">
+                            </optgroup>
+                            <optgroup label="天然气" id="naturalGas">
+                                <!--  <option value="CNG">CNG</option> -->
+                            </optgroup>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 区域属性：</label>
+                    <div class="col-md-4">
+                        <select name="areaAttribute" disabled placeholder="请选择区域属性"
+                                class="form-control">
+                            <option value="省内">省内</option>
+                            <option value="跨省">跨省</option>
+                            <option value="进京报备">进京报备</option>
+                        </select>
+                    </div>
+                </div>
+                <div data-toggle="distpicker">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label"><input type="checkbox" class="cityCheck" data-edit="city"> 省、直辖市：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="province1">Province</label>
+                            <select class="form-control city" disabled data-province="—— 省 ——" name="province"
+                                    id="province1"></select>
+                        </div>
+                        <label class="col-md-2 control-label"><input type="checkbox" class="cityCheck" data-edit="city"> 市、区：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="city1">City</label>
+                            <select class="form-control city" disabled data-city="—— 市 ——" name="city" id="city1"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label"><input type="checkbox" class="cityCheck" data-edit="city"> 县：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="city1">County</label>
+                            <select class="form-control city" disabled name="county" data-district="—— 县 ——" id="county"></select>
+                        </div>
+                        <label class="col-md-2 control-label"><input type="checkbox"> 运营类别：</label>
+                        <div class="col-md-4">
+                            <div style="position:relative;">
+                                <div class="input-group">
+                                    <input name="category" disabled type="text"
+                                           class="form-control"
+                                           id="category">
+                                    <div class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-white dropdown-toggle"
+                                                data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right"
+                                            role="menu" style="width:100%!important">
+                                        </ul>
+                                    </div>
+                                </div>
+                                <input id="vehiclePurpose" disabled name="vehiclePurpose"
+                                       hidden="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 所属行业：</label>
+                    <div class="col-md-4">
+                        <select id="operation" disabled class="form-control" name="tradeName">
+                            <option value = "">请选择所属行业</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车辆状态：</label>
+                    <div class="col-md-4">
+                        <select name="isStart" disabled class="form-control">
+                            <option selected="selected" value="1">启用</option>
+                            <option value="0">停用</option>
+                        </select>
+                        <input id="radionOn" disabled type="text" hidden="true"/>
+                        <input id="radionOff" disabled type="text" hidden="true"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 核定载人数：</label>
+                    <div class="col-md-4">
+                        <input id="numberLoad" disabled name="numberLoad" placeholder="请输入核定载人数" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 核定载质量：</label>
+                    <div class="col-md-4">
+                        <input name="loadingQuality" disabled placeholder="请输入核定载质量" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">车辆保险单号：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleInsuranceNumber" disabled placeholder="请输入车辆保险单号" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车辆等级：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleLevel" disabled placeholder="请输入车辆等级" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 技术等级有效期：</label>
+                    <div class="col-md-4">
+                        <input disabled autocomplete="off"
+                               class="form-control layer-date laydate-icon" placeholder="请选择有效期"
+                               id="technologyValidity" name="vehicleTechnologyValidity"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 保养里程数(km)：</label>
+                    <div class="col-md-4">
+                        <input name="maintainMileage" disabled placeholder="请输入保养里程数" maxlength="6" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 保养有效期：</label>
+                    <div class="col-md-4">
+                        <input disabled autocomplete="off"
+                               class="form-control layer-date laydate-icon" placeholder="请选择保养有效期"
+                               id="maintainValidity" name="maintainValidity"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 车台安装日期：</label>
+                    <div class="col-md-4">
+                        <input disabled autocomplete="off"
+                               class="form-control layer-date laydate-icon" placeholder="请选择车台安装日期"
+                               id="vehiclePlatformInstallDate" name="vehiclePlatformInstallDate"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><input type="checkbox"> 备注：</label>
+                    <div class="col-md-4">
+                        <input name="remark" disabled placeholder="请输入备注" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><input type="checkbox"> 维修状态：</label>
+                    <div class="col-md-4">
+                        <label class="control-label radioLabel" style="margin-right: 20px">
+                            <input disabled name="stateRepair" value="1" type="radio" style="vertical-align: -2px;"/> 是
+                        </label>
+                        <label class="control-label radioLabel">
+                            <input disabled name="stateRepair" checked value="0" type="radio" style="vertical-align: -2px;"/> 否
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitAdd" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script th:inline="javascript">
+    var publicSize6 = [[#{public.size6.length}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize15 = [[#{public.size15.length}]];
+    var publicSize17 = [[#{public.size17.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize24 = [[#{public.size24.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var publicNull = [[#{public.null}]];
+    var vehicleOwnerNull = [[#{vehicle.vehicleOwner.null}]];
+    var vehicleOwnerMaxlength = [[#{vehicle.vehicleOwner.maxlength}]];
+
+    var integerTwo = [[#{info.integer.two}]];//输入值范围0-99
+    var integerFour = [[#{info.integer.four}]];//输入值范围0-9999
+    var integerSix = [[#{info.integer.six}]];//输入值范围0-999999
+    var lengthFour = [[#{info.length.four}]];//输入范围1-10位
+    var lengthTen = [[#{info.length.ten}]];//输入范围1-10位
+    var lengthEight = [[#{info.length.eight}]];//输入范围1-8位
+    var lengthTwenty = [[#{info.length.twenty}]];//输入范围1-20位
+    var naturalNumber = [[#{info.natural.number}]];//输入类型为自然数
+    var minZero = [[#{info.min.zero}]];//输入类型为非负数
+    var decimalone = [[#{info.decimal.one}]];//精度0.1
+    var chassisNumber = [[#{OCR.vehicle.chassisNumber}]]; // 车架号
+    var brandModelsError = [[#{OCR.vehicle.brandModels}]]; // 品牌型号
+    var enNumberErr = [[#{OCR.vehicle.EnNumber}]];
+    var chEnNumberErr = [[#{OCR.vehicle.ChEnNumber}]];
+</script>
+<script src="/clbs/resources/js/vehicleBatchEdit.js"></script>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.oilsubsidy.DirectionStationMiddleDao">
+    <insert id="add" parameterType="com.zw.platform.domain.oilsubsidy.line.DirectionStationMiddleDO">
+        insert into zw_m_oil_subsidy_direction_station_middle
+        values(#{directionInfoId},#{stationInfoId},#{stationInfoOrder},#{directionType})
+    </insert>
+
+    <insert id="addBatch" parameterType="com.zw.platform.domain.oilsubsidy.line.DirectionStationMiddleDO">
+        insert into zw_m_oil_subsidy_direction_station_middle
+        values
+        <foreach collection ="list" item="item" index= "index" separator =",">
+            (#{item.directionInfoId},#{item.stationInfoId},#{item.stationInfoOrder},#{item.directionType})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.oilsubsidy.line.LineDO">
+        update zw_m_oil_subsidy_direction_station_middle
+        <set>
+            <if test="stationInfoId != null and stationInfoId !=''">
+                station_info_id = #{stationInfoId},
+            </if>
+            <if test="stationInfoOrder != null">
+                station_info_order = #{stationInfoOrder}
+            </if>
+        </set>
+        where direction_Info_Id =#{directionInfoId} and direction_type = #{directionType}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        delete from zw_m_oil_subsidy_direction_station_middle where direction_Info_Id =#{directionInfoId}
+    </delete>
+
+    <delete id="deleteBatch">
+        delete from zw_m_oil_subsidy_direction_station_middle where direction_Info_Id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+            and direction_type in (0,1)
+    </delete>
+
+    <select id="getAllFieldById" resultType="com.zw.platform.domain.oilsubsidy.line.LineDO" parameterType="String">
+        select direction_Info_Id,station_info_id,station_info_order,direction_type
+        from zw_m_oil_subsidy_direction_station_middle where direction_Info_Id =#{directionInfoId}
+    </select>
+
+    <select id="getStationInfoByDirectionId" resultType="com.zw.platform.domain.oilsubsidy.line.DirectionStationDTO">
+        select t1.id, t1.name,t1.describe,t1.number,t1.latitude,t1.longitude, t2.station_info_order as stationOrder
+        ,t2.direction_type,t2.direction_info_id
+        from zw_m_oil_subsidy_station_info t1 inner  join
+            zw_m_oil_subsidy_direction_station_middle t2 on t2.station_info_id = t1.id
+            where t1.flag = 1 and t2.direction_info_id in
+        <foreach collection="directionIds"  separator="," open="(" item="directionId" close=")">
+            #{directionId}
+        </foreach>
+            order by  t2.direction_type desc,t2.station_info_order
+    </select>
+
+</mapper>

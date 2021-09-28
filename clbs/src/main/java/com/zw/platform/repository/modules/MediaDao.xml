@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.MediaDao">
+
+    <!-- 查询多媒体 -->
+    <select id="findMedia"
+            parameterType="com.zw.platform.domain.multimedia.query.MediaQuery"
+            resultType="com.zw.platform.domain.multimedia.Media">
+        SELECT distinct m.*,v.brand, GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') assignment,v.plate_color FROM zw_m_media m
+        INNER JOIN zw_m_vehicle_info v ON v.id = m.vehicle_id AND v.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag=1
+        INNER JOIN zw_m_assignment a ON av.assignment_id = a.id AND a.flag = 1
+        WHERE m.flag = 1
+        <if test="startTime != null">
+            AND m.create_data_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND m.create_data_time &lt;= #{endTime}
+        </if>
+        <if test="type != null">
+            AND m.type = #{type}
+        </if>
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND (m.media_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR v.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        <if test="vehicleId != null and vehicleId !=''">
+            AND m.vehicle_id = #{vehicleId}
+        </if>
+        GROUP BY m.id,m.vehicle_id
+        ORDER BY m.create_data_time DESC
+    </select>
+
+    <!-- 新增多媒体 -->
+    <insert id="addMedia" parameterType="com.zw.platform.domain.multimedia.form.MediaForm">
+        insert into zw_m_media
+        (id, type, media_name,media_url,format_code, event_code, way_id, vehicle_id, media_id,
+        flag, create_data_time, create_data_username,risk_id,risk_event_id,source,visit_id,media_url_new,
+        description, latitude, longitude, speed, monitor_name, upload_time)
+        values (#{id}, #{type}, #{mediaName}, #{mediaUrl},#{formatCode},#{eventCode}, #{wayId}, #{vehicleId},
+        #{mediaId}, #{flag}, #{createDataTime}, #{createDataUsername},#{riskId},#{riskEventId},#{source},
+        #{visitId},#{mediaUrlNew}, #{description}, #{latitude}, #{longitude}, #{speed}, #{brand}, #{uploadTime})
+    </insert>
+
+    <!-- 根据id删除多媒体 -->
+    <update id="deleteById">
+		update zw_m_media set flag = 0 WHERE id = #{id}
+	</update>
+
+	    <select id="findById" resultType="com.zw.platform.domain.multimedia.form.MediaForm"
+            parameterType="string">
+        SELECT * from zw_m_media where id =#{id}
+    </select>
+    
+    <select id="queryMediaPathByRiskId" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT DISTINCT media_url FROM zw_m_media WHERE flag = 1 AND  risk_id = #{riskId} AND source = 1 and media_name like '%.zip'
+	</select>
+
+    <update id="updateMediaStatus" parameterType="string">
+        update  zw_m_media set flag = 1 WHERE media_name = #{mediaName}
+    </update>
+    <select id="hasTerminalEvidece" resultType="java.util.Map">
+        SELECT m.media_name AS mediaName,m.media_url AS mediaUrl FROM zw_m_media m WHERE m.flag = 1
+        <if test="isEvent == true">
+            AND m.risk_event_id = #{downLoadId}
+        </if>
+        <if test="isEvent == false">
+            AND m.risk_id = #{downLoadId}
+        </if>
+    </select>
+
+    <select id="queryAll"  resultType="com.zw.platform.domain.multimedia.form.MediaForm">
+        select id ,media_id ,vehicle_id from zw_m_media where flag=1 and substring_index(media_name,".",-1)='jpeg'
+    </select>
+
+    <select id="queryMediaUrlById" resultType="java.lang.String" parameterType="java.lang.String">
+        select media_url from zw_m_media where flag = 1 and id =#{id}
+    </select>
+
+    <select id="queryMediaUrlNewById" resultType="java.lang.String" parameterType="java.lang.String">
+        select media_url_new from zw_m_media where flag = 1 and id =#{id};
+    </select>
+
+    <select id="queryRiskEvidenceByRiskId" resultType="com.zw.platform.domain.multimedia.form.MediaForm"
+            parameterType="string">
+        SELECT * from zw_m_media where risk_id =#{riskId} and media_name not like '%.zip' and  media_id is null
+    </select>
+
+    <select id="queryZipRiskEvidenceByRiskId" resultType="com.zw.platform.domain.multimedia.form.MediaForm"
+            parameterType="string">
+        SELECT * from zw_m_media where risk_id =#{riskId} and media_name  like '%.zip' and  media_id is null
+    </select>
+
+    <select id="getMediaByMediaId" parameterType="string" resultType="com.zw.platform.domain.multimedia.Media">
+        select id,description from zw_m_media where flag = 1 and id = #{id}
+    </select>
+
+    <update id="updateMediaDescription">
+      update zw_m_media set description = #{description} where id = #{id}
+    </update>
+
+</mapper>

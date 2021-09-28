@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>多窗口监控</title>
+    <meta charset="utf-8"/>
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10"/>-->
+    <meta http-equiv="Expires" content="0"/>
+    <meta http-equiv="Cache-Control" content="no-cache"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="refresh" content="36000; url=/clbs/login?type=timeout"/>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" id="icoLink" name="favicon.ico" th:href="@{/resources/img/favicon.ico}" type="image/x-icon"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" th:href="@{/resources/js/bootstrap/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}"/>
+    <link rel="stylesheet" href="/wro/animate.css" th:href="@{/wro/animate.css}"/>
+    <link rel="stylesheet" href="/wro/main.css" th:href="@{/wro/main.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/multiWindowMonitoring.css"/>
+    <link rel="stylesheet" href="resources/js/zTree/css/zTreeStyle.css"
+          th:href="@{/resources/js/zTree/css/zTreeStyle.css}"/>
+    <link rel="stylesheet" href="/wro/wizard.css" th:href="@{/wro/wizard.css}"/>
+    <link rel="stylesheet" href="/wro/adaptiveStyle.css" th:href="@{/wro/adaptiveStyle.css}"/>
+    <link rel="stylesheet" href="/wro/clockPlugins.css" th:href="@{/wro/clockPlugins.css}"/>
+    <link rel="stylesheet" href="/clbs/resources/css/twinkle.css"/>
+    <link rel="stylesheet" href="/clbs/resources/js/jQueryPowertip/justtool.css"/>
+    <script src="resources/js/modernizr-2.6.2.min.js" th:src="@{/resources/js/modernizr-2.6.2.min.js}"></script>
+    <script src="resources/js/jquery-1.10.2.min.js" th:src="@{/resources/js/jquery-1.10.2.min.js}"></script>
+    <style>
+        .form-group {
+            margin-bottom: 13px;
+        }
+    </style>
+</head>
+<body>
+<section style="overflow: hidden">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper main-content-wrapper-white main-content-toggle-left">
+        <div th:replace="fragments/menu">menu</div>
+        <div class="content">
+            <div class="left-part" id="leftPart">
+                <div class="panel-heading page-heading">
+                    <h3 class="panel-title page-title">监控对象</h3>
+                    <a class="jump-link" data-toggle="tooltip"
+                       data-placement="left" title="轨迹回放" target="_blank"
+                       href="/clbs/v/monitoring/trackPlayback" data-original-title="轨迹回放"
+                    >
+                        <img src="/clbs/resources/img/guijihuifang.svg">
+                    </a>
+                </div>
+
+
+
+                <div>
+                    <div class="form-horizontal">
+                        <div class="form-group allGroup" style="padding-top:15px;padding-left:15px;padding-right:15px;">
+                            <div style="cursor:pointer" id="chooseAll"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding tree-type-link" data-type="all">
+                                <span>全部</span><span id="tall">(...)</span>
+                            </div>
+                            <div style="cursor:pointer" id="online"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPaddingOnLine tree-type-link" data-type="online">
+                                <span>在线</span><span id="tline">(...)</span>
+                            </div>
+                            <div style="cursor:pointer" id="chooseMissLine"
+                                 class="col-md-4 col-sm-5 col-xs-5 text-center btnPadding tree-type-link" data-type="offline">
+                                <span>不在线</span><span id="tmiss">(...)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group allGroup" style="padding-left:15px">
+                        <div class="col-md-5 col-sm-12 col-xs-12" style="padding: 0px 5px 0px 0px;">
+                            <select id="searchType" placeholder="请选择搜索类别"
+                                    class="form-control">
+                                <option selected="selected" value="name">监控对象</option>
+                                <option value="deviceNumber">终端号</option>
+                                <option value="simcardNumber">终端手机号</option>
+                                <option value="group">企业</option>
+                                <option value="assignName">分组</option>
+                                <option value="professional">从业人员</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 col-sm-12 col-xs-12"
+                             style="padding: 0px 10px 0px 0px;">
+                            <input id="search_condition" name="search" autocomplete="off"
+                                   type="text" class="form-control" placeholder="关键字"/>
+                        </div>
+                        <div class="col-md-2 col-sm-12 col-xs-12" style="padding: 0px 0px 0px 0px;">
+                            <button  class="btn btn-default dropdown-toggle" type="button"
+                                     aria-haspopup="true" aria-expanded="true" id="refresh">
+                                <i class="glyphicon glyphicon-refresh"></i>
+                            </button>
+
+                        </div>
+                    </div>
+                    <div class="col-md-12 tree-container" id="thetree">
+                        <div id="treeLoad" style="width: 140px; margin: 20px auto 0 65px";>
+                            <i class="fa fa-spinner loading-state"></i>
+                            <span>加载中，请稍候</span>
+                        </div>
+                        <ul id="treeDemo" class="ztree"></ul>
+                    </div>
+                    <div class="col-md-12 stateArea" id="IdentificationInfo" style="padding:0;padding-top:12px;">
+                        <div class="col-md-12 form-group" style="margin-bottom: 7px">
+                            <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center tree-type-link"  data-type="heartBeat">
+                                    <span type="button" id="chooseHeartBeat" style="cursor:pointer"
+                                          class="heartbeatArea">
+                                        <span class="heartbeat_ico"></span>心&nbsp;&nbsp;&nbsp;跳
+                                    </span>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center tree-type-link"  data-type="notPosition">
+													<span class="onlineNotPositioningArea" style="cursor:pointer"
+                                                          id="chooseNot" type="button">
+														<span class="onlineNotPositioning_ico"></span>未定位
+													</span>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-4 stateIcon text-center tree-type-link"  data-type="alarm">
+													<span type="button" id="chooseAlam" style="cursor:pointer"
+                                                          class="warningArea">
+														<span class="warning_ico"></span>报&nbsp;&nbsp;&nbsp;警
+													</span>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group" style="margin-bottom: 7px">
+                            <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center tree-type-link"  data-type="run">
+													<span class="onlineDrivingArea" style="cursor:pointer"
+                                                          id="chooseRun" type="button">
+														<span class="onlineDriving_ico"></span>行&nbsp;&nbsp;&nbsp;驶
+													</span>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center tree-type-link" data-type="stop">
+													<span type="button" id="chooseStop" style="cursor:pointer"
+                                                          class="onlineParkingArea">
+														<span class="onlineParking_ico"></span>停&nbsp;&nbsp;&nbsp;止
+													</span>
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center tree-type-link" data-type="overSpeed">
+													<span type="button" id="chooseOverSeep" style="cursor:pointer"
+                                                          class="speedLimitWarningArea">
+														<span class="speedLimitWarning_ico"></span>超&nbsp;&nbsp;&nbsp;速
+													</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="small-window-container">
+                        <div class="small-window-number">
+                            <span class="small-window-number-span number-icon" data-type="1">1</span>
+                            <span class="small-window-number-span number-icon" data-type="2">2</span>
+                            <span class="small-window-number-span number-icon" data-type="3">3</span>
+                            <span class="small-window-number-span number-icon" data-type="4">4</span>
+                            <span class="small-window-number-span number-icon" data-type="5">5</span>
+                            <span class="small-window-number-span active number-icon" data-type="6">6</span>
+                            <span class="small-window-number-span number-icon" data-type="7">7</span>
+                            <span class="small-window-number-span number-icon" data-type="8">8</span>
+                            <span class="small-window-number-span number-icon" data-type="9">9</span>
+                            <span class="small-window-number-span number-icon" data-type="10">10</span>
+                        </div>
+                        <div class="small-window-setting">
+                            <span class="small-window-number-span">
+                                <a href="/clbs/core/uum/custom/setting_MULTI_WINDOW_REALTIME_MONITORING"
+                                   style="color: white;display:inline-block;width:100%;height:100%;"
+                                   data-toggle="modal" data-target="#commonSmWin">
+                                    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                                </a>
+                            </span>
+                            <div>
+                                <span class="small-window-number-span map-icon">
+                                <div class="map-setting-container">
+                                    <label class="input-label">
+                                        <input type="radio" name="map-type" value="amap" class="radio-input" checked="">
+                                        <span class="radio-active"></span>
+                                        <span>高德地图</span>
+                                    </label>
+                                    <label class="input-label">
+                                        <input type="radio" name="map-type" value="google" class="radio-input">
+                                        <span class="radio-active"></span>
+                                        <span>谷歌地图</span>
+                                    </label>
+                                    <label class="input-label">
+                                        <input type="radio" name="map-type" value="satellite" class="radio-input" >
+                                        <span class="radio-active"></span>
+                                        <span>卫星地图</span>
+                                    </label>
+
+                                    <label class="input-label pull-right">
+                                        <input type="checkbox" name="showTraffic" id="showTraffic" class="check-input">
+                                        <span class="check-active"></span>
+                                        <span>路况</span>
+                                    </label>
+                                </div>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="right-part" id="rightPart">
+                <div class="multi-window-container" id="multiWindowContainer">
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div th:replace="fragments/footer_multi_window_monitoring">footer</div>
+</section>
+<div class="drag-placeholder"></div>
+<script type="text/html" id="windowDefaultTmpl">
+    <div class="empty-prompt">
+    </div>
+    <div class="map-box">
+        <div class="map-bag" ></div>
+        <div class="ope-container">
+            <span class="cancel-subscribe-icon ope-icon" title="取消订阅"></span>
+            <!--<span class="track-icon ope-icon" title="显示尾迹"></span>-->
+            <span class="full-screen-icon ope-icon" title="切换全屏"></span>
+            <span class="move-icon ope-icon" title="拖拽移动"></span>
+        </div>
+        <div class="signal-container">
+            <div class="battery-box">
+                <div class="battery-bag" style="width:50%"></div>
+                <div class="battery-text">50</div>
+            </div>
+            <div class="satellite-box">
+                <div class="satellite-text">1</div>
+            </div>
+            <div class="wifi-box wifi-box-1">
+
+            </div>
+            <div class="gps-box gps-box-1">
+                <div class="gps-text">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="status-box">
+        <div class="locate-container">
+            <span class="locate-icon ope-icon" title="跟踪"></span>
+        </div>
+        <div class="status-bag container-fluid">
+            <div class="row">
+                <div class="col-md-8 status-text">状态：--</div>
+                <div class="col-md-4 status-signal"></div>
+                <div class="status-arrow"></div>
+            </div>
+            <div class="row">
+                <div class="window-time-box">定位时间：<span class="window-time">--</span></div>
+            </div>
+            <div class="row">
+                <div class="window-location-box">
+                    当前位置：<span class="window-location">--</span>
+                </div>
+            </div>
+        </div>
+        <div class="sensor-box">
+            <div class="sensor-bag flex-box flex-wrap">
+
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorSpeedTmpl">
+    <div class="flex-item speed-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">km/h</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon speed-icon"></span>
+            <span class="sensor-title-text">当前速度</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorMileageTmpl">
+    <div class="flex-item mileage-item">
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">km</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon mileage-icon"></span>
+            <span class="sensor-title-text">当日里程</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorAccTmpl">
+    <div class="flex-item mileage-item">
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon acc-icon"></span>
+            <span class="sensor-title-text">ACC</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorOilTmpl">
+    <div class="flex-item oil-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">L</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon oil-icon"></span>
+            <span class="sensor-title-text">当前油量</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensoroilExpendTmpl">
+    <div class="flex-item oilExpend-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">L</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon oilExpend-icon"></span>
+            <span class="sensor-title-text">当日油耗</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorTempTmpl">
+    <div class="flex-item temp-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">°C</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon temp-icon"></span>
+            <span class="sensor-title-text">当前温度</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorHumiTmpl">
+    <div class="flex-item humi-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">%</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon humi-icon"></span>
+            <span class="sensor-title-text">当前湿度</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorWorkhourTmpl">
+    <div class="flex-item workhour-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">h</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon workhour-icon"></span>
+            <span class="sensor-title-text"></span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorReverseTmpl">
+    <div class="flex-item reverse-item">
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">h</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon reverse-icon"></span>
+            <span class="sensor-title-text"></span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorWeightTmpl">
+    <div class="flex-item weight-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit"></span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon weight-icon"></span>
+            <span class="sensor-title-text"></span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorTireTmpl">
+    <div class="flex-item tire-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+            <span class="sensor-unit">bar</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon tire-icon"></span>
+            <span class="sensor-title-text">胎压</span>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="sensorIOTmpl">
+    <div class="flex-item io-item">
+        <div class="sensor-number"></div>
+        <div class="sensor-value-line">
+            <span class="sensor-value">--</span>
+        </div>
+        <div class="sensor-title">
+            <span class="sensor-icon io-icon"></span>
+            <span class="sensor-title-text"></span>
+        </div>
+    </div>
+</script>
+<script src="https://webapi.amap.com/maps?v=2.0&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.AutoComplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolygonEditor,AMap.PolylineEditor,AMap.MoveAnimation,AMap.CircleEditor"></script>
+<script src="resources/js/sockjs-1.1.1.min.js" th:src="@{/resources/js/sockjs-1.1.1.min.js}"></script>
+<script src="resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/multi-window-monitoring.js" th:src="@{/wro/multi-window-monitoring.js}"></script>
+
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+    var vehicleNumberChoose = [[#{vehicle.number.choose}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<form th:object="${result}" id="editForm" role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXDetail" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">详情</h4>
+    </div>
+    <style>
+        .tooltip{
+            width: 190px;
+        }
+    </style>
+    <div class="modal-body">
+        <input type="text" th:field="*{cid}" class="hidden"/>
+        <input type="text" th:field="*{pid}" class="hidden"/>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"><label class="text-danger">*</label> 组织机构名称：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{name}" type="text" maxlength="50"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{organizationCode}" type="text" maxlength="10"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 上级组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{upOrganizationCode}" type="text" maxlength="10"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 管理组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{managerOrganizationCode}" type="text" maxlength="30"
+                                   class="form-control inpOrganizationDetails"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营范围：</label>
+                        <div class="col-md-7">
+                            <div th:text="*{scopeOfOperation}" style="text-align: justify;padding: 8px 12px 0;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">行业类别：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{operation}" type="text" maxlength="10"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 发证机关：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{issuingOrgan}" type="text" maxlength="25"
+                                   class="form-control inpOrganizationDetails inputStyleHide"
+                                   readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证号：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{license}" type="text" maxlength="25"
+                                   class="form-control inpOrganizationDetails inputStyleHide"
+                                   readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证字别：</label>
+                        <div class="col-md-7">
+                            <input id="businessLicenseType" class="form-control inpOrganizationDetails"
+                                   th:field="*{businessLicenseType}"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 许可证有效期起：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control inpOrganizationDetails inputStyleHide"
+                                   th:field="*{licenseValidityStartDate}"
+                                   id="licenseValidityStartDate" name="licenseValidityStartDate" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 许可证有效期止：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control inpOrganizationDetails inputStyleHide"
+                                   th:field="*{licenseValidityEndDate}"
+                                   id="licenseValidityEndDate" name="licenseValidityEndDate" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">经营状态：</label>
+                        <div class="col-md-7">
+                            <select th:field="*{operatingState}" disabled class="form-control inputStyleHide"
+                                    style="background: none!important;">
+                                <option value="0" selected></option>
+                                <option value="1">营业</option>
+                                <option value="2">停业</option>
+                                <option value="3">整改</option>
+                                <option value="4">停业整顿</option>
+                                <option value="5">歇业</option>
+                                <option value="6">注销</option>
+                                <option value="7">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div data-toggle="distpicker">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">省、直辖市：</label>
+                            <div class="col-md-7">
+                                <input th:field="*{provinceName}" type="text" maxlength="20"
+                                       class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">市、区：</label>
+                            <div class="col-md-7">
+                                <input th:field="*{cityName}" type="text" maxlength="20"
+                                       class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">县：</label>
+                            <div class="col-md-7">
+                                <input th:field="*{countyName}" type="text" maxlength="20"
+                                       class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label"> 行政区划代码：</label>
+                            <div class="col-md-7">
+                                <input th:field="*{areaNumber}" type="text" maxlength="13"
+                                       class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">注册日期：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{registerDate}" type="text" maxlength="20"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 企业法人：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{principal}" type="text" maxlength="50"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">法人电话号码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{principalPhone}" type="text"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 联系人：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{contactName}" name="contactName" id="contactName" type="text"
+                                   maxlength="20"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 电话号码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{phone}" type="text"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 地址：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{address}" maxlength="50" type="text"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">备注：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{description}" maxlength="50" type="text"
+                                   class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">查岗用户：
+                            <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip" data-placement="top"
+                               data-original-title="此处设置的查岗用户可接收本企业和子企业的查岗推送，其他用户仅可接收本企业查岗推送！">
+                            </i>
+                        </label>
+                        <div class="col-md-7">
+                            <input th:field="*{extraInspectionReceivers}" type="text" class="form-control inpOrganizationDetails inputStyleHide" readonly/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doCloseDetail" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+
+<script>
+    $("[data-toggle='tooltip']").tooltip();
+</script>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.CircleDao">
+    <update id="deleteCircle">
+        update zw_m_circle
+        set flag = 0
+        where id = #{fenceId}
+    </update>
+
+    <select id="getCircleById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.Circle">
+        SELECT zmc.*, zmft.color_code, zmft.transparency
+        FROM zw_m_circle zmc
+                 left join zw_m_fence_info zmfi on zmfi.shape = zmc.id and zmfi.flag = 1
+                 left join zw_m_fence_type zmft on zmft.id = zmfi.fence_type_id and zmft.flag = 1
+        WHERE zmc.flag = 1
+          and zmc.id = #{id}
+    </select>
+    <!--新增圆-->
+    <insert id="circles" parameterType="com.zw.platform.domain.functionconfig.form.CircleForm">
+        INSERT INTO zw_m_circle (
+        id, name, longitude, latitude, type, description, radius, group_id, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{name}, #{longitude}, #{latitude}, #{type}, #{description}, #{radius}, #{groupId},#{createDataTime}, #{createDataUsername}
+        )
+    </insert>
+    <!--更新圆形区域-->
+    <update id="updateCircle" parameterType="com.zw.platform.domain.functionconfig.form.CircleForm">
+        UPDATE zw_m_circle 
+        SET
+        	name = #{name}, 
+        	longitude = #{longitude}, 
+        	latitude = #{latitude}, 
+        	type = #{type}, 
+        	description = #{description}, 
+        	radius = #{radius}, 
+        	update_data_time = #{updateDataTime}, 
+        	update_data_username = #{updateDataUsername}
+        WHERE id = #{circleId}
+    </update>
+    <!-- 新增电子围栏总表 -->
+    <insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.ManageFenceFrom">
+        INSERT INTO zw_m_fence_info (id, type, shape, flag, create_data_time, create_data_username, fence_type_id, area)
+        VALUES (#{id}, #{type}, #{shape}, #{flag}, #{createDataTime}, #{createDataUsername}, #{typeId}, #{area})
+    </insert>
+    
+    <!-- 根据id list 查询圆形 -->
+     <select id="getCircleByIds"  resultType="com.zw.platform.domain.functionconfig.Circle">
+        SELECT
+        *
+        FROM
+        zw_m_circle
+        WHERE flag=1 and
+        id in 
+        <foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+    </select>
+    
+    <!-- 查询所有圆形区域 -->
+    <select id="findAllCircles" resultType="com.zw.platform.domain.functionconfig.Circle">
+        SELECT * FROM zw_m_circle WHERE flag=1 
+    </select>
+</mapper>

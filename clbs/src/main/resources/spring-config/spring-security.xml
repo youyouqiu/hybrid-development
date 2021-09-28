@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:oauth2="http://www.springframework.org/schema/security/oauth2"
+       xmlns:sec="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/security/oauth2
+    http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+    http://www.springframework.org/schema/security
+    http://www.springframework.org/schema/security/spring-security.xsd">
+    <description>spring security权限控制</description>
+    <!-- 开发环境 配置debug，会输出详细Security处理日志，正式环境建议去掉 -->
+    <!--<sec:debug/>-->
+    <!-- 配置不过滤的资源（静态资源及登录相关）, 当指定一个http元素的security属性为none时，表示其对应pattern的filter链为空 -->
+    <sec:http pattern="/files/**" security="none"/>
+    <sec:http pattern="/resources/**" security="none"/>
+    <sec:http pattern="/wro/**" security="none"/>
+    <sec:http pattern="/webservice/*" security="none"/>
+    <sec:http pattern="/a/businessReport/alarmSearch/genCode" security="none"/>
+    <!-- Web Socket不经过认证 -->
+<!--    <sec:http pattern="/vehicle/**" security="none"/>-->
+    <sec:http pattern="/guide/vehicle/**" security="none"/>
+    <sec:http pattern="/risk/security/**" security="none"/>
+    <sec:http pattern="/ackHealth/**" security="none"/>
+    <sec:http pattern="/expire/**" security="none"/>
+    <!-- 获取验证码的路径 -->
+    <sec:http pattern="/getCaptcha.gsp" security="none"/>
+    <sec:http pattern="/getCaptchaString" security="none"/>
+    <!-- 登录页面 -->
+    <sec:http pattern="/login" security="none"/>
+     <!-- 登录页面 -->
+    <sec:http pattern="/check" security="none"/>
+    <sec:http pattern="/ftpVideo/**" security="none"/>
+    <!-- 转发的实时视频页面 -->
+    <sec:http pattern="/v/monitoring/forward/**" security="none"/>
+    <!-- 转发的视频回放页面websocket -->
+    <sec:http pattern="/videoPlaybackForward/**" security="none"/>
+    <!--<sec:http pattern="/realTimeVideo/video/getChannels" security="none"/>-->
+    <!-- app网络状态检查接口 -->
+    <sec:http pattern="/app/order/checkServerUnobstructed" security="none"/>
+    <!-- app单点登录获得客户端id -->
+    <sec:http pattern="/m/user/clientId" security="none"/>
+    <!-- app单点登录验证客户端id -->
+    <sec:http pattern="/m/user/clientId/check" security="none"/>
+    <!-- app强制更新状态检查接口 -->
+    <sec:http pattern="/app/update/force" security="none"/>
+    <sec:http pattern="/app/update/highest" security="none"/>
+    <sec:http pattern="/app/sm/check" security="none"/>
+    <sec:http pattern="/single/vehicle/**" security="none"/>
+
+    <sec:http pattern="/vehicle/offlineExport" security="none"/>
+    <!-- oauth -->
+    <sec:http pattern="/oauth/token" create-session="stateless"
+              authentication-manager-ref="oauth2AuthenticationManager"
+              use-expressions="false">
+        <sec:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+        <sec:anonymous enabled="false"/>
+        <sec:http-basic entry-point-ref="oauth2AuthenticationEntryPoint"/>
+        <sec:custom-filter ref="clientCredentialsTokenEndpointFilter"
+                           before="BASIC_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+    <!-- oauth资源 -->
+    <sec:http pattern="/swagger/**" create-session="never"
+              entry-point-ref="oauth2AuthenticationEntryPoint"
+              access-decision-manager-ref="oauth2AccessDecisionManager"
+              use-expressions="false">
+        <sec:anonymous enabled="false"/>
+        <sec:intercept-url pattern="/swagger/**"
+                           access="IS_AUTHENTICATED_FULLY,SCOPE_READ"/>
+        <sec:custom-filter ref="mobileResourceServer"
+                           before="PRE_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+
+    <sec:http pattern="/app/**" create-session="never"
+              entry-point-ref="oauth2AuthenticationEntryPoint"
+              access-decision-manager-ref="oauth2AccessDecisionManager"
+              use-expressions="false">
+        <sec:anonymous enabled="false"/>
+        <sec:intercept-url pattern="/app/**" access="IS_AUTHENTICATED_FULLY,SCOPE_READ"/>
+        <sec:custom-filter ref="mobileResourceServer" before="PRE_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+
+    <sec:http pattern="/cb/chatServer" create-session="never"
+              entry-point-ref="oauth2AuthenticationEntryPoint"
+              access-decision-manager-ref="oauth2AccessDecisionManager"
+              use-expressions="false">
+        <sec:anonymous enabled="false"/>
+        <sec:intercept-url pattern="/cb/chatServer" access="IS_AUTHENTICATED_FULLY,SCOPE_READ"/>
+        <sec:custom-filter ref="mobileResourceServer" before="PRE_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+
+    <sec:http pattern="/ws/**" create-session="never"
+              entry-point-ref="oauth2AuthenticationEntryPoint"
+              access-decision-manager-ref="oauth2AccessDecisionManager"
+              use-expressions="false">
+        <sec:anonymous enabled="false"/>
+        <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY,SCOPE_READ"/>
+        <sec:custom-filter ref="mobileResourceServer" before="PRE_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauth2AccessDeniedHandler"/>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+
+    <!-- http元素用于定义Web相关权限控制 -->
+    <sec:http disable-url-rewriting="true" use-expressions="false"
+              authentication-manager-ref="authenticationManager">
+        <sec:intercept-url pattern="/oauth/**"
+                           access="IS_AUTHENTICATED_FULLY,ROLE_UNITY,ROLE_MOBILE"/>
+        <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY"/>
+        <sec:form-login login-page="/login"
+                        login-processing-url="/j_spring_security_check"
+                        authentication-failure-handler-ref="loginFailureHandler"
+                        authentication-success-handler-ref="loginSuccessHandler"/>
+        <sec:logout invalidate-session="true" logout-url="/logout"
+                    logout-success-url="/login?type=logout" delete-cookies="JSESSIONID"/>
+        <sec:custom-filter ref="customCorsFilter" before="PRE_AUTH_FILTER"/>
+        <sec:custom-filter ref="preAuthFilter" before="CHANNEL_FILTER"/>
+        <!--<sec:custom-filter before="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />-->
+        <!--<sec:custom-filter ref="webAuthenticationProcessingFilter" before="FORM_LOGIN_FILTER"/>-->
+<!--        <sec:session-management invalid-session-url="/login?type=expired">-->
+<!--            <sec:concurrency-control max-sessions="1" error-if-maximum-exceeded="false"-->
+<!--                                     expired-url="/login?type=expired" session-registry-ref="sessionRegistry"/>-->
+<!--        </sec:session-management>-->
+        <sec:anonymous enabled="true"/>
+        <sec:csrf disabled="true"/>
+        <sec:headers>
+            <sec:xss-protection />
+            <sec:frame-options policy="SAMEORIGIN" />
+        </sec:headers>
+    </sec:http>
+
+    <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
+        <constructor-arg ref="sessionRegistry" />
+        <constructor-arg value="/login?type=expired" />
+    </bean>
+
+    <bean id="sas" class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+                    <constructor-arg ref="sessionRegistry"/>
+                    <property name="maximumSessions" value="1" />
+                    <property name="exceptionIfMaximumExceeded" value="false" />
+                </bean>
+                <bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+                </bean>
+                <bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+                    <constructor-arg ref="sessionRegistry"/>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="preAuthFilter" class="com.zw.platform.commons.filter.PreAuthFilter">
+        <constructor-arg name="authPath" value="/clbs/j_spring_security_check"/>
+    </bean>
+
+    <bean id="customCorsFilter" class="com.zw.platform.commons.filter.CustomCorsFilter">
+        <constructor-arg name="authPath" value="/clbs/j_spring_security_check"/>
+        <constructor-arg name="redirectPath" value="/clbs/home"/>
+    </bean>
+
+    <bean id="loginFailureHandler" class="com.zw.platform.util.spring.LoginFailureHandler" />
+    <bean id="loginSuccessHandler" class="com.zw.platform.util.spring.LoginSuccessHandler" />
+
+    <bean id="webAuthenticationProcessingFilter" class="com.zw.platform.commons.filter.WebAuthenticationProcessingFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="sessionAuthenticationStrategy" ref="sas" />
+        <property name="authenticationFailureHandler" ref="loginFailureHandler"/>
+        <property name="authenticationSuccessHandler" ref="loginSuccessHandler"/>
+    </bean>
+
+    <!-- 用于认证的AuthenticationManager -->
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider ref="ldapAuthProvider"/>
+    </sec:authentication-manager>
+    <bean id="contextSource"
+          class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+        <constructor-arg value="${ldap.url}/${ldap.base}"/>
+        <property name="userDn" value="${ldap.userDn}"/>
+        <property name="password" value="${ldap.password}"/>
+    </bean>
+    <bean id="ldapAuthProvider"
+          class="com.zw.platform.commons.UserPermissionStatusCheck">
+        <constructor-arg ref="passwordComparisonAuthenticator"/>
+        <constructor-arg ref="ldapAuthoritiesPopulator"/>
+        <property name="userDetailsContextMapper" ref="ldapUserDetailsContextMapper"/>
+        <property name="messageSource" ref="messageSource"/>
+        <property name="hideUserNotFoundExceptions" value="true"/>
+    </bean>
+    <bean id="passwordComparisonAuthenticator"
+          class="org.springframework.security.ldap.authentication.PasswordComparisonAuthenticator">
+        <constructor-arg ref="contextSource"/>
+        <property name="userSearch">
+            <bean class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+                <constructor-arg index="0" value="ou=organization"/>
+                <constructor-arg index="1" value="(uid:caseExactMatch:={0})"/>
+                <constructor-arg index="2" ref="contextSource"/>
+            </bean>
+        </property>
+        <property name="passwordEncoder" ref="passwordEncoder"/>
+    </bean>
+    <bean id="ldapAuthoritiesPopulator"
+          class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
+        <constructor-arg ref="contextSource"/>
+        <constructor-arg value="ou=Groups"/>
+        <property name="groupSearchFilter" value="(member={0})"/>
+        <property name="rolePrefix" value=""/>
+        <property name="searchSubtree" value="true"/>
+        <property name="convertToUpperCase" value="true"/>
+    </bean>
+    <bean id="ldapUserDetailsContextMapper" class="com.zw.platform.commons.CustomUserDetailsContextMapper"/>
+    <!-- 密码生成器。 bcrypt算法与md5/sha算法有一个很大的区别，每次生成的hash值都是不同的，这样暴力猜解起来或许要更困难一些 -->
+    <bean id="passwordEncoder"
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+        <constructor-arg name="strength"
+                         value="${security.passwordEncoderStrength}"/>
+    </bean>
+    <bean id="tokenStore" class="com.zw.platform.commons.CustomTokenStore"/>
+    <bean id="tokenServices" class="com.zw.platform.commons.CustomTokenServices">
+        <property name="tokenStore" ref="tokenStore"/>
+        <property name="supportRefreshToken" value="true"/>
+    </bean>
+    <oauth2:client-details-service id="clientDetailsService">
+        <oauth2:client client-id="mobile_1"
+                       access-token-validity="1800"
+                       authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                       secret="secret_1" scope="read,write,trust"/>
+        <oauth2:client client-id="web_1"
+                       authorized-grant-types="password,authorization_code,refresh_token,implicit"
+                       secret="secret_1" scope="read,write,trust"/>
+    </oauth2:client-details-service>
+    <bean id="oauth2ClientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetailsService"/>
+    </bean>
+    <sec:authentication-manager id="oauth2AuthenticationManager">
+        <sec:authentication-provider
+            user-service-ref="oauth2ClientDetailsUserService"/>
+    </sec:authentication-manager>
+    <oauth2:authorization-server
+        client-details-service-ref="clientDetailsService" token-services-ref="tokenServices"
+        user-approval-handler-ref="oauthUserApprovalHandler">
+        <oauth2:authorization-code/>
+        <oauth2:implicit/>
+        <oauth2:refresh-token/>
+        <oauth2:client-credentials/>
+        <oauth2:password/>
+    </oauth2:authorization-server>
+    <bean id="oauth2AuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint"/>
+    <bean id="oauth2AccessDeniedHandler"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler"/>
+    <bean id="oauthUserApprovalHandler"
+          class="org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler"/>
+    <bean id="oauth2AccessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter"/>
+                <bean class="org.springframework.security.access.vote.RoleVoter"/>
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    <oauth2:resource-server id="mobileResourceServer"
+                            resource-id="mobile-resource" token-services-ref="tokenServices"/>
+    <bean id="clientCredentialsTokenEndpointFilter" class="com.zw.platform.commons.filter.MyToken">
+        <property name="authenticationManager" ref="oauth2AuthenticationManager"/>
+    </bean>
+<!--    <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">-->
+<!--        <property name="contextSource" ref="contextSource"/>-->
+<!--    </bean>-->
+    <!-- 防止跨站提交攻击, 但是rest服务会失效，需要自定义一个Matcher -->
+    <bean id="csrfSecurityRequestMatcher" class="com.zw.platform.commons.SecurityCsrfRequestMatcher">
+        <property name="execludeUrls">
+            <list>
+                <value>/rest/</value>
+            </list>
+        </property>
+    </bean>
+    <!--日志 loggerListener -->
+    <bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener"/>
+    <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+</beans>
+    <!--必须是POST请求 http://localhost:8080/clbs/oauth/token?client_id=mobile_1&client_secret=secret_1&grant_type=password&username=zhangsan&password=123456
+        http://localhost:8080/clbs/admin?access_token=4219a91f-45d5-4a07-9e8e-3acbadd0c23e -->

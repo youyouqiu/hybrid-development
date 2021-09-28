@@ -1,0 +1,260 @@
+<form th:action="@{/v/carbonmgt/equipEntry/edit}" th:object="${result}"
+	id="editForm" role="form" action="#" method="post"
+	class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">基准信息录入</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+			<input th:field="*{id}" type="text" hidden="true" />
+			<input id="vehicleCategory" th:field="*{vehicleCategory}" type="text" hidden="true" />
+				<div class="form-group">
+					<label class="col-md-4 control-label"> 车牌号：</label>
+					 <div class="col-md-6 ">
+					 	 <input th:field="*{brand}" name="brand" type="text" class="form-control" id="brand" disabled />
+                    	</div>
+                </div>  
+				<div class="form-group">
+					<label class="col-md-4 control-label"><label
+						class="text-danger"></label> 燃料类型：</label>
+					<div class="col-md-6">
+						<input  name="fuelType" th:field="*{fuelType}"  id="fType" type="text" class="form-control" disabled />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-4 control-label"> 车辆类型：</label>
+					<div class="col-md-6">
+						<input name="vehicleType" th:field="*{vehicleType}" id ="vType" type="text" class="form-control" disabled  />
+					</div>
+				</div>
+				<div class="vehicleTypeBox" style="display:none;">
+					<div class="form-group">
+						<label class="col-md-4 control-label"><label class="text-danger">*</label> 里程基准能耗（L或m³/百公里）：</label>
+						<div class="col-md-6">
+							<input name="mileageBenchmark" th:field="*{mileageBenchmark}" placeholder="请输入里程基准能耗" type="text" class="form-control" />
+						</div>
+					</div>
+					
+				</div>
+				<div class="vehicleTypeBox1" style="display:none;">
+					<div class="form-group">
+						<label class="col-md-4 control-label"><label class="text-danger">*</label> 时间基准能耗（L或m³/h）：</label>
+						<div class="col-md-6">
+							<input name="timeBenchmark" th:field="*{timeBenchmark}" placeholder="请输入时间基准能耗" type="text" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-4 control-label"><label class="text-danger">*</label> 工时基准能耗（L或m³/h）：</label>
+						<div class="col-md-6">
+							<input name="workHoursBenchmark" th:field="*{workHoursBenchmark}" placeholder="请输入工时基准能耗" type="text" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+						<label class="col-md-4 control-label"><label class="text-danger">*</label> 怠速基准能耗（L或m³/h）：</label>
+						<div class="col-md-6">
+							<input name="idleBenchmark" id="idleBenchmark" th:field="*{idleBenchmark}" placeholder="请输入怠速基准能耗" type="text" class="form-control" />
+						</div>
+				</div>
+            </div>
+        </div>
+    </div>
+	 <input id="monitoring" name="vehicleId" style="display:none;">
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+(function(window,$){
+	
+	editBaselineInformationEntry = {
+			
+		init: function(){
+			
+			//组织树结构
+			var setting = {
+				async : {
+					url : "/clbs/m/basicinfo/enterprise/professionals/tree",
+					tyoe : "post",
+					enable : true,
+					autoParam : [ "id" ],
+					contentType : "application/json",
+					dataType : "json",
+				},
+				view : {
+					dblClickExpand : false
+				},
+				data : {
+					simpleData : {
+						enable : true
+					}
+				},
+				callback : {
+					beforeClick : editBaselineInformationEntry.beforeClick,
+					onClick : editBaselineInformationEntry.onClick
+
+				}
+			};
+			$.fn.zTree.init($("#ztreeDemo"), setting, null);
+
+			var roles = {
+				mileageBenchmark : {
+					required : true,
+					isFloatAndGtZero : true,
+					maxlength:20
+				},
+				timeBenchmark : {
+					required : true,
+					isFloatAndGtZero : true,
+					maxlength:20
+				},
+				workHoursBenchmark : {
+					required : true,
+					isFloatAndGtZero : true,
+					maxlength:20
+				},
+				idleBenchmark : {
+					required : true,
+					isFloatAndGtZero : true,
+					maxlength:20
+				}
+			}
+			var messages = {
+				mileageBenchmark : {
+					required : [[#{mileage.benchmark.null}]],
+					isFloatAndGtZero: "请输入大于零的合法数字",
+					maxlength:"基准能耗输入不能超过20位哟"  
+				},
+				timeBenchmark : {
+					required : [[#{time.benchmark.null}]],
+					isFloatAndGtZero: "请输入大于零的合法数字",
+					maxlength:"基准能耗输入不能超过20位哟"   
+				},
+				workHoursBenchmark : {
+					required : [[#{workhours.benchmark.null}]],
+					isFloatAndGtZero: "请输入大于零的合法数字",
+					maxlength:"基准能耗输入不能超过20位哟"  
+				},
+				idleBenchmark : {
+					required : [[#{idle.benchmark.null}]],
+					isFloatAndGtZero: "请输入大于零的合法数字",
+					maxlength:"基准能耗输入不能超过20位哟"  
+				}
+			}
+		 	var vehicleval = $("#vehicleCategory").val();
+		 	if (vehicleval =="4" ) {
+		    	$("div.vehicleTypeBox1").show();
+		        $("div.vehicleTypeBox").hide();
+			} else {
+				$("div.vehicleTypeBox").show();
+		        $("div.vehicleTypeBox1").hide();
+			}
+		 	myTable.add('commonWin', 'editForm', roles, messages);
+			
+		},
+		beforeClick: function(treeId, treeNode){
+			var check = (treeNode);
+			return check;
+		},
+		onClick: function(e, treeId, treeNode){
+			var zTree = $.fn.zTree.getZTreeObj("ztreeDemo"), nodes = zTree
+			.getSelectedNodes(), v = "";
+			n = "";
+			nodes.sort(function compare(a, b) {
+				return a.id - b.id;
+			});
+			for (var i = 0, l = nodes.length; i < l; i++) {
+				n += nodes[i].name;
+				v += nodes[i].id + ",";
+			}
+			if (v.length > 0)
+				v = v.substring(0, v.length - 1);
+			var cityObj = $("#zTreeCitySel");
+			$("#groupId").val(v);
+			cityObj.val(n);
+			$("#zTreeContent").hide();
+			$.ajax({
+		         type: "POST",
+		         url: "/clbs/v/carbonmgt/equipEntry/findVehicle",
+		         data: {
+		             "ids": v
+		         },
+		         dataType: "json",
+		         success: function (data) {
+		        		 var dataList = $.parseJSON(data);
+		                 var vehicleList = {value: []};
+		                 i = dataList.length;
+		                 while(i--) {
+		                	 vehicleList.value.push({
+		                         name: dataList[i].brand,
+		                         id: dataList[i].id
+		                     }); 
+		                 }
+		        		 $("#brand").bsSuggest({
+		        	         indexId: 1,  
+		        	         indexKey: 0, 
+		        	         idField: "id",
+		        	         keyField: "name",
+		        	         effectiveFields: ["name"],
+		        	         searchFields:["id"],
+		        	         data: vehicleList
+		        	     }).on('onDataRequestSuccess', function (e, result) {
+		        	     }).on('onSetSelectValue', function (e, keyword, data1) {
+		        	         $("#monitoring").attr("value",keyword.id);
+		        	         for(j=0;j<dataList.length;j++){
+		        	        	 var vehicle = dataList[j];
+		        	        	 if(vehicle.id == keyword.id){
+		        	        		 $("#fType").attr("value",vehicle.fuelType);
+		        	        		 $("#vType").attr("value",vehicle.vehicleType);
+		        	        	 }
+		        	         }
+		        	         
+		        	     }).on('onUnsetSelectValue', function () {
+		        	     });
+		         }
+			 })
+		},
+		doSubmit: function(){
+			$("#editForm").submit();
+		},
+		showMenu: function(){
+			if ($("#zTreeContent").is(":hidden")) {
+				$("#zTreeContent").show();
+			} else {
+				$("#zTreeContent").hide();
+			}
+			$("body").bind("mousedown", editBaselineInformationEntry.onBodyDown);
+		},
+		hideMenu: function(){
+			$("#zTreeContent").fadeOut("fast");
+			$("body").unbind("mousedown", editBaselineInformationEntry.onBodyDown);
+		},
+		onBodyDown: function(event){
+			if (!(event.target.id == "menuBtn" || event.target.id == "zTreeContent" || $(
+				event.target).parents("#zTreeContent").length > 0)) {
+				editBaselineInformationEntry.hideMenu();
+			}
+		},
+			
+	}
+	
+	$(function(){
+		
+		editBaselineInformationEntry.init();
+		//提交
+		$("#doSubmit").bind("click",editBaselineInformationEntry.doSubmit);
+		
+	})
+	
+})(window,$)
+</script>

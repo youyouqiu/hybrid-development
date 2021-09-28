@@ -1,0 +1,175 @@
+<form th:action="@{/v/oilmassmgt/fueltankmgt/editOilCal}" id="oilCalForm" role="form" action="#" method="post" class="form-horizontal" enctype="multipart/form-data">
+	<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">油箱标定数据</h4>
+    </div>
+    <div class="modal-body modal-alarmSetting-body">
+		<table id="dataTable" class="table table-bordered table-hover calibrationDetails" cellspacing="0" width="100%">
+	        <thead>
+	            <tr>
+	                <th class="text-center">序号</th>
+	                <th class="text-center">液位高度(mm)</th>
+	                <th class="text-center">油量值(升)</th>
+	            </tr>
+	        </thead>
+	        <tbody id="dataList">
+	        </tbody>
+	    </table>
+    </div>
+	<div class="modal-footer" style="border-top: none;">
+		<input type="hidden" name="id" id="ocId" />
+		<input type="hidden" name="id2" id="ocId2" />
+		<input type="hidden" name="oilBoxId" id="ocOilBoxId" />
+		<input type="hidden" name="oilBoxId2" id="ocOilBoxId2" />
+		<button class="btn btn-primary" type="button" id="submitBtn" onclick="submitOilCal()">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script th:inline="javascript">
+    $(function() {
+    	var detailFlag = $("#detailFlag").val();
+    	if (detailFlag == "1") { // 从详情界面过来
+	    	$("#submitBtn").attr("class", "hidden"); // 隐藏提交按钮
+    	}else{
+    		$(function(){
+    	    	$(".calibrationDetails tbody tr").css("background-color","#f9f9f9");
+    	    	$(".calibrationDetails tbody tr td input").mouseover(function(){
+        	    	$(".calibrationDetails").attr("class","table table-striped table-bordered");
+    	    	    $(this).css({
+    	    	    	"border" : "1px solid #e0e0e0",
+    	    	    	"border-radius" : "3px",
+    	    	    	"background" : "#fff",
+    	    	    	"-webkit-box-shadow" : "inset 0 1px 2px rgba(0,0,0,.1)",
+    	    	    	"-moz-box-shadow" : "inset 0 1px 2px rgba(0,0,0,.1)",
+    	    	    	"-box-shadow" : "inset 0 1px 2px rgba(0,0,0,.1)"
+    	    	    });
+    	    	});
+    	    	$(".calibrationDetails tbody tr td input").mouseout(function(){
+    	    	    $(this).css({
+    	    	    	"border" : "1px solid #f9f9f9",
+    	    	    	"background" : "#f9f9f9",
+    	    	    	"-webkit-box-shadow" : "none",
+    	    	    	"-moz-box-shadow" : "none",
+    	    	    	"-box-shadow" : "none"
+    	    	    });
+    	    	});
+    		});
+    	}
+    	
+    	if ($("#curBox").val() == "1") { // 油箱1
+    		var oilLevelHeights = $("#oilLevelHeights").val();
+        	var oilValues = $("#oilValues").val();
+        	var oilBoxId = $("#oilBoxId").val();
+        	var id = $("#id").val();
+        	$("#ocId").val(id);
+        	$("#ocOilBoxId").val(oilBoxId);
+        	var heightArr = oilLevelHeights.split(",");
+        	var valueArr = oilValues.split(",");
+        	if (heightArr.length > 0 && valueArr.length > 0) {
+        		var heightArrLength = 0;
+            	if (heightArr.length > 50) {
+            		heightArrLength = 50;
+            	} else {
+            		heightArrLength = heightArr.length;
+            	}
+        		$("#dataList").empty();
+        		if (heightArr != null && heightArr.length > 0) {
+        			for (var i=0; i<heightArrLength; i++) {
+               			var str = "";
+               			str += "<tr class='odd'>";
+               			str += "<td class='text-center'>" + (i+1) + "</td>"; // 序号
+             			if (detailFlag == "1") { // 详情页面跳转过来
+                 			str += "<td class='text-center'><input name='oilLevelHeights' value='" + parseFloat(heightArr[i]==''?0:heightArr[i]).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>"; // 车牌号
+                     		str += "<td class='text-center'><input name='oilValues' value='" + parseFloat(valueArr[i]==''?0:valueArr[i]).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>"; // 车辆类型
+                 		}else {
+                 			str += "<td class='text-center'><input name='oilLevelHeights' value='" + parseFloat(heightArr[i]==''?0:heightArr[i]).toFixed(1) + "' onkeyup='value=value.replace(/[^0-9]/g,\"\")' maxlength='4' style='border:1px solid #f9f9f9;background-color:transparent;' /></td>"; // 车牌号
+                     		str += "<td class='text-center'><input name='oilValues' value='" + parseFloat(valueArr[i]==''?0:valueArr[i]).toFixed(1) + "' onkeyup='value=value.replace(/[^0-9.]/g,\"\")' maxlength='10' style='border:1px solid #f9f9f9;background-color:transparent;' /></td>"; // 车辆类型
+                 		}
+               			str += "</tr>";
+               			$("#dataList").append(str);
+               		}
+        		}
+        	}
+    	} else { // 油箱2
+    		var oilLevelHeights = $("#oilLevelHeights2").val();
+        	var oilValues = $("#oilValues2").val();
+        	var oilBoxId2 = $("#oilBoxId2").val();
+        	var id2 = $("#id2").val();
+        	$("#ocId2").val(id2);
+        	$("#ocOilBoxId2").val(oilBoxId2);
+        	var heightArr = oilLevelHeights.split(",");
+        	var valueArr = oilValues.split(",");
+        	if (heightArr.length > 0 && valueArr.length > 0) {
+        		var heightArrLength = 0;
+            	if (heightArr.length > 50) {
+            		heightArrLength = 50;
+            	} else {
+            		heightArrLength = heightArr.length;
+            	}
+        		$("#dataList").empty();
+        		if (heightArr != null && heightArr.length > 0) {
+        			for (var i=0; i<heightArrLength; i++) {
+               			var str = "";
+               			str += "<tr class='odd'>";
+               			str += "<td class='text-center'>" + (i+1) + "</td>"; // 序号
+               			if (detailFlag == "1") { // 详情页面跳转过来
+               				str += "<td class='text-center'><input name='oilLevelHeights2' value='" + parseFloat(heightArr[i]==''?0:heightArr[i]).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>"; // 车牌号
+                   			str += "<td class='text-center'><input name='oilValues2' value='" + parseFloat(valueArr[i]==''?0:valueArr[i]).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>"; // 车辆类型
+               			}else {
+               				str += "<td class='text-center'><input name='oilLevelHeights2' value='" + parseFloat(heightArr[i]==''?0:heightArr[i]).toFixed(1) + "' onkeyup='value=value.replace(/[^0-9]/g,\"\")' maxlength='4' style='border:1px solid #f9f9f9;background-color:transparent;' /></td>"; // 车牌号
+                   			str += "<td class='text-center'><input name='oilValues2' value='" + parseFloat(valueArr[i]==''?0:valueArr[i]).toFixed(1) + "' onkeyup='value=value.replace(/[^0-9.]/g,\"\")' maxlength='10' style='border:1px solid #f9f9f9;background-color:transparent;' /></td>"; // 车辆类型
+               			}
+               			str += "</tr>";
+               			$("#dataList").append(str);
+               		}
+        		}
+        	}
+    	}
+    	
+    });
+    
+    function submitOilCal() {
+    	$("#submitBtn").attr("disabled", true);
+    	$("#oilCalForm").ajaxSubmit(function(data) {
+    		var data = $.parseJSON(data)
+    		if(data.success){
+    			$("#submitBtn").attr("disabled", false);
+        		getNewCalData();
+        		$("#commonSmWin").modal("hide");
+            	myTable.refresh();
+    		}else{
+    			layer.msg(data.msg,{move:false});
+    		}
+   		});
+    }
+    
+    function getNewCalData() {
+		var curBox = $("#curBox").val();    	
+    	$.ajax({
+			type : 'POST',
+			url : '/clbs/v/oilmassmgt/fueltankmgt/getNewCalData',
+			async : false,
+			data : {"curBox" : curBox},
+			dataType : 'json',
+			success : function(data) {
+				if (data != null && data.obj != null) {
+					if (curBox == "1") {
+						$("#oilLevelHeights").val(data.obj.oilLevelHeights);
+				    	$("#oilValues").val(data.obj.oilValues);
+					}
+					if (curBox == "2") {
+						$("#oilLevelHeights2").val(data.obj.oilLevelHeights2);
+				    	$("#oilValues2").val(data.obj.oilValues2);
+					}
+				}
+			},
+			error : function() {
+				layer.msg("获取标定数据失败！", {move: false});	
+			}
+		});
+    }
+</script>

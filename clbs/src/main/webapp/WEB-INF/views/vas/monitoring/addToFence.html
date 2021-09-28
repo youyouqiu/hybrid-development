@@ -1,0 +1,173 @@
+<!-- 将轨迹保存为围栏 -->
+<div id="addFencePage" class="modal-content" >
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">轨迹</h4>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/add}" id="addLineForm" role="form" action="#" method="post">
+            <table id="table-lng-lat" class="table table-striped table-bordered table-hover table-lng-lat">
+            </table>
+            <div class="row">
+                <div class="form-group">
+                	<input type="hidden" id="addOrUpdateLineFlag" name="addOrUpdateLineFlag" value="0" />
+                	<input type="hidden" id="lineId" name="lineId" />
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 线路名称：</label>
+                    <div class=" col-md-8">
+                        <input type="text" placeholder="请输入线路名称" class="form-control" id="lineName1" name="name"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">线路类型：</label>
+                    <div class=" col-md-8">
+                        <select class="form-control" id="lineType1" name="type">
+                            <option value="国道">国道</option>
+                            <option value="省道">省道</option>
+                            <option value="县道">县道</option>
+                            <option value="高速">高速</option>
+                            <option value="高架立交">高架立交</option>
+                            <option value="其他小路">其他小路</option>
+                        </select>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 偏移量(m)：</label>
+                    <div class=" col-md-8">
+                        <input placeholder="请输入数字" value="50" onkeyup="value=value.replace(/[^0-9]/g,'') " class="form-control" id="lineWidth1" name="width"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">描述：</label>
+                    <div class=" col-md-8">
+                        <textarea class="form-control" rows="3" id="lineDescription1" name="description"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" id="pointSeqs" name="pointSeqs" />
+                <input type="hidden" id="longitudes" name="longitudes" />
+                <input type="hidden" id="latitudes" name="latitudes" />
+                <button id="doSubmitAdd" type="button" onclick="doSubmits1()" class="btn btn-primary">保存</button>
+                <button id="doCloseAdd" type="button" class="btn btn-default btn-off cancle" data-dismiss="modal">取消</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('input').inputClear();
+//add by liubq 2016/10/25------------start--------------------------------------------------
+function getHistory1() {
+	var pointSeqs = ""; // 点序号
+    var longitudes = ""; // 所有的经度
+    var latitudes = ""; // 所有的纬度
+    
+    var vehicleId = $("#savePid").val();
+    var startTime = $("#startTime").val();
+    var endTime = $("#endTime").val();
+    $.ajax({
+        type: "POST",
+        url: "/clbs/v/monitoring/getHistoryData",
+        data: {
+            "vehicleId": vehicleId,
+            "startTime": startTime,
+            "endTime": endTime
+        },
+        dataType: "json",
+        async: false,
+        success: function (data) {
+            if (data.success) {
+                var positionals = $.parseJSON(data.msg);
+                var msg = positionals.resultful;
+                var len = msg.length;
+                var position;
+                var latitude;
+                var longtitude;
+                var m = 0;
+                for (var i = 0; i < len; i++) {
+                    position = msg[i];
+                    latitude = position.latitude;//纬度
+                    longtitude = position.longtitude;//经度
+                    
+                    pointSeqs += (m++) + ",";
+                    longitudes += Math.formatFloat(longtitude/1000000, 6) + ",";
+                    latitudes += Math.formatFloat(latitude/1000000, 6) + ",";
+                }
+                if (pointSeqs.length > 0) {
+            		pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+            	}
+            	if (longitudes.length > 0) {
+            		longitudes = longitudes.substr(0, longitudes.length - 1);
+            	}
+            	if (latitudes.length > 0) {
+            		latitudes = latitudes.substr(0, latitudes.length - 1);
+            	}
+            	$("#pointSeqs").val(pointSeqs);
+            	$("#longitudes").val(longitudes);
+            	$("#latitudes").val(latitudes);
+            }
+        }
+    });
+}
+
+//轨迹
+function doSubmits1() {
+    if(validate_line()){
+    	getHistory1();
+    	var pointSeqs = $("#pointSeqs").val();
+    	var longitudes = $("#longitudes").val();
+    	var latitudes = $("#latitudes").val();
+    	if (pointSeqs == "" || longitudes == "" || latitudes == "") {
+    		layer.msg("未找到历史轨迹数据！");
+    		//$(".cancle").click();
+    		return;
+    	}
+    	$("#addLineForm").ajaxSubmit(function(data) {
+    		data = JSON.parse(data);
+    		if(data.success){
+    			layer.msg("保存成功");
+                $(".cancle").click();
+    		}else{
+    			if(data.msg ==null){
+	        		layer.msg("保存失败");
+	        	}else if(data.msg.toString().indexOf("系统错误")>-1){
+	        		layer.msg(data.msg,{move:false});
+	        	}
+    		}
+        });
+    }
+}
+
+//线路添加时验证
+function validate_line() {
+	return	$("#addLineForm").validate({
+		rules : {
+			name : {
+				required : true,
+				maxlength : 20
+			},
+			width : {
+				required : true, 
+				maxlength : 10
+			}, 
+			description : {
+				maxlength : 100
+			}
+		},
+		messages : {
+			name : {
+				required : [[#{line.name.null}]], 
+				maxlength : "长度不超过20"
+			},
+			width : {
+				required : [[#{deviation.null}]], 
+				maxlength : "长度不超过10"
+			}, 
+			description : {
+				maxlength : "长度不超过100"
+			}
+		}
+	}).form();	
+}
+//add by liubq 2016/10/25------------end-----------------------------------------------------
+</script>

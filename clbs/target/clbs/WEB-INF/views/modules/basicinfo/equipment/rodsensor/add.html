@@ -1,0 +1,93 @@
+<form th:action="@{/m/basicinfo/equipment/rodsensor/add}" id="addForm" role="form" action="#" method="post"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">新增油位传感器</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 传感器型号： </label>
+                    <div class="col-md-4">
+                        <input autocomplete="off" name="sensorNumber" placeholder="请输入传感器型号" maxlength="25" type="text" class="form-control" id="sensorNumber"/>
+                    </div>               
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 传感器长度(mm)： </label>
+                   	 	<div class="col-md-4">
+                        <input autocomplete="off" name="sensorLength" placeholder="请输入数字，最多5位" onkeyup="value=value.replace(/[^0-9.]/g,'')" maxlength="5" type="text" class="form-control" id="sensorLength" />
+                    </div>               
+                </div>  
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 滤波系数： </label>
+                  	<div class="col-md-4">
+                        <select name="filteringFactor" placeholder="" class="form-control">      
+                        	<option value="01">实时</option>                  	
+                        	<option value="02" selected>平滑</option>                        	
+                        	<option value="03">平稳</option>                        	
+                       	</select>
+                    </div>
+                    <label class="col-sm-2 control-label"><label class="text-danger">*</label> 波特率： </label>
+                    <div class="col-md-4">
+                        <select name="baudRate" placeholder="" class="form-control">                        	
+                        	<option value="01">2400</option>
+							<option value="02">4800</option>
+							<option selected="selected" value="03">9600</option>
+							<option value="04">19200</option>
+							<option value="05">38400</option>
+							<option value="06">57600</option>
+							<option value="07">115200</option>
+                       	</select>
+                    </div>
+                </div>  
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 奇偶校验： </label>
+                   	<div class="col-md-4">
+                        <select name="oddEvenCheck" placeholder="" class="form-control">                        	                        	
+                        	<option value="1">奇校验</option>
+                        	<option value="2">偶校验</option>   
+                        	<option value="3" selected>无校验</option>                     	
+                       	</select>
+                    </div>
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 补偿使能： </label>
+                    <div class="col-md-4">
+                       <select name="compensationCanMake" placeholder="" class="form-control">                        	
+                        	<option value="1" selected>使能</option>
+                        	<option value="2">禁用</option>                        	
+                       	</select> 
+                    </div> 
+                </div>
+                <div class="form-group">
+					<label class="col-md-2 control-label">备注：</label>
+					<div class="col-md-4">
+					<input autocomplete="off" name="remark"  placeholder="请输入备注" maxlength="40" type="text" id= "remarks" class="form-control" />
+					</div>
+				</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmitsAdd">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+
+</form>
+<label id="error_label" class='error' style='display: none;'></label>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+	var oilSensorNumberNull = [[#{oil.sensorNumber.null}]];
+	var oilSensorNumberMaxlength = [[#{oil.sensorNumber.maxlength}]];
+	var oilSensorTypeError = [[#{oil.sensorType.error}]];
+	var oilSensorNumberExists = [[#{oil.sensorNumber.exists}]];
+	var oilSensorLengthNull = [[#{oil.sensorLength.null}]];
+	var numberDoubleError = [[#{number.gtZero.error}]];
+	var oilFilteringFactorNull = [[#{oil.filteringFactor.null}]];
+	var oilBaudRateNull = [[#{oil.baudRate.null}]];
+	var oilOddEvenCheckNull = [[#{oil.oddEvenCheck.null}]];
+	var oilCompensationCanMakeNull = [[#{oil.compensationCanMake.null}]];
+</script>
+<script src="/wro/rodsensorAdd.js" th:src="@{/wro/rodsensorAdd.js}"></script>

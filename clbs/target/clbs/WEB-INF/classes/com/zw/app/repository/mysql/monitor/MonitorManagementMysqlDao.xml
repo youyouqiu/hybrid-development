@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.app.repository.mysql.monitor.MonitorManagementMysqlDao">
+    <!-- 获取监控对象绑定的油箱类型（主、副）-->
+    <select id="getOilBoxType" parameterType="String" resultType="String">
+        SELECT GROUP_CONCAT(oil_box_type SEPARATOR ',')
+        FROM zw_m_oil_box_vehicle
+        WHERE vehicle_id = #{mid} AND flag = 1
+    </select>
+
+    <!-- 获取监控对象绑定的油耗传感器id -->
+    <select id="getOilWearId" parameterType="String" resultType="String">
+        SELECT oil_wear_id
+        FROM zw_o_oil_wear_vehicle
+        WHERE vehicle_id = #{mid} AND flag = 1
+    </select>
+</mapper>

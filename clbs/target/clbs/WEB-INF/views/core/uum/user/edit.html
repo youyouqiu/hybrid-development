@@ -1,0 +1,194 @@
+<form th:action="@{/c/user/edit.gsp}" th:object="${result}"
+      id="editForm" role="form" action="#" class="form-horizontal"
+      method="post">
+    <div class="modal-header">
+        <button type="button" id="doXEdit" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改用户</h4>
+        <style>
+            .form-control[disabled] {
+                cursor: not-allowed !important;
+                background-color: #eee !important;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="userId" name="userId" th:value="${id}" type="text" hidden="true"/>
+                <input id="sign" th:field="*{sign}" type="text" hidden="true"/>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label
+                            class="text-danger">*</label> 用户名：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{username}" readonly="true"
+                               type="hidden" class="form-control" id="userNameHidden"/>
+                        <span class="form-control" id="userNameSpan" readonly="true" style="line-height: 1.8"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"> 密码：</label>
+                    <div class="col-md-7">
+                        <input id="passwordEdit" name="password" placeholder="长度8-25位，必须包含大小写字母、数字和特殊字符（不含空格）中的两者" class="form-control"
+                               autocomplete="new-password"/>
+                    </div>
+                </div>
+                <div id="sendAPassWord" class="form-group hidden">
+                    <label class="col-md-3 control-label">下发口令：</label>
+                    <div class="col-md-7">
+                        <!-- 修改时不显示下发口令内容 -->
+                        <input th:field="*{sendDownCommand}" placeholder="请输入下发口令" class="form-control"
+                               id="sendDownCommand">
+                    </div>
+                </div>
+                <input id="groupIds" th:field="*{groupId}" name="groupId" type="text"
+                       hidden="true"/>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label
+                            class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-7 fastClear">
+                        <input th:field="*{groupName}" name="groupName"
+                               class="form-control" id="zTreeCitySelEdit" placeholder="请选择所属企业"
+                               style="background-color: #fafafa; cursor: pointer;"
+                               type="text" autocomplete="off"/>
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true"></span>
+                        <div id="zTreeContentEdit" class="ztreeModelBox" style="top:36px!important">
+                            <ul id="ztreeDemoEdit" class="ztree"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger"></label> 状态：</label>
+                    <div class="col-md-7">
+                        <select th:field="*{state}" class="form-control">
+                            <option value="1">启用</option>
+                            <option value="0">停用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">授权截止日期：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{authorizationDate}" style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon"
+                               readonly id="authorizationDateEdit"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"> 真实姓名：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{fullName}" placeholder="请输入真实姓名" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label
+                            class="text-danger"></label> 身份证号：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{identityNumber}" placeholder="请输入身份证号" type="text"
+                               id="identityNumber" class="form-control" maxlength="18"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">性别：</label>
+                    <div class="col-md-7">
+                        <label class="radio-inline"><input type="radio" th:field="*{gender}" name="sex" value="1"
+                                                           checked="checked"> 男</label>
+                        <label class="radio-inline"><input type="radio" th:field="*{gender}" name="sex" value="2">
+                            女</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">电话号码：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{mobile}" placeholder="请输入电话号码" type="text"
+                               class="form-control" maxlength="11"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">邮箱：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{mail}" placeholder="请输入邮箱" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">身份：</label>
+                    <div class="col-md-7">
+                        <input name="identity" th:field="*{identity}" placeholder="请输入身份" type="text" id="identity" maxlength="20"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">行业：</label>
+                    <div class="col-md-7">
+                        <select name="industry" th:field="*{industry}" id="industry" class="form-control">
+                            <option value="-1">-- 请选择行业 --</option>
+                            <option th:each="c:${operationList}"
+                                    th:value="${c.id}"
+                                    th:text="${c.operationType}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">职务：</label>
+                    <div class="col-md-7">
+                        <input name="duty" th:field="*{duty}" placeholder="请输入职务" type="text" id="duty" maxlength="20"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">科室：</label>
+                    <div class="col-md-7">
+                        <input name="administrativeOffice" th:field="*{administrativeOffice}" placeholder="请输入科室" type="text" id="administrativeOffice" maxlength="20"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">社会保险号：</label>
+                    <div class="col-md-7">
+                        <input name="socialSecurityNumber" th:field="*{socialSecurityNumber}" placeholder="请输入社会保险号" type="text" id="socialSecurityNumber" maxlength="20"
+                               class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<input th:value="${userId}" id="currentUserId" type="hidden"/>
+<script th:inline="javascript">
+    var userNameNull = [[#{username.null}]];
+    var userNameError = [[#{username.error}]];
+    var userNameMinLength = [[#{username.minLength}]];
+    var usernameExists = [[#{username.exists}]];
+    var usernameAuthorizationDateNull = [[#{username.authorizationDate.null}]];
+    var usernameAuthorizationToday = [[#{username.authorization.today}]];
+    var passWordNull = [[#{password.null}]];
+    var passwordMinLength = [[#{password.minLength}]];
+    var passwordCompareNull = [[#{password.compare.null}]];
+    var emailError = [[#{email.error}]];
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var publicMinSize2Length = [[#{public.minSize2.length}]];
+    var publicSelectGroupNull = [[#{public.selectGroup.null}]];
+    var publicMinSize6Length = [[#{public.minSize6.length}]];
+    var publicSize25 = [[#{public.size25.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize60 = [[#{public.size60.length}]];
+    var publicNull = [[#{public.null}]];
+    var publicEditSuccess = [[#{public.edit.success}]];
+    var publicEditError = [[#{public.edit.error}]];
+    var userGroupSelectNull = [[#{user.groupSelect.null}]];
+</script>
+<script src="/wro/userEdit.js" th:src="@{/wro/userEdit.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

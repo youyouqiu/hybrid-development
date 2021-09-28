@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.VibrationSensorDao">
+
+<!-- 查询振动传感器 -->
+	<select id="findVibrationSensor" parameterType="com.zw.platform.domain.vas.workhourmgt.query.VibrationSensorQuery"
+		resultType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm">
+		SELECT DISTINCT * FROM zw_w_shock_sensor
+		WHERE flag = 1
+		 <if test="simpleQueryParam != null and simpleQueryParam!=''">  
+            AND sensor_type LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>  
+        ORDER BY create_data_time DESC
+	</select>
+	<!-- 根据id查询振动传感器 -->
+	<select id="findVibrationSensorById" parameterType="String"
+		resultType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm">
+		SELECT DISTINCT * FROM zw_w_shock_sensor
+		WHERE flag = 1
+        AND id =  #{id}
+	</select>
+	
+	<!-- 根据传感器型号查询传感器 -->
+	<select id="findVibrationSensorByType" parameterType="string" resultType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm">
+		SELECT DISTINCT * FROM zw_w_shock_sensor
+		WHERE flag = 1
+        AND sensor_type =  #{type}
+	</select>
+	
+	<!-- 根据number查询振动传感器 -->
+	 <select id="findByNumber" parameterType="String" resultType = "int">
+		SELECT count(*) FROM zw_w_shock_sensor
+		WHERE flag = 1
+		AND sensor_type =  #{sensorNumber}
+	</select> 
+	
+	<!-- 新增振动传感器 -->
+	  <insert id="addVibrationSensor" parameterType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm" >
+	    insert into zw_w_shock_sensor (id, sensor_type, manufacturers,baud_rate, 
+	      parity, inertia_comp_en, filter_factor, flag, create_data_time, create_data_username,remark)
+	    values (#{id}, #{sensorType},#{manufacturers},#{baudRate}, 
+	      #{parity}, #{inertiaCompEn}, #{filterFactor}, #{flag}, #{createDataTime}, #{createDataUsername},#{remark})
+	  </insert>
+	  
+	  <!-- 修改 -->
+	   <update id="updateVibrationSensor" parameterType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm" >
+	      update zw_w_shock_sensor
+		      set sensor_type = #{sensorType},
+		      manufacturers = #{manufacturers},
+		      baud_rate = #{baudRate},
+		      parity = #{parity},
+		      inertia_comp_en = #{inertiaCompEn},
+		      filter_factor = #{filterFactor},
+		      update_data_time = #{updateDataTime},
+		      update_data_username = #{updateDataUsername},
+		      remark=#{remark}
+		      where id = #{id}
+		  </update>
+		  
+		  <!-- 删除（逻辑删除） -->
+		  <update id="deleteVibrationSensor" parameterType="String" >
+	      update zw_w_shock_sensor
+		      set flag = 0
+		      where id = #{id}
+		      and flag = 1
+		  </update>
+	
+	<!-- 批量新增振动传感器 -->
+	<insert id="addByBatch" parameterType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm">
+		INSERT INTO zw_w_shock_sensor (
+			id, sensor_type, manufacturers, parity, filter_factor, baud_rate, inertia_comp_en, create_data_time, create_data_username,remark
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id}, #{item.sensorType}, #{item.manufacturers}, #{item.parity}, #{item.filterFactor}, #{item.baudRate}, #{item.inertiaCompEn},
+        	#{item.createDataTime}, #{item.createDataUsername},#{item.remark})
+		</foreach>
+	</insert>
+	<select id="isExist" parameterType="String" resultType = "int">
+		SELECT count(*) FROM zw_w_shock_sensor
+		WHERE flag = 1
+		AND sensor_type =  #{sensorNumber} and  id <![CDATA[ <> ]]> #{id}
+	</select>
+	<select id="findById" parameterType="String" resultType="com.zw.platform.domain.vas.workhourmgt.form.VibrationSensorForm">
+		SELECT * from zw_w_shock_sensor ss LEFT JOIN zw_w_shock_sensor_vehicle  sv on ss.id=sv.shock_sensor_id where ss.id=#{id} and sv.flag=1
+	</select>  
+</mapper>

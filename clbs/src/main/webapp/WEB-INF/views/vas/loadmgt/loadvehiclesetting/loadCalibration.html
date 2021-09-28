@@ -1,0 +1,71 @@
+<form th:action="@{/v/oilmassmgt/fueltankmgt/editOilCal}" id="oilCalForm" role="form" action="#" method="post"
+      class="form-horizontal" enctype="multipart/form-data">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">载重标定数据</h4>
+        <style>
+            .bind-btn {
+                margin-top: 4px;
+                padding-left: 12px !important;
+            }
+            .floatDiv {
+                float: left;
+                margin-left: 20px;
+            }
+            #del:hover{cursor: pointer}
+            #del:before{position: static}
+        </style>
+    </div>
+    <div class="modal-body modal-alarmSetting-body">
+        <div class="form-group">
+            <div class="floatDiv">
+                <button class="editBtn editBtn-info bind-btn" type="button" id="getADVal" 0>获取当前AD值</button>
+            </div>
+            <div class="floatDiv">
+                <label class="col-md-2 control-label"> AD值：</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" placeholder="请输入AD值" id="adVal" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                </div>
+                <label class="col-md-3 control-label"> 实际载重(kg)：</label>
+                <div class="col-md-4">
+                    <input class="form-control" type="text" placeholder="请输入载重值" id="adActualVal" onkeyup='value=value.replace(/[^0-9.]/g,"")'/>
+                </div>
+            </div>
+            <div class="floatDiv">
+                <button class="editBtn editBtn-info bind-btn" type="button" id="addadActualVal" 0>新增</button>
+            </div>
+        </div>
+        <table id="dataTable" class="table table-bordered table-hover calibrationDetails" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th class="text-center">序号</th>
+                <th class="text-center">
+                    <input type="checkbox" id="check"/>
+                    <i id="del" class="fa fa-trash-o"></i>
+                </th>
+                <th class="text-center">AD值</th>
+                <th class="text-center">实际载重(kg)</th>
+            </tr>
+            </thead>
+            <tbody id="dataList">
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer" style="border-top: none;">
+        <input type="hidden" name="curCalibration" id="curCalibration"/>
+        <input type="hidden" name="id" id="ocId"/>
+        <input type="hidden" name="id2" id="ocId2"/>
+        <input type="hidden" name="oilBoxId" id="ocOilBoxId"/>
+        <input type="hidden" name="oilBoxId2" id="ocOilBoxId2"/>
+        <button class="btn btn-primary" type="button" id="submitBtn">
+            <strong>提 交</strong>
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var isOnlineMsg = [[#{oil.calibration.isOnline}]]
+</script>
+<script type="text/javascript" src="/clbs/resources/js/loadManagementLoadCalibration.js" ></script>

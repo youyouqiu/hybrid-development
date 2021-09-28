@@ -1,0 +1,78 @@
+<form id="editForm" action="#" th:action="@{/v/sensorConfig/vehiclePoll/add}" role="form" method="post"  class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">设置车辆外设轮询</h4>
+    </div>
+    <div class="modal-body" id="vehicleModalBody">
+        <div class="row">
+            <div class="form-group">
+                 <label class="col-md-2 control-label">监控对象：</label>
+                 <div class="col-md-3">
+					 <input id="pollingsList" th:value="${pollingsListJson}" type="hidden" />
+					 <input id="referVehicleList" th:value="${referVehicleList}" type="hidden" />
+					 <input name="vehicleId" th:value="${vehicle.id}" id="vehicleId" type="hidden" />
+					 <input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken">
+					<input name="brands" th:value="${vehicle.brand}" type="text" class="form-control readonly" id="brands" readonly>
+                 </div>
+                 <label class="col-md-2 control-label">参考对象：</label>
+                 <div class="col-md-3">
+					<div class="input-group">
+						<input name="referBrands" type="text" class="form-control" id="referBrands">
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-white dropdown-toggle"
+								data-toggle="dropdown">
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;">
+							</ul>
+						</div>
+					</div>
+                 </div>
+            </div>
+            <div id="sensorOrTime">
+	            <div class="form-group">
+
+	                 <label class="col-md-2 control-label"><label class="text-danger">*</label> 传感器类型：</label>
+	                 <div class="col-md-3">
+						<div class="input-group">
+							<input type="text"  class="form-control sensorType" id="sensorType">
+							<input name="sensorType" type="hidden"  class="form-control" id="hidden_sensorType">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;">
+								</ul>
+							</div>
+						</div>
+	                 </div>
+	                 <label class="col-md-2 control-label"><label class="text-danger">*</label> 轮询时间(s)：</label>
+	                 <div class="col-md-3">
+						 <input type="text" autocomplete="off" class="form-control sensorTypeTime sensorTypeFirstTime" onBlur="editvehiclePeripheralPolling.pollingTimeVerification()" id="pollingTime" name="pollingTime" value="3" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入轮询时间"/>
+					 </div>
+	                 <div class="col-md-1">
+	                 	<button id="sensorOrTime-add-btn" onclick="editvehiclePeripheralPolling.addSensorAndTime();" type="button" class="btn btn-primary addIcon"><span class="glyphicon glyphiconPlus" aria-hidden="true"></span></button>
+	                 </div>
+	            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<style>
+.readonly{cursor:auto!important;}
+</style>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+</script>
+<script src="/wro/vehiclePollEdit.js" th:src="@{/wro/vehiclePollEdit.js}"></script>

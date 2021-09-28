@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.lkyw.repository.mysql.positioningStatistics.PositioningStatisticsDao">
+
+    <select id="findAllInfoByGroupIdSet"
+            resultType="com.zw.lkyw.domain.positioningStatistics.MonitorPositioningInfo">
+        SELECT
+        info.id AS monitorId,
+        info.brand AS monitorName,
+        CASE info.plate_color
+        WHEN 1 THEN
+        '蓝'
+        WHEN 2 THEN
+        '黄'
+        WHEN 3 THEN
+        '黑'
+        WHEN 4 THEN
+        '白'
+        ELSE
+        '其他'
+        END AS plateColor,
+        type.vehicle_type AS vehicleType,
+        info.group_id groupId,
+        0 AS monitorType
+        FROM
+        zw_m_vehicle_info info
+        INNER JOIN zw_m_vehicle_type type ON info.vehicle_type = type.id
+        WHERE
+        info.flag = 1
+        AND type.flag = 1
+        <if test="search != null and search!=''">
+            AND brand like CONCAT('%',#{search},'%')
+        </if>
+        <if test="groupIdSet != null and groupIdSet.size > 0">
+            AND group_id IN
+            <foreach item="item" collection="groupIdSet" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="findAllMonitorIdByGroupId" resultType="java.lang.String">
+        SELECT
+        r.monitorId
+        FROM
+        (
+        SELECT
+        info.id AS monitorId
+        FROM
+        zw_m_vehicle_info info
+        WHERE
+        info.flag = 1
+        <if test="search != null and search!=''">
+            AND brand like CONCAT('%',#{search},'%')
+        </if>
+        and info.group_id = #{groupId}
+        UNION ALL
+        SELECT
+        id AS monitorId
+        FROM
+        zw_m_people_info
+        WHERE
+        flag = 1
+        <if test="search != null and search!=''">
+            AND people_number like CONCAT('%',#{search},'%')
+        </if>
+        and org_Id = #{groupId}
+        UNION ALL
+        SELECT
+        id AS monitorId
+        FROM
+        zw_m_thing_info
+        WHERE
+        flag = 1
+        <if test="search != null and search!=''">
+            AND thing_number like CONCAT('%',#{search},'%')
+        </if>
+        and group_id = #{groupId}
+        ) r
+    </select>
+</mapper>

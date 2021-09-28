@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.OfflineExportDao">
+    <update id="updateExportStatus">
+        UPDATE zw_m_offline_export set status = #{status} WHERE status !=2 and create_date_time &lt; #{updateTime}
+    </update>
+    <select id="getUserNamesByDigestId" resultType="string" parameterType="string">
+        select username from zw_m_offline_export where digest_id = #{digestId}
+        order by create_date_time desc
+    </select>
+
+    <select id="getOfflineExportByDigestId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.OfflineExportInfo">
+        select * , CONCAT_WS('',real_path,'?n=',file_name)as assemblePath from zw_m_offline_export where digest_id = #{digestId}
+        order by create_date_time desc limit 1
+    </select>
+
+    <select id="getOfflineExportBySimpleQuery"
+            resultType="com.zw.platform.domain.basicinfo.OfflineExportInfo"
+            parameterType="com.zw.platform.domain.basicinfo.query.OfflineExportQuery">
+        select *, CONCAT_WS('',real_path,'?n=',file_name)as assemblePath from zw_m_offline_export where
+        username = #{query.userName}
+        <if test="query.fileName != null and query.fileName != '' ">
+            and file_name LIKE CONCAT('%',#{query.fileName},'%')
+        </if>
+        <if test="query.status != null">
+            and status = #{query.status}
+        </if>
+        order by create_date_time desc
+    </select>
+
+    <select id="selectExportRealPath" resultType="java.lang.String">
+        select
+        real_path
+        from
+        zw_m_offline_export
+         where create_date_time &lt; #{deleteTime}
+         and real_path
+         not in (select real_path from zw_m_offline_export where create_date_time &gt;= #{deleteTime})
+    </select>
+
+    <insert id="addOfflineExportInfo" parameterType="com.zw.platform.domain.basicinfo.OfflineExportInfo">
+        insert into  zw_m_offline_export(username,`module`,business_id,query_condition,file_name,create_date_time,digest_id,status,finish_time,real_path,file_size)
+        values(#{userName},#{module},#{businessId},#{queryCondition},#{fileName},#{createDateTime},#{digestId},#{status},#{finishTime},#{realPath},#{fileSize})
+    </insert>
+
+
+    <delete id="deleteOfflineExport">
+        DELETE from zw_m_offline_export where create_date_time &lt; #{deleteTime}
+    </delete>
+
+</mapper>

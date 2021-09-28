@@ -1,0 +1,24 @@
+<div th:replace="common/common_window::window(windowId=commonWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_lg_window::window(windowId=commonLgWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_sm_window::window(windowId=commonSmWin)">公共弹出窗口(小)</div>
+<div th:replace="common/common_window::window(windowId=uploaderWin)">公共上传窗口</div>
+<div th:replace="common/common_chat_window::window(windowId=chatWin)">聊天窗口</div>
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="/wro/multi-window-monitoring-footer.js" th:src="@{/wro/multi-window-monitoring-footer.js}"></script>
+<script>
+    // <!--优化模态框加载慢问题-->
+    $(function(){
+        var modal_load_html = '',
+            common_modal=$("#commonWin,#commonLgWin,#commonSmWin");
+        modal_load_html+='<div class="layui-layer-loading" id="modal-load-wrapper">\n' +
+            '\t<div id="modal-load" class="layui-layer-content layui-layer-loading2"></div>\n' +
+            '</div>';
+
+        common_modal.find('.modal-content').html(modal_load_html);
+        common_modal.on("hidden.bs.modal", function() {
+            $(this).removeData("bs.modal");
+            $(this).find('.modal-content').html(modal_load_html);
+        });
+    })
+</script>

@@ -1,0 +1,186 @@
+<form th:action="@{/talkback/basicinfo/monitoring/personnel/edit.gsp}" th:object="${result}" id="editForm" action="#"
+    role="form" method="post" class="form-horizontal">
+  <div class="modal-header">
+    <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">修改人员信息</h4>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <input th:field="*{id}" type="text" hidden="true" />
+        <input th:value="*{bindId}" id="bindId" type="hidden" />
+        <input type="text" id="skillTree" th:value="${skillTree}" hidden>
+        <input type="text" id="allDriverType" th:value="${allDriverType}" hidden>
+        <input type="text" id="allJob" th:value="${allJob}" hidden>
+        <input name="isIncumbency" id="isIncumbency" th:value="*{isIncumbency}" hidden>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 监控对象： </label>
+          <div class="col-md-7">
+            <input name="peopleNumber" id="peopleNumber" th:field="*{peopleNumber}" maxlength="20"
+                autocomplete="off" placeholder="请输入监控对象,例如:张三,张三1,张三(XX镇)等" type="text"
+                class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label"><label
+              class="text-danger">*</label> 所属组织：</label>
+          <div class="has-feedback col-md-7 fastClear">
+            <input th:field="*{groupName}" name="groupName"
+                style="background-color: #fafafa; cursor: pointer;"
+                class="form-control" id="zTreeCitySel" placeholder="请选择所属组织"
+                type="text" value="" autocomplete="off" />
+            <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                aria-hidden="true"></span>
+            <input class="form-control hidden" name="groupId" id="groupId" th:field="*{groupId}" />
+            <div class="ztreeModelBox" id="zTreeContent">
+              <ul id="ztreeDemo" class="ztree"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 职位类别：
+          </label>
+          <div class="col-md-7">
+            <div class="input-group">
+              <input data-disabled-delicon="true" name="jobName" th:field="*{jobName}" type="text" placeholder="请选择职位类别" class="form-control brands" id="jobName"
+                  autocomplete="off" />
+              <div class="input-group-btn">
+                <button id="quickObjButton" type="button" class="btn btn-white dropdown-toggle" data-toggle="">
+                  <i class="caret"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+              </div>
+            </div>
+            <input id="jobId" name="jobId" th:field="*{jobId}" class="fakeHide">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">技能：</label>
+          <div class="has-feedback col-md-7 fastClear">
+            <input name="skillNames" th:field="*{skillNames}" autocomplete="off" class="form-control"
+                id="skills"
+                placeholder="请选择技能" style="background-color: #fafafa; cursor: pointer;" type="text" readonly />
+            <span id="skillsSpan" class="fa fa-chevron-down form-control-feedback"
+                aria-hidden="true"></span>
+            <div class="menuContent" id="zTreeContent1">
+              <ul id="skillsZtreeDemo" class="ztree"></ul>
+            </div>
+            <input type="text" name="skillIds" th:field="*{skillIds}" id="skillIds" hidden>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">驾照类别：</label>
+          <div class="has-feedback col-md-7 fastClear">
+            <input name="driverTypeNames" th:field="*{driverTypeNames}" autocomplete="off"
+                class="form-control" id="driverCategory"
+                placeholder="请选择驾照类别(最多选择3项)" style="background-color: #fafafa; cursor: pointer;"
+                type="text" readonly />
+            <span id="driverCategorySpan" class="fa fa-chevron-down form-control-feedback"
+                aria-hidden="true"></span>
+            <div class="menuContent" id="zTreeContent2">
+              <ul id="driverCategoryZtreeDemo" class="ztree"></ul>
+            </div>
+            <input type="text" name="driverTypeIds" th:field="*{driverTypeIds}" id="driverTypeIds" hidden>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">资格证：</label>
+          <div class="has-feedback col-md-7 fastClear">
+            <select name="qualificationId" th:field="*{qualificationId}" id="certificate"
+                class="form-control selectChange">
+              <option value="">无</option>
+              <option th:each="c:${allQualification}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id==qualificationId}"></option>
+            </select>
+            <input type="text" name="qualificationName" th:field="*{qualificationName}"
+                id="qualificationName" class="selectInput" hidden>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">血型：</label>
+          <div class="has-feedback col-md-7">
+            <select name="bloodTypeId" th:field="*{bloodTypeId}" id="bloodType" class="form-control selectChange">
+              <option value=""></option>
+              <option th:each="c:${allBloodType}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id==bloodTypeId}"></option>
+            </select>
+            <input type="text" name="bloodTypeName" th:field="*{bloodTypeName}" id="bloodTypeName" class="selectInput" hidden>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">身份证：</label>
+          <div class="has-feedback col-md-7">
+            <input name="identity" th:field="*{identity}" autocomplete="off" class="form-control" id="identity" placeholder="请输入身份证" type="text" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">民族：</label>
+          <div class="has-feedback col-md-3">
+            <select name="nationId" th:field="*{nationId}" id="national" class="form-control selectChange"
+                style="padding-left: 5px">
+              <option value=""></option>
+              <option th:each="c:${allNation}" th:value="${c.id}" th:text="${c.name}" th:selected="${c.id==nationId}"></option>
+            </select>
+            <input type="text" name="nationName" th:field="*{nationName}" id="nationName"
+                class="selectInput" hidden>
+          </div>
+          <div class="col-md-5">
+            <label class="col-md-3 control-label">
+              <label class="text-danger">*</label> 性别：
+            </label>
+            <div class="col-md-7">
+              <div th:field="*{gender}">
+                <label class="radio-inline"><input type="radio" th:field="*{gender}" name="gender"
+                    value="1" /> 男</label>
+                <label class="radio-inline"><input type="radio" th:field="*{gender}" name="gender"
+                    value="2" /> 女</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">联系电话：</label>
+          <div class="col-md-7">
+            <input th:field="*{phone}" placeholder="请输入电话号码" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">备注：</label>
+          <div class="col-md-7">
+            <input th:field="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div id="bindMsg" hidden="true" style="text-align:left;color:red;">
+      <p> 注 ： 该人员绑定终端和终端手机号，监控对象不允许修改，如需修改请先解除绑定！</p>
+    </div>
+    <button class="btn btn-primary" type="button" id="doSubmits">
+      <strong>提 交</strong>
+    </button>
+    <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+  var identityError = [[#{identity.error}]];
+  var phoneError = [[#{phone.error}]];
+  var telPhoneError = [[#{telPhone.error}]];
+  var emailError = [[#{email.error}]];
+  var publicSize8 = [[#{public.size8.length}]];
+  var publicSize20 = [[#{public.size20.length}]];
+  var publicSize50 = [[#{public.size50.length}]];
+  var publicSize100 = [[#{public.size100.length}]];
+  var publicNull = [[#{public.null}]];
+  var publicSelectGroupNull = [[#{public.selectGroup.null}]];
+  var PersonnelNameNull = [[#{Personnel.name.null}]];
+  var personnelNumberNull = [[#{personnel.number.null}]];
+  var personnelIdentityExists = [[#{personnel.identity.exists}]];
+  var personnelNumberError = [[#{personnel.number.error}]];
+  var personnelNumberExists = [[#{personnel.number.exists}]];
+</script>
+<script src="/wro/personnelEditForDispatch.js" th:src="@{/wro/personnelEditForDispatch.js}"></script>

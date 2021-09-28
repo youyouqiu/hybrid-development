@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>车辆定位统计</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        .tooltip-inner{
+            padding: 3px 8px!important;
+            white-space: pre-wrap;
+        }
+    </style>
+    <link rel="stylesheet" href="/clbs/resources/css/detailDrawer/detailDrawer.css">
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <!--breadcrumb 当前页面所处位置-->
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">四川监管报表</li>
+                        <li class="active">车辆定位统计</li>
+                    </ul>
+                    <h1 class="h1" style="float:none">车辆定位统计</h1>
+                </div>
+            </div>
+            <!--页面主要内容-->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel-default">
+                        <div class="panel-heading" style="padding-bottom: 0">
+                            <ul class="nav nav-tabs" style="border-bottom: none;">
+                                <li id="panelTab1" class="active"><a href="#panel1" data-toggle="tab">企业车辆定位统计</a>
+                                </li>
+                                <li id="panelTab2" class=""><a href="#panel2" data-toggle="tab">车辆月度定位统计</a>
+                                </li>
+                                <li id="panelTab3" class=""><a href="#panel3" data-toggle="tab">异常定位统计</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <!--企业车辆定位统计 表格-->
+                        <div class="tab-pane active" id="panel1">
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <!--vehiclePosition => stretch2-->
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="vehiclePosition-filter">
+                                        <div class="col-md-12 alarmSearchToolPanel">
+                                            <form id="vehiclePositionForm" class="form-horizontal" action="#" method="post" role="form">
+                                                <div class="form-group">
+                                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                                    <input class="form-control hidden"/>
+                                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                        <!--vehiclePositionInput groupSelect-->
+                                                        <!--groupInputs  groupSelect-->
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                               placeholder="请选择组织" class="form-control"
+                                                               id="vehiclePositionInput" maxlength="30" name="groupSelect" type="text" autocomplete="off"/>
+                                                        <span class="fa fa-chevron-down form-control-feedback"
+                                                              style="top: 0; right: 15px;cursor:pointer;"
+                                                              aria-hidden="true"></span>
+                                                        <!--vehiclePositionMenu menuContent-->
+                                                        <div id="vehiclePositionMenu" class="menuContent">
+                                                            <!--vehiclePositionTree treeDemo-->
+                                                            <ul id="vehiclePositionTree" class="ztree"></ul>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                    <div class="col-md-4 col-sm-8 searchListSelect">
+                                                        <!--vehiclePositionTime timeIntervalThree-->
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                               class="form-control layer-date laydate-icon"
+                                                               id="vehiclePositionTime" name="timeIntervalThree" readonly/>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 control-label" id="dateSearchData">
+                                                        <button id="todayClickThree" type="button" class="btn btn-primary fixed-width" name="0" onclick="vehiclePosition.inquireClick(0)">今天</button>
+                                                        <button id="yesterdayClickThree" type="button" class="btn btn-primary fixed-width" name="-1" onclick="vehiclePosition.inquireClick(-1)">前一天</button>
+                                                        <button id="nearlyThreeDaysThree" type="button" class="btn btn-primary fixed-width" name="-3" onclick="vehiclePosition.inquireClick(-3)">前三天</button>
+                                                        <button id="nearlySevenDaysThree" type="button" class="btn btn-primary fixed-width" name="-7" onclick="vehiclePosition.inquireClick(-7)">前七天</button>
+                                                        <button type="button" class="btn btn-primary search-btn fixed-width" name="1" onclick="vehiclePosition.inquireClick(1)"><i class="glyphicon glyphicon-search"></i> 查询</button>
+                                                        <button id="batchDetail" type="button" class="btn btn-primary export-btn" name="batch" onclick="vehiclePosition.inquireClick('batch')" disabled><i class="glyphicon glyphicon-log-out"></i> 批量导出明细</button>
+                                                        <!--vehiclePositionExport exportAlarm-->
+                                                        <button id="vehiclePositionExport" type="button" class="btn btn-purple export-btn fixed-width" disabled><i class="glyphicon glyphicon-log-out"></i> 导出</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="vehiclePosition">
+                                        <h3 class="panel-title fwb">数据列表</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="vehiclePosition-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body fixed-table-body" id="vehiclePosition-body">
+                                        <div class="ToolPanel">
+                                            <div class="bars pull-left">
+                                                <div class="btn-group pull-left barsMargin" role="group">
+                                                    <form role="form">
+                                                        <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                                      id="vehiclePositionQuery" name="simpleQueryParam"
+                                                                      style="width:300px" maxlength="30"
+                                                                      placeholder="请输入请输入企业名称"></label>
+                                                        <button type="button" id="vehiclePositionSearch"
+                                                                class="btn btn-outline btn-default">搜索
+                                                        </button>
+                                                        <input id="hiddenText" type="text" style="display:none">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="columns btn-group pull-right personnelInformation">
+                                                <button id="vehiclePositionRefresh" class="btn btn-default" type="button"
+                                                        name="refresh"
+                                                        title="刷新">
+                                                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                </button>
+                                                <div class="keep-open btn-group" title="定制显示列">
+                                                    <button id="customizeColumns" type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                            class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu"
+                                                        id="vehiclePositionColumn"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table id="vehiclePositionTable"
+                                               class="table table-striped table-bordered table-hover noCheckTable"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center" rowspan="2" data-index="1">序号</th>
+                                                <th class="text-center" rowspan="2" data-index="2" style="min-width: 250px;">道路运输企业</th>
+                                                <th class="text-center" rowspan="2" data-index="3">车辆数</th>
+                                                <th class="text-center" colspan="3">定位统计 <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" data-original-title="无效定位数：未定位或卫星信号低于3个的定位数据数量">
+                                                </i> </th>
+                                                <th class="text-center" colspan="2">无定位统计 <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" data-original-title="无定位车辆数：无有效定位数据的车辆">
+                                                </i></th>
+                                                <th class="text-center" colspan="2">定位中断统计 <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" data-original-title="定位中断：有效定位数据间隔超过10分钟">
+                                                </i></th>
+                                                <th class="text-center" colspan="2">离线位移统计 <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" data-original-title="离线位移：掉线30分钟以上且移动超过50公里">
+                                                </i></th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center" data-index="4">合计定位总数</th>
+                                                <th class="text-center" data-index="5">合计无效定位数</th>
+                                                <th class="text-center" data-index="6">有效率</th>
+                                                <th class="text-center" data-index="7">无定位车辆数</th>
+                                                <th class="text-center" data-index="8">无定位率</th>
+                                                <th class="text-center" data-index="9">车辆数</th>
+                                                <th class="text-center" data-index="10">次数</th>
+                                                <th class="text-center" data-index="11">车辆数</th>
+                                                <th class="text-center" data-index="12">次数</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--车辆月度定位统计 表格-->
+                        <div class="tab-pane tableFEStyle" id="panel2">
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <!--monthPosition-->
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="monthPosition-filter">
+                                        <div class="col-md-12 alarmSearchToolPanel">
+                                            <form id="monthPositionForm" class="form-horizontal" action="#"
+                                                  method="post" role="form">
+                                                <div class="form-group">
+                                                    <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                                    <input class="form-control hidden"/>
+                                                    <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                        <!--queryType monthPositionType-->
+                                                        <select name="monthPositionType" id="monthPositionType" class="Inlinesearch form-control treeSelect">
+                                                            <option value="vehicle" selected="">监控对象</option>
+                                                            <option value="group">企业</option>
+                                                            <option value="assignment">分组</option>
+                                                        </select>
+                                                        <!--groupSelectTwo monthPositionInput-->
+                                                        <input style="cursor: pointer; background-color: #fafafa;"
+                                                               placeholder="请选择" class="form-control moreQueryGroup"
+                                                               id="monthPositionInput" name="groupSelect" type="text" maxlength="30" autocomplete="off"/>
+                                                        <span class="fa fa-chevron-down form-control-feedback"
+                                                              style="top: 0; right: 15px;cursor:pointer;"
+                                                              aria-hidden="true"></span>
+                                                        <!--menuContentTwo monthPositionMenu-->
+                                                        <div id="monthPositionMenu" class="menuContent">
+                                                            <!--treeDemoTwo vehiclePositionTree-->
+                                                            <ul id="monthPositionTree" class="ztree"></ul>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                    <div class="col-md-3 col-sm-8 searchListSelect">
+                                                        <!--select3 monthPositionTime-->
+                                                        <select class="form-control" id="monthPositionTime">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 control-label">
+                                                        <button id="thisMonth" type="button"
+                                                                class="btn btn-primary fixed-width"
+                                                                onclick="monthPosition.inquireClick('thisMonth')">本月
+                                                        </button>
+                                                        <button id="lastMonthOne" type="button"
+                                                                class="btn btn-primary fixed-width"
+                                                                onclick="monthPosition.inquireClick('lastMonth')">上个月
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-primary search-btn fixed-width" name="1"
+                                                                onclick="monthPosition.inquireClick(1)"><i
+                                                                class="glyphicon glyphicon-search"></i> 查询
+                                                        </button>
+                                                        <!--exportAlarmTwo monthPositionExport-->
+                                                        <button disabled id="monthPositionExport" type="button" class="btn btn-purple export-btn fixed-width"><i class="glyphicon glyphicon-log-out"></i> 导出</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="monthPosition">
+                                        <h3 class="panel-title fwb">数据列表</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="monthPosition-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body fixed-table-body" id="monthPosition-body">
+                                        <div class="ToolPanel">
+                                            <div class="bars pull-left">
+                                                <div class="btn-group pull-left barsMargin" role="group">
+                                                    <form role="form">
+                                                        <!--simpleQueryParamTwo monthPositionQuery-->
+                                                        <label><input autocomplete="off" type="text"
+                                                                      class="Inlinesearch form-control"
+                                                                      id="monthPositionQuery" maxlength="30"
+                                                                      name="simpleQueryParam"
+                                                                      placeholder="请输入车牌号"></label>
+                                                        <!--search_buttonTwo monthPositionSearch-->
+                                                        <button type="button" id="monthPositionSearch"
+                                                                class="btn btn-outline btn-default">搜索
+                                                        </button>
+                                                        <input type="text" style="display:none">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="columns btn-group pull-right personnelInformation">
+                                                <!--refreshTableTwo monthPositionRefresh-->
+
+
+                                                <button id="monthPositionRefresh" class="btn btn-default" type="button"
+                                                        name="refresh"
+                                                        title="刷新">
+                                                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                </button>
+                                                <div class="keep-open btn-group" title="定制显示列">
+                                                    <button id="customizeColumnsTwo" type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                            class="caret"></span>
+                                                    </button>
+                                                    <!--Ul-menu-textTwo monthPositionColumn-->
+                                                    <ul class="dropdown-menu" role="menu"
+                                                        id="monthPositionColumn"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--dataTableTwo monthPositionTable-->
+                                        <table id="monthPositionTable"
+                                               class="table table-striped table-bordered table-hover noCheckTable"
+                                               cellspacing="0" width="100%">
+                                            <thead id="monthTableThead">
+                                            <!--<tr>
+                                                <th class="text-center" rowspan="2">序号</th>
+                                                <th class="text-center" rowspan="2">车牌号</th>
+                                                <th class="text-center" rowspan="2">车牌颜色</th>
+                                                <th class="text-center" rowspan="2">车辆类型</th>
+                                                <th class="text-center" rowspan="2" style="min-width: 250px;">所属企业</th>
+                                                <th class="text-center" colspan="3">定位统计</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center">累计定位总数</th>
+                                                <th class="text-center">累计无效数</th>
+                                                <th class="text-center">有效率</th>
+                                                &lt;!&ndash;定位数 无效数 有效率&ndash;&gt;
+                                            </tr>-->
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--异常定位统计 表格-->
+                        <div class="tab-pane tableFEStyle" id="panel3">
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <!--unusualPosition-->
+                                <div class="panel panel-default">
+                                    <div class="panel-body" id="unusualPosition-filter">
+                                        <div class="col-md-12 alarmSearchToolPanel">
+                                            <form id="unusualPositionForm" class="form-horizontal" action="#"
+                                                  method="post" role="form">
+                                                <div class="form-group">
+                                                    <div class="col-md-4">
+                                                        <label class="control-label" style="float: left;">组织：</label>
+                                                        <input class="form-control hidden"/>
+                                                        <div class="has-feedback fastClear" style="margin-left: 40px;padding-left: 15px;padding-right: 15px;">
+                                                            <select name="unusualPositionType" id="unusualPositionType" class="Inlinesearch form-control treeSelect">
+                                                                <option value="vehicle" selected="">监控对象</option>
+                                                                <option value="group">企业</option>
+                                                                <option value="assignment">分组</option>
+                                                            </select>
+                                                            <input style="cursor: pointer; background-color: #fafafa;"
+                                                                   placeholder="请选择" class="form-control moreQueryGroup"
+                                                                   id="unusualPositionInput" name="groupSelect" maxlength="30" type="text" autocomplete="off"/>
+                                                            <span class="fa fa-chevron-down form-control-feedback"
+                                                                  style="top: 0; right: 15px;cursor:pointer;"
+                                                                  aria-hidden="true"></span>
+                                                            <div id="unusualPositionMenu" class="menuContent">
+                                                                <ul id="unusualPositionTree" class="ztree"></ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="control-label" style="float: left;">时间：</label>
+                                                        <div class="" style="margin-left: 40px;padding-left: 15px;padding-right: 15px;">
+                                                            <select class="form-control" id="unusualPositionTime">
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-4 form-inline">
+                                                        <label class="">当天的定位数≤</label>
+                                                        <input autocomplete="off" type="text" class="form-control text-center" id="unPositionNumber" name="unPositionNumber" style="width: 70px;" placeholder="请输入" value="500" maxlength="5">
+                                                        <label>为不定位天数</label>
+                                                    </div>
+                                                    <div class="col-md-4 form-inline">
+                                                        <label class="">当天的无效定位数></label>
+                                                        <input autocomplete="off" type="text" class="form-control text-center" id="invalidPositionNumber" name="invalidPositionNumber" style="width: 70px;" placeholder="请输入" value="500" maxlength="5">
+                                                        <label>为无效天数</label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <button id="thisMonthTwo" type="button"
+                                                                class="btn btn-primary fixed-width"
+                                                                onclick="unusualPosition.inquireClick('thisMonth')">本月
+                                                        </button>
+                                                        <button id="lastMonthTwo" type="button"
+                                                                class="btn btn-primary fixed-width"
+                                                                onclick="unusualPosition.inquireClick('lastMonth')">上个月
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-primary search-btn fixed-width" name="1"
+                                                                onclick="unusualPosition.inquireClick(1)"><i
+                                                                class="glyphicon glyphicon-search"></i> 查询
+                                                        </button>
+                                                        <button disabled id="unusualPositionExport" type="button"
+                                                                class="btn btn-purple export-btn fixed-width"><i
+                                                                class="glyphicon glyphicon-log-out"></i> 导出
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" id="unusualPosition">
+                                        <h3 class="panel-title fwb">数据列表</h3>
+                                        <div class="actions pull-right listActions">
+                                            <i class="fa chevron-down" id="unusualPosition-chevron"></i>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body fixed-table-body" id="unusualPosition-body">
+                                        <div class="ToolPanel">
+                                            <div class="bars pull-left">
+                                                <div class="btn-group pull-left barsMargin" role="group">
+                                                    <form role="form">
+                                                        <label><input autocomplete="off" type="text"
+                                                                      class="Inlinesearch form-control"
+                                                                      id="unusualPositionQuery" maxlength="30"
+                                                                      name="simpleQueryParam"
+                                                                      placeholder="请输入车牌号"></label>
+                                                        <button type="button" id="unusualPositionSearch"
+                                                                class="btn btn-outline btn-default">搜索
+                                                        </button>
+                                                        <input type="text" style="display:none">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="columns btn-group pull-right personnelInformation">
+                                                <button id="unusualPositionRefresh" class="btn btn-default" type="button"
+                                                        name="refresh"
+                                                        title="刷新">
+                                                    <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                </button>
+                                                <div class="keep-open btn-group" title="定制显示列">
+                                                    <button id="customizeColumnsThree" type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                            class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu"
+                                                        id="unusualPositionColumn"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table id="unusualPositionTable"
+                                               class="table table-striped table-bordered table-hover noCheckTable"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center" rowspan="2">序号</th>
+                                                <th class="text-center" rowspan="2">车牌号</th>
+                                                <th class="text-center" rowspan="2">车牌颜色</th>
+                                                <th class="text-center" rowspan="2">车辆类型</th>
+                                                <th class="text-center" rowspan="2" style="min-width: 250px;">所属企业</th>
+                                                <th class="text-center" colspan="2">不定位统计</th>
+                                                <th class="text-center" colspan="3">无效定位统计</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center">不定位天数</th>
+                                                <th class="text-center">有效率</th>
+                                                <th class="text-center">无效天数</th>
+                                                <th class="text-center">无效定位数</th>
+                                                <th class="text-center">有效率</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="drawer-container" id="drawerBox" style="display: block;">
+                <div class="alarmSearchToolPanel">
+                    <!--企业车辆定位明细-->
+                    <div class="panel panel-default" id="drawerCompany">
+                        <div class="panel-heading">
+                            <!--企业车辆定位明细 异常定位明细-->
+                            <h3 class="panel-title fwb">企业车辆定位明细</h3>
+                            <div class="actions pull-right">
+                                <span class="glyphicon glyphicon-remove detail-close" onclick="companyVehicles.closeDrawer()"></span>
+                            </div>
+                        </div>
+                        <div class="panel-default">
+                            <div class="panel-heading" style="padding-bottom: 0;background: #fff;">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#companyDetail1" role="tab" data-toggle="tab">定位统计明细</a></li>
+                                    <li><a href="#companyDetail2" role="tab" data-toggle="tab">无定位统计明细</a></li>
+                                    <li><a href="#companyDetail3" role="tab" data-toggle="tab">定位中断统计明细</a></li>
+                                    <li><a href="#companyDetail4" role="tab" data-toggle="tab">离线位移统计明细</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-content panel-body fixed-table-body">
+                            <div class="tab-pane active" id="companyDetail1">
+                                <div class="ToolPanel" style="margin-bottom: 20px;">
+                                    <form role="form" style="display: inline-block;position: relative;">
+                                        <label><input autocomplete="off" type="text"
+                                                      class="Inlinesearch form-control"
+                                                      id="posDetailQuery"
+                                                      name="simpleQueryParam" maxlength="30"
+                                                      placeholder="请输入车牌号"></label>
+                                        <button type="button" id="posDetailSearch"
+                                                class="btn btn-outline btn-default">搜索
+                                        </button>
+                                        <input type="text" style="display:none">
+                                    </form>
+                                </div>
+                                <div class="detailTableView">
+                                    <table id="posDetailTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">车牌号</th>
+                                            <th class="text-center">车牌颜色</th>
+                                            <th class="text-center">车辆类型</th>
+                                            <th class="text-center" style="min-width: 220px;">所属企业</th>
+                                            <th class="text-center">累计定位数</th>
+                                            <th class="text-center">累计无效数</th>
+                                            <th class="text-center">有效率</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="companyDetail2">
+                                <div class="ToolPanel" style="margin-bottom: 20px;">
+                                    <form role="form" style="display: inline-block;position: relative;">
+                                        <label><input autocomplete="off" type="text"
+                                                      class="Inlinesearch form-control"
+                                                      id="unPosDetailQuery"
+                                                      name="simpleQueryParam"
+                                                      maxlength="30"
+                                                      placeholder="请输入车牌号"></label>
+                                        <button type="button" id="unPosDetailSearch"
+                                                class="btn btn-outline btn-default">搜索
+                                        </button>
+                                        <input type="text" style="display:none">
+                                    </form>
+                                </div>
+                                <div class="detailTableView">
+                                    <table id="unPosDetailTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">车牌号</th>
+                                            <th class="text-center">车牌颜色</th>
+                                            <th class="text-center">车辆类型</th>
+                                            <th class="text-center" style="min-width: 220px;">所属企业</th>
+                                            <th class="text-center">最后定位时间</th>
+                                            <th class="text-center">最后定位位置</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="companyDetail3">
+                                <div class="ToolPanel" style="margin-bottom: 20px;">
+                                    <form role="form" style="display: inline-block;position: relative;">
+                                        <label><input autocomplete="off" type="text"
+                                                      class="Inlinesearch form-control"
+                                                      id="breakDetailQuery"
+                                                      name="simpleQueryParam"
+                                                      maxlength="30"
+                                                      placeholder="请输入车牌号"></label>
+                                        <button type="button" id="breakDetailSearch"
+                                                class="btn btn-outline btn-default">搜索
+                                        </button>
+                                        <input type="text" style="display:none">
+                                    </form>
+                                </div>
+                                <div class="detailTableView">
+                                    <table id="breakDetailTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">车牌号</th>
+                                            <th class="text-center">车牌颜色</th>
+                                            <th class="text-center">车辆类型</th>
+                                            <th class="text-center" style="min-width: 220px;">所属企业</th>
+                                            <th class="text-center">中断时长</th>
+                                            <th class="text-center">开始时间</th>
+                                            <th class="text-center">结束时间</th>
+                                            <th class="text-center">开始位置</th>
+                                            <th class="text-center">结束位置</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="companyDetail4">
+                                <div class="ToolPanel" style="margin-bottom: 20px;">
+                                    <form role="form" style="display: inline-block;position: relative;">
+                                        <label><input autocomplete="off" type="text"
+                                                      class="Inlinesearch form-control"
+                                                      id="offlineDetailQuery"
+                                                      name="simpleQueryParam"
+                                                      maxlength="30"
+                                                      placeholder="请输入车牌号"></label>
+                                        <button type="button" id="offlineDetailSearch"
+                                                class="btn btn-outline btn-default">搜索
+                                        </button>
+                                        <input type="text" style="display:none">
+                                    </form>
+                                </div>
+                                <div class="detailTableView">
+                                    <table id="offlineDetailTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">车牌号</th>
+                                            <th class="text-center">车牌颜色</th>
+                                            <th class="text-center">车辆类型</th>
+                                            <th class="text-center" style="min-width: 220px;">所属企业</th>
+                                            <th class="text-center">离线开始时间</th>
+                                            <th class="text-center">离线结束时间</th>
+                                            <th class="text-center">离线位移公里数</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--异常定位明细-->
+                    <div class="panel panel-default" id="drawerUnusual" style="display: none;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">异常定位明细</h3>
+                            <div class="actions pull-right">
+                                <span class="glyphicon glyphicon-remove detail-close" onclick="companyVehicles.closeDrawer()"></span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="max-height: calc(100vh - 110px);overflow: auto;">
+                            <table id="unusualDetailTable" class="table table-striped table-bordered table-hover noCheckTable"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">序号</th>
+                                    <th class="text-center">车牌号</th>
+                                    <th class="text-center">车牌颜色</th>
+                                    <th class="text-center">车辆类型</th>
+                                    <th class="text-center" style="min-width: 220px;">所属企业</th>
+                                    <th class="text-center">定位数</th>
+                                    <th class="text-center">无效数</th>
+                                    <th class="text-center">定位时间</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+                        <button id="detailExportBtn"  type="button" class="btn btn-primary export-btn" disabled>
+                            <i class="glyphicon glyphicon-log-out"></i> 导出
+                        </button>
+                        <button type="button" class="btn btn-default btn-off" style="width:74.15px" onclick="companyVehicles.closeDrawer()">关 &nbsp;闭</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<style>
+    .hide{
+        display: none!important;
+    }
+</style>
+</body>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var monitoringObjecNull = [[#{monitoring.objec.null}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var zTreeCheckGroup = [[#{Vehicle.select.group}]];
+    var vehicleSelectGroup = [[#{Vehicle.select.group}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+    var notDataExport = [[#{not.data.export}]];
+    var exportFail = [[#{export.fail}]];
+    var publicError = [[#{public.error}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js"
+        th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/positioningStatistics/companyVehicles.js"
+        th:src="@{/resources/js/positioningStatistics/companyVehicles.js}"></script>
+</html>

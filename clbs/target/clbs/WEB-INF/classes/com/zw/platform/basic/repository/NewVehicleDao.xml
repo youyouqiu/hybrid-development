@@ -1,0 +1,1741 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewVehicleDao">
+    <sql id="allField">
+        id, vehicle_number, vehicle_owner, vehicle_owner_phone, aliases, vehicle_type, chassis_number,
+        engine_number, brand, area_attribute, province, city, fuel_type, plate_color, is_start, flag, online_time,
+        create_data_time, create_data_username, update_data_time, update_data_username, vehicle_purpose,
+        vehicl_operation_number, road_transport_number, road_transport__validity, vehicle_insurance_number,
+        vehicle_photo, vehicle_technology_validity, vehicle_color, vehicle_icon, remark, vehicle_sub_type_id,
+        vehicle_level, phone_check, number_load, loading_quality, state_repair, county, scope_business,
+        issued_authority, management_type, road_transport_validity_start, line_number, provenance, via_name,
+        destination, departure, route_entry, destination_station, export_route, daily_number, management_remind_days,
+        operating_state, license_no, registration_date, registration_start_date, registration_end_date,
+        registration_remind_days, registration_remark, using_nature, brand_model, license_issuance_date, vehicle_brand,
+        vehicle_model, vehicle_production_date, first_online_time, purchase_way, valid_end_date, license_numbers,
+        total_quality, traction_total_mass, profile_size_long, profile_size_wide, profile_size_high, internal_size_long,
+        internal_size_wide, internal_size_high, shaft_number, tires_number, tire_size, vehicle_owner_name,
+        owner_phone_one, owner_phone_two, owner_phone_three, owner_landline, machine_age, self_respect, ability_work,
+        working_radius, brand_models_id, initial_mileage, initial_work_hours, maintain_mileage, maintain_validity,
+        vehicle_platform_install_date, province_id, city_id, trade_name, driving_license_front_photo,
+        driving_license_duplicate_photo, transport_number_photo, group_id
+    </sql>
+
+    <select id="getSortList" resultType="string">
+        SELECT id
+        from zw_m_vehicle_info
+        where flag = 1
+        ORDER BY create_data_time
+    </select>
+
+    <select id="initCacheList" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT vehicle.id,vehicle.brand as `name`, vehicle.aliases as alias,vehicle.group_id as orgId, '0' as
+        monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,
+        GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,GROUP_CONCAT(DISTINCT asm.`name`) groupName,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date,vehicle.plate_color,
+        GROUP_CONCAT(DISTINCT p.professionals_id) professionalIds,
+        GROUP_CONCAT(DISTINCT pi.name) professionalNames,
+        cofig.service_lifecycle_id,cofig.intercom_info_id, device.org_id deviceOrgId, simcard.org_id
+        simCardOrgId,cofig.vehicle_password,
+        intercom.intercom_device_id intercomDeviceNumber,
+        intercom.user_id,intercom.number
+        callNumber,vehicle.operating_state,vehicle.vehicle_type,vehicle.vehicle_sub_type_id,vehicle.is_start,vehicle.state_repair,
+        vehicle.vehicle_purpose,vehicleType.vehicle_category vehicleCategoryId,vehicleType.vehicle_type
+        vehicleTypeName,vehicle.chassis_number,vehicle.province_id,vehicle.province,
+        vehicle.city_id,vehicle.city,vehicle.county,terminal.support_video_flag
+        isVideo,device.manufacturer_id,vp.purpose_category vehiclePurposeName,simcard.auth_code
+        from zw_m_vehicle_info vehicle
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_assignment asm on assign.assignment_id = asm.id and asm.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_config_professionals p on cofig.id = p.config_id and p.flag = 1
+        LEFT JOIN zw_m_professionals_info pi on p.professionals_id = pi.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag = 1
+        LEFT JOIN zw_m_vehicle_type vehicleType on vehicle.vehicle_type = vehicleType.id
+        LEFT JOIN zw_m_vehicle_purpose vp ON vehicle.vehicle_purpose=vp.id AND vp.flag = 1
+        where vehicle.flag = 1
+        and vehicle.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by vehicle.id
+    </select>
+
+    <select id="getIconList" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT v.id,icon.ico_name firstValue,v.brand `name`,v.vehicle_icon,icon.ico_name vehicleIconName
+        from zw_m_vehicle_info v
+        LEFT JOIN zw_c_ico_config icon on v.vehicle_icon = icon.id
+        where v.flag = 1
+        and v.vehicle_icon<![CDATA[<>]]>''
+    </select>
+
+    <select id="getDetailById" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT vehicle.id,vehicle.brand as `name`, vehicle.aliases as alias,vehicle.group_id as orgId,vehicle.vehicle_owner,vc.id vehicleCategoryId,vc.vehicle_category vehicleCategoryName,
+        vehicle.vehicle_type,vt.vehicle_type vehicleTypeName,vehicle.vehicle_owner_phone, vehicle.phone_check,vehicle.vehicle_color,vehicle.fuel_type, fType.fuel_type fuelTypeName,
+        vehicle.area_attribute,vehicle.province, vehicle.city,vehicle.county,vehicle.vehicle_purpose, vp.purpose_category vehiclePurposeName, vehicle.trade_name,vehicle.is_start,
+        vehicle.number_load, vehicle.loading_quality,vehicle.vehicle_level,vehicle.vehicle_insurance_number,DATE_FORMAT(vehicle.vehicle_technology_validity, '%Y-%m-%d') as vehicleTechnologyValidityStr,
+        vehicle.vehicle_technology_validity,vehicle.maintain_mileage,vehicle.maintain_validity, DATE_FORMAT(vehicle.maintain_validity, '%Y-%m-%d') maintainValidityStr,vehicle.vehicle_platform_install_date,
+        DATE_FORMAT( vehicle.vehicle_platform_install_date, '%Y-%m-%d') AS vehiclePlatformInstallDateStr,vehicle.remark,vehicle.state_repair,vehicle.road_transport_number,vehicle.vehicl_operation_number,
+        vehicle.issued_authority,vehicle.management_type,vehicle.road_transport_validity_start, DATE_FORMAT(vehicle.road_transport_validity_start, '%Y-%m-%d') roadTransportValidityStartStr,
+        DATE_FORMAT(vehicle.road_transport__validity, '%Y-%m-%d') as roadTransportValidityStr,vehicle.road_transport__validity roadTransportValidity,vehicle.line_number,vehicle.provenance,vehicle.via_name,vehicle.destination,
+        vehicle.departure,vehicle.route_entry,vehicle.destination_station,vehicle.export_route,vehicle.daily_number,vehicle.management_remind_days,vehicle.operating_state,vehicle.chassis_number,
+        vehicle.engine_number,vehicle.using_nature,vehicle.brand_model,vehicle.registration_start_date, vehicle.registration_end_date,vehicle.license_issuance_date,vehicle.registration_date,vehicle.registration_remind_days,
+        vehicle.registration_remark,DATE_FORMAT(vehicle.registration_start_date,'%Y-%m-%d') AS registrationStartDateStr,DATE_FORMAT(vehicle.registration_end_date,'%Y-%m-%d') AS registrationEndDateStr,
+        DATE_FORMAT(vehicle.license_issuance_date,'%Y-%m-%d') AS licenseIssuanceDateStr,DATE_FORMAT(vehicle.registration_date,'%Y-%m-%d') AS registrationDateStr,
+        vehicle.vehicle_brand,vehicle.vehicle_model,vehicle.vehicle_production_date,DATE_FORMAT(vehicle.vehicle_production_date,'%Y-%m-%d') as vehicleProductionDateStr,vehicle.first_online_time,
+        DATE_FORMAT(vehicle.first_online_time,'%Y-%m-%d') as firstOnlineTimeStr,vehicle.purchase_way,vehicle.valid_end_date,DATE_FORMAT(vehicle.valid_end_date,'%Y-%m-%d') validEndDateStr,
+        vehicle.license_numbers,vehicle.total_quality,vehicle.traction_total_mass,vehicle.profile_size_long,vehicle.profile_size_wide,vehicle.profile_size_high,vehicle.internal_size_long,
+        vehicle.internal_size_wide,vehicle.internal_size_high,vehicle.shaft_number,vehicle.tires_number,vehicle.tire_size,vehicle.vehicle_owner_name,vehicle.owner_phone_one,vehicle.owner_phone_two,
+        vehicle.owner_phone_three,vehicle.owner_landline,vehicle.machine_age,vehicle.self_respect,vehicle.ability_work,vehicle.working_radius,vehicle.brand_models_id,bm.model_name AS modelName,
+        bra.brand_name AS brandName,vehicle.initial_mileage,vehicle.initial_work_hours,DATE_FORMAT(vehicle.machine_age, '%Y-%m-%d') machineAgeStr,
+        vehicle.vehicle_photo,vehicle.online_time,vehicle.license_no,DATE_FORMAT(vehicle.create_data_time,'%Y-%m-%d') createDataTimeStr,DATE_FORMAT(vehicle.update_data_time,'%Y-%m-%d') updateDataTimeStr,
+        vehicle.driving_license_front_photo,vehicle.driving_license_duplicate_photo,vehicle.transport_number_photo,vehicle.vehicle_icon,
+        '0' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,vehicle.plate_color,
+        vehicle.province_id, vehicle.city_id, GROUP_CONCAT(DISTINCT p.professionals_id) professionalIds,GROUP_CONCAT(DISTINCT pi.name) professionalNames,
+        vehicle.vehicle_sub_type_id,vc.standard,vtt.vehicle_subtypes vehicleSubType,simcard.auth_code,GROUP_CONCAT(DISTINCT bsc.business_scope_id) AS scopeBusinessIds,
+        GROUP_CONCAT(DISTINCT d.`value`) AS scopeBusiness, GROUP_CONCAT(DISTINCT d.`code`) scopeBusinessCodes,cofig.access_network
+        from zw_m_vehicle_info vehicle
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        LEFT JOIN zw_m_config_professionals p on cofig.id = p.config_id and p.flag = 1
+        LEFT JOIN zw_m_professionals_info pi on p.professionals_id = pi.id
+        left join zw_m_vehicle_type vt on vehicle.vehicle_type = vt.id and vt.flag = 1
+        LEFT JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        left join zw_m_vehicle_type vtt on vehicle.vehicle_sub_type_id = vtt.id and vtt.flag = 1
+        LEFT JOIN zw_m_fuel_type fType ON fType.id = vehicle.fuel_type and fType.flag = 1
+        LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = vehicle.vehicle_purpose AND vp.flag = 1
+        LEFT JOIN zw_m_brand_models bm ON vehicle.brand_models_id = bm.id AND bm.flag = 1
+        LEFT JOIN zw_m_brand bra ON bm.brand_id = bra.id AND bm.flag = 1
+        LEFT JOIN zw_m_business_scope_config bsc ON vehicle.id = bsc.id and bsc.type = 2
+        LEFT JOIN zw_c_dictionary d ON bsc.business_scope_id = d.id
+        where vehicle.flag = 1
+        and vehicle.id = #{id}
+        group by vehicle.id
+    </select>
+
+    <select id="getDetailByBrand" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT vehicle.id,vehicle.brand as `name`, vehicle.aliases as alias,vehicle.group_id as orgId,vehicle.vehicle_owner,vc.id vehicleCategoryId,vc.vehicle_category vehicleCategoryName,
+        vehicle.vehicle_type,vt.vehicle_type vehicleTypeName,vehicle.vehicle_owner_phone, vehicle.phone_check,vehicle.vehicle_color,vehicle.fuel_type, fType.fuel_type fuelTypeName,
+        vehicle.area_attribute,vehicle.province, vehicle.city,vehicle.county,vehicle.vehicle_purpose, vp.purpose_category vehiclePurposeName, vehicle.trade_name,vehicle.is_start,
+        vehicle.number_load, vehicle.loading_quality,vehicle.vehicle_level,vehicle.vehicle_insurance_number,DATE_FORMAT(vehicle.vehicle_technology_validity, '%Y-%m-%d') as vehicleTechnologyValidityStr,
+        vehicle.vehicle_technology_validity,vehicle.maintain_mileage,vehicle.maintain_validity, DATE_FORMAT(vehicle.maintain_validity, '%Y-%m-%d') maintainValidityStr,vehicle.vehicle_platform_install_date,
+        DATE_FORMAT( vehicle.vehicle_platform_install_date, '%Y-%m-%d') AS vehiclePlatformInstallDateStr,vehicle.remark,vehicle.state_repair,vehicle.road_transport_number,vehicle.vehicl_operation_number,
+        vehicle.issued_authority,vehicle.management_type,vehicle.road_transport_validity_start, DATE_FORMAT(vehicle.road_transport_validity_start, '%Y-%m-%d') roadTransportValidityStartStr,
+        DATE_FORMAT(vehicle.road_transport__validity, '%Y-%m-%d') as roadTransportValidityStr,vehicle.road_transport__validity roadTransportValidity,vehicle.line_number,vehicle.provenance,vehicle.via_name,vehicle.destination,
+        vehicle.departure,vehicle.route_entry,vehicle.destination_station,vehicle.export_route,vehicle.daily_number,vehicle.management_remind_days,vehicle.operating_state,vehicle.chassis_number,
+        vehicle.engine_number,vehicle.using_nature,vehicle.brand_model,vehicle.registration_start_date, vehicle.registration_end_date,vehicle.license_issuance_date,vehicle.registration_date,vehicle.registration_remind_days,
+        vehicle.registration_remark,DATE_FORMAT(vehicle.registration_start_date,'%Y-%m-%d') AS registrationStartDateStr,DATE_FORMAT(vehicle.registration_end_date,'%Y-%m-%d') AS registrationEndDateStr,
+        DATE_FORMAT(vehicle.license_issuance_date,'%Y-%m-%d') AS licenseIssuanceDateStr,DATE_FORMAT(vehicle.registration_date,'%Y-%m-%d') AS registrationDateStr,
+        vehicle.vehicle_brand,vehicle.vehicle_model,vehicle.vehicle_production_date,DATE_FORMAT(vehicle.vehicle_production_date,'%Y-%m-%d') as vehicleProductionDateStr,vehicle.first_online_time,
+        DATE_FORMAT(vehicle.first_online_time,'%Y-%m-%d') as firstOnlineTimeStr,vehicle.purchase_way,vehicle.valid_end_date,DATE_FORMAT(vehicle.valid_end_date,'%Y-%m-%d') validEndDateStr,
+        vehicle.license_numbers,vehicle.total_quality,vehicle.traction_total_mass,vehicle.profile_size_long,vehicle.profile_size_wide,vehicle.profile_size_high,vehicle.internal_size_long,
+        vehicle.internal_size_wide,vehicle.internal_size_high,vehicle.shaft_number,vehicle.tires_number,vehicle.tire_size,vehicle.vehicle_owner_name,vehicle.owner_phone_one,vehicle.owner_phone_two,
+        vehicle.owner_phone_three,vehicle.owner_landline,vehicle.machine_age,vehicle.self_respect,vehicle.ability_work,vehicle.working_radius,vehicle.brand_models_id,bm.model_name AS modelName,
+        bra.brand_name AS brandName,vehicle.initial_mileage,vehicle.initial_work_hours,DATE_FORMAT(vehicle.machine_age, '%Y-%m-%d') machineAgeStr,
+        vehicle.vehicle_photo,vehicle.online_time,vehicle.license_no,DATE_FORMAT(vehicle.create_data_time,'%Y-%m-%d') createDataTimeStr,DATE_FORMAT(vehicle.update_data_time,'%Y-%m-%d') updateDataTimeStr,
+        vehicle.driving_license_front_photo,vehicle.driving_license_duplicate_photo,vehicle.transport_number_photo,vehicle.vehicle_icon,
+        '0' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,vehicle.plate_color,
+        vehicle.province_id, vehicle.city_id, GROUP_CONCAT(DISTINCT p.professionals_id) professionalIds,GROUP_CONCAT(DISTINCT pi.name) professionalNames,
+        vehicle.vehicle_sub_type_id,vc.standard,vtt.vehicle_subtypes vehicleSubType,simcard.auth_code,GROUP_CONCAT(DISTINCT bsc.business_scope_id) AS scopeBusinessIds,
+        GROUP_CONCAT(DISTINCT d.`value`) AS scopeBusiness, GROUP_CONCAT(DISTINCT d.`code`) scopeBusinessCodes,intercom.intercom_device_id intercomDeviceNumber,
+        intercom.user_id,intercom.number callNumber, cofig.intercom_info_id
+        from zw_m_vehicle_info vehicle
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        LEFT JOIN zw_m_config_professionals p on cofig.id = p.config_id and p.flag = 1
+        LEFT JOIN zw_m_professionals_info pi on p.professionals_id = pi.id
+        left join zw_m_vehicle_type vt on vehicle.vehicle_type = vt.id and vt.flag = 1
+        LEFT JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        left join zw_m_vehicle_type vtt on vehicle.vehicle_sub_type_id = vtt.id and vtt.flag = 1
+        LEFT JOIN zw_m_fuel_type fType ON fType.id = vehicle.fuel_type and fType.flag = 1
+        LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = vehicle.vehicle_purpose AND vp.flag = 1
+        LEFT JOIN zw_m_brand_models bm ON vehicle.brand_models_id = bm.id AND bm.flag = 1
+        LEFT JOIN zw_m_brand bra ON bm.brand_id = bra.id AND bm.flag = 1
+        LEFT JOIN zw_m_business_scope_config bsc ON vehicle.id = bsc.id and bsc.type = 2
+        LEFT JOIN zw_c_dictionary d ON bsc.business_scope_id = d.id
+        where vehicle.flag = 1
+        and vehicle.brand = BINARY #{brand}
+        group by vehicle.id
+    </select>
+
+    <select id="getDetailByIds" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT vehicle.id,vehicle.brand as `name`, vehicle.aliases as alias,vehicle.group_id as
+        orgId,vehicle.vehicle_owner,vc.id vehicleCategoryId,vc.vehicle_category vehicleCategoryName,
+        vehicle.vehicle_type,vt.vehicle_type vehicleTypeName,vehicle.vehicle_owner_phone,
+        vehicle.phone_check,vehicle.vehicle_color,vehicle.fuel_type, fType.fuel_type fuelTypeName,
+        vehicle.area_attribute,vehicle.province, vehicle.city,vehicle.county,vehicle.vehicle_purpose,
+        vp.purpose_category vehiclePurposeName, vehicle.trade_name,vehicle.is_start,
+        vehicle.number_load,
+        vehicle.loading_quality,vehicle.vehicle_level,vehicle.vehicle_insurance_number,DATE_FORMAT(vehicle.vehicle_technology_validity,
+        '%Y-%m-%d') as vehicleTechnologyValidityStr,
+        vehicle.vehicle_technology_validity,vehicle.maintain_mileage,vehicle.maintain_validity,
+        DATE_FORMAT(vehicle.maintain_validity, '%Y-%m-%d') maintainValidityStr,vehicle.vehicle_platform_install_date,
+        DATE_FORMAT( vehicle.vehicle_platform_install_date, '%Y-%m-%d') AS
+        vehiclePlatformInstallDateStr,vehicle.remark,vehicle.state_repair,vehicle.road_transport_number,vehicle.vehicl_operation_number,
+        vehicle.issued_authority,vehicle.management_type,vehicle.road_transport_validity_start,
+        DATE_FORMAT(vehicle.road_transport_validity_start, '%Y-%m-%d') roadTransportValidityStartStr,
+        DATE_FORMAT(vehicle.road_transport__validity, '%Y-%m-%d') as
+        roadTransportValidityStr,vehicle.road_transport__validity
+        roadTransportValidity,vehicle.line_number,vehicle.provenance,vehicle.via_name,vehicle.destination,
+        vehicle.departure,vehicle.route_entry,vehicle.destination_station,vehicle.export_route,vehicle.daily_number,vehicle.management_remind_days,vehicle.operating_state,vehicle.chassis_number,
+        vehicle.engine_number,vehicle.using_nature,vehicle.brand_model,vehicle.registration_start_date,
+        vehicle.registration_end_date,vehicle.license_issuance_date,vehicle.registration_date,vehicle.registration_remind_days,
+        vehicle.registration_remark,DATE_FORMAT(vehicle.registration_start_date,'%Y-%m-%d') AS
+        registrationStartDateStr,DATE_FORMAT(vehicle.registration_end_date,'%Y-%m-%d') AS registrationEndDateStr,
+        DATE_FORMAT(vehicle.license_issuance_date,'%Y-%m-%d') AS
+        licenseIssuanceDateStr,DATE_FORMAT(vehicle.registration_date,'%Y-%m-%d') AS registrationDateStr,
+        vehicle.vehicle_brand,vehicle.vehicle_model,vehicle.vehicle_production_date,DATE_FORMAT(vehicle.vehicle_production_date,'%Y-%m-%d')
+        as vehicleProductionDateStr,vehicle.first_online_time,
+        DATE_FORMAT(vehicle.first_online_time,'%Y-%m-%d') as
+        firstOnlineTimeStr,vehicle.purchase_way,vehicle.valid_end_date,DATE_FORMAT(vehicle.valid_end_date,'%Y-%m-%d')
+        validEndDateStr,
+        vehicle.license_numbers,vehicle.total_quality,vehicle.traction_total_mass,vehicle.profile_size_long,vehicle.profile_size_wide,vehicle.profile_size_high,vehicle.internal_size_long,
+        vehicle.internal_size_wide,vehicle.internal_size_high,vehicle.shaft_number,vehicle.tires_number,vehicle.tire_size,vehicle.vehicle_owner_name,vehicle.owner_phone_one,vehicle.owner_phone_two,
+        vehicle.owner_phone_three,vehicle.owner_landline,vehicle.machine_age,vehicle.self_respect,vehicle.ability_work,vehicle.working_radius,vehicle.brand_models_id,bm.model_name
+        AS modelName,
+        bra.brand_name AS brandName,vehicle.initial_mileage,vehicle.initial_work_hours,DATE_FORMAT(vehicle.machine_age,
+        '%Y-%m-%d') machineAgeStr,
+        vehicle.vehicle_photo,vehicle.online_time,vehicle.license_no,DATE_FORMAT(vehicle.create_data_time,'%Y-%m-%d')
+        createDataTimeStr,DATE_FORMAT(vehicle.update_data_time,'%Y-%m-%d') updateDataTimeStr,
+        vehicle.driving_license_front_photo,vehicle.driving_license_duplicate_photo,vehicle.transport_number_photo,vehicle.vehicle_icon,
+        '0' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,cofig.id as
+        configId,cofig.device_id,device.device_number,
+        cofig.sim_card_id,simcard.simcard_number as simCardNumber, simcard.real_id
+        realSimCardNumber,device.device_type,device.functional_type,
+        device.terminal_type_id,terminal.terminal_type,terminal.terminal_manufacturer,
+        GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        GROUP_CONCAT(DISTINCT ag.name) groupName,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate, DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS
+        updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS
+        expire_date,vehicle.plate_color,
+        vehicle.province_id, vehicle.city_id, GROUP_CONCAT(DISTINCT p.professionals_id)
+        professionalIds,GROUP_CONCAT(DISTINCT pi.name) professionalNames,
+        vehicle.vehicle_sub_type_id,vc.standard,vtt.vehicle_subtypes vehicleSubType,simcard.auth_code,
+        GROUP_CONCAT(DISTINCT bsc.business_scope_id) AS scopeBusinessIds,
+        GROUP_CONCAT(DISTINCT d.`value`) AS scopeBusiness, GROUP_CONCAT(DISTINCT d.`code`)
+        scopeBusinessCodes,cofig.access_network
+        from zw_m_vehicle_info vehicle
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_assignment ag on assign.assignment_id = ag.id and ag.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id and service.flag = 1
+        LEFT JOIN zw_m_config_professionals p on cofig.id = p.config_id and p.flag = 1
+        LEFT JOIN zw_m_professionals_info pi on p.professionals_id = pi.id
+        left join zw_m_vehicle_type vt on vehicle.vehicle_type = vt.id and vt.flag = 1
+        LEFT JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        left join zw_m_vehicle_type vtt on vehicle.vehicle_sub_type_id = vtt.id and vtt.flag = 1
+        LEFT JOIN zw_m_fuel_type fType ON fType.id = vehicle.fuel_type and fType.flag = 1
+        LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = vehicle.vehicle_purpose AND vp.flag = 1
+        LEFT JOIN zw_m_brand_models bm ON vehicle.brand_models_id = bm.id AND bm.flag = 1
+        LEFT JOIN zw_m_brand bra ON bm.brand_id = bra.id AND bm.flag = 1
+        LEFT JOIN zw_m_business_scope_config bsc ON vehicle.id = bsc.id and bsc.type = 2
+        LEFT JOIN zw_c_dictionary d ON bsc.business_scope_id = d.id
+        where vehicle.flag = 1
+        and vehicle.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by vehicle.id
+    </select>
+
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.VehicleDO">
+        INSERT INTO zw_m_vehicle_info
+        (
+        id,
+        vehicle_number,
+        vehicle_owner,
+        vehicle_owner_phone,
+        aliases,
+        vehicle_type,
+        chassis_number,
+        engine_number,
+        brand,
+        area_attribute,
+        province,
+        city,
+        fuel_type,
+        plate_color,
+        is_start,
+        flag,
+        online_time,
+        create_data_time,
+        create_data_username,
+        vehicle_purpose,
+        vehicl_operation_number,
+        road_transport_number,
+        road_transport__validity,
+        vehicle_insurance_number,
+        vehicle_photo,
+        vehicle_technology_validity,
+        vehicle_color,
+        vehicle_icon,
+        remark,
+        vehicle_sub_type_id,
+        vehicle_level,
+        phone_check,
+        number_load,
+        loading_quality,
+        state_repair,
+        county,
+        scope_business,
+        issued_authority,
+        management_type,
+        road_transport_validity_start,
+        line_number,
+        provenance,
+        via_name,
+        destination,
+        departure,
+        route_entry,
+        destination_station,
+        export_route,
+        daily_number,
+        management_remind_days,
+        operating_state,
+        license_no,
+        registration_date,
+        registration_start_date,
+        registration_end_date,
+        registration_remind_days,
+        registration_remark,
+        brand_model,
+        license_issuance_date,
+        vehicle_brand,
+        vehicle_model,
+        vehicle_production_date,
+        first_online_time,
+        purchase_way,
+        valid_end_date,
+        license_numbers,
+        total_quality,
+        traction_total_mass,
+        profile_size_long,
+        profile_size_wide,
+        profile_size_high,
+        internal_size_long,
+        internal_size_wide,
+        internal_size_high,
+        shaft_number,
+        tires_number,
+        tire_size,
+        vehicle_owner_name,
+        owner_phone_one,
+        owner_phone_two,
+        owner_phone_three,
+        owner_landline,
+        machine_age,
+        self_respect,
+        ability_work,
+        working_radius,
+        brand_models_id,
+        initial_mileage,
+        initial_work_hours,
+        maintain_mileage,
+        maintain_validity,
+        vehicle_platform_install_date,
+        province_id,
+        city_id,
+        trade_name,
+        driving_license_front_photo,
+        driving_license_duplicate_photo,
+        transport_number_photo,
+        group_id,
+        using_nature
+        )
+        values (
+        #{id},
+        #{vehicleNumber},
+        #{vehicleOwner},
+        #{vehicleOwnerPhone},
+        #{aliases},
+        #{vehicleType},
+        #{chassisNumber},
+        #{engineNumber},
+        #{brand},
+        #{areaAttribute},
+        #{province},
+        #{city},
+        #{fuelType},
+        #{plateColor},
+        #{isStart},
+        #{flag},
+        #{onlineTime},
+        now(),
+        #{createDataUsername},
+        #{vehiclePurpose},
+        #{vehiclOperationNumber},
+        #{roadTransportNumber},
+        #{roadTransportValidity},
+        #{vehicleInsuranceNumber},
+        #{vehiclePhoto},
+        #{vehicleTechnologyValidity},
+        #{vehicleColor},
+        #{vehicleIcon},
+        #{remark},
+        #{vehicleSubTypeId},
+        #{vehicleLevel},
+        #{phoneCheck},
+        #{numberLoad},
+        #{loadingQuality},
+        #{stateRepair},
+        #{county},
+        #{scopeBusiness},
+        #{issuedAuthority},
+        #{managementType},
+        #{roadTransportValidityStart},
+        #{lineNumber},
+        #{provenance},
+        #{viaName},
+        #{destination},
+        #{departure},
+        #{routeEntry},
+        #{destinationStation},
+        #{exportRoute},
+        #{dailyNumber},
+        #{managementRemindDays},
+        #{operatingState},
+        #{licenseNo},
+        #{registrationDate},
+        #{registrationStartDate},
+        #{registrationEndDate},
+        #{registrationRemindDays},
+        #{registrationRemark},
+        #{brandModel},
+        #{licenseIssuanceDate},
+        #{vehicleBrand},
+        #{vehicleModel},
+        #{vehicleProductionDate},
+        #{firstOnlineTime},
+        #{purchaseWay},
+        #{validEndDate},
+        #{licenseNumbers},
+        #{totalQuality},
+        #{tractionTotalMass},
+        #{profileSizeLong},
+        #{profileSizeWide},
+        #{profileSizeHigh},
+        #{internalSizeLong},
+        #{internalSizeWide},
+        #{internalSizeHigh},
+        #{shaftNumber},
+        #{tiresNumber},
+        #{tireSize},
+        #{vehicleOwnerName},
+        #{ownerPhoneOne},
+        #{ownerPhoneTwo},
+        #{ownerPhoneThree},
+        #{ownerLandline},
+        #{machineAge},
+        #{selfRespect},
+        #{abilityWork},
+        #{workingRadius},
+        #{brandModelsId},
+        #{initialMileage},
+        #{initialWorkHours},
+        #{maintainMileage},
+        #{maintainValidity},
+        #{vehiclePlatformInstallDate},
+        #{provinceId},
+        #{cityId},
+        #{tradeName},
+        #{drivingLicenseFrontPhoto},
+        #{drivingLicenseDuplicatePhoto},
+        #{transportNumberPhoto},
+        #{orgId},
+        #{usingNature}
+        )
+    </insert>
+
+    <select id="getById" resultType="com.zw.platform.basic.domain.VehicleDO">
+        SELECT
+        *,group_id as orgId
+        FROM zw_m_vehicle_info
+        WHERE id = #{id}
+    </select>
+
+    <select id="getByBrand" resultType="com.zw.platform.basic.domain.VehicleDO">
+         SELECT
+        *,group_id as orgId
+        FROM zw_m_vehicle_info
+        WHERE flag = 1
+        and brand = #{brand}
+        ORDER BY create_data_time desc limit 1
+    </select>
+    <select id="getExportList" resultType="com.zw.platform.basic.dto.export.VehicleExportDTO">
+        SELECT vehicle.id,vehicle.brand,vehicle.group_id orgId,device.device_number,simcard.simcard_number
+        simCardNumber,
+        GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        case when vc.standard = 0 then '通用' when vc.standard = 1 then '货运' when vc.standard = 2 then '工程机械' end as
+        standard,
+        vc.vehicle_category vehicleCategoryName,vt.vehicle_type
+        vehicleTypeName,vehicle.road_transport_number,vehicle.license_no,
+        vehicle.aliases alias,vehicle.vehicle_owner,vehicle.vehicle_owner_phone,vehicle.vehicle_level,
+        case when vehicle.phone_check = 0 then '未检验' when vehicle.phone_check = 1 then '已校验' else null end as
+        phone_check,
+        vehicle.vehicle_color,vehicle.plate_color,fType.fuel_type
+        fuelTypeName,vehicle.area_attribute,vehicle.province,vehicle.city,
+        case when vehicle.is_start then '启用' else '停用' end as isStartStr,vp.purpose_category
+        vehiclePurposeName,vehicle.trade_name,
+        vehicle.number_load,vehicle.loading_quality,DATE_FORMAT(vehicle.vehicle_technology_validity, '%Y-%m-%d') as
+        vehicleTechnologyValidityStr,
+        case when vehicle.state_repair=1 then '是' else '否' end as
+        stateRepairStr,DATE_FORMAT(vehicle.create_data_time,'%Y-%m-%d') createDataTimeStr,
+        DATE_FORMAT(vehicle.update_data_time,'%Y-%m-%d') updateDataTimeStr,vehicle.maintain_mileage,
+        DATE_FORMAT(vehicle.maintain_validity, '%Y-%m-%d') maintainValidityStr,
+        DATE_FORMAT(vehicle.vehicle_platform_install_date, '%Y-%m-%d') AS vehiclePlatformInstallDateStr,vehicle.remark
+        from zw_m_vehicle_info vehicle
+        LEFT JOIN zw_m_config cofig on vehicle.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id and device.flag = 1
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id and simcard.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle assign on vehicle.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt on vehicle.vehicle_type = vt.id and vt.flag = 1
+        LEFT JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        LEFT JOIN zw_m_fuel_type fType ON fType.id = vehicle.fuel_type and fType.flag = 1
+        LEFT JOIN zw_m_vehicle_purpose vp ON vp.id = vehicle.vehicle_purpose AND vp.flag = 1
+        where vehicle.flag = 1
+        and vehicle.id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        group by vehicle.id
+    </select>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.VehicleDO">
+        UPDATE zw_m_vehicle_info
+        <set>
+            vehicle_number = #{vehicleNumber},
+            vehicle_owner = #{vehicleOwner},
+            vehicle_owner_phone = #{vehicleOwnerPhone},
+            aliases = #{aliases},
+            vehicle_type = #{vehicleType},
+            chassis_number = #{chassisNumber},
+            engine_number = #{engineNumber},
+            brand = #{brand},
+            area_attribute = #{areaAttribute},
+            province = #{province},
+            city = #{city},
+            fuel_type = #{fuelType},
+            plate_color = #{plateColor},
+            is_start = #{isStart},
+            flag = 1,
+            online_time = #{onlineTime},
+            update_data_time = now(),
+            update_data_username = #{updateDataUsername},
+            vehicle_purpose = #{vehiclePurpose},
+            vehicl_operation_number = #{vehiclOperationNumber},
+            road_transport_number = #{roadTransportNumber},
+            road_transport__validity = #{roadTransportValidity},
+            vehicle_insurance_number = #{vehicleInsuranceNumber},
+            vehicle_photo = #{vehiclePhoto},
+            vehicle_technology_validity = #{vehicleTechnologyValidity},
+            vehicle_color = #{vehicleColor},
+            vehicle_icon = #{vehicleIcon},
+            remark = #{remark},
+            vehicle_sub_type_id = #{vehicleSubTypeId},
+            vehicle_level = #{vehicleLevel},
+            phone_check = #{phoneCheck},
+            number_load = #{numberLoad},
+            loading_quality = #{loadingQuality},
+            state_repair = #{stateRepair},
+            county = #{county},
+            scope_business = #{scopeBusiness},
+            issued_authority = #{issuedAuthority},
+            management_type = #{managementType},
+            road_transport_validity_start = #{roadTransportValidityStart},
+            line_number = #{lineNumber},
+            provenance = #{provenance},
+            via_name = #{viaName},
+            destination = #{destination},
+            departure = #{departure},
+            route_entry = #{routeEntry},
+            destination_station = #{destinationStation},
+            export_route = #{exportRoute},
+            daily_number = #{dailyNumber},
+            management_remind_days = #{managementRemindDays},
+            operating_state = #{operatingState},
+            license_no = #{licenseNo},
+            registration_date = #{registrationDate},
+            registration_start_date = #{registrationStartDate},
+            registration_end_date = #{registrationEndDate},
+            registration_remind_days = #{registrationRemindDays},
+            registration_remark = #{registrationRemark},
+            brand_model = #{brandModel},
+            license_issuance_date = #{licenseIssuanceDate},
+            vehicle_brand = #{vehicleBrand},
+            vehicle_model = #{vehicleModel},
+            vehicle_production_date = #{vehicleProductionDate},
+            first_online_time = #{firstOnlineTime},
+            purchase_way = #{purchaseWay},
+            valid_end_date = #{validEndDate},
+            license_numbers = #{licenseNumbers},
+            total_quality = #{totalQuality},
+            traction_total_mass = #{tractionTotalMass},
+            profile_size_long = #{profileSizeLong},
+            profile_size_wide = #{profileSizeWide},
+            profile_size_high = #{profileSizeHigh},
+            internal_size_long = #{internalSizeLong},
+            internal_size_wide = #{internalSizeWide},
+            internal_size_high = #{internalSizeHigh},
+            shaft_number = #{shaftNumber},
+            tires_number = #{tiresNumber},
+            tire_size = #{tireSize},
+            vehicle_owner_name = #{vehicleOwnerName},
+            owner_phone_one = #{ownerPhoneOne},
+            owner_phone_two = #{ownerPhoneTwo},
+            owner_phone_three = #{ownerPhoneThree},
+            owner_landline = #{ownerLandline},
+            machine_age = #{machineAge},
+            self_respect = #{selfRespect},
+            ability_work = #{abilityWork},
+            working_radius = #{workingRadius},
+            brand_models_id = #{brandModelsId},
+            initial_mileage = #{initialMileage},
+            initial_work_hours = #{initialWorkHours},
+            maintain_mileage = #{maintainMileage},
+            maintain_validity = #{maintainValidity},
+            vehicle_platform_install_date = #{vehiclePlatformInstallDate},
+            province_id = #{provinceId},
+            city_id = #{cityId},
+            trade_name = #{tradeName},
+            driving_license_front_photo = #{drivingLicenseFrontPhoto},
+            driving_license_duplicate_photo = #{drivingLicenseDuplicatePhoto},
+            transport_number_photo = #{transportNumberPhoto},
+            group_id = #{orgId},
+            using_nature = #{usingNature}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete" parameterType="string">
+        UPDATE zw_m_vehicle_info
+        SET flag = 0
+        where id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="batchUpdate">
+        UPDATE zw_m_vehicle_info
+        <set>
+            <if test='null != vehicle.vehicleNumber'>vehicle_number = #{vehicle.vehicleNumber},</if>
+            <if test='null != vehicle.vehicleOwner'>vehicle_owner = #{vehicle.vehicleOwner},</if>
+            <if test='null != vehicle.vehicleOwnerPhone'>vehicle_owner_phone = #{vehicle.vehicleOwnerPhone},</if>
+            <if test='null != vehicle.aliases'>aliases = #{vehicle.aliases},</if>
+            <if test='null != vehicle.vehicleType'>vehicle_type = #{vehicle.vehicleType},</if>
+            <if test='null != vehicle.chassisNumber'>chassis_number = #{vehicle.chassisNumber},</if>
+            <if test='null != vehicle.engineNumber'>engine_number = #{vehicle.engineNumber},</if>
+            <if test='null != vehicle.brand'>brand = #{vehicle.brand},</if>
+            <if test='null != vehicle.areaAttribute'>area_attribute = #{vehicle.areaAttribute},</if>
+            <if test='null != vehicle.province'>province = #{vehicle.province},</if>
+            <if test='null != vehicle.city'>city = #{vehicle.city},</if>
+            <if test='null != vehicle.fuelType'>fuel_type = #{vehicle.fuelType},</if>
+            <if test='null != vehicle.plateColor'>plate_color = #{vehicle.plateColor},</if>
+            <if test='null != vehicle.isStart'>is_start = #{vehicle.isStart},</if>
+            <if test='null != vehicle.flag'>flag = #{vehicle.flag},</if>
+            <if test='null != vehicle.onlineTime'>online_time = #{vehicle.onlineTime},</if>
+            <if test='null != vehicle.createDataTime'>create_data_time = #{vehicle.createDataTime},</if>
+            <if test='null != vehicle.createDataUsername'>create_data_username = #{vehicle.createDataUsername},</if>
+            <if test='null != vehicle.updateDataTime'>update_data_time = #{vehicle.updateDataTime},</if>
+            <if test='null != vehicle.updateDataUsername'>update_data_username = #{vehicle.updateDataUsername},</if>
+            <if test='null != vehicle.vehiclePurpose'>vehicle_purpose = #{vehicle.vehiclePurpose},</if>
+            <if test='null != vehicle.vehiclOperationNumber'>vehicl_operation_number =
+                #{vehicle.vehiclOperationNumber},
+            </if>
+            <if test='null != vehicle.roadTransportNumber'>road_transport_number = #{vehicle.roadTransportNumber},</if>
+            <if test='null != vehicle.roadTransportValidity'>road_transport__validity =
+                #{vehicle.roadTransportValidity},
+            </if>
+            <if test='null != vehicle.vehicleInsuranceNumber'>vehicle_insurance_number =
+                #{vehicle.vehicleInsuranceNumber},
+            </if>
+            <if test='null != vehicle.vehiclePhoto'>vehicle_photo = #{vehicle.vehiclePhoto},</if>
+            <if test='null != vehicle.vehicleTechnologyValidity'>vehicle_technology_validity =
+                #{vehicle.vehicleTechnologyValidity},
+            </if>
+            <if test='null != vehicle.vehicleColor'>vehicle_color = #{vehicle.vehicleColor},</if>
+            <if test='null != vehicle.vehicleIcon'>vehicle_icon = #{vehicle.vehicleIcon},</if>
+            <if test='null != vehicle.remark'>remark = #{vehicle.remark},</if>
+            <if test='null != vehicle.vehicleLevel'>vehicle_level = #{vehicle.vehicleLevel},</if>
+            <if test='null != vehicle.phoneCheck'>phone_check = #{vehicle.phoneCheck},</if>
+            <if test='null != vehicle.numberLoad'>number_load = #{vehicle.numberLoad},</if>
+            <if test='null != vehicle.loadingQuality'>loading_quality = #{vehicle.loadingQuality},</if>
+            <if test='null != vehicle.stateRepair'>state_repair = #{vehicle.stateRepair},</if>
+            <if test='null != vehicle.county'>county = #{vehicle.county},</if>
+            <if test='null != vehicle.scopeBusiness'>scope_business = #{vehicle.scopeBusiness},</if>
+            <if test='null != vehicle.issuedAuthority'>issued_authority = #{vehicle.issuedAuthority},</if>
+            <if test='null != vehicle.managementType'>management_type = #{vehicle.managementType},</if>
+            <if test='null != vehicle.roadTransportValidityStart'>road_transport_validity_start =
+                #{vehicle.roadTransportValidityStart},
+            </if>
+            <if test='null != vehicle.lineNumber'>line_number = #{vehicle.lineNumber},</if>
+            <if test='null != vehicle.provenance'>provenance = #{vehicle.provenance},</if>
+            <if test='null != vehicle.viaName'>via_name = #{vehicle.viaName},</if>
+            <if test='null != vehicle.destination'>destination = #{vehicle.destination},</if>
+            <if test='null != vehicle.departure'>departure = #{vehicle.departure},</if>
+            <if test='null != vehicle.routeEntry'>route_entry = #{vehicle.routeEntry},</if>
+            <if test='null != vehicle.destinationStation'>destination_station = #{vehicle.destinationStation},</if>
+            <if test='null != vehicle.exportRoute'>export_route = #{vehicle.exportRoute},</if>
+            <if test='null != vehicle.dailyNumber'>daily_number = #{vehicle.dailyNumber},</if>
+            <if test='null != vehicle.managementRemindDays'>management_remind_days = #{vehicle.managementRemindDays},
+            </if>
+            <if test='null != vehicle.operatingState'>operating_state = #{vehicle.operatingState},</if>
+            <if test='null != vehicle.licenseNo'>license_no = #{vehicle.licenseNo},</if>
+            <if test='null != vehicle.registrationDate'>registration_date = #{vehicle.registrationDate},</if>
+            <if test='null != vehicle.registrationStartDate'>registration_start_date =
+                #{vehicle.registrationStartDate},
+            </if>
+            <if test='null != vehicle.registrationEndDate'>registration_end_date = #{vehicle.registrationEndDate},</if>
+            <if test='null != vehicle.registrationRemindDays'>registration_remind_days =
+                #{vehicle.registrationRemindDays},
+            </if>
+            <if test='null != vehicle.registrationRemark'>registration_remark = #{vehicle.registrationRemark},</if>
+            <if test='null != vehicle.brandModel'>brand_model = #{vehicle.brandModel},</if>
+            <if test='null != vehicle.licenseIssuanceDate'>license_issuance_date = #{vehicle.licenseIssuanceDate},</if>
+            <if test='null != vehicle.initialMileage'>initial_mileage = #{vehicle.initialMileage},</if>
+            <if test='null != vehicle.initialWorkHours'>initial_work_hours = #{vehicle.initialWorkHours},</if>
+            <if test='null != vehicle.maintainMileage'>maintain_mileage = #{vehicle.maintainMileage},</if>
+            <if test='null != vehicle.maintainValidity'>maintain_validity = #{vehicle.maintainValidity},</if>
+            <if test='null != vehicle.vehiclePlatformInstallDate'>vehicle_platform_install_date =
+                #{vehicle.vehiclePlatformInstallDate},
+            </if>
+            <if test='null != vehicle.provinceId'>province_id = #{vehicle.provinceId},</if>
+            <if test='null != vehicle.cityId'>city_id = #{vehicle.cityId},</if>
+            <if test='null != vehicle.tradeName'>trade_name = #{vehicle.tradeName},</if>
+            <if test='null != vehicle.drivingLicenseFrontPhoto'>driving_license_front_photo =
+                #{vehicle.drivingLicenseFrontPhoto},
+            </if>
+            <if test='null != vehicle.drivingLicenseDuplicatePhoto'>driving_license_duplicate_photo =
+                #{vehicle.drivingLicenseDuplicatePhoto},
+            </if>
+            <if test='null != vehicle.transportNumberPhoto'>transport_number_photo = #{vehicle.transportNumberPhoto},
+            </if>
+            <if test='null != vehicle.orgId'>group_id = #{vehicle.orgId},</if>
+            <if test="null != standard and standard != 1">
+                vehicle_brand = null,
+                vehicle_model = null,
+                vehicle_production_date = null,
+                first_online_time = null,
+                purchase_way = null,
+                valid_end_date =null,
+                license_numbers = null,
+                total_quality = null,
+                traction_total_mass = null,
+                profile_size_long = null,
+                profile_size_wide = null,
+                profile_size_high = null,
+                internal_size_long = null,
+                internal_size_wide = null,
+                internal_size_high = null,
+                shaft_number = null,
+                tires_number = null,
+                tire_size = null,
+            </if>
+            <if test="null != standard and standard != 2">
+                vehicle_owner_name = null,
+                owner_phone_one = null,
+                owner_phone_two = null,
+                owner_phone_three = null,
+                owner_landline = null,
+                vehicle_sub_type_id = null,
+                self_respect = null,
+                ability_work = null,
+                working_radius = null,
+                brand_models_id = null,
+                machine_age = null,
+            </if>
+        </set>
+        WHERE id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findAll" resultType="com.zw.platform.basic.domain.VehicleDO">
+        select id, brand
+        from zw_m_vehicle_info
+        where flag = 1
+    </select>
+
+    <insert id="addByBatch" parameterType="com.zw.platform.basic.domain.VehicleDO">
+        INSERT INTO zw_m_vehicle_info
+        (
+        id,
+        vehicle_number,
+        vehicle_owner,
+        vehicle_owner_phone,
+        aliases,
+        vehicle_type,
+        chassis_number,
+        engine_number,
+        brand,
+        area_attribute,
+        province,
+        city,
+        fuel_type,
+        plate_color,
+        is_start,
+        flag,
+        online_time,
+        create_data_time,
+        create_data_username,
+        vehicle_purpose,
+        vehicl_operation_number,
+        road_transport_number,
+        road_transport__validity,
+        vehicle_insurance_number,
+        vehicle_photo,
+        vehicle_technology_validity,
+        vehicle_color,
+        vehicle_icon,
+        remark,
+        vehicle_sub_type_id,
+        vehicle_level,
+        phone_check,
+        number_load,
+        loading_quality,
+        state_repair,
+        county,
+        scope_business,
+        issued_authority,
+        management_type,
+        road_transport_validity_start,
+        line_number,
+        provenance,
+        via_name,
+        destination,
+        departure,
+        route_entry,
+        destination_station,
+        export_route,
+        daily_number,
+        management_remind_days,
+        operating_state,
+        license_no,
+        registration_date,
+        registration_start_date,
+        registration_end_date,
+        registration_remind_days,
+        registration_remark,
+        brand_model,
+        license_issuance_date,
+        vehicle_brand,
+        vehicle_model,
+        vehicle_production_date,
+        first_online_time,
+        purchase_way,
+        valid_end_date,
+        license_numbers,
+        total_quality,
+        traction_total_mass,
+        profile_size_long,
+        profile_size_wide,
+        profile_size_high,
+        internal_size_long,
+        internal_size_wide,
+        internal_size_high,
+        shaft_number,
+        tires_number,
+        tire_size,
+        vehicle_owner_name,
+        owner_phone_one,
+        owner_phone_two,
+        owner_phone_three,
+        owner_landline,
+        machine_age,
+        self_respect,
+        ability_work,
+        working_radius,
+        brand_models_id,
+        initial_mileage,
+        initial_work_hours,
+        maintain_mileage,
+        maintain_validity,
+        vehicle_platform_install_date,
+        province_id,
+        city_id,
+        trade_name,
+        driving_license_front_photo,
+        driving_license_duplicate_photo,
+        transport_number_photo,
+        group_id,
+        using_nature
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.vehicleNumber},
+            #{item.vehicleOwner},
+            #{item.vehicleOwnerPhone},
+            #{item.aliases},
+            #{item.vehicleType},
+            #{item.chassisNumber},
+            #{item.engineNumber},
+            #{item.brand},
+            #{item.areaAttribute},
+            #{item.province},
+            #{item.city},
+            #{item.fuelType},
+            #{item.plateColor},
+            #{item.isStart},
+            #{item.flag},
+            #{item.onlineTime},
+            now(),
+            #{item.createDataUsername},
+            #{item.vehiclePurpose},
+            #{item.vehiclOperationNumber},
+            #{item.roadTransportNumber},
+            #{item.roadTransportValidity},
+            #{item.vehicleInsuranceNumber},
+            #{item.vehiclePhoto},
+            #{item.vehicleTechnologyValidity},
+            #{item.vehicleColor},
+            #{item.vehicleIcon},
+            #{item.remark},
+            #{item.vehicleSubTypeId},
+            #{item.vehicleLevel},
+            #{item.phoneCheck},
+            #{item.numberLoad},
+            #{item.loadingQuality},
+            #{item.stateRepair},
+            #{item.county},
+            #{item.scopeBusiness},
+            #{item.issuedAuthority},
+            #{item.managementType},
+            #{item.roadTransportValidityStart},
+            #{item.lineNumber},
+            #{item.provenance},
+            #{item.viaName},
+            #{item.destination},
+            #{item.departure},
+            #{item.routeEntry},
+            #{item.destinationStation},
+            #{item.exportRoute},
+            #{item.dailyNumber},
+            #{item.managementRemindDays},
+            #{item.operatingState},
+            #{item.licenseNo},
+            #{item.registrationDate},
+            #{item.registrationStartDate},
+            #{item.registrationEndDate},
+            #{item.registrationRemindDays},
+            #{item.registrationRemark},
+            #{item.brandModel},
+            #{item.licenseIssuanceDate},
+            #{item.vehicleBrand},
+            #{item.vehicleModel},
+            #{item.vehicleProductionDate},
+            #{item.firstOnlineTime},
+            #{item.purchaseWay},
+            #{item.validEndDate},
+            #{item.licenseNumbers},
+            #{item.totalQuality},
+            #{item.tractionTotalMass},
+            #{item.profileSizeLong},
+            #{item.profileSizeWide},
+            #{item.profileSizeHigh},
+            #{item.internalSizeLong},
+            #{item.internalSizeWide},
+            #{item.internalSizeHigh},
+            #{item.shaftNumber},
+            #{item.tiresNumber},
+            #{item.tireSize},
+            #{item.vehicleOwnerName},
+            #{item.ownerPhoneOne},
+            #{item.ownerPhoneTwo},
+            #{item.ownerPhoneThree},
+            #{item.ownerLandline},
+            #{item.machineAge},
+            #{item.selfRespect},
+            #{item.abilityWork},
+            #{item.workingRadius},
+            #{item.brandModelsId},
+            #{item.initialMileage},
+            #{item.initialWorkHours},
+            #{item.maintainMileage},
+            #{item.maintainValidity},
+            #{item.vehiclePlatformInstallDate},
+            #{item.provinceId},
+            #{item.cityId},
+            #{item.tradeName},
+            #{item.drivingLicenseFrontPhoto},
+            #{item.drivingLicenseDuplicatePhoto},
+            #{item.transportNumberPhoto},
+            #{item.orgId},
+            #{item.usingNature}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="addCargoGroupVehicle" parameterType="com.zw.platform.basic.domain.CargoGroupVehicleDO">
+        insert into zw_m_cargo_group_vehicle(id,time,group_id,type,vehicle_id,operating_state,flag)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.time}, #{item.orgId}, #{item.type}, #{item.vehicleId},
+            #{item.operatingState},#{item.flag})
+        </foreach>
+    </insert>
+
+    <select id="getByBrands" resultType="com.zw.platform.basic.dto.MonitorBaseDTO">
+        SELECT v.id,v.aliases as alias,v.group_id orgId,v.brand as `name`,case when c.vehicle_id <![CDATA[<>]]> '' then
+        '1' else '0' end as bindType,case when c.intercom_info_id <![CDATA[<>]]> '' then
+        '1' else '0' end as intercomBindType
+        from zw_m_vehicle_info v
+        left join zw_m_config c ON v.id = c.vehicle_id and c.flag = 1
+        where v.flag = 1
+        <if test="brands!=null and brands.size() > 0">
+            and v.brand in
+            <foreach collection="brands" item="brand" index="index" separator="," open="(" close=")">
+                #{brand}
+            </foreach>
+        </if>
+    </select>
+    <update id="updateBrand" parameterType="string">
+        update zw_m_vehicle_info
+        set brand = #{brand}
+        where id = #{id}
+    </update>
+
+    <select id="getByOrgId" resultType="string">
+        SELECT id from zw_m_vehicle_info
+        where flag = 1
+        and group_id = #{orgId}
+        <if test="ids!=null and ids.size()>0">
+            and id in
+            <foreach collection="ids" item="id" separator="," close=")" open="(">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getScanByName" resultType="string" parameterType="string">
+        SELECT brand FROM zw_m_vehicle_info
+        WHERE brand LIKE CONCAT('扫_',#{brand}) AND flag = 1
+    </select>
+
+    <select id="getIdByBrand" resultType="java.lang.String">
+        select id from zw_m_vehicle_info where flag = 1 AND BINARY brand = #{brand}
+    </select>
+
+    <select id="getIdByBrandAndColor" resultType="java.lang.String">
+        select id from zw_m_vehicle_info where flag = 1 AND BINARY brand = #{brand} and  plate_color =#{vehicleColor}
+    </select>
+
+    <select id="getVehicleDTOByDeviceNumber" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT v.id ,v.brand as name, v.plate_color,d.device_type,d.org_id deviceOrgId FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        WHERE v.flag = 1
+          AND d.device_number = BINARY #{deviceNumber}
+    </select>
+
+    <select id="getBindVehicleDTOByBrand" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        SELECT  v.id ,v.brand as name,v.plate_color,v.group_id as orgId,v.province_Id,v.city_id,v.road_transport_number,
+                v.vehicl_operation_number,d.device_type,v.loading_quality, v.provenance,v.destination,
+                v.scope_business,v.vehicle_type,v.vehicle_purpose,v.number_Load ,v.destination_Station,v.departure
+                FROM zw_m_vehicle_info v
+                INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+                INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+                WHERE v.flag = 1 AND BINARY brand = #{brand}
+    </select>
+
+    <select id="getOrgIdByBrand" resultType="java.lang.String">
+       select group_id from zw_m_vehicle_info where BINARY brand = #{brand} and flag = 1
+    </select>
+
+    <select id="getVehicleIdsByOrgId" resultType="java.lang.String">
+    SELECT vehicleInfo.id
+        FROM zw_m_vehicle_info vehicleInfo
+        INNER JOIN zw_m_config config ON
+        vehicleInfo.id =
+        config.vehicle_id AND config.flag = 1
+        WHERE vehicleInfo.flag = 1
+        AND vehicleInfo.group_id = #{orgId}
+        ORDER BY vehicleInfo.create_data_time DESC
+    </select>
+
+    <select id="getVehicleInfoByDeviceId" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        select zmvi.id, zmvi.brand as name ,zmvi.plate_color
+        from zw_m_vehicle_info zmvi
+                 inner join zw_m_config zmc on zmvi.id = zmc.vehicle_id and zmc.flag = 1
+                 inner join zw_m_device_info zmdi on zmc.device_id = zmdi.id and zmdi.flag = 1
+        where zmvi.flag = 1
+          and zmdi.id = #{deviceId}
+    </select>
+
+    <select id="getPartFieldById" resultType="com.zw.platform.basic.dto.VehicleDTO">
+        select id, brand,city_id, city, province_id, province, county from clbs.zw_m_vehicle_info where flag = 1
+        and id = #{id}
+    </select>
+
+    <update id="updateIcon">
+        UPDATE zw_m_vehicle_info set vehicle_icon = #{iconId}
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateVehicleTransportNumberInfo"
+            parameterType="com.zw.app.entity.appOCR.VehicleTransportInfoUploadEntity">
+        UPDATE
+            zw_m_vehicle_info
+        SET road_transport_number  = #{transportNumber},
+            transport_number_photo = #{transportNumberPhoto},
+            update_data_time       = #{updateDataTime},
+            update_data_username   = #{updateDataUsername}
+        where id = #{monitorId}
+          and flag = 1
+    </update>
+
+    <update id="updateVehicleDrivingLicenseInfo"
+            parameterType="com.zw.app.entity.appOCR.VehicleDrivingLicenseUploadEntity">
+        UPDATE zw_m_vehicle_info SET
+        <if test="pageSign != null and pageSign!='' and pageSign == 1">
+            chassis_number = #{chassisNumber},engine_number= #{engineNumber},using_nature = #{usingNature},
+            brand_model = #{brandModel},registration_date = #{registrationDate},
+            license_issuance_date = #{licenseIssuanceDate},driving_license_front_photo= #{drivingLicenseFrontPhoto},
+        </if>
+        <if test="pageSign != null and pageSign!='' and pageSign == 2">
+            valid_end_date = #{validEndDate},total_quality = #{totalQuality},profile_size_long = #{profileSizeLong},
+            profile_size_wide = #{profileSizeWide},profile_size_high = #{profileSizeHigh},
+            driving_license_duplicate_photo = #{drivingLicenseDuplicatePhoto},
+        </if>
+        update_data_time = #{updateDataTime},update_data_username = #{updateDataUsername} where id = #{monitorId} and
+        flag = 1
+    </update>
+
+    <update id="updateVehiclePhoto" parameterType="com.zw.app.entity.appOCR.VehiclePhotoUpLoadEntity">
+        UPDATE zw_m_vehicle_info
+        SET vehicle_photo        = #{vehiclePhoto},
+            update_data_time     = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        WHERE id = #{monitorId}
+          AND flag = 1
+    </update>
+
+    <select id="getVehicleListByIds" resultType="com.zw.platform.basic.domain.VehicleDO">
+        select *,group_id as orgId from zw_m_vehicle_info
+        where
+        id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--得到行驶证已经过期的车辆-->
+    <select id="getVehicleIdsByAlreadyExpireLicense" parameterType="string"
+            resultType="string">
+        SELECT veh.id
+        FROM zw_m_vehicle_info veh
+        WHERE DATE_FORMAT(veh.registration_end_date, '%Y-%m-%d') &lt; CURDATE() AND veh.flag = 1
+    </select>
+
+    <!--得到行驶证达到提前提醒天数条件的车辆-->
+    <select id="getVehicleIdsByWillExpireLicense" parameterType="string"
+            resultType="string">
+        SELECT veh.id
+        FROM zw_m_vehicle_info veh
+        WHERE veh.flag = 1 AND DATE_SUB(veh.registration_end_date,INTERVAL veh.registration_remind_days DAY) &lt;= CURDATE() AND CURDATE() &lt;=veh.registration_end_date
+    </select>
+
+    <!--得到道路运输证达到已经过期的车辆-->
+    <select id="getVehicleIdsByAlreadyExpireRoadTransport" parameterType="string"
+            resultType="string">
+        SELECT veh.id
+        FROM zw_m_vehicle_info veh
+        WHERE DATE_FORMAT(veh.road_transport__validity, '%Y-%m-%d') &lt; CURDATE() AND veh.flag = 1
+    </select>
+
+    <!--得到道路运输证达到提前提醒天数条件的车辆-->
+    <select id="getVehicleIdsByWillExpireRoadTransport" parameterType="string"
+            resultType="string">
+        SELECT veh.id
+        FROM zw_m_vehicle_info veh
+        WHERE DATE_SUB(veh.road_transport__validity,INTERVAL veh.management_remind_days DAY) &lt;= CURDATE() AND CURDATE() &lt;= veh.road_transport__validity AND veh.flag=1
+    </select>
+
+    <select id="getVehicleIdsByMaintenanceExpired" parameterType="string"
+            resultType="string">
+        SELECT veh.id
+        FROM zw_m_vehicle_info veh
+        WHERE DATE_FORMAT(veh.maintain_validity, '%Y-%m-%d') &lt; CURDATE() AND veh.flag=1
+    </select>
+
+    <select id="getVehicleIdsByMaintenanceMileageIsNotNull" parameterType="string"
+            resultType="com.zw.platform.basic.domain.BaseKvDo">
+        SELECT veh.id AS keyName,veh.maintain_mileage AS firstVal
+        FROM zw_m_vehicle_info veh
+        WHERE veh.maintain_mileage IS NOT NULL AND veh.maintain_mileage > 0 AND veh.flag=1
+    </select>
+    <select id="getByVehiclePurposeId" parameterType="string" resultType="string">
+        SELECT id FROM zw_m_vehicle_info v where  v.flag = 1 and  v.vehicle_purpose = #{vehiclePurposeId}
+    </select>
+
+    <select id="findAllMidsBytype" resultType="java.lang.String">
+    SELECT vehicle_id
+        from
+        zw_m_config
+        where
+        flag=1
+        and
+        monitor_type=#{type}
+    </select>
+
+    <select id="get809ForwardIds" resultType="string" parameterType="string">
+        SELECT DISTINCT av.vehicle_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN zw_m_vehicle_info car on av.vehicle_id = car.id and car.flag = 1
+        INNER JOIN zw_m_config c ON car.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        WHERE a.`flag` = 1
+        AND a.id IN
+        <foreach item="item" collection="assigns" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.monitor_type = 0
+        AND d.manufacturer_id <![CDATA[<>]]>  ''
+        AND d.device_modelNumber <![CDATA[<>]]>  ''
+    </select>
+
+    <select id="getVehicleByIds" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        select id, group_id, brand, plate_color, vehicle_type
+        from zw_m_vehicle_info
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findAllVehicleId" resultType="string">
+        select id from zw_m_vehicle_info where flag =1
+    </select>
+
+    <delete id="deleteAssignmentByVehicleId">
+        update zw_m_assignment_vehicle set flag =0 where vehicle_id in
+        <foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteConfigByVehicleId">
+        update zw_m_config set flag =0 where vehicle_id in
+        <foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getByVehicleTypeId" resultType="string">
+        SELECT  id from zw_m_vehicle_info
+        where flag =1
+        and vehicle_type = #{vehicleTypeId}
+    </select>
+
+    <select id="findByOrgIds" resultType="com.zw.platform.basic.domain.VehicleDO">
+        SELECT
+        <include refid="allField"/>
+        ,group_id as orgId
+        FROM zw_m_vehicle_info
+        WHERE group_id IN
+        <foreach item="item" collection="orgIds" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+        and flag =1
+    </select>
+
+    <select id="findByBrandAndPlateColor" resultType="com.zw.platform.basic.domain.VehicleDO">
+        SELECT
+        <include refid="allField"/>
+        ,group_id as orgId
+        FROM zw_m_vehicle_info where flag = 1
+        and brand = #{brand}
+        <if test="plateColor != null and plateColor != ''">
+            and plate_color = #{plateColor}
+        </if>
+    </select>
+
+    <select id="getVehicleTransportNumber" resultType="com.zw.app.entity.appOCR.VehicleTransportInfoUploadEntity">
+        SELECT
+            road_transport_number AS transportNumber,
+            transport_number_photo AS transportNumberPhoto
+        FROM
+            zw_m_vehicle_info
+        WHERE
+            id = #{vehicleId} and flag = 1
+    </select>
+
+    <select id="getVehicleDrivingLicense" resultType="com.zw.app.entity.appOCR.VehicleDrivingLicenseUploadEntity">
+        SELECT vi.chassis_number                  AS chassisNumber,
+               vi.engine_number                   AS engineNumber,
+               vi.using_nature                    AS usingNature,
+               vi.brand_model                     AS brandModel,
+               vi.registration_date               AS registrationDate,
+               vi.license_issuance_date           AS licenseIssuanceDate,
+               vi.driving_license_front_photo     AS drivingLicenseFrontPhoto,
+               vi.valid_end_date                  AS validEndDate,
+               vi.total_quality                   AS totalQuality,
+               vi.profile_size_long               AS profileSizeLong,
+               vi.profile_size_wide               AS profileSizeWide,
+               vi.profile_size_high               AS profileSizeHigh,
+               vi.driving_license_duplicate_photo AS drivingLicenseDuplicatePhoto,
+               vc.standard                        AS pageSign
+        FROM zw_m_vehicle_info vi
+                 LEFT JOIN zw_m_vehicle_type vt ON vi.vehicle_type = vt.id
+            AND vt.flag = 1
+                 LEFT JOIN zw_m_vehicle_category vc ON vt.vehicle_category = vc.id
+            AND vc.flag = 1
+        WHERE vi.id = #{vehicleId}
+          and vi.flag = 1
+    </select>
+
+    <select id="getVehicleInfoById" resultType="com.zw.lkyw.domain.videoCarouselReport.VideoCarouselReport">
+        select vi.brand AS monitorName,vi.plate_color AS signColor,vi.group_id as groupId,vt.vehicle_type AS objectType,
+        vi.id AS monitorId from zw_m_vehicle_info vi INNER
+        JOIN zw_m_vehicle_type vt ON vt.id = vi.vehicle_type AND vt.flag = 1
+        WHERE vi.flag = 1
+        <if test="list != null and list.size() > 0">
+            AND vi.id IN
+            <foreach collection="list" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getAllCargoGroupVehicleIds" resultType="java.util.Map">
+        SELECT vinfo.group_id as GROUPID, vinfo.id as VEHICLEID
+        from zw_m_vehicle_info vinfo,
+             zw_m_vehicle_type vtype,
+             zw_m_vehicle_category vcategory
+        where vinfo.flag = 1
+          and vinfo.vehicle_type = vtype.id
+          AND vtype.vehicle_category = vcategory.id
+          and vcategory.standard = 1
+          and vcategory.flag = 1
+          and vcategory.flag = 1
+    </select>
+
+    <select id="findVehicleByUserGroupConfig" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT info.* FROM
+        (
+        SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE
+        car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE
+        peo.flag=1
+        UNION
+        SELECT th.id id, th.thing_number brand FROM zw_m_thing_info th WHERE
+        th.flag=1
+        ) info
+        INNER JOIN zw_m_config con ON con.vehicle_id = info.id AND con.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id = info.id AND
+        av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = a.id AND au.flag =
+        1
+        WHERE
+        au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="deleteUserAssignByUsers">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and user_id in
+        <foreach item="item" collection="userList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="deleteUserAssByUserAndAssign">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and user_id = #{userId}
+        and assignment_id in
+        <foreach item="item" collection="assignmentList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findUserAssignByAid" resultType="String">
+        SELECT DISTINCT user_id
+        FROM zw_m_assignment_user
+        WHERE flag = 1
+        AND assignment_id = #{assignmentId}
+        AND user_id IN
+        <foreach item="item" collection="userList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <update id="deleteUserAssignByUsersAid">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and assignment_id = #{assignmentId}
+        and user_id in
+        <foreach item="item" collection="userIds" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findByVehicle" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT vi.*, vt.vehicle_type AS vehType
+        FROM zw_m_vehicle_info vi
+                 LEFT JOIN zw_m_vehicle_type vt ON vt.id = vi.vehicle_type AND vt.flag = 1
+        WHERE vi.flag = 1
+          and vi.brand = BINARY #{brand}
+    </select>
+
+    <update id="updateSynchronizeVehicle" parameterType="com.zw.platform.domain.basicinfo.form.SynchronizeVehicleForm">
+        update zw_m_vehicle_info
+        set
+        <if test="form.vehicleOwner != null  and form.vehicleOwner != ''">
+            vehicle_owner = #{form.vehicleOwner},
+        </if>
+        <if test="form.vehicleOwnerPhone != null  and form.vehicleOwnerPhone != ''">
+            vehicle_owner_phone = #{form.vehicleOwnerPhone},
+        </if>
+        <if test="form.chassisNumber != null  and form.chassisNumber != ''">
+            chassis_number = #{form.chassisNumber},
+        </if>
+        <if test="form.remark != null  and form.remark != ''">
+            remark = #{form.remark},
+        </if>
+        <if test="form.vehiclePlatformInstallDate != null ">
+            vehicle_platform_install_date = #{form.vehiclePlatformInstallDate},
+        </if>
+        <if test="form.updateDataTime != null ">
+            update_data_time = #{form.updateDataTime}
+        </if>
+        where id=#{form.id}
+    </update>
+
+    <select id="getIsBandVehicleByBrandModelsId" resultType="int">
+        SELECT count(*)
+        from zw_m_vehicle_info
+        WHERE flag = 1
+          and brand_models_id = #{id}
+    </select>
+
+    <select id="findAllSendVehicle" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT v.* FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time
+        createDataTime,car.flag FROM
+        zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1'
+        monitorType,peo.create_data_time createDataTime,peo.flag FROM
+        zw_m_people_info peo WHERE peo.flag=1
+
+        ) v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag =
+        1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =
+        au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE v.flag =1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getFuelType" parameterType="string" resultType="string">
+        SELECT ft.fuel_type FROM zw_m_fuel_type ft LEFT JOIN zw_m_vehicle_info
+            v ON ft.id=v.fuel_type and ft.flag=1 WHERE v.brand =#{brand} and
+            v.flag = 1
+    </select>
+
+    <select id="findVehicleByGroupAssign" parameterType="string" resultType="string">
+        SELECT DISTINCT v.id
+        FROM zw_m_vehicle_info v
+                 INNER JOIN
+             zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+                 INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        WHERE a.org_id = #{groupId}
+          AND v.flag = 1
+    </select>
+
+    <select id="findVehicleByIds" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT v.* FROM zw_m_vehicle_info v
+        WHERE v.flag = 1
+        and v.id in
+        <foreach item="item" collection="ids" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findParamId" parameterType="string" resultType="string">
+        SELECT id
+        from zw_m_directive
+        where monitor_object_id = #{vid}
+          and parameter_type = '8'
+          and flag = 1
+        ORDER BY create_data_time desc
+    </select>
+
+    <select id="findParamStatus" parameterType="string" resultType="java.util.Map">
+        SELECT m.vehicle_id AS vehicleId, di.id AS dirId, di.status
+        FROM zw_m_config m
+                 LEFT JOIN zw_m_directive di ON di.monitor_object_id = m.vehicle_id AND
+                                                di.flag = 1
+        WHERE m.sim_card_id = #{simId}
+          AND di.parameter_type = '8'
+        ORDER BY di.create_data_time DESC
+    </select>
+
+    <select id="findPeopleByNumber" parameterType="java.lang.String"
+            resultType="java.util.Map">
+        SELECT *
+        FROM zw_m_people_info
+        WHERE flag = 1
+          AND people_number = BINARY
+            #{brand}
+    </select>
+
+    <select id="findBrandsByIds" resultType="string">
+        SELECT brand FROM zw_m_vehicle_info WHERE flag = 1 and id in
+        <foreach item="item" collection="ids" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+        order by create_data_time DESC,id DESC
+    </select>
+
+    <select id="findMonitorByName" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT v.id, v.brand, v.monitorType FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time
+        createDataTime,car.flag FROM
+        zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1'
+        monitorType,peo.create_data_time createDataTime,peo.flag FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        ) v
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id = v.id AND av.flag =
+        1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = a.id AND au.flag =
+        1
+        WHERE
+        v.flag = 1
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND au.user_id = #{userId}
+        <if test="name != null and name!=''">
+            AND v.brand LIKE CONCAT('%',#{name},'%')
+        </if>
+        ORDER BY v.createDataTime DESC
+    </select>
+
+    <select id="findVehicleByUserAndGroupForVasMileage"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT info.*,
+        date_format(msb.saving_products_install_time,'%Y-%m-%d %H:%i:%s')
+        savingProductsInstallTime FROM zw_m_vehicle_info info
+        LEFT JOIN zw_o_euipment e ON info.id = e.vehicle_id AND e.flag = 1
+        INNER JOIN zw_m_vehicle_type t ON info.vehicle_type = t.id AND t.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id = info.id AND
+        av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = a.id AND au.flag =
+        1
+        LEFT JOIN zw_m_mobile_source_baseinfo msb ON info.id = msb.vehicle_id AND
+        msb.flag = 1
+        WHERE
+        info.flag = 1
+        AND t.vehicle_category != "4"
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND au.user_id = #{userId}
+    </select>
+
+    <select id="findVehicleByUserAndGroupForVas" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT info.* FROM zw_m_vehicle_info info
+        INNER JOIN zw_o_euipment e ON info.id = e.vehicle_id AND e.flag = 1
+        INNER JOIN zw_m_vehicle_type t ON info.vehicle_type = t.id AND t.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id = info.id AND
+        av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = a.id AND au.flag =
+        1
+        WHERE
+        info.flag = 1
+        AND t.vehicle_category = "4"
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND au.user_id = #{userId}
+    </select>
+
+    <select id="findVehicleIdsByGroupId" resultType="string" parameterType="string">
+        SELECT DISTINCT info.monitorId
+        FROM (
+                 SELECT vg.id AS monitorId
+                 FROM zw_m_vehicle_info vg
+                 WHERE vg.group_id = #{groupId}
+                   and flag = 1
+                 UNION
+                 SELECT pg.id AS monitorId
+                 FROM zw_m_people_info pg
+                 WHERE pg.org_id = #{groupId}
+                   and flag = 1
+                 UNION
+                 SELECT th.id AS monitorId
+                 FROM zw_m_thing_info th
+                 WHERE th.group_id = #{groupId}
+                   and flag = 1
+             ) info
+    </select>
+
+    <select id="findVehicleCountByAssignment" parameterType="string"
+            resultType="integer">
+        SELECT
+            count( 1 )
+        FROM
+            zw_m_assignment zma
+                INNER JOIN zw_m_assignment_vehicle zmav ON zma.id = zmav.assignment_id
+                AND zmav.flag = 1
+                INNER JOIN (
+                SELECT car.id id, car.brand brand, '0' monitorType, car.create_data_time createDataTime
+                FROM zw_m_vehicle_info car WHERE car.flag = 1
+                UNION
+                SELECT peo.id id, peo.people_number brand, '1' monitorType, peo.create_data_time createDataTime
+                FROM zw_m_people_info peo WHERE peo.flag = 1
+                UNION
+                SELECT ti.id id, ti.thing_number brand, '2' monitorType, ti.create_data_time createDataTime
+                FROM zw_m_thing_info ti WHERE ti.flag = 1
+            ) vi ON vi.id = zmav.vehicle_id
+        WHERE
+            zma.id = #{assignmentId}
+          AND zma.flag = 1
+    </select>
+
+    <select id="getAllAssignmentVehicleNumber" resultType="com.zw.platform.domain.basicinfo.AssignmentInfo">
+        SELECT
+        a.id,a.name,(SELECT count(1) FROM zw_m_assignment_vehicle av
+        INNER JOIN (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time
+        createDataTime FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1'
+        monitorType,peo.create_data_time createDataTime FROM zw_m_people_info
+        peo WHERE peo.flag=1
+        UNION
+        SELECT ti.id id, ti.thing_number brand,'2'
+        monitorType,ti.create_data_time createDataTime FROM zw_m_thing_info
+        ti WHERE ti.flag=1
+        ) vi
+        ON vi.id = av.vehicle_id
+        WHERE a.id = av.assignment_id AND av.flag = 1
+        ) AS vehicleNumber
+        FROM zw_m_assignment a WHERE a.flag=1 AND a.id IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateVehicleFuelType" parameterType="com.zw.platform.domain.basicinfo.form.VehicleForm">
+        update zw_m_vehicle_info
+        set fuel_type = #{fuelType}
+        where id = #{id}
+    </update>
+
+    <select id="getVehicleOperationStatusById"
+            resultType="com.zw.platform.domain.reportManagement.VehicleOperationStatusReport">
+        SELECT
+        id,
+        brand,
+        plate_color AS plateColor,
+        operating_state AS operatingState,
+        road_transport_validity_start AS roadTransportValidityStart,
+        road_transport__validity AS roadTransportValidity
+        FROM
+        zw_m_vehicle_info
+        WHERE
+        id IN
+        <foreach item="item" collection="vehicleId" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+        AND flag = 1 ORDER BY create_data_time DESC
+    </select>
+
+</mapper>

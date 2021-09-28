@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.SimCardNewDao">
+    <sql id="Example_Where_Clause">
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="condition.simcardNumber != null">
+                and simcard_number = LIKE
+                CONCAT('%',#{condition.simcardNumber},'%')
+            </if>
+            <if test="condition.isStart != null">
+                and is_start = #{condition.isStart}
+            </if>
+            <if test="condition.operator != null">
+                and operator = #{condition.operator}
+            </if>
+            <if test="condition.openCardTime != null">
+                and open_card_time = #{condition.openCardTime}
+            </if>
+            <if test="condition.capacity != null">
+                and capacity = #{condition.capacity}
+            </if>
+            <if test="condition.networkType != null">
+                and network_type = #{condition.networkType}
+            </if>
+            <if test="condition.simFlow != null">
+                and sim_flow = #{condition.simFlow}
+            </if>
+            <if test="condition.useFlow != null">
+                and use_flow = #{condition.useFlow}
+            </if>
+            <if test="condition.flag != null">
+                and flag = #{condition.flag}
+            </if>
+            <if test="condition.createDataTime != null">
+                and create_data_time = #{condition.createDataTime}
+            </if>
+            <if test="condition.createDataUsername != null">
+                and create_data_username =
+                #{condition.createDataUsername}
+            </if>
+            <if test="condition.updateDataTime != null">
+                and update_data_time = #{condition.updateDataTime}
+            </if>
+            <if test="condition.updateDataUsername != null">
+                and update_data_username =
+                #{condition.updateDataUsername}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 根据id查询sim卡 -->
+    <select id="getById" parameterType="string"
+            resultType="com.zw.platform.basic.domain.SimCardInfoDo">
+        SELECT s.* ,c.id as bindId FROM zw_m_sim_card_info s
+        left join zw_m_config c on c.sim_card_id=s.id and c.flag=1
+        WHERE s.flag = 1
+        <if test="id != null and id != ''">
+            and s.id = #{id}
+        </if>
+    </select>
+
+
+    <!-- 根据id删除一个终端 -->
+    <update id="deleteById">
+		update   zw_m_sim_card_info set flag =0 WHERE id = #{id} and flag =1
+	</update>
+    <update id="deleteByBatch">
+        update zw_m_sim_card_info set flag =0
+        WHERE flag =1
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </update>
+
+    <select id="getAllSimCardNumber" resultType="string">
+		SELECT simcard_number FROM zw_m_sim_card_info WHERE flag = 1
+	</select>
+
+    <!-- 新增sim卡 -->
+    <insert id="add" parameterType="com.zw.platform.basic.domain.SimCardDO">
+		insert into
+		zw_m_sim_card_info (id, simcard_number, is_start,operator,
+		open_card_time, capacity,
+		network_type, sim_flow, use_flow, flag,
+		create_data_time, create_data_username, alerts_flow,
+		end_time,iccid,imsi,
+		hour_threshold_value,day_threshold_value,month_threshold_value,correction_coefficient,forewarning_coefficient,imei,
+		month_real_value,day_real_value,monthly_statement,month_traffic_deadline,fake_ip,real_id,remark,placement_city,org_id)
+		values (#{id}, #{simcardNumber}, #{isStart}, #{operator},
+		#{openCardTime}, #{capacity},
+		#{networkType}, #{simFlow}, #{useFlow},
+		#{flag}, #{createDataTime},
+		#{createDataUsername}, #{alertsFlow} ,
+		#{endTime},#{iccid},#{imsi},#{hourThresholdValue},#{dayThresholdValue}
+		,#{monthThresholdValue},#{correctionCoefficient},#{forewarningCoefficient},#{imei},#{monthRealValue},#{dayRealValue},
+		#{monthlyStatement},#{monthTrafficDeadline},#{fakeIP},#{realId},#{remark},#{placementCity},#{orgId})
+	</insert>
+    <select id="getNoRepeatNumber" resultType="string">
+        select simcard_number from zw_m_sim_card_info where flag =1 and simcard_number=#{number}
+        <if test="id != null and id != ''">
+            AND id != #{id}
+        </if>
+        limit 1
+    </select>
+
+    <select id="getBindMonitorId" parameterType="string" resultType="string">
+        SELECT
+        c.vehicle_id AS monitorId
+        FROM
+        zw_m_config c
+        WHERE
+        c.flag = 1
+        <if test="id!=null and id!=''">
+            AND c.sim_card_id = #{id}
+        </if>
+        limit 1
+    </select>
+    <!-- 批量新增sim卡 -->
+    <insert id="addByBatch" parameterType="java.util.List">
+        insert into zw_m_sim_card_info (id, simcard_number, is_start,
+        operator, open_card_time, capacity,
+        network_type, sim_flow, use_flow,
+        flag, create_data_time, create_data_username,
+        alerts_flow,
+        end_time,iccid,imsi,hour_threshold_value
+        ,day_threshold_value,month_threshold_value,correction_coefficient,forewarning_coefficient,imei,
+        month_real_value,day_real_value,monthly_statement,month_traffic_deadline,fake_ip,real_id,remark,placement_city,org_id)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.simcardNumber}, #{item.isStart},
+            #{item.operator},
+            #{item.openCardTime}, #{item.capacity},
+            #{item.networkType}, #{item.simFlow}, #{item.useFlow},
+            #{item.flag},#{item.createDataTime},#{item.createDataUsername},
+            #{item.alertsFlow} , #{item.endTime},
+            #{item.iccid},#{item.imsi},#{item.hourThresholdValue},#{item.dayThresholdValue}
+            ,#{item.monthThresholdValue},#{item.correctionCoefficient},#{item.forewarningCoefficient},#{item.imei},
+            #{item.monthRealValue},#{item.dayRealValue},#{item.monthlyStatement},#{item.monthTrafficDeadline},#{item.fakeIP},
+            #{item.realId},#{item.remark},#{item.placementCity},#{item.orgId})
+        </foreach>
+    </insert>
+    <!-- 修改sim卡 -->
+    <update id="updateSimCard" parameterType="com.zw.platform.basic.domain.SimCardDO">
+        update zw_m_sim_card_info
+        <set>
+            <if test="fakeIP != null">
+                fake_ip = #{fakeIP},
+            </if>
+            <if test="simcardNumber != null">
+                simcard_number = #{simcardNumber},
+            </if>
+            <if test="isStart != null">
+                is_start = #{isStart},
+            </if>
+            <if test="operator != null">
+                operator = #{operator},
+            </if>
+            <if test="capacity != null">
+                capacity = #{capacity},
+            </if>
+            <if test="networkType != null">
+                network_type = #{networkType},
+            </if>
+            <if test="simFlow != null">
+                sim_flow = #{simFlow},
+            </if>
+            <if test="useFlow != null">
+                use_flow = #{useFlow},
+            </if>
+            <if test="alertsFlow != null">
+                alerts_flow = #{alertsFlow},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="orgId != null">
+                org_id = #{orgId},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+            <if test="iccid != null">
+                iccid = #{iccid},
+            </if>
+            <if test="imsi != null">
+                imsi = #{imsi},
+            </if>
+            <if test="hourThresholdValue != null">
+                hour_threshold_value = #{hourThresholdValue},
+            </if>
+            <if test="dayThresholdValue != null">
+                day_threshold_value = #{dayThresholdValue},
+            </if>
+            <if test="monthThresholdValue != null">
+                month_threshold_value = #{monthThresholdValue},
+            </if>
+            <if test="correctionCoefficient != null">
+                correction_coefficient = #{correctionCoefficient},
+            </if>
+            <if test="forewarningCoefficient != null">
+                forewarning_coefficient = #{forewarningCoefficient},
+            </if>
+            <if test="imei != null">
+                imei = #{imei},
+            </if>
+            <if test="monthRealValue != null">
+                month_real_value = #{monthRealValue},
+            </if>
+            <if test="dayRealValue != null">
+                day_real_value = #{dayRealValue},
+            </if>
+            <if test="monthlyStatement != null">
+                monthly_statement = #{monthlyStatement},
+            </if>
+            <if test="monthTrafficDeadline != null">
+                month_traffic_deadline = #{monthTrafficDeadline},
+            </if>
+            <if test="placementCity != null">
+                placement_city = #{placementCity},
+            </if>
+            open_card_time = #{openCardTime},
+            end_time = #{endTime},
+            real_id = #{realId},
+            remark=#{remark}
+        </set>
+        where id = #{id}
+    </update>
+    <select id="getMonitorIdByNumber" resultType="string">
+        select c.vehicle_id from zw_m_sim_card_info s inner join zw_m_config c on s.id=c.sim_card_id and c.flag =1 where s.flag =1 and s.simcard_number=#{number}
+    </select>
+
+    <select id="getBindMonitorIds" parameterType="string" resultType="string">
+        SELECT
+        c.vehicle_id AS monitorId
+        FROM
+        zw_m_config c
+        WHERE
+        c.flag = 1
+        and c.sim_card_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        limit 1
+    </select>
+    <select id="getSimCardList" resultType="com.zw.platform.basic.domain.SimCardListDO">
+        SELECT s.id,s.iccid,s.imei,s.imsi,s.simcard_number,s.real_id,s.org_id,s.is_start,
+        s.operator,s.placement_city,s.sim_flow,s.day_real_value,s.month_real_value,
+        s.alerts_flow,s.monthly_statement,s.correction_coefficient,s.forewarning_coefficient,
+        s.hour_threshold_value,s.day_threshold_value,s.month_threshold_value,s.open_card_time,
+        s.end_time,c.vehicle_id as monitorId,d.device_number,s.create_data_time,s.update_data_time,
+        s.remark,c.id as configId from zw_m_sim_card_info s LEFT JOIN zw_m_config c ON s.id=c.sim_card_id AND c.flag =1
+        LEFT JOIN zw_m_device_info d on d.id=c.device_id and d.flag =1 where s.flag =1 and s.id
+        IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findReal" parameterType="string" resultType="string">
+        SELECT id FROM zw_m_sim_card_info WHERE real_id LIKE CONCAT('%',#{number},'%') AND flag = 1
+    </select>
+
+    <select id="findSendStatusMapByIds" parameterType="string" resultType="com.zw.platform.basic.domain.BaseKvtDo">
+        SELECT m.sim_card_id AS keyName,di.id AS firstValue, di.status as secondVal FROM
+        zw_m_config m
+        LEFT JOIN zw_m_directive di ON di.monitor_object_id=m.vehicle_id AND
+        di.flag=1
+        WHERE m.sim_card_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND di.parameter_type='8'
+    </select>
+
+    <update id="updateNumber">
+        update zw_m_sim_card_info set
+        <if test="number !=null and number!=''">
+            simcard_number=#{number},
+        </if>
+        real_id=#{realNum}
+        where id=#{id} and flag =1
+    </update>
+
+    <select id="getOrgSimCardIds" resultType="string">
+        select id from zw_m_sim_card_info where flag =1 and org_id =#{orgId}
+    </select>
+
+    <select id="getByNumbers" resultType="com.zw.platform.basic.dto.SimCardDTO">
+        SELECT s.id,s.simcard_number,s.real_id,s.org_id,c.id as configId,c.vehicle_id
+        from zw_m_sim_card_info s
+        LEFT JOIN zw_m_config c ON s.id = c.sim_card_id and c.flag = 1
+        where s.flag = 1
+        <if test="numbers!=null and numbers.size() >0">
+            and s.simcard_number in
+            <foreach collection="numbers" item="simNum" separator="," open="(" close=")">
+                #{simNum}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getByNumber" resultType="com.zw.platform.basic.dto.SimCardDTO">
+  SELECT s.id,s.iccid,s.imei,s.simcard_number,s.real_id,s.org_id,s.is_start,
+        s.operator,s.placement_city,s.sim_flow,s.day_real_value,s.month_real_value,
+        s.alerts_flow,s.monthly_statement,s.correction_coefficient,s.forewarning_coefficient,
+        s.hour_threshold_value,s.day_threshold_value,s.month_threshold_value,s.open_card_time,
+        s.end_time,c.vehicle_id as monitorId,s.create_data_time,s.update_data_time,
+        s.remark,c.id as configId,s.auth_code from zw_m_sim_card_info s
+        LEFT JOIN zw_m_config c ON s.id=c.sim_card_id AND c.flag =1
+        where s.flag = 1
+        and s.simcard_number = #{simCardNumber}
+    </select>
+
+    <select id="getSortList" resultType="string">
+     SELECT id from zw_m_sim_card_info where flag = 	1 ORDER BY create_data_time
+    </select>
+
+    <select id="getByDeviceIds" resultType="com.zw.platform.basic.dto.SimCardDTO">
+        SELECT s.* , c.vehicle_id vehicleId,d.id deviceId FROM zw_m_config c
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE c.flag = 1
+        and d.id IN
+        <foreach collection="deviceIds" item="deviceId" separator="," open="(" close=")">
+            #{deviceId}
+        </foreach>
+    </select>
+
+
+    <!-- 根据id查询sim卡及其组织 -->
+    <select id="getF3SimInfo" parameterType="string" resultType="com.zw.platform.basic.dto.F3SimCardDTO">
+		SELECT
+		  s.simcard_number AS simcardNumber,
+		  s.iccid AS iccid,
+		  d.device_number AS deviceNumber,
+	      s.imei AS imei,
+	      s.imsi AS imsi,
+	      s.day_real_value AS dayRealValue,
+	      s.month_real_value AS monthRealValue,
+	      s.monthly_statement AS monthlyStatement,
+	      s.correction_coefficient AS correctionCoefficient,
+	      s.forewarning_coefficient AS forewarningCoefficient,
+	      s.hour_threshold_value AS hourThresholdValue,
+	      s.day_threshold_value AS dayThresholdValue,
+	      s.month_threshold_value AS monthThresholdValue,
+	      v.brand AS brand,
+	      s.id AS sid,
+	      c.id AS bindId,
+	      c.vehicle_id AS vid,
+	      c.monitor_type AS monitorType,
+	      s.month_traffic_deadline AS monthTrafficDeadline
+          FROM zw_m_config c
+          INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+          LEFT JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id AND v.flag = 1
+          LEFT JOIN zw_m_people_info p ON p.id = c.vehicle_id AND p.flag = 1
+          LEFT JOIN zw_m_thing_info t ON t.id = c.vehicle_id AND t.flag = 1
+          INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+          WHERE c.vehicle_id = #{id} AND c.flag = 1
+	</select>
+
+    <select id="findSimcardById" parameterType="string" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT simcardInfo.*, simcardInfo.org_id groupId FROM zw_m_sim_card_info
+        simcardInfo WHERE simcardInfo.flag = 1
+        <if test="id != null and id != ''">
+            and simcardInfo.id = #{id}
+        </if>
+    </select>
+
+    <select id="findSimcardBySimcardNumber" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT simcardInfo.*, simcardInfo.org_id groupId FROM zw_m_sim_card_info
+        simcardInfo
+        WHERE simcardInfo.flag = 1
+        <if test="simcardNumber != null and simcardNumber != ''">
+            AND simcardInfo.simcard_number = #{simcardNumber}
+        </if>
+    </select>
+
+    <select id="findSimcardByUser" resultType="map">
+        SELECT de.id AS id,de.remark,de.simcard_number AS
+        simcardNumber,de.is_start AS isStart,de.operator AS operator,
+        de.open_card_time AS openCardTime,de.capacity AS
+        capacity,de.network_type AS networkType,
+        de.sim_flow AS
+        simFlow,de.use_flow AS useFlow,de.alerts_flow AS
+        alertsFlow,de.end_time AS
+        endTime,de.create_data_time AS
+        create_data_time,
+        de.update_data_time AS updateDataTime,
+        m.brand AS
+        brand,de.org_id AS groupName,de.iccid AS iccid,de.imsi AS
+        imsi,de.hour_threshold_value AS
+        hourThresholdValue,
+        de.day_threshold_value AS dayThresholdValue,de.month_threshold_value
+        AS monthThresholdValue,
+        de.correction_coefficient AS
+        correctionCoefficient,de.forewarning_coefficient AS
+        forewarningCoefficient,m.vehicleId AS vehicleId,m.configId AS
+        configId,
+        de.monthly_statement AS monthlyStatement,de.month_real_value
+        AS
+        monthRealValue,de.day_real_value AS
+        dayRealValue,m.pstatus AS
+        pstatus,
+        de.imei AS imei,m.deviceNumber AS
+        deviceNumber,de.month_traffic_deadline AS
+        monthTrafficDeadline
+        FROM
+        zw_m_sim_card_info de
+        LEFT JOIN
+        (SELECT m.id AS configId,di.status AS
+        pstatus,d.device_number AS
+        deviceNumber,v.brand AS brand,m.vehicle_id
+        AS
+        vehicleId,m.sim_card_id,m.flag FROM zw_m_config m INNER JOIN
+        zw_m_device_info d ON m.device_id=d.id AND d.flag=1
+        LEFT JOIN
+        zw_m_directive di ON di.monitor_object_id=m.vehicle_id AND
+        di.parameter_type='8' AND di.flag=1
+        INNER JOIN
+        (SELECT id,people_number
+        AS brand FROM zw_m_people_info WHERE flag=1 UNION
+        ALL SELECT id,brand
+        FROM
+        zw_m_vehicle_info WHERE flag=1) v ON v.id=m.vehicle_id)m ON
+        m.sim_card_id=de.id AND
+        m.flag=1
+        WHERE de.flag=1
+        AND de.org_id in
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+                AND ( de.simcard_number LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                OR m.brand LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+        ORDER BY de.create_data_time DESC,de.id
+    </select>
+
+    <select id="findSimcardGroupById" parameterType="string" resultType="java.util.HashMap">
+        SELECT p.org_id                  AS groupName,
+               p.id                      AS id,
+               p.is_start                AS isStart,
+               p.simcard_number          AS simcardNumber,
+               p.operator                AS operator,
+               p.open_card_time          AS openCardTime,
+               p.capacity                AS capacity,
+               p.network_type            AS networkType,
+               p.sim_flow                AS simFlow,
+               p.use_flow                AS useFlow,
+               p.alerts_flow             AS alertsFlow,
+               p.end_time                AS endTime,
+               c.id                      AS bindId,
+               p.iccid                   as iccid,
+               p.imsi                    as imsi,
+               p.hour_threshold_value    as hourThresholdValue,
+               p.day_threshold_value     AS dayThresholdValue,
+               p.month_threshold_value   AS monthThresholdValue,
+               p.correction_coefficient  AS correctionCoefficient,
+               p.forewarning_coefficient AS forewarningCoefficient,
+               p.imei                    as imei,
+               p.month_real_value        as monthRealValue,
+               p.day_real_value          as dayRealValue,
+               p.monthly_statement       as monthlyStatement,
+               p.month_traffic_deadline  as monthTrafficDeadline,
+               p.real_id                 AS realId,
+               p.remark,
+               p.placement_city          as placementCity
+        FROM zw_m_sim_card_info p
+                 LEFT JOIN
+             zw_m_config c ON c.sim_card_id = p.id AND c.flag = 1
+        WHERE p.flag
+            = 1
+          AND p.id = #{id}
+    </select>
+
+    <select id="findBySIMCard" parameterType="string" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT *
+        FROM zw_m_sim_card_info
+        WHERE flag = 1
+          and simcard_number =
+              #{simcardNumber}
+    </select>
+
+    <select id="getIsBand" parameterType="string" resultType="int">
+        SELECT count(id)
+        from zw_m_sim_card_info
+        WHERE flag = 1
+          and id = #{id}
+    </select>
+
+    <select id="isExist" parameterType="string" resultType="com.zw.platform.domain.basicinfo.SimcardInfo">
+        SELECT simcardInfo.*
+        FROM zw_m_sim_card_info simcardInfo
+        WHERE flag = 1
+          AND simcard_number = #{simcardNumber}
+          and id <![CDATA[ <> ]]>
+		#{id}
+    </select>
+
+    <select id="getAuthCodeBySimId" parameterType="String" resultType="String">
+        SELECT auth_code FROM zw_m_sim_card_info WHERE id = #{simId} AND flag = 1
+    </select>
+
+</mapper>

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ConnectionParamsConfigDao">
+
+    <insert id="addConfig" parameterType="java.util.List">
+        INSERT INTO zw_m_809_config
+        (id,config_id,setting_id,create_data_time,create_data_username,protocol_type)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.configId},#{item.plantFormId},#{item.createDataTime},#{item.createDataUsername},#{item.protocolType})
+        </foreach>
+    </insert>
+
+    <update id="deleteConfig" parameterType="java.util.List">
+        UPDATE zw_m_809_config SET flag = 0 WHERE flag = 1 AND id IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteConfigBySettingId" parameterType="java.util.List">
+        UPDATE zw_m_809_config SET flag = 0 WHERE flag = 1 AND setting_id IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="deleteOilSubsidyConfigByConfigIds">
+        UPDATE zw_m_809_config SET flag = 0 WHERE flag = 1 AND config_id IN
+        <foreach collection="configIds" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and protocol_type=#{protocolType}
+    </update>
+
+    <select id="findConfig" parameterType="com.zw.platform.domain.connectionparamsset_809.T809ForwardConfigQuery"
+            resultType="com.zw.platform.domain.connectionparamsset_809.T809ForwardConfig">
+        SELECT DISTINCT
+        c.id,c.config_id,c.setting_id plantFormId,c.create_data_time,c.create_data_username,
+        c.update_data_time,c.update_data_username,vi.brand,s.platform_name plantFormName,s.ip plantFormIp,s.port
+        plantFormPort,s.protocol_type,vi.id vehicleId
+        FROM zw_m_809_config c
+        INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = mc.vehicle_id AND vi.flag = 1
+        INNER JOIN zw_m_809_setting s ON s.id = c.setting_id AND s.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.vehicle_id = vi.id AND av.flag = 1
+        WHERE c.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND (vi.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR s.platform_name LIKE CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        <if test="assignList != null">
+            AND av.assignment_id IN
+            <foreach collection="assignList" item="aid" open="(" separator="," close=")">
+                #{aid}
+            </foreach>
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <resultMap type="com.zw.platform.domain.connectionparamsset_809.T809PlatFormSubscribe" id="T809PlatFormResultMap">
+        <result column="device_number" property="deviceNumber"/>
+        <result column="simcard_number" property="identification"/>
+        <collection property="settingIds" ofType="java.lang.String">
+            <result column="setting_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="findConfigByConfigUuid" parameterType="java.util.List"
+            resultMap="T809PlatFormResultMap">
+        SELECT
+        di.device_number,c.setting_id,si.simcard_number
+        FROM zw_m_809_config c
+        INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = mc.vehicle_id AND vi.flag = 1
+        INNER JOIN zw_m_809_setting s ON s.id = c.setting_id AND s.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = mc.device_id AND di.flag = 1
+        INNER JOIN zw_m_sim_card_info si ON si.id = mc.sim_card_id AND si.flag = 1
+        WHERE c.flag = 1 AND c.id IN
+        <foreach collection="list" item="cid" index="index" open="(" close=")" separator=",">
+            #{cid}
+        </foreach>
+    </select>
+
+
+    <select id="findConfigByConfigId" parameterType="java.util.List"
+            resultMap="T809PlatFormResultMap">
+        SELECT
+        di.device_number,c.setting_id,si.simcard_number
+        FROM zw_m_809_config c
+        INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = mc.vehicle_id AND vi.flag = 1
+        INNER JOIN zw_m_809_setting s ON s.id = c.setting_id AND s.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = mc.device_id AND di.flag = 1
+        INNER JOIN zw_m_sim_card_info si ON si.id = mc.sim_card_id AND si.flag = 1
+        WHERE c.flag = 1
+        <if test="protocolType != null and protocolType != ''">
+            and c.protocol_type = #{protocolType}
+        </if>
+        AND c.config_id IN
+        <foreach collection="configIds" item="configId" index="index" open="(" close=")" separator=",">
+            #{configId}
+        </foreach>
+
+    </select>
+
+    <select id="findConfigBySettingId" parameterType="java.util.List"
+            resultMap="T809PlatFormResultMap">
+        SELECT
+        di.device_number,c.setting_id,si.simcard_number
+        FROM zw_m_809_config c
+        INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON vi.id = mc.vehicle_id AND vi.flag = 1
+        INNER JOIN zw_m_809_setting s ON s.id = c.setting_id AND s.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = mc.device_id AND di.flag = 1
+        INNER JOIN zw_m_sim_card_info si ON si.id = mc.sim_card_id AND si.flag = 1
+        WHERE s.flag = 1 AND c.id IN
+        <foreach collection="list" item="cid" index="index" open="(" close=")" separator=",">
+            #{cid}
+        </foreach>
+    </select>
+
+    <select id="findConfigBySimNumber" parameterType="string" resultMap="T809PlatFormResultMap">
+        SELECT c.setting_id, c.protocol_type
+        FROM zw_m_809_config c
+        INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+        INNER JOIN zw_m_sim_card_info si ON si.id = mc.sim_card_id AND si.flag = 1
+        WHERE c.flag = 1 AND si.simcard_number = #{simNumber}
+    </select>
+
+    <select id="findVehiclesOfPlatform" parameterType="String" resultType="String">
+		SELECT vi.id
+		FROM zw_m_809_config cf 
+		INNER JOIN zw_m_809_setting s ON s.id = cf.setting_id AND s.flag = 1
+		INNER JOIN zw_m_config c ON c.id = cf.config_id AND c.flag = 1
+		INNER JOIN zw_m_vehicle_info vi ON vi.id = c.vehicle_id AND vi.flag = 1
+		WHERE cf.flag = 1 AND cf.setting_id = #{platFormId}
+	</select>
+
+    <select id="findConfigUuidByPids" parameterType="java.util.List" resultType="String">
+        SELECT GROUP_CONCAT(id) FROM zw_m_809_config
+        WHERE flag = 1 AND setting_id IN
+        <foreach collection="list" item="pid" index="index" open="(" close=")" separator=",">
+            #{pid}
+        </foreach>
+    </select>
+
+    <select id="findBind809ConfigMonitorIds" resultType="string">
+		SELECT con.vehicle_id from zw_m_809_config c
+		INNER JOIN zw_m_config con ON con.id = c.config_id AND con.flag = 1
+		WHERE c.flag = 1
+	</select>
+
+    <select id="findConfigIdByVConfigIds" parameterType="java.util.List" resultType="String">
+        SELECT id FROM zw_m_809_config WHERE config_id IN
+        <foreach collection="list" index="index" item="cid" open="(" close=")" separator=",">
+            #{cid}
+        </foreach>
+        AND flag = 1
+    </select>
+
+    <!-- 根据车id查询809连接信息 -->
+    <select id="getConnectionInfoByVehicleId" parameterType="string"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+		SELECT
+			setting.*
+		FROM
+			zw_m_809_setting setting
+		INNER JOIN zw_m_809_config conf ON conf.setting_id = setting.id
+		AND setting.flag = 1
+		INNER JOIN zw_m_config vconf ON vconf.id = conf.config_id
+		AND conf.flag = 1
+		INNER JOIN zw_m_vehicle_info vinfo ON vinfo.id = vconf.vehicle_id
+		AND vconf.flag = 1
+		WHERE
+		vinfo.id = #{vehicleId}
+		AND vinfo.flag = 1
+	</select>
+
+    <!-- 查询全部绑定809转发平台的车辆 -->
+    <select id="getAllBind809Info" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParamConfigInfo">
+	   SELECT vconf.id as vehicleConfigId,setting.center_id as centerId,setting.zone_description as zoneDescription,setting.group_id as groupId
+	   FROM zw_m_config vconf
+       INNER JOIN zw_m_vehicle_info vinfo ON vinfo.id = vconf.vehicle_id AND vinfo.flag = 1
+       LEFT JOIN zw_m_809_config conf ON conf.config_id = vconf.id AND conf.flag = 1
+	   INNER JOIN zw_m_809_setting setting ON setting.id = conf.setting_id AND setting.flag = 1
+	   WHERE vconf.flag = 1
+	</select>
+
+    <select id="getTransPlatIdByVehicleId" resultType="String">
+		SELECT s.id  from zw_m_809_config c,zw_m_809_setting s,zw_m_config cfg
+		where c.flag =1 and s.flag =1  and cfg.flag =1 and c.config_id=cfg.id and s.id=c.setting_id
+		and cfg.vehicle_id =#{vehicleId}
+	</select>
+
+    <select id="findForwardVehiclesBySettingId" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+		SELECT zmvi.id, zmvi.brand
+		FROM zw_m_809_setting zm809s
+				 inner join zw_m_809_config zm809c on zm809s.id = zm809c.setting_id and zm809c.flag = 1
+				 inner join zw_m_config zmc ON zmc.id = zm809c.config_id AND zmc.flag = 1
+				 inner join zw_m_vehicle_info zmvi ON zmvi.id = zmc.vehicle_id AND zmvi.flag = 1
+		WHERE zm809s.flag = 1
+		  AND zm809s.id = #{settingId}
+	</select>
+    <select id="findForwardVehiclesByProtocolType" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+		SELECT zmvi.id, zmvi.brand
+		FROM zw_m_809_setting zm809s
+				 inner join zw_m_809_config zm809c on zm809s.id = zm809c.setting_id and zm809c.flag = 1
+				 inner join zw_m_config zmc ON zmc.id = zm809c.config_id AND zmc.flag = 1
+				 inner join zw_m_vehicle_info zmvi ON zmvi.id = zmc.vehicle_id AND zmvi.flag = 1
+		WHERE zm809s.flag = 1
+		  AND zm809s.protocol_type = #{protocolType}
+	</select>
+
+    <select id="getConnectionInfoByVehicleIds"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT DISTINCT setting.*
+        FROM zw_m_809_setting setting
+        INNER JOIN zw_m_809_config conf ON conf.setting_id = setting.id
+        AND setting.flag = 1
+        INNER JOIN zw_m_config vconf ON vconf.id = conf.config_id
+        AND conf.flag = 1
+        INNER JOIN zw_m_vehicle_info vinfo ON vinfo.id = vconf.vehicle_id
+        AND vconf.flag = 1
+        WHERE vinfo.flag = 1
+        AND vinfo.id in
+        <foreach collection="vehicleIds" item="vehicleId" open="(" separator="," close=")">
+            #{vehicleId}
+        </foreach>
+    </select>
+
+    <select id="getConnectionInfoByGroupId"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT DISTINCT vinfo.group_id, setting.*
+        FROM zw_m_809_setting setting
+        INNER JOIN zw_m_809_config conf ON conf.setting_id = setting.id
+        AND setting.flag = 1
+        INNER JOIN zw_m_config vconf ON vconf.id = conf.config_id
+        AND conf.flag = 1
+        INNER JOIN zw_m_vehicle_info vinfo ON vinfo.id = vconf.vehicle_id
+        AND vconf.flag = 1
+        WHERE vinfo.flag = 1
+        and vinfo.group_id in
+        <foreach collection="groupIds" item="groupId" open="(" separator="," close=")">
+            #{groupId}
+        </foreach>
+    </select>
+    <select id="getVehicleConnectionInfoByVehicleIds"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT DISTINCT vinfo.id vehicleId,setting.*
+        FROM zw_m_809_setting setting
+        INNER JOIN zw_m_809_config conf ON conf.setting_id = setting.id
+        AND setting.flag = 1
+        INNER JOIN zw_m_config vconf ON vconf.id = conf.config_id
+        AND conf.flag = 1
+        INNER JOIN zw_m_vehicle_info vinfo ON vinfo.id = vconf.vehicle_id
+        AND vconf.flag = 1
+        WHERE vinfo.flag = 1
+        AND vinfo.id in
+        <foreach collection="vehicleIds" item="vehicleId" open="(" separator="," close=")">
+            #{vehicleId}
+        </foreach>
+    </select>
+
+    <select id="getByMonitorIdAndProtocol"
+            resultType="com.zw.platform.domain.connectionparamsset_809.T809ForwardConfig">
+        select config.vehicle_id as id, c.config_id,s.id plantFormId,s.platform_name plantFormName, s.`ip`
+        plantFormIp,s.`port` plantFormPort,s.protocol_type, s.center_id platFormCenterId
+        from zw_m_809_config c
+        INNER JOIN zw_m_config config on c.config_id= config.id and config.flag=1
+        INNER JOIN zw_m_809_setting s on c.setting_id = s.id and s.flag=1
+        where c.flag =1
+        <if test="protocolTypes !=null and protocolTypes.size() >0">
+            and c.protocol_type IN
+            <foreach collection="protocolTypes" open="(" close=")" separator="," item="protocolType">
+                #{protocolType}
+            </foreach>
+        </if>
+        and config.vehicle_id in
+        <foreach collection="monitorIds" open="(" close=")" separator="," item="monitorId">
+            #{monitorId}
+        </foreach>
+    </select>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.RiskLevelDao">
+    <select id="findRiskLevel" parameterType="com.zw.platform.domain.riskManagement.query.RiskLevelQuery"
+            resultType="java.util.Map">
+        select risk.id as riskLevelId,risk.risk_level as riskLevel,
+        risk.risk_value as riskValue,risk.description as description,
+        risk.flag as flag,risk.create_data_time as createTime,
+        risk.create_data_username as createUser,
+        risk.update_data_time as updateTime,
+        risk.update_data_username as updateUser
+        from zw_m_risk_level risk
+        where risk.flag = 1
+        <if test="queryParam != null and queryParam.simpleQueryParam != null and queryParam.simpleQueryParam != ''">
+            AND risk.risk_level like CONCAT('%',#{queryParam.simpleQueryParam},'%')
+        </if>
+        <if test="queryParam != null and queryParam.id != null and queryParam.id != ''">
+            AND risk.id = #{queryParam.id}
+        </if>
+        order by CONVERT (risk.risk_value, signed) asc
+    </select>
+    <update id="deleteRiskLevel" parameterType="java.util.List">
+        UPDATE zw_m_risk_level SET flag=0
+        WHERE id IN
+        <foreach collection="uuids" item="uuid" open="(" close=")" separator=",">
+            #{uuid}
+        </foreach>
+    </update>
+    <insert id="insertRiskLevel" parameterType="com.zw.platform.domain.riskManagement.RiskLevelFromBean">
+          insert into zw_m_risk_level (id,risk_level,description,flag,create_data_time,create_data_username)
+           values (#{fromBean.id},#{fromBean.riskLevel},#{fromBean.description},#{fromBean.flag},#{fromBean.createDataTime},#{fromBean.createDataUsername})
+    </insert>
+    <update id="updateRiskLevel" parameterType="com.zw.platform.domain.riskManagement.RiskLevelFromBean">
+        UPDATE  zw_m_risk_level
+        SET risk_level=#{fromBean.riskLevel},risk_value=#{fromBean.riskValue},
+        description=#{fromBean.description},
+        update_data_time=#{fromBean.updateDataTime},
+        update_data_username=#{fromBean.updateDataUsername}
+        WHERE id=#{fromBean.id}
+    </update>
+    <select id="isNotExist" parameterType="com.zw.platform.domain.riskManagement.RiskLevelFromBean"
+            resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM zw_m_risk_level WHERE flag = 1 AND id != #{fromBean.id} AND risk_level = #{fromBean.riskLevel}
+    </select>
+    <select id="getAllLevelName" resultType="java.lang.String">
+        SELECT distinct(risk_level) FROM zw_m_risk_level WHERE flag = 1 ORDER BY convert(risk_value,signed) ASC
+    </select>
+    <select id="getRiskLevelMap" resultType="hashmap">
+        SELECT risk_value as riskValue,risk_level as riskLevel from zw_m_risk_level
+    </select>
+</mapper>

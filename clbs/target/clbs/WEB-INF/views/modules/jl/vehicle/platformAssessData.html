@@ -1,0 +1,157 @@
+<!--请求数据/平台考核数据-->
+<div id="platformAssessDataBox" class="row">
+    <div class="col-md-12">
+        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+            <div class="panel panel-default">
+                <div class="panel-heading" id="stretch7">
+                    <h3 class="panel-title fwb">查询</h3>
+                    <div class="actions pull-right listActions">
+                        <i class="fa chevron-down" id="stretch7-chevron"></i>
+                    </div>
+                </div>
+                <div class="panel-body" id="stretch7-body">
+                    <div class="col-md-12 alarmSearchToolPanel">
+                        <form id="platformAssessFormData" class="form-horizontal" action="#"
+                              method="post" role="form" style="padding-right: 20px"
+                              th:action="@{/jl/vehicle/query/vehicle/info}"
+                        >
+                            <div class="form-group">
+                                <label class="col-sm-3 col-md-2 control-label">
+                                    <label class="text-danger">*</label> 平台名称：
+                                </label>
+                                <div class=" col-sm-8 col-md-2">
+                                    <select class="form-control offOperatePlatform"
+                                            id="platformAssess" name="offOperatePlatform">
+                                        <option value="">请选择平台名称</option>
+                                    </select>
+                                </div>
+                                <label class="col-sm-3 col-md-2 control-label">
+                                    <label class="text-danger">*</label> 平台账号：
+                                </label>
+                                <div class=" col-sm-8 col-md-3">
+                                    <input type="text" class="form-control" id="accountNo" name="accountNo" placeholder="请输入平台账号"
+                                           autocomplete="off" maxlength="30">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 col-md-2 control-label">
+                                    <label class="text-danger">*</label> 时间类型：
+                                </label>
+                                <div class=" col-sm-8 col-md-2">
+                                    <select class="form-control" id="timeType" name="timeType">
+                                        <option value="1">年</option>
+                                        <option value="2">季</option>
+                                        <option value="3">月</option>
+                                        <option value="4">周</option>
+                                        <option value="5" selected>日</option>
+                                    </select>
+                                </div>
+                                <label class="col-sm-3 col-md-2 control-label">
+                                    <label class="text-danger">*</label> 时间：
+                                </label>
+                                <div class=" col-sm-8 col-md-3">
+                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                           class="form-control layer-date laydate-icon yearTimeInput"
+                                           id="yearTimeInput" name="time"
+                                           readonly disabled/>
+                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                           class="form-control layer-date laydate-icon quarterTimeInput"
+                                           id="quarterTimeInput" name="time"
+                                           readonly disabled/>
+                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                           class="form-control layer-date laydate-icon monthTimeInput"
+                                           id="monthTimeInput" name="time"
+                                           readonly disabled/>
+                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                           class="form-control layer-date laydate-icon weekTimeInput"
+                                           id="weekTimeInput" name="time"
+                                           readonly disabled/>
+                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                           class="form-control layer-date laydate-icon"
+                                           id="dateTimeInput" name="time"
+                                           readonly/>
+                                </div>
+                            </div>
+                            <div class="form-group pull-right">
+                                <button id="platformAssessDataSearch" type="button"
+                                        class="btn btn-primary search-btn"><i
+                                        class="glyphicon glyphicon-search"></i> 查询
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+            <div class="panel panel-default">
+                <div class="panel-heading" id="stretch8">
+                    <h3 class="panel-title fwb">数据下发结果</h3>
+                    <div class="actions pull-right listActions">
+                        <i class="fa chevron-down" id="stretch8-chevron"></i>
+                    </div>
+                </div>
+                <div class="panel-body fixed-table-body" id="stretch8-body">
+                    <table id="platformAssessDataTable"
+                           class="table table-striped table-bordered noCheckTable"
+                           cellspacing="0" width="100%">
+                        <tbody>
+                        <tr>
+                            <th class="text-center" colspan="8"><span style="font-size: 16px">平台考核信息</span></th>
+                        </tr>
+                        <tr>
+                            <th class="text-center">平台编号</th>
+                            <td class="text-center" id="pa-platformId">--</td>
+                            <th class="text-center">累计连接时间</th>
+                            <td class="text-center" id="pa-totalConnTime">--</td>
+                            <th class="text-center">中断连接次数</th>
+                            <td class="text-center" id="pa-disConnNumber">--</td>
+                            <th class="text-center">累计断开时间</th>
+                            <td class="text-center" id="pa-totalDisConnTime">--</td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">接入车辆数</th>
+                            <td class="text-center" id="pa-onlineVehicleNo">--</td>
+                            <th class="text-center">接入车辆占比</th>
+                            <td class="text-center" id="pa-onlineVehicleRate">--</td>
+                            <th class="text-center">维修响应时间</th>
+                            <td class="text-center" id="pa-repairRespondTime">--</td>
+                            <th class="text-center">报修车次数量</th>
+                            <td class="text-center" id="pa-repairVehicleNo">--</td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">报修车次数占接入车辆比例</th>
+                            <td class="text-center" id="pa-repairVehicleRate">--</td>
+                            <th class="text-center">软件完善相应</th>
+                            <td class="text-center" id="pa-softwareRespondRate">--</td>
+                            <th class="text-center">上传数据错误率</th>
+                            <td class="text-center" id="pa-uploadErrorRate">--</td>
+                            <th class="text-center">呼叫应答率</th>
+                            <td class="text-center" id="pa-callAnsweringRate">--</td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">企业满意度</th>
+                            <td class="text-center" id="pa-companySatisfactionDegree">--</td>
+                            <th class="text-center">投诉举报</th>
+                            <td class="text-center" id="pa-complaintNo">--</td>
+                            <th class="text-center">事故倒查时的信息完整性</th>
+                            <td class="text-center" id="pa-accidentsSolveRate">--</td>
+                            <th class="text-center" colspan="2"></th>
+
+                        </tr>
+                        <tr>
+                            <td id="platformAssessMessage" class="text-right" colspan="8">暂无数据</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div class="pull-right alarmSearchToolPanel">
+                        <button id="exportplatformAssessData" type="button" disabled
+                                class="btn btn-purple export-btn"><i
+                                class="glyphicon glyphicon-log-out"></i> 导出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,930 @@
+<form th:action="@{/m/basicinfo/monitoring/vehicle/edit.gsp}"
+      th:object="${result}" id="editForm" role="form" action="#"
+      method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改车辆信息</h4>
+        <style>
+            label.control-label {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="idStr" th:field="*{id}" type="text" hidden="true"/> <input
+                    th:value="*{bindId}" id="bindId" type="hidden"/>
+                <input th:field="*{deviceNumber}" type="text" hidden="true"/>
+                <input th:field="*{simcardNumber}" type="text" hidden="true"/>
+                <input th:field="*{assign}" type="text" hidden="true"/>
+                <input th:field="*{createDataTimeStr}" type="text" hidden="true"/>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        基本信息
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 车牌号：</label>
+                    <div class="col-md-4">
+                        <input name="brand" th:field="*{brand}" placeholder="请输入车牌号" type="text" id="editBrand"
+                               class="form-control"/>
+                        <input th:value="*{brand}" id="scn" type="hidden" onblur="this.value=this.value.toUpperCase()"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input th:field="*{groupName}" name="groupName"
+                               style="background-color: #fafafa; cursor: pointer;"
+                               class="form-control" id="zTreeCitySel" placeholder="请选择所属企业"
+                               type="text" value="" autocomplete="off"/> <span id="zTreeCitySelSpan"
+                                                                               class="fa fa-chevron-down form-control-feedback"
+                                                                               aria-hidden="true"></span> <input
+                            class="form-control hidden"
+                            name="groupId" id="groupId" th:field="*{groupId}"/>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <label id="error_label_edit" class="error" style="display: none;"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">别名：</label>
+                    <div class="col-md-4">
+                        <input name="aliases" th:field="*{aliases}" placeholder="请输入车辆别名" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">车主：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleOwner" th:field="*{vehicleOwner}" placeholder="请输入车主名称" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        <label class="text-danger">*</label> 车辆类别：
+                    </label>
+                    <div class="col-md-4">
+                        <select name="vehicleCategoryId" th:value="*{vehicleCategoryName}" placeholder="其他车辆"
+                                id="vehicleCategory"
+                                class="form-control">
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        <label class="text-danger">*</label> 车辆类型：
+                    </label>
+                    <div class="col-md-4">
+                        <select name="vehicleType" th:value="*{vehicleType}" placeholder="其他车辆" id="vehicleType"
+                                class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">车主电话：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleOwnerPhone" th:field="*{vehicleOwnerPhone}" placeholder="请输入车主电话"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">电话是否校验：</label>
+                    <div class="col-md-4">
+                        <select name="phoneCheck" th:field="*{phoneCheck}" placeholder="请输入车辆类型" id="phoneCheck"
+                                class="form-control">
+                            <option value="-1" selected>-请选择校验状态-</option>
+                            <option value="0">未校验</option>
+                            <option value="1">已校验</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">车辆颜色：</label>
+                    <div class="col-md-4">
+                        <select name="vehicleColor" th:field="*{vehicleColor}" placeholder="请选择车辆颜色"
+                                class="form-control">
+                            <option selected="selected" value="0">黑色</option>
+                            <option value="1">白色</option>
+                            <option value="2">红色</option>
+                            <option value="3">蓝色</option>
+                            <option value="4">紫色</option>
+                            <option value="5">黄色</option>
+                            <option value="6">绿色</option>
+                            <option value="7">粉色</option>
+                            <option value="8">棕色</option>
+                            <option value="9">灰色</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">车牌颜色：</label>
+                    <div class="col-md-4">
+                        <select name="plateColor" th:field="*{plateColor}" placeholder="请选择车牌颜色"
+                                class="form-control">
+                            <option value="1">蓝色</option>
+                            <option selected="selected" value="2">黄色</option>
+                            <option value="3">黑色</option>
+                            <option value="4">白色</option>
+                            <option value="5">绿色</option>
+                            <option value="94">渐变绿色</option>
+                            <option value="93">黄绿色</option>
+                            <option value="91">农黄</option>
+                            <option value="90">农蓝</option>
+                            <option value="92">农绿</option>
+                            <option value="9">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">燃料类型：</label>
+                    <div class="col-md-4">
+                        <select name="fuelType" th:value="*{fuelType}" class="form-control" id="fuelType"
+                                placeholder="请输入燃料类型">
+                            <optgroup label="柴油" id="dieselOil">
+                            </optgroup>
+                            <optgroup label="汽油" id="gasoline">
+                            </optgroup>
+                            <optgroup label="天然气" id="naturalGas">
+                                <!--  <option value="CNG">CNG</option> -->
+                            </optgroup>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">区域属性：</label>
+                    <div class="col-md-4">
+                        <select name="areaAttribute" th:field="*{areaAttribute}" placeholder="请选择区域属性"
+                                class="form-control">
+                            <option value="省内">省内</option>
+                            <option value="跨省">跨省</option>
+                            <option value="进京报备">进京报备</option>
+                        </select>
+                    </div>
+                </div>
+                <div data-toggle="distpicker">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">省、直辖市：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="province1">Province</label>
+                            <select class="form-control" th:field="*{province}" data-province="—— 省 ——" name="province"
+                                    id="province1"></select>
+                        </div>
+                        <label class="col-md-2 control-label">市、区：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="city1">City</label>
+                            <select class="form-control" th:value="*{city}" data-city="—— 市 ——" name="city"
+                                    id="city1"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">县：</label>
+                        <div class="col-md-4">
+                            <label class="sr-only" for="city1">County</label>
+                            <select class="form-control" th:value="*{county}" name="county" data-district="—— 县 ——"
+                                    id="county"></select>
+                        </div>
+                        <label class="col-md-2 control-label">运营类别：</label>
+                        <div class="col-md-4">
+                            <div style="position:relative;">
+                                <div class="input-group">
+                                    <input name="category" type="text"
+                                           class="form-control"
+                                           id="category" th:value="*{vehiclePurposeName}"
+                                           style="background: #fff !important;">
+                                    <div class="input-group-btn">
+                                        <button type="button"
+                                                class="btn btn-white dropdown-toggle"
+                                                data-toggle="dropdown">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right"
+                                            role="menu" style="width:100%!important">
+                                        </ul>
+                                    </div>
+                                </div>
+                                <input id="vehiclePurpose" name="vehiclePurpose" th:value="*{vehiclePurpose}"
+                                       hidden="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">所属行业：</label>
+                    <div class="col-md-4">
+                        <input type="text" th:value="*{tradeName}" id="tradeName" hidden>
+                        <select id="operation" class="form-control" name="tradeName">
+                            <option value="">请选择所属行业</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">车辆状态：</label>
+                    <div class="col-md-4">
+                        <select th:field="*{isStart}" name="isStart" class="form-control">
+                            <option value="1">启用</option>
+                            <option value="0">停用</option>
+                        </select> <input id="radionOn" type="text" hidden="true"/> <input
+                            id="radionOff" type="text" hidden="true"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">核定载人数：</label>
+                    <div class="col-md-4">
+                        <input id="numberLoad" th:field="*{numberLoad}" name="numberLoad" placeholder="请输入核定载人数"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">核定载质量：</label>
+                    <div class="col-md-4">
+                        <input name="loadingQuality" th:field="*{loadingQuality}" placeholder="请输入核定载质量" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">车辆保险单号：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleInsuranceNumber" th:field="*{vehicleInsuranceNumber}"
+                               placeholder="请输入车辆保险单号" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">车辆等级：</label>
+                    <div class="col-md-4">
+                        <input name="vehicleLevel" th:field="*{vehicleLevel}" placeholder="请输入车辆等级" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">技术等级有效期：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择有效期"
+                               id="technologyValidity" th:field="*{vehicleTechnologyValidity}"
+                               name="vehicleTechnologyValidity"/>
+                    </div>
+                    <label class="col-md-2 control-label">保养里程数(km)：</label>
+                    <div class="col-md-4">
+                        <input name="maintainMileage" th:field="*{maintainMileage}" placeholder="请输入保养里程数" maxlength="6"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">保养有效期：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择保养有效期"
+                               id="maintainValidity" th:field="*{maintainValidity}" name="maintainValidity"/>
+                    </div>
+                    <label class="col-md-2 control-label">车台安装日期：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" placeholder="请选择车台安装日期"
+                               id="vehiclePlatformInstallDate" th:field="*{vehiclePlatformInstallDate}"
+                               name="vehiclePlatformInstallDate"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input name="remark" th:field="*{remark}" placeholder="请输入备注" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">维修状态：</label>
+                    <div class="col-md-4">
+                        <label class="control-label radioLabel" style="margin-right: 20px">
+                            <input name="stateRepair" th:field="*{stateRepair}" value="1" type="radio"
+                                   style="vertical-align: -2px;"/> 是
+                        </label>
+                        <label class="control-label radioLabel">
+                            <input name="stateRepair" th:field="*{stateRepair}" checked value="0" type="radio"
+                                   style="vertical-align: -2px;"/> 否
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        运输证信息
+                    </label>
+                </div>
+                <div class="form-group contentHeader">
+                    <label class="col-md-2 control-label">道路运输证号：</label>
+                    <div class="col-md-4">
+                        <input id="roadTransportNumber" th:field="*{roadTransportNumber}" name="roadTransportNumber"
+                               placeholder="请输入道路运输证号"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                    <div class="col-md-6 control-label text-right">
+                        <span id="transportCertificate" class="info-span"
+                              style="cursor: pointer;"><font>显示更多</font><span class="fa fa-chevron-down"
+                                                                              aria-hidden="true"></span></span>
+                    </div>
+                </div>
+                <div id="transportCertificate-content" class="content" style="display: none">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">经营许可证号：</label>
+                        <div class="col-md-4">
+                            <input name="vehiclOperationNumber" th:field="*{vehiclOperationNumber}"
+                                   placeholder="请输入经营许可证号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">经营范围：</label>
+                        <div class="col-md-4">
+                            <select id="scopeBusiness" class="form-control selectpicker" multiple title="请选择经营范围">
+                            </select>
+                            <input id="scopeOfOperationInput" th:value="*{scopeBusinessIds}" type="hidden"/>
+                            <input id="scopeOfOperationVal" name="scopeBusiness" type="hidden"/>
+                            <input id="scopeOfOperationIds" name="scopeBusinessIds" type="hidden"/>
+                            <input id="scopeOfOperationCodes" name="scopeBusinessCodes" type="hidden"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">核发机关：</label>
+                        <div class="col-md-4">
+                            <input name="issuedAuthority" th:field="*{issuedAuthority}" placeholder="请输入核发机关"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">经营权类型：</label>
+                        <div class="col-md-4">
+                            <select name="managementType" th:field="*{managementType}" id="managementType"
+                                    class="form-control">
+                                <option value="-1">- 请选择经营权类型 -</option>
+                                <option value="0">国有</option>
+                                <option value="1">集体</option>
+                                <option value="2">私营</option>
+                                <option value="3">个体</option>
+                                <option value="4">联营</option>
+                                <option value="5">股份制</option>
+                                <option value="6">外商投资</option>
+                                <option value="7">港澳台及其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">道路运输证有效期起：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择道路运输证有效期起"
+                                   id="roadTransportValidityStart" th:field="*{roadTransportValidityStart}"
+                                   name="roadTransportValidityStart"/>
+                        </div>
+                        <label class="col-md-2 control-label">道路运输证有效期至：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择道路运输证有效期至"
+                                   id="roadTransportValidity" th:field="*{roadTransportValidity}"
+                                   name="roadTransportValidity"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">线路牌号：</label>
+                        <div class="col-md-4">
+                            <input name="lineNumber" th:field="*{lineNumber}" placeholder="请输入线路牌号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">始发地：</label>
+                        <div class="col-md-4">
+                            <input name="provenance" th:field="*{provenance}" placeholder="请输入始发地" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">途经站名：</label>
+                        <div class="col-md-4">
+                            <input name="viaName" th:field="*{viaName}" placeholder="请输入途经站名" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">终到地：</label>
+                        <div class="col-md-4">
+                            <input name="destination" th:field="*{destination}" placeholder="请输入终到地" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">始发站：</label>
+                        <div class="col-md-4">
+                            <input name="departure" th:field="*{departure}" placeholder="请输入始发站" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">路线入口：</label>
+                        <div class="col-md-4">
+                            <input name="routeEntry" th:field="*{routeEntry}" placeholder="请输入路线入口" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">终到站：</label>
+                        <div class="col-md-4">
+                            <input name="destinationStation" th:field="*{destinationStation}" placeholder="请输入终到站"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">路线出口：</label>
+                        <div class="col-md-4">
+                            <input name="exportRoute" th:field="*{exportRoute}" placeholder="请输入路线出口" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">每日发班次数：</label>
+                        <div class="col-md-4">
+                            <input name="dailyNumber" th:field="*{dailyNumber}" placeholder="请输入每日发班次数" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">提前提醒天数：</label>
+                        <div class="col-md-4">
+                            <input name="managementRemindDays" th:field="*{managementRemindDays}"
+                                   placeholder="请输入提前提醒天数" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">营运状态：</label>
+                        <div class="col-md-4">
+                            <select name="operatingState" th:field="*{operatingState}" id="operatingState"
+                                    class="form-control">
+                                <option value="0" selected>营运</option>
+                                <option value="1">停运</option>
+                                <option value="2">挂失</option>
+                                <option value="3">报废</option>
+                                <option value="4">歇业</option>
+                                <option value="5">注销</option>
+                                <option value="6">迁出(过户)</option>
+                                <option value="7">迁出(转籍)</option>
+                                <option value="8">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        行驶证信息
+                    </label>
+                </div>
+                <div class="form-group contentHeader">
+                    <!--<label class="col-md-2 control-label">行驶证号：</label>-->
+                    <!--<div class="col-md-4">-->
+                    <!--<input id="licenseNo" name="licenseNo" th:field="*{licenseNo}" placeholder="请输入行驶证号" type="text"-->
+                    <!--class="form-control"/>-->
+                    <!--</div>-->
+                    <label class="col-md-2 control-label">车架号：</label>
+                    <div class="col-md-4">
+                        <input name="chassisNumber" th:field="*{chassisNumber}" placeholder="请输入车架号" type="text"
+                               class="form-control"/>
+                    </div>
+                    <div class="col-md-6 control-label text-right">
+                        <span id="drivingLicense" class="info-span"
+                              style="cursor: pointer;"><font>显示更多</font><span class="fa fa-chevron-down"
+                                                                              aria-hidden="true"></span></span>
+                    </div>
+                </div>
+                <div id="drivingLicense-content" class="content" style="display: none">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">发动机号：</label>
+                        <div class="col-md-4">
+                            <input name="engineNumber" th:field="*{engineNumber}" placeholder="请输入发动机号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">使用性质：</label>
+                        <div class="col-md-4">
+                            <input name="usingNature" th:field="*{usingNature}" placeholder="请输入使用性质" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">品牌型号：</label>
+                        <div class="col-md-4">
+                            <input name="brandModel" th:field="*{brandModel}" placeholder="请输入品牌型号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">行驶证有效期起：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择行驶证有效期起"
+                                   id="registrationStartDate" th:field="*{registrationStartDate}"
+                                   name="registrationStartDate"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">行驶证有效期至：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择行驶证有效期至"
+                                   id="registrationEndDate" th:field="*{registrationEndDate}"
+                                   name="registrationEndDate"/>
+                        </div>
+                        <label class="col-md-2 control-label">行驶证发证日期：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择行驶证发证日期"
+                                   id="licenseIssuanceDate" th:field="*{licenseIssuanceDate}"
+                                   name="licenseIssuanceDate"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">行驶证登记日期：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择行驶证登记日期"
+                                   id="registrationDate" th:field="*{registrationDate}" name="registrationDate"/>
+                        </div>
+                        <label class="col-md-2 control-label">提前提醒天数：</label>
+                        <div class="col-md-4">
+                            <input name="registrationRemindDays" th:field="*{registrationRemindDays}"
+                                   placeholder="请输入提前提醒天数" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">备注：</label>
+                        <div class="col-md-4">
+                            <input name="registrationRemark" th:field="*{registrationRemark}" placeholder="请输入备注"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 freightTransport-box">
+                <div class="form-group contentHeader">
+                    <label class="col-md-2 control-label">
+                        货运信息
+                    </label>
+                    <div class="col-md-offset-4 col-md-6 control-label text-right">
+                        <span id="freightTransport" class="info-span"
+                              style="cursor: pointer;"><font>显示更多</font><span class="fa fa-chevron-down"
+                                                                              aria-hidden="true"></span></span>
+                    </div>
+                </div>
+                <div id="freightTransport-content" class="content" style="display: none">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">车辆品牌：</label>
+                        <div class="col-md-4">
+                            <input id="vehicleBrand" th:field="*{vehicleBrand}" name="vehicleBrand"
+                                   placeholder="请输入车辆品牌" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">车辆型号：</label>
+                        <div class="col-md-4">
+                            <input id="vehicleModel" th:field="*{vehicleModel}" name="vehicleModel"
+                                   placeholder="请输入车辆型号" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">车辆出厂日期：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择车辆出厂日期"
+                                   id="vehicleProductionDate" th:field="*{vehicleProductionDate}"
+                                   name="vehicleProductionDate"/>
+                        </div>
+                        <label class="col-md-2 control-label">首次上线时间：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择首次上线时间"
+                                   id="firstOnlineTime" th:field="*{firstOnlineTime}" name="firstOnlineTime"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">车辆购置方式：</label>
+                        <div class="col-md-4">
+                            <select name="purchaseWay" th:field="*{purchaseWay}" id="purchaseWay"
+                                    class="form-control">
+                                <option value="-1">- 请选择车辆购置方式 -</option>
+                                <option value="0">分期付款</option>
+                                <option value="1">一次性付清</option>
+                            </select>
+                        </div>
+                        <label class="col-md-2 control-label">校验有效期至：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择校验有效期至"
+                                   id="validEndDate" th:field="*{validEndDate}" name="validEndDate"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">执照上传数：</label>
+                        <div class="col-md-4">
+                            <input name="licenseNumbers" th:field="*{licenseNumbers}" placeholder="请输入执照上传数" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">总质量(kg)：</label>
+                        <div class="col-md-4">
+                            <input name="totalQuality" th:field="*{totalQuality}" placeholder="请输入总质量" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">准牵引总质量(kg)：</label>
+                        <div class="col-md-4">
+                            <input name="tractionTotalMass" th:field="*{tractionTotalMass}" placeholder="请输入准牵引总质量"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">外廓尺寸-长(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="profileSizeLong" th:field="*{profileSizeLong}" placeholder="请输入外廓尺寸-长"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">外廓尺寸-宽(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="profileSizeWide" th:field="*{profileSizeWide}" placeholder="请输入外廓尺寸-宽"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">外廓尺寸-高(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="profileSizeHigh" th:field="*{profileSizeHigh}" placeholder="请输入外廓尺寸-高"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">货厢内部尺寸-长(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="internalSizeLong" th:field="*{internalSizeLong}" placeholder="请输入货厢内部尺寸-长"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">货厢内部尺寸-宽(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="internalSizeWide" th:field="*{internalSizeWide}" placeholder="请输入货厢内部尺寸-宽"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">货厢内部尺寸-高(mm)：</label>
+                        <div class="col-md-4">
+                            <input name="internalSizeHigh" th:field="*{internalSizeHigh}" placeholder="请输入货厢内部尺寸-高"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">轴数：</label>
+                        <div class="col-md-4">
+                            <input name="shaftNumber" th:field="*{shaftNumber}" placeholder="请输入轴数" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">轮胎数：</label>
+                        <div class="col-md-4">
+                            <input name="tiresNumber" th:field="*{tiresNumber}" placeholder="请输入轮胎数" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">轮胎规格：</label>
+                        <div class="col-md-4">
+                            <input name="tireSize" th:field="*{tireSize}" placeholder="请输入轮胎规格" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 constructionMachinery-box">
+                <div class="form-group contentHeader">
+                    <label class="col-md-2 control-label">
+                        工程机械信息
+                    </label>
+                    <div class="col-md-offset-4 col-md-6 control-label text-right">
+                        <span id="constructionMachinery" class="info-span"
+                              style="cursor: pointer;"><font>显示更多</font><span class="fa fa-chevron-down"
+                                                                              aria-hidden="true"></span></span>
+                    </div>
+                </div>
+                <div id="constructionMachinery-content" class="content" style="display: none">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            <label class="text-danger">*</label>车主姓名：
+                        </label>
+                        <div class="col-md-4">
+                            <input id="vehicleOwnerName" th:field="*{vehicleOwnerName}" name="vehicleOwnerName"
+                                   placeholder="请输入车主姓名" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            <label class="text-danger">*</label>车主手机1：
+                        </label>
+                        <div class="col-md-4">
+                            <input id="ownerPhoneOne" th:field="*{ownerPhoneOne}" name="ownerPhoneOne"
+                                   placeholder="请输入车主手机1" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">车主手机2：</label>
+                        <div class="col-md-4">
+                            <input name="ownerPhoneTwo" th:field="*{ownerPhoneTwo}" placeholder="请输入车主手机2" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">车主手机3：</label>
+                        <div class="col-md-4">
+                            <input name="ownerPhoneThree" th:field="*{ownerPhoneThree}" placeholder="请输入车主手机3"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">车主座机：</label>
+                        <div class="col-md-4">
+                            <input name="ownerLandline" th:field="*{ownerLandline}" placeholder="请输入车主座机" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            <label class="text-danger">*</label>车辆子类型：
+                        </label>
+                        <div class="col-md-4">
+                            <select name="vehicleSubTypeId" th:value="*{vehicleSubTypeId}" id="vehicleSubTypeId"
+                                    class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            <label class="selfRespect-required text-danger" style="display: none;">*</label>自重(T)：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="selfRespect" th:field="*{selfRespect}" id="selfRespect" placeholder="请输入,精度0.1"
+                                   type="text"
+                                   class="form-control"/>
+                            <label id="selfRespect-error" class="error" style="display: none">请输入车辆自重</label>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            <label class="abilityWork-required text-danger" style="display: none;">*</label>工作能力(T)：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="abilityWork" th:field="*{abilityWork}" id="abilityWork" placeholder="请输入,精度0.1"
+                                   type="text"
+                                   class="form-control"/>
+                            <label id="abilityWork-error" class="error" style="display: none">请输入车辆工作能力</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">工作半径(m)：</label>
+                        <div class="col-md-4">
+                            <input name="workingRadius" th:field="*{workingRadius}" placeholder="请输入,精度0.1" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">机龄：</label>
+                        <div class="col-md-4">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" placeholder="请选择机龄"
+                                   id="machineAge" th:field="*{machineAge}" name="machineAge"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            品牌：
+                        </label>
+                        <div class="col-md-4">
+                            <select id="brandName" th:value="*{brandName}"
+                                    class="form-control">
+                            </select>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            机型：
+                        </label>
+                        <div class="col-md-4">
+                            <select name="brandModelsId" th:value="*{brandModelsId}" id="brandModelsId"
+                                    class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">初始里程(km)：</label>
+                        <div class="col-md-4">
+                            <input name="initialMileage" th:field="*{initialMileage}" placeholder="请输入,精度0.1"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">初始工时(h)：</label>
+                        <div class="col-md-4">
+                            <input name="initialWorkHours" th:field="*{initialWorkHours}" placeholder="请输入,精度0.1"
+                                   type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <table id="carInfoPhotoTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <th width="25%"></th>
+                        <th width="25%"></th>
+                        <th width="25%"></th>
+                        <th width="25%"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr id="carInfoPhotoTableFirstTr">
+                        <td align="center">
+                            <div id="localImag" style="padding: 0 5px">
+                                <img height="200px" id="preview" src="">
+                                <input id="vehiclephoto" name="vehiclePhoto" th:field="*{vehiclePhoto}"
+                                       type="hidden"/>
+                            </div>
+                        </td>
+                        <td align="center" id="transportNumberImage">
+                            <div style="padding: 0 5px">
+                                <img height="200px" id="transportNumberImageUrl" src="">
+                                <input id="transportNumberPhoto" name="transportNumberPhoto"
+                                       th:field="*{transportNumberPhoto}"
+                                       type="hidden"/>
+                            </div>
+                        </td>
+                        <td align="center" id="drivingLicenseFrontImage">
+                            <div style="padding: 0 5px">
+                                <img height="200px" id="drivingLicenseFrontImageUrl" src="">
+                                <input id="drivingLicenseFrontPhoto" name="drivingLicenseFrontPhoto"
+                                       th:field="*{drivingLicenseFrontPhoto}"
+                                       type="hidden"/>
+                            </div>
+                        </td>
+                        <td align="center" id="drivingLicenseDuplicateImage">
+                            <div style="padding: 0 5px">
+                                <img height="200px" id="drivingLicenseDuplicateImageUrl" src="">
+                                <input id="drivingLicenseDuplicatePhoto" name="drivingLicenseDuplicatePhoto"
+                                       th:field="*{drivingLicenseDuplicatePhoto}"
+                                       type="hidden"/>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <div class="inpFilePhoto" style="margin-top: 10px">
+                                <input type="file"
+                                       accept="image/gif,image/jpeg,image/jpg,image/png"
+                                       name="file" id="doc" style="width: 202px;"
+                                       onchange="vehicleEdit.setImagePreview();">
+                                <label class="changeFile" for="doc">载入车辆照片</label>
+                            </div>
+                        </td>
+                        <td align="center" id="transportNumberText">
+                            <span>运输证</span>
+                        </td>
+                        <td align="center" id="drivingLicenseFrontText">
+                            <span>行驶证正面</span>
+                        </td>
+                        <td align="center" id="drivingLicenseDuplicateText">
+                            <span>行驶证反面</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <input id="permissionEditTree" name="permissionEditTree" type="text"
+                   hidden="true"/>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<lable th:value="${result.province}" id="hiddenProvince"></lable>
+<lable th:value="${result.city}" id="hiddenCity"></lable>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script th:inline="javascript">
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var vehicleBrandNull = [[#{vehicle.brand.null}]];
+    var vehicleBrandError = [[#{vehicle.brand.error}]];
+    var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+    var publicSize6 = [[#{public.size6.length}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize15 = [[#{public.size15.length}]];
+    var publicSize17 = [[#{public.size17.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize24 = [[#{public.size24.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var publicNull = [[#{public.null}]];
+    var vehicleOwnerNull = [[#{vehicle.vehicleOwner.null}]];
+    var vehicleOwnerMaxlength = [[#{vehicle.vehicleOwner.maxlength}]];
+
+    var integerTwo = [[#{info.integer.two}]];//输入值范围0-99
+    var integerFour = [[#{info.integer.four}]];//输入值范围0-9999
+    var integerSix = [[#{info.integer.six}]];//输入值范围0-999999
+    var lengthFour = [[#{info.length.four}]];//输入范围1-10位
+    var lengthEight = [[#{info.length.eight}]];//输入范围1-8位
+    var lengthTen = [[#{info.length.ten}]];//输入范围1-10位
+    var lengthTwenty = [[#{info.length.twenty}]];//输入范围1-20位
+    var naturalNumber = [[#{info.natural.number}]];//输入类型为自然数
+    var minZero = [[#{info.min.zero}]];//输入类型为非负数
+    var decimalone = [[#{info.decimal.one}]];//精度0.1
+    var enNumberErr = [[#{OCR.vehicle.EnNumber}]];
+    var chEnNumberErr = [[#{OCR.vehicle.ChEnNumber}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="resources/js/vehicleEdit.js" th:src="@{/resources/js/vehicleEdit.js}"></script>
+

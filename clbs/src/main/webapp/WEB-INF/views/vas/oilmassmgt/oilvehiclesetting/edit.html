@@ -1,0 +1,548 @@
+<form th:action="@{/v/oilmassmgt/oilvehiclesetting/edit.gsp}" th:object="${result}"
+ id="editForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">油量管理设置修改</h4>
+	</div>
+      <div class="modal-body">
+      	<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<input id = "newId2"  th:field="*{newId2}" name = "newId2" type="hidden"/> 
+					<!-- curBox用于区分标定详情页面显示哪个油箱的数据 --> 
+					<input id = "curBox" type="hidden" />
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer"  th:field="*{brand}" name = "vehicleBrand" placeholder="请输入监控对象" class="form-control" readonly />
+						<input  th:field="*{vehicleId}" name = "vehicleId" type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label"> 参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands" >
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+                <div class="col-md-12">
+                       <div class="panel-heading">
+                           <div class="dropdown panel-title fwb">
+                               <ul class="nav nav-tabs">
+                                   <li class="active" id="TabFenceBox"><a href="#home1" data-toggle="tab">主油箱</a></li>
+                                   <li id="TabCarBox"><a href="#profile1" data-toggle="tab">副油箱</a></li>
+                               </ul>
+                           </div>
+                       </div>
+                       <div class="panel-body">
+                           <div class="tab-content">
+                           		<!-- 油箱1 -->
+							   <div class="form-group">
+								   <label class="col-sm-2 control-label">
+									   油箱基本参数
+								   </label>
+							   </div>
+                               <div class="tab-pane active" id="home1">
+                               <input th:field="*{id}" name = "id" type="hidden"/>
+                               	<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 油箱型号：
+									</label>
+									<div class="col-md-4">
+										<input type="hidden" name="oilBoxId" th:field="*{oilBoxId}" id="formOilBoxId" />
+										<div class="input-group">
+											<input  type="text" placeholder="请选择油箱型号" class="form-control" th:field="*{type}"  th:data-id="*{oilBoxId}" id="oilBoxId" >
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle" style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+									<div class="col-md-2 control-label text-right">
+										<span id="tankBasisInfo"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+									</div>
+								</div>
+								<div id="tankBasisInfo-content">
+									<div class="form-group">
+										<label class="col-md-2 control-label">油箱形状：</label>
+										<div class="col-md-4">
+											<select disabled id="shape" th:field="*{shape}" class="form-control">
+					                        	<option value="1" selected="selected">长方体</option>
+					                        	<option value="2">圆柱形</option>
+					                        	<option value="3">D形</option>
+					                        	<option value="4">椭圆形</option>
+					                        </select>
+					                        <input type="hidden" name="shape" id="shape1Hidden" />
+										</div>
+										<label class="col-md-2 control-label">长度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "boxLength" th:field="*{boxLength}" name = "boxLength"  class="form-control" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">宽度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "width" name = "width" th:field="*{width}"  class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">高度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "height" name = "height" th:field="*{height}"  class="form-control" />
+										</div>
+									</div>
+									<div class="form-group" id = "cuboidForm">
+										<label class="col-md-2 control-label">下圆角半径(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "buttomRadius" name = "buttomRadius" th:field="*{buttomRadius}" class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">上圆角半径(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "topRadius" name = "topRadius" th:field="*{topRadius}" class="form-control" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">壁厚(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "thickness" name = "thickness" th:field="*{thickness}" class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">理论容积(L)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "theoryVolume" name = "theoryVolume" th:field="*{theoryVolume}"  class="form-control" />
+										</div>
+									</div>
+										<div class="form-group">
+										<label class="col-md-2 control-label">油箱容量(L)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "realVolume" name = "realVolume" th:field="*{realVolume}"  class="form-control" />
+										</div>
+									</div>
+								</div>
+								<hr/>
+							    <div class="form-group">
+								    <label class="col-sm-2 control-label">
+										传感器基本参数
+								    </label>
+							    </div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+									</label>
+									<div class="col-md-4">
+										<input type="hidden" id="sensorType" name="sensorType" th:field="*{sensorType}" />
+										<div class="input-group">
+										<input  type="text" placeholder="请选择传感器型号" class="form-control" id="sensorNumber" th:field="*{sensorNumber}" th:data-id="*{sensorType}" >
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle" style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" id="sensorchance" role="menu" style="width:100%;">
+												</ul>
+											</div>	
+										</div>	
+									</div>
+									<label class="col-md-4"></label>
+									<div class="col-md-2 control-label text-right">
+										<span id="sensorBasisInfo"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+									</div>
+								</div>
+								<div id="sensorBasisInfo-content">
+									<div class="form-group">
+										<label class="col-md-2 control-label">传感器长度：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "sensorLength" th:field="*{sensorLength}"  name = "sensorLength"  class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">滤波系数：</label>
+										<div class="col-md-4">
+					                        <select disabled name="filteringFactor" th:field="*{filteringFactor}"  id = "filteringFactor"  class="form-control">      
+					                        	<option value="01">实时</option>                  	
+					                        	<option value="02" selected>平滑</option>                        	
+					                        	<option value="03">平稳</option>                        	
+					                       	</select>
+					                    </div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">波特率：</label>
+										<div class="col-md-4">
+					                        <select disabled name="baudRate" id = "baudRate" th:field="*{baudRate}"  class="form-control">                        	
+					                        	<option value="01">2400</option>
+												<option value="02">4800</option>
+												<option selected="selected" value="03">9600</option>
+												<option value="04">19200</option>
+												<option value="05">38400</option>
+												<option value="06">57600</option>
+												<option value="07">115200</option>
+					                       	</select>
+					                    </div>  
+					                    <label class="col-md-2 control-label">奇偶校验：</label>
+										<div class="col-md-4">
+					                        <select disabled name="oddEvenCheck" id = "oddEvenCheck" th:field="*{oddEvenCheck}"   class="form-control">                        	                        	
+					                        	<option value="1">奇校验</option>
+					                        	<option value="2">偶校验</option>   
+					                        	<option value="3" selected>无校验</option>                     	
+					                       	</select>
+					                    </div>   
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">补偿使能：</label>
+										<div class="col-md-4">
+					                       <select disabled name="compensationCanMake" id = "compensationCanMake" th:field="*{compensationCanMake}"   class="form-control">                        	
+					                        	<option value="1" selected>使能</option>
+					                        	<option value="2">禁用</option>                        	
+					                       	</select> 
+					                    </div>   
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+										class="text-danger">*</label> 标定组数：</label>
+									<div class="col-md-4">
+										<input type="text" id = "calibrationSets" name = "calibrationSets" th:field="*{calibrationSets}" placeholder="请输入2到50之间的整数" class="form-control" />
+										<input name="oilLevelHeights" id="oilLevelHeights" th:field="*{oilLevelHeights}" type="hidden" />
+				                        <input name="oilValues" id="oilValues" th:field="*{oilValues}" type="hidden" />
+				                        <input name="boxId" id="boxId" type="hidden" />
+									</div>
+									<label class="col-md-2 control-label">自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "automaticUploadTime" th:field="*{automaticUploadTime}" name="automaticUploadTime" 
+												class="form-control" style="background-color: #fafafa">
+												<option value="01">被动</option>
+												<option value="02">10</option>
+												<option value="03">20</option>
+												<option value="04">30</option>
+											</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "outputCorrectionCoefficientK" name = "outputCorrectionCoefficientK" th:field="*{outputCorrectionCoefficientK}" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "outputCorrectionCoefficientB" name = "outputCorrectionCoefficientB" th:field="*{outputCorrectionCoefficientB}" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">加油时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "addOilTimeThreshold" name = "addOilTimeThreshold" th:field="*{addOilTimeThreshold}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入加油时间阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">加油量阈值(L)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "addOilAmountThreshol" name = "addOilAmountThreshol" th:field="*{addOilAmountThreshol}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入加油量阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">漏油时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "seepOilTimeThreshold" name = "seepOilTimeThreshold" th:field="*{seepOilTimeThreshold}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入漏油时间阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">漏油量阈值(L)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "seepOilAmountThreshol" name = "seepOilAmountThreshol" th:field="*{seepOilAmountThreshol}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入漏油量阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<span style="float: left;">
+								        <a class="btn btn-primary" type="button" onclick="editOilVehicleSetting.setValue('1')" th:href="@{/v/oilmassmgt/fueltankmgt/import}" data-toggle="modal" data-target="#commonSmWin">
+								        	<strong>导入标定数据</strong>
+								        </a>
+								        <select class="btn btn-primary" id="chooseTemplate" style="height: 37px">
+							            	<option value="">--选择模板--</option>
+							            	<option value="1">AD值标定模板</option>
+							            	<option value="2">标尺标定模板</option>
+							            </select>
+										<a class="btn btn-primary" id="calculateBtn" type="button" onclick="editOilVehicleSetting.calculate1()">
+								        	<strong>计算标定</strong>
+								        </a>
+								        <a class="btn btn-primary" type="button" onclick="editOilVehicleSetting.setValue('1')" th:href="@{/v/oilmassmgt/fueltankmgt/calibrationDetail}" data-toggle="modal" data-target="#commonSmWin" >
+								            <strong>查看标定</strong>
+								        </a>
+							    	</span>
+							   </div>
+							</div>
+							<!-- 油箱2 -->
+							<div class="tab-pane" id="profile1">
+							<input th:field="*{id2}" name = "id2" type="hidden"/>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 油箱型号：
+									</label>
+									<div class="col-md-4">
+											<input type="hidden" name="oilBoxId2"  th:field="*{oilBoxId2}" id="formOilBoxId2" />
+										<div class="input-group">
+											<input  type="text" placeholder="请选择油箱型号" class="form-control" id="oilBoxId2" th:field="*{type2}" th:data-id="*{oilBoxId2}" >
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle" style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+									<div class="col-md-2 text-right control-label">
+										<span id="tankBasisInfoTwo"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+									</div>
+								</div>
+								<div id="tankBasisInfoTwo-content">
+									<div class="form-group">
+										<label class="col-md-2 control-label">油箱形状：</label>
+										<div class="col-md-4">
+											<select disabled id="shape2" th:field="*{shape2}" class="form-control">
+					                        	<option value="1" selected="selected">长方体</option>
+					                        	<option value="2">圆柱形</option>
+					                        	<option value="3">D形</option>
+					                        	<option value="4">椭圆形</option>
+					                        </select>
+					                        <input type="hidden" name="shape2" id="shape2Hidden" />
+										</div>
+										<label class="col-md-2 control-label">长度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "boxLength2" name = "boxLength2" th:field="*{boxLength2}"  class="form-control" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">宽度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "width2" name = "width2" th:field="*{width2}"  class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">高度(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "height2" name = "height2" th:field="*{height2}"  class="form-control" />
+										</div>
+									</div>
+									<div class="form-group" id = "cuboidForm2">
+										<label class="col-md-2 control-label">下圆角半径(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "buttomRadius2" name = "buttomRadius2" th:field="*{buttomRadius2}" class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">上圆角半径(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "topRadius2" name = "topRadius2" th:field="*{topRadius2}" class="form-control" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">壁厚(mm)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "thickness2" name = "thickness2" th:field="*{thickness2}"  class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">理论容积(L)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "theoryVolume2" name = "theoryVolume2" th:field="*{theoryVolume2}"  class="form-control" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">油箱容量(L)：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "realVolume2" name = "realVolume2" th:field="*{realVolume2}"  class="form-control" />
+										</div>
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+										传感器基本参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+									</label>
+									<div class="col-md-4">
+										<input type="hidden" id="sensorType2" name="sensorType2" th:field="*{sensorType2}" />
+										<div class="input-group">
+										<input  type="text" placeholder="请选择传感器型号" class="form-control" id="sensorNumber2" th:field="*{sensorNumber2}" th:data-id="*{sensorType2}" >
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle" style="height:36px" data-toggle="dropdown">
+												<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" id="sensorchance2" role="menu" style="width:100%;">
+												</ul>
+											</div>
+										</div>	
+									</div>
+									<label class="col-md-4"></label>
+									<div class="col-md-2 control-label text-right">
+										<span id="sensorBasisInfoTwo"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+									</div>
+								</div>
+								<div id="sensorBasisInfoTwo-content">
+									<div class="form-group">
+										<label class="col-md-2 control-label">传感器长度：</label>
+										<div class="col-md-4">
+											<input readonly="readonly" id = "sensorLength2" th:field="*{sensorLength2}"  name = "sensorLength2"  class="form-control" />
+										</div>
+										<label class="col-md-2 control-label">滤波系数：</label>
+										<div class="col-md-4">
+					                        <select disabled name="filteringFactor2" th:field="*{filteringFactor2}"  id = "filteringFactor2"  class="form-control">      
+					                        	<option value="01">实时</option>                  	
+					                        	<option value="02" selected>平滑</option>                        	
+					                        	<option value="03">平稳</option>                        	
+					                       	</select>
+					                    </div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">波特率：</label>
+										<div class="col-md-4">
+					                        <select disabled name="baudRate2" id = "baudRate2" th:field="*{baudRate2}"   class="form-control">                        	
+					                        	<option value="01">2400</option>
+												<option value="02">4800</option>
+												<option selected="selected" value="03">9600</option>
+												<option value="04">19200</option>
+												<option value="05">38400</option>
+												<option value="06">57600</option>
+												<option value="07">115200</option>
+					                       	</select>
+					                    </div>  
+					                    <label class="col-md-2 control-label">奇偶校验：</label>
+										<div class="col-md-4">
+					                        <select disabled name="oddEvenCheck2" id = "oddEvenCheck2" th:field="*{oddEvenCheck2}"   class="form-control">                        	                        	
+					                        	<option value="1">奇校验</option>
+					                        	<option value="2">偶校验</option>   
+					                        	<option value="3" selected>无校验</option>                     	
+					                       	</select>
+					                    </div>   
+									</div>
+									<div class="form-group">
+										<label class="col-md-2 control-label">补偿使能：</label>
+										<div class="col-md-4">
+					                       <select disabled name="compensationCanMake2" id = "compensationCanMake2" th:field="*{compensationCanMake2}"   class="form-control">                        	
+					                        	<option value="1" selected>使能</option>
+					                        	<option value="2">禁用</option>                        	
+					                       	</select> 
+					                    </div>   
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"><label
+										class="text-danger">*</label> 标定组数：</label>
+									<div class="col-md-4">
+										<input type="text" id = "calibrationSets2" name = "calibrationSets2" th:field="*{calibrationSets2}" placeholder="请输入2到50之间的整数" class="form-control" />
+										<input name="oilLevelHeights2" id="oilLevelHeights2" th:field="*{oilLevelHeights2}" type="hidden" />
+				                        <input name="oilValues2" id="oilValues2" th:field="*{oilValues2}" type="hidden" />
+				                        <input name="boxId2" id="boxId2" type="hidden" />
+									</div>
+									<label class="col-md-2 control-label">自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "automaticUploadTime2" th:field="*{automaticUploadTime2}" name="automaticUploadTime2" 
+												class="form-control" style="background-color: #fafafa">
+											<option value="01">被动</option>
+											<option value="02">10s</option>
+											<option value="03">20s</option>
+											<option value="04">30s</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "outputCorrectionCoefficientK2" name = "outputCorrectionCoefficientK2" th:field="*{outputCorrectionCoefficientK2}" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "outputCorrectionCoefficientB2" name = "outputCorrectionCoefficientB2" th:field="*{outputCorrectionCoefficientB2}" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">加油时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "addOilTimeThreshold2" name = "addOilTimeThreshold2" th:field="*{addOilTimeThreshold2}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入加油时间阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">加油量阈值(L)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "addOilAmountThreshol2" name = "addOilAmountThreshol2" th:field="*{addOilAmountThreshol2}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入加油量时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">漏油时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "seepOilTimeThreshold2" name = "seepOilTimeThreshold2" th:field="*{seepOilTimeThreshold2}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入漏油时间阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">漏油量阈值(L)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "seepOilAmountThreshol2" name = "seepOilAmountThreshol2" th:field="*{seepOilAmountThreshol2}" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入漏油油量时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<span style="float: left;">
+								        <a class="btn btn-primary" type="button" onclick="editOilVehicleSetting.setValue('2')" th:href="@{/v/oilmassmgt/fueltankmgt/import}" data-toggle="modal" data-target="#commonSmWin">
+								        	<strong>导入标定数据</strong>
+								        </a>
+								        <select class="btn btn-primary" id="chooseTemplate2" style="height: 37px">
+							            	<option value="">--选择模板--</option>
+							            	<option value="1">AD值标定模板</option>
+							            	<option value="2">标尺标定模板</option>
+							            </select>
+										<a class="btn btn-primary" id="calculateBtn2" type="button" onclick="editOilVehicleSetting.calculate2()">
+								        	<strong>计算标定</strong>
+								        </a>
+								        <a class="btn btn-primary" type="button" onclick="editOilVehicleSetting.setValue('2')" th:href="@{/v/oilmassmgt/fueltankmgt/calibrationDetail}" data-toggle="modal" data-target="#commonSmWin" >
+								            <strong>查看标定</strong>
+								        </a>
+							    	</span>
+							   </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+      </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmitBtn">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" id="closeWindow" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+<input id = "fuelTankList"  th:value="${fuelTankList}" type="hidden"/> 
+<input id = "rodSensorList"  th:value="${rodSensorList}" type="hidden"/>
+<input id="selectOilBox" th:value="${result.oilBoxId}" type="hidden"/>
+<input id="selectOilBox2" th:value="${result.oilBoxId2}" type="hidden"/>
+<input id="selectSensorType" th:value="${result.sensorType}" type="hidden"/>
+<input id="selectSensorType2" th:value="${result.sensorType2}" type="hidden"/>
+<input id="oilBoxType" th:value="${oilBoxType}" type="hidden" />
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+    var publicSize10=[[#{public.size10.length}]];
+    var phoneError = [[#{phone.error}]];
+    var publicNull = [[#{public.null}]];
+    var publicNumberInt = [[#{public.number.int}]];
+    var oilvehicleSetting200Length= [[#{oilvehicleSetting.1max200.length}]];
+    var oilvehicleSetting201Length = [[#{oilvehicleSetting.0max200.length}]];
+    var oilvehicleSettingMax300Length = [[#{ oilvehicleSetting.max300.length}]];
+</script>
+<script type="text/javascript" src="/resources/js/oilvehicleSettingEdit.js" th:src="@{/resources/js/oilvehicleSettingEdit.js}"></script>

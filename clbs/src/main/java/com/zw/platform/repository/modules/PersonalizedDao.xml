@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.PersonalizedDao">
+    <!-- 修改个性化页面 -->
+    <update id="updateLogo"
+            parameterType="com.zw.platform.domain.basicinfo.Personalized">
+        update zw_c_logo_config
+        <set>
+            <if test="loginLogo != null">
+                login_logo = #{loginLogo},
+            </if>
+            <if test="homeLogo != null">
+                home_logo = #{homeLogo},
+            </if>
+            <if test="videoBackground != null">
+                video_background = #{videoBackground},
+            </if>
+            <if test="webIco!=null">
+                web_ico =#{webIco},
+            </if>
+            <if test="topTitle != null">
+                top_title = #{topTitle},
+            </if>
+            <if test="copyright != null">
+                copyright = #{copyright},
+            </if>
+            <if test="websiteName != null">
+                website_name = #{websiteName},
+            </if>
+            <if test="recordNumber != null">
+                record_number = #{recordNumber},
+            </if>
+            <if test="frontPage != null">
+                front_page = #{frontPage},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+            <if test="serviceExpireReminder != null ">
+                service_expire_reminder = #{serviceExpireReminder},
+            </if>
+            <if test="loginBackground != null ">
+                login_background = #{loginBackground},
+            </if>
+            <if test="platformSite != null ">
+                platform_site = #{platformSite},
+            </if>
+            <if test="loginPersonalization != null ">
+                login_personalization = #{loginPersonalization},
+            </if>
+        </set>
+        where group_id =#{groupId} and flag = 1
+    </update>
+
+    <!-- 查询总数 -->
+    <select id="find" resultType="com.zw.platform.domain.basicinfo.Personalized">
+		SELECT * from zw_c_logo_config  
+		where group_id = #{groupId} and flag = 1
+	</select>
+
+    <!-- 通过平台网址查询个性化配置详情 -->
+    <select id="findByPlatformSite" resultType="com.zw.platform.domain.basicinfo.Personalized">
+		SELECT * from zw_c_logo_config
+		where platform_site = #{platformSite} and flag = 1
+	</select>
+    <!-- 新增个性化配置 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.Personalized">
+        INSERT into zw_c_logo_config (id,login_logo,home_logo,video_background,web_ico,top_title,copyright,website_name,
+        record_number,group_id,front_page,create_data_time,create_data_username,service_expire_reminder,
+        login_background,platform_site,login_personalization)
+		VALUES(#{id},#{loginLogo},#{homeLogo},#{videoBackground},#{webIco},#{topTitle},#{copyright},#{websiteName},
+		#{recordNumber},#{groupId},#{frontPage},#{createDataTime},#{createDataUsername},#{serviceExpireReminder},
+		#{loginBackground},#{platformSite},#{loginPersonalization})
+    </insert>
+    <!-- 新增个性化对象图标 -->
+    <insert id="addIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+		insert into zw_c_ico_config (id,ico_name,ico_url,defult_state,monitor_type,create_data_time,create_data_username)
+		VALUES(#{id},#{icoName},#{icoUrl},#{defultState},#{monitorType},#{createDataTime},#{createDataUsername})
+	</insert>
+    <!-- 修改个性化对象图标的类型 -->
+    <update id="updateIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+		UPDATE zw_c_ico_config set defult_state=#{defultState} where id=#{id}
+	</update>
+    <!-- 修改图标到车辆表 -->
+    <update id="updateVehicleIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_vehicle_info set vehicle_icon=#{vehicleIcon} where
+        flag = 1
+        and id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 修改图标到人员表 -->
+    <update id="updatePeopleIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_people_info set people_icon=#{peopleIcon} where
+        flag = 1
+        and id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 修改图标到物品表 -->
+    <update id="updateThingIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_thing_info set thing_icon=#{thingIcon} where
+        flag = 1
+        and id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 修改图标到车辆表 -->
+    <update id="deflutVehicleIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_vehicle_info set vehicle_icon="" where id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 修改图标到人员表 -->
+    <update id="deflutPeopleIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_people_info set people_icon="" where id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 修改图标到物品表 -->
+    <update id="deflutThingIco" parameterType="com.zw.platform.domain.basicinfo.Ico">
+        UPDATE zw_m_thing_info set thing_icon="" where id in
+        <foreach item="ids" collection="list" open="(" separator=","
+                 close=")">
+            #{ids}
+        </foreach>
+    </update>
+
+    <!-- 查询所有对象图标 -->
+    <select id="findIco" resultType="com.zw.platform.domain.basicinfo.Ico">
+		SELECT * from zw_c_ico_config where flag=1  ORDER BY defult_state desc,create_data_time desc 
+	</select>
+    <!-- 查询单个车辆图标 -->
+    <select id="findIcoByID" resultType="com.zw.platform.domain.basicinfo.Ico">
+		SELECT * from zw_c_ico_config where flag=1 and id=#{id} ORDER BY create_data_time desc 
+	</select>
+    <!-- 根据图标id获取图标名称 -->
+    <select id="getIcoNameById" resultType="String">
+		SELECT ico_name from zw_c_ico_config where flag = 1 and id = #{icoId}
+	</select>
+    <!-- 删除图标 -->
+    <delete id="delIco" parameterType="string">
+		DELETE from zw_c_ico_config where id=#{id}
+	</delete>
+    <select id="findObjectIcon" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Ico">
+		 SELECT DISTINCT
+		    sc.simcard_number as phone,B.plate_color AS plateColor,
+        	ic.ico_name vehicleTypeIcon,t.categoryIcon categoryIcon
+	        FROM
+		    zw_m_config A
+	        INNER JOIN zw_m_vehicle_info B ON A.vehicle_id=B.id  AND B.flag = 1
+	        LEFT JOIN zw_m_vehicle_type D ON D.id=B.vehicle_type AND D.flag = 1
+          LEFT JOIN zw_m_sim_card_info sc on A.sim_card_id= sc.id
+          LEFT JOIN zw_c_ico_config ic ON ic.id = B.vehicle_icon AND ic.flag =1
+			LEFT JOIN
+			(SELECT vc.*, ic1.ico_name categoryIcon FROM zw_m_vehicle_category vc
+				LEFT JOIN zw_c_ico_config ic1 ON ic1.id = vc.ico AND ic1.flag = 1) t
+			ON t.id = D.vehicle_category
+	        WHERE A.flag = 1
+		AND A.vehicle_id = #{id}
+		GROUP BY B.id
+	</select>
+
+    <select id="findSubTypeIcon" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Ico">
+          SELECT DISTINCT
+	      ic1.ico_name categoryIcon,ic.ico_name vehicleTypeIcon
+          FROM
+	      zw_m_vehicle_info B
+          LEFT JOIN zw_m_vehicle_type D ON D.id = B.vehicle_sub_type_id
+          AND D.flag = 1
+          LEFT JOIN zw_c_ico_config ic1 ON D.ico_id = ic1.id
+          LEFT JOIN zw_c_ico_config ic on B.vehicle_icon = ic.id
+          WHERE
+	      B.flag = 1
+          AND B.id = #{id}
+	</select>
+
+    <!-- 根据所属企业查询 -->
+    <select id="findByPermission" resultType="com.zw.platform.domain.basicinfo.Personalized">
+        SELECT DISTINCT c.*,r.perm_value frontPageUrl FROM zw_c_logo_config c
+        LEFT JOIN zw_c_resource r ON r.id = c.front_page AND r.flag = 1
+        LEFT JOIN zw_c_role_resource rr ON rr.resource_id = r.id AND rr.flag = 1
+        WHERE c.group_id = #{groupId} AND c.flag = 1
+        AND (
+            c.front_page = 'isHome' OR rr.role_id IN
+            <foreach item="item" collection="roleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        )
+    </select>
+
+    <!-- 获取车辆使用的图标文件名 -->
+    <select id="getVehicleUseIcoNames" parameterType="java.util.List"
+            resultType="com.zw.platform.domain.basicinfo.query.UseIco">
+        SELECT vi.id monitorId,vIco.ico_name monitorIcoName
+        ,vcIco.ico_name monitorCategoryIcoName,subIco.ico_name monitorSubTypeIcoName
+        FROM zw_m_vehicle_info vi
+        INNER JOIN zw_m_vehicle_type vt ON vt.id = vi.vehicle_type AND vt.flag = 1
+        INNER JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        LEFT JOIN zw_c_ico_config vcIco ON vcIco.id = vc.ico AND vcIco.flag = 1
+        LEFT JOIN zw_c_ico_config vIco ON vIco.id = vi.vehicle_icon AND vIco.flag = 1
+        LEFT JOIN zw_m_vehicle_type subVt ON subVt.id = vi.vehicle_sub_type_id AND subVt.flag = 1
+        LEFT JOIN zw_c_ico_config subIco ON subIco.id = subVt.ico_id AND subIco.flag = 1
+        WHERE vi.flag = 1
+        <if test="monitorIds != null and monitorIds.size > 0">
+            AND vi.id IN
+            <foreach collection="monitorIds" separator="," item="mid" index="index" open="(" close=")">
+                #{mid}
+            </foreach>
+        </if>
+        UNION
+        SELECT pi.id monitorId,ic.ico_name monitorIcoName,null,null
+        FROM zw_m_people_info pi
+        INNER JOIN zw_c_ico_config ic ON ic.id = pi.people_icon AND ic.flag = 1
+        WHERE pi.flag = 1
+        <if test="monitorIds != null and monitorIds.size > 0">
+            AND pi.id IN
+            <foreach collection="monitorIds" separator="," item="mid" index="index" open="(" close=")">
+                #{mid}
+            </foreach>
+        </if>
+        UNION
+        SELECT ti.id monitorId,ic.ico_name monitorIcoName,null,null
+        FROM zw_m_thing_info ti
+        INNER JOIN zw_c_ico_config ic ON ic.id = ti.thing_icon AND ic.flag = 1
+        WHERE ti.flag = 1
+        <if test="monitorIds != null and monitorIds.size > 0">
+            AND ti.id IN
+            <foreach collection="monitorIds" separator="," item="mid" index="index" open="(" close=")">
+                #{mid}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getVehicleUseIcoNamesByType"
+            resultType="com.zw.platform.domain.basicinfo.query.UseIco">
+    select vIco.ico_name monitorIcoName from zw_c_ico_config vIco where vIco.id = #{vehicleForm.vehicleIcon} AND vIco.flag = 1
+    UNION  select vcIco.ico_name monitorCategoryIcoName  from zw_m_vehicle_category vc
+        LEFT JOIN zw_c_ico_config vcIco ON vcIco.id = vc.ico AND vcIco.flag = 1 where vc.id = #{vehicleForm.vehicleCategoryId} AND vc.flag = 1
+    UNION select subIco.ico_name monitorSubTypeIcoName  from zw_m_vehicle_type subVt
+        LEFT JOIN zw_c_ico_config subIco ON subIco.id = subVt.ico_id AND subIco.flag = 1 where  subVt.id = #{vehicleForm.vehicleSubTypeId} AND subVt.flag = 1
+
+  </select>
+
+    <select id="getVidsBySubTypeId" parameterType="String" resultType="String">
+		SELECT id FROM zw_m_vehicle_info WHERE vehicle_sub_type_id = #{subTypeId}
+	</select>
+
+    <select id="getVidsByCategoryId" parameterType="String" resultType="String">
+		SELECT vi.id FROM zw_m_vehicle_info vi INNER JOIN zw_m_vehicle_type vt ON vt.id = vi.vehicle_type AND vt.flag = 1
+		WHERE vi.flag = 1 AND vt.vehicle_category = #{categoryId}
+	</select>
+</mapper>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.OBDVehicleTypeDao">
+
+    <!-- 页面查询 -->
+    <select id="findList" parameterType="com.zw.platform.util.common.BaseQueryBean"
+            resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select
+        id,`name`,`type`,code,description,initial
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and `name` like CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <!-- 新增 -->
+    <insert id="addVehicleType" parameterType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        insert into zw_m_obd_vehicle_type
+        (id,`name`,`type`,code,description,flag,create_data_time,create_data_username)
+        values
+        (#{id},#{name},#{type},#{code},#{description},#{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <!-- 根据id查询 -->
+    <select id="findVehicleTypeById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select
+        id,`name`,`type`,code,description,initial
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and id = #{id}
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateVehicleType" parameterType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        update zw_m_obd_vehicle_type
+        set
+        `name` = #{name},
+        `type` = #{type},
+        code = #{code},
+        description = #{description},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where flag = 1
+        and id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <update id="delete" parameterType="String">
+        update zw_m_obd_vehicle_type
+        set
+        flag = 0
+        where flag = 1
+        and id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 查询是否绑定设置 -->
+    <select id="findOBDSetting" parameterType="String" resultType="String">
+        select id
+        from zw_m_obd_setting
+        where flag = 1
+        and obd_vehicle_type_id = #{id}
+    </select>
+
+    <!-- 导出查询 -->
+    <select id="findExport" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id,`type`,`name`,code,description
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        <if test="query != null and query != ''">
+            and `name` like CONCAT('%',#{query},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <!-- 批量导入 -->
+    <insert id="addByBatch" parameterType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        insert into zw_m_obd_vehicle_type
+        (id,`name`,`type`,code,description,flag,create_data_time,create_data_username)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.name},#{item.type},#{item.code},
+            #{item.description},#{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 校验名称 -->
+    <select id="findByNameAndType" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and `name` = #{name}
+        and `type` = #{type}
+    </select>
+
+    <!-- 根据id查询 -->
+    <select id="findById" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id,`type`,`name`,code,description
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and id = #{id}
+    </select>
+
+    <!-- 校验code -->
+    <select id="findByCode" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id,`name`,`type`
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and `code` = #{code}
+    </select>
+
+    <select id="saveFaultCodes">
+        INSERT INTO
+        zw_m_obd_fault_info(id,monitor_id,fault_code,upload_time,description,flag,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="faultCodeList" item="item" separator=",">
+            (#{item.id},#{item.monitorId},#{item.faultCode},#{item.uploadTime},#{item.description},#{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </select>
+
+    <select id="findFaultCodeByVid" resultType="com.zw.platform.domain.statistic.info.FaultCodeInfo">
+        SELECT id,monitor_id,fault_code,upload_time,description
+        FROM zw_m_obd_fault_info fai WHERE fai.flag = 1
+        AND fai.monitor_id = #{id}
+        order by upload_time DESC limit 1
+    </select>
+
+    <select id="findFaultCodeInfoList" parameterType="com.zw.platform.domain.statistic.FaultCodeQuery"
+            resultType="com.zw.platform.domain.statistic.info.FaultCodeInfo">
+        SELECT fai.id,fai.monitor_id,fai.fault_code,DATE_FORMAT(fai.upload_time,'%Y-%m-%d %H:%i:%s') AS
+        uploadTime,fai.description,vt.name as obdName
+        FROM zw_m_obd_fault_info fai
+        inner join zw_m_obd_setting os on os.vehicle_id = fai.monitor_id and os.flag = 1
+        inner join zw_m_obd_vehicle_type vt on vt.id = os.obd_vehicle_type_id and vt.flag = 1
+        WHERE fai.flag = 1
+        AND fai.monitor_id IN
+        <foreach collection="monitorList" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+        AND fai.upload_time BETWEEN #{startDateTime} AND #{endDateTime}
+        order by upload_time DESC
+    </select>
+
+    <!-- 页面查询 -->
+    <select id="findAll" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select
+        id,`name`,`type`,code,description
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        order by create_data_time desc
+    </select>
+    <select id="getObdSensorInfoByMonitorId" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        SELECT
+            obdvt.`name`,obdvt.type,obdvt.`code`,obdvt.description,obdvt.initial
+        FROM
+            zw_m_obd_setting obdset
+        INNER JOIN zw_m_obd_vehicle_type obdvt ON obdset.obd_vehicle_type_id = obdvt.id
+        AND obdvt.flag = 1
+        WHERE
+            obdset.vehicle_id = #{monitorId}
+        AND obdset.flag = 1
+    </select>
+    <select id="getObdSensorInfoByMonitorIds" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        SELECT
+        obdvt.`name`,obdvt.type,obdvt.`code`,obdvt.description,obdvt.initial,obdset.vehicle_id
+        FROM
+        zw_m_obd_setting obdset
+        INNER JOIN zw_m_obd_vehicle_type obdvt ON obdset.obd_vehicle_type_id = obdvt.id
+        AND obdvt.flag = 1
+        WHERE obdset.flag = 1
+        and obdset.vehicle_id IN
+        <foreach collection="monitorIds" item="monitorId" separator="," open="(" close=")">
+            #{monitorId}
+        </foreach>
+    </select>
+    <select id="getBandObdSensorMonitorId" resultType="string">
+        SELECT
+            obdset.vehicle_id
+        FROM
+            zw_m_obd_setting obdset
+        INNER JOIN zw_m_obd_vehicle_type obdvt ON obdset.obd_vehicle_type_id = obdvt.id
+        AND obdvt.flag = 1
+        WHERE obdset.flag = 1
+    </select>
+
+    <select id="getByIds" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id, name, type, code, description, initial, create_data_time, create_data_username,
+        update_data_time, update_data_username
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getByFuzzyName" resultType="com.zw.platform.domain.basicinfo.form.OBDVehicleTypeForm">
+        select id, name, type, code, description, initial, create_data_time, create_data_username,
+        update_data_time, update_data_username
+        from zw_m_obd_vehicle_type
+        where flag = 1
+        and name like CONCAT('%',#{fuzzyName},'%')
+    </select>
+</mapper>

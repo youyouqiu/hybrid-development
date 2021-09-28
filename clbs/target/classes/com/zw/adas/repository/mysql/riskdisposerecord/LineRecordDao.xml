@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.LineRecordDao">
+
+    <insert id="insert"
+            parameterType="com.zw.adas.domain.report.deliveryLine.LineRecordDo">
+        INSERT INTO zw_m_809_line_record
+        (
+            id,
+            vehicle_id,
+            brand,
+            vehicle_color,
+            line_id,
+            line_uuid,
+            fence_config_id,
+            receive_time,
+            swift_number,
+            flag
+        )
+        values (
+            #{id},
+            #{vehicleId},
+            #{brand},
+            #{vehicleColor},
+            #{lineId},
+            #{lineUuid},
+            #{fenceConfigId},
+            #{receiveTime},
+            #{swiftNumber},
+            #{flag}
+        )
+    </insert>
+    <delete id="delete">
+        DELETE FROM zw_m_809_line_record
+        WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zw.adas.domain.report.deliveryLine.LineRecordDo">
+        UPDATE zw_m_809_line_record
+        <set>
+            <if test ='null != vehicleId'>vehicle_id = #{vehicleId},</if>
+            <if test ='null != brand'>brand = #{brand},</if>
+            <if test ='null != vehicleColor'>vehicle_color = #{vehicleColor},</if>
+            <if test ='null != lineId'>line_id = #{lineId},</if>
+            <if test ='null != lineUuid'>line_uuid = #{lineUuid},</if>
+            <if test ='null != fenceConfigId'>fence_config_id = #{fenceConfigId},</if>
+            <if test ='null != receiveTime'>receive_time = #{receiveTime},</if>
+            <if test ='null != flag'>flag = #{flag},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <select id="getById" resultType="com.zw.adas.domain.report.deliveryLine.LineRecordDo">
+        SELECT
+        *
+        FROM zw_m_809_line_record
+        WHERE id = #{id}
+    </select>
+
+    <select id="pageList" resultType="com.zw.adas.domain.report.deliveryLine.LineRecordDto">
+        SELECT
+        *
+        FROM zw_m_809_line_record
+        WHERE vehicle_id in
+        <foreach collection="query.monitorIds" item="monitorId" separator="," open="(" close=")">
+            #{monitorId}
+        </foreach>
+        and receive_time between  #{query.startTime} and #{query.endTime}
+        <if test ="null != query.simpleQueryParam and '' != query.simpleQueryParam">
+        and brand like CONCAT('%',#{query.simpleQueryParam},'%')
+        </if>
+        and flag = 1 order by receive_time desc
+    </select>
+</mapper>

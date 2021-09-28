@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.FluxSensorDao">
+    <!-- 查询流量传感器 -->
+    <select id="findSensor" parameterType="com.zw.platform.domain.vas.oilmgt.query.FluxSensorQuery"
+            resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+        SELECT DISTINCT * FROM zw_o_oil_wear
+        WHERE flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND oil_wear_number LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据id查询流量传感器 -->
+    <select id="findById" parameterType="String"
+            resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+        SELECT DISTINCT * FROM zw_o_oil_wear
+        WHERE flag = 1
+        AND id = #{id}
+    </select>
+
+    <!-- 根据number查询流量传感器 -->
+    <select id="findByNumber" parameterType="String"
+            resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+        SELECT DISTINCT * FROM zw_o_oil_wear
+        WHERE flag = 1
+        AND oil_wear_number = BINARY #{number}
+    </select>
+
+    <!-- 新增流量传感器 -->
+    <insert id="addFluxSensor" parameterType="com.zw.platform.domain.vas.oilmgt.form.FluxSensorForm">
+        insert into zw_o_oil_wear (id, oil_wear_number, device_number, parameter_length, baud_rate,
+        parity, inertia_comp_en, filter_factor, ranges, fuel_select, metering_schemes, flag, create_data_time,
+        create_data_username,remark)
+        values (#{id}, #{oilWearNumber}, #{deviceNumber}, #{parameterLength}, #{baudRate},
+        #{parity}, #{inertiaCompEn}, #{filterFactor}, #{ranges}, #{fuelSelect}, #{meteringSchemes}, #{flag},
+        #{createDataTime}, #{createDataUsername},#{remark})
+    </insert>
+
+    <!-- 批量新增流量传感器 -->
+    <insert id="addFluxSensorByBatch" parameterType="com.zw.platform.domain.vas.oilmgt.form.FluxSensorForm">
+        insert into zw_o_oil_wear (id, oil_wear_number, device_number, parameter_length, baud_rate,
+        parity, inertia_comp_en, filter_factor, ranges, fuel_select, metering_schemes, flag, create_data_time,
+        create_data_username,remark)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.oilWearNumber}, #{item.deviceNumber}, #{item.parameterLength}, #{item.baudRate},
+            #{item.parity}, #{item.inertiaCompEn}, #{item.filterFactor}, #{item.ranges}, #{item.fuelSelect},
+            #{item.meteringSchemes}, #{item.flag}, #{item.createDataTime}, #{item.createDataUsername},#{item.remark})
+        </foreach>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateFluxSensor" parameterType="com.zw.platform.domain.vas.oilmgt.form.FluxSensorForm">
+        update zw_o_oil_wear
+        set oil_wear_number = #{oilWearNumber},
+        baud_rate = #{baudRate},
+        parity = #{parity},
+        filter_factor = #{filterFactor},
+        inertia_comp_en = #{inertiaCompEn},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        remark=#{remark}
+        where id = #{id}
+    </update>
+
+    <!-- 删除（逻辑删除） -->
+    <update id="deleteFluxSensor" parameterType="String">
+        update zw_o_oil_wear
+        set flag = 0
+        where id = #{id}
+        and flag = 1
+    </update>
+
+    <!-- 删除关联关系（逻辑删除） -->
+    <update id="deleteFluxSensorBind" parameterType="String">
+        update zw_o_oil_wear_vehicle
+        set flag = 0
+        where oil_wear_id = #{sensorId}
+        and flag = 1
+    </update>
+
+    <!-- 删除关联关系（逻辑删除） -->
+    <update id="deleteFluxSensorBindByVehicleId" parameterType="String">
+        update zw_o_oil_wear_vehicle
+        set flag = 0
+        where vehicle_id = #{vehicleId}
+        and flag = 1
+    </update>
+    <select id="isExist" parameterType="String"
+            resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+        SELECT DISTINCT * FROM zw_o_oil_wear
+        WHERE flag = 1
+        AND oil_wear_number = #{number} and id <![CDATA[ <> ]]> #{id}
+    </select>
+    <select id="findOilWearByVid" parameterType="String" resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+        SELECT * from zw_o_oil_wear ow LEFT JOIN zw_o_oil_wear_vehicle ov on ow.id=ov.oil_wear_id where ow.id=#{id} and
+        ov.flag=1
+    </select>
+    <update id="deleteBatchFluxSensorBindByVehicleId">
+        update zw_o_oil_wear_vehicle
+        set flag = 0
+        where vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+        and flag = 1
+    </update>
+</mapper>

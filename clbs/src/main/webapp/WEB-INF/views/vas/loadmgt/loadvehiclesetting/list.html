@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>载重管理设置</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<style>
+.modal-footer .btn+.btn {margin: 0 0 3px 0;}
+</style>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+    	<div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">应用管理</li>
+                        <li class="active">载重管理</li>
+                        <li class="active">载重管理设置</li>
+                    </ul>
+                    <h1 class="h1 ">载重管理设置</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox oilMassVehicle"
+                         style="padding-right: 0px; padding-left: 0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">组织架构</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-9">
+                                        <input autocomplete="off" id="search_condition" name="search" class="form-control" style="margin-bottom: 10px;" type="text" placeholder="请输入分组名称" />
+                                    </div>
+                                    <div class="col-md-3 btnPadding">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group">
+                                                <button id="customizeColumnsTwo" style="padding-top:8px" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu alarmSettingDropdown protocol-dropdown-menu" role="menu" id="Ul-menu-text-v">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px; height:629px !important;">
+                                    <ul id="treeDemo" class="ztreee" style="height:615px !important;overflow:auto;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rightDataList" style="padding-right: 0px; padding-left: 10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">载重管理列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label>
+                                                	<input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" style="width: 300px" placeholder="请输入监控对象/载重传感器型号">
+                                                </label>
+                                                <button type="button" id="search_button" onclick="myTable.requestData()" class="btn btn-outline btn-default">搜索</button>
+                                                <input id="hiddenText" type="text" style="display: none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+											操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <li><a href="javascript:void(0);" id="send_model"><i class="glyphicon glyphicon-circle-arrow-down icoPaddingLeft"></i>批量下发</a></li>
+                                                <li><a href="#" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量解除</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right oilMassVehicleList">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i><span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTable" class="table table-striped table-bordered table-hover checkTable" cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th><input
+                                                type="checkbox" id="checkAll"></th>
+                                        <th>操作</th>
+                                        <th>下发状态</th>
+                                        <th>监控对象</th>
+                                        <th>所属企业</th>
+                                        <th>对象类型</th>
+                                        <th>载重编号</th>
+                                        <th>空载阈值</th>
+                                        <th>轻载阈值</th>
+                                        <th>满载阈值</th>
+                                        <th>超载阈值</th>
+                                        <th>传感器型号</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script th:inline="javascript">
+    var sendCommandComplete = [[#{send.command.complete}]];
+    var selectItem = [[#{select.item}]];
+    var systemError = [[#{system.error}]];
+    var publicNull = [[#{public.null}]];
+    var workHourLastTimeNull = [[#{workHour.lastTime.null}]];
+    var workHourLastTimeInteger = [[#{workHour.lastTime.integer}]];
+    var workHourLastTimeRange = [[#{workHour.lastTime.range}]];
+    var workHourThresholdVoltageNull = [[#{workHour.thresholdVoltage.null}]];
+    var workHourThresholdVoltageInteger = [[#{workHour.thresholdVoltage.integer}]];
+    var workHourThresholdVoltageRange = [[#{workHour.thresholdVoltage.range}]];
+    var workHourThresholdWorkFlowNull = [[#{workHour.thresholdWorkFlow.null}]];
+    var workHourThresholdWorkFlowInteger = [[#{workHour.thresholdWorkFlow.integer}]];
+    var workHourThresholdWorkFlowRange = [[#{workHour.thresholdWorkFlow.range}]];
+    var workHourThresholdStandbyAlarmNull = [[#{workHour.thresholdStandbyAlarm.null}]];
+    var workHourThresholdStandbyAlarmInteger = [[#{workHour.thresholdStandbyAlarm.integer}]];
+    var workHourThresholdStandbyAlarmRange = [[#{workHour.thresholdStandbyAlarm.range}]];
+    var workHourSmoothingFactorNull = [[#{workHour.smoothingFactor.null}]];
+    var workHourSmoothingFactorInteger = [[#{workHour.smoothingFactor.integer}]];
+    var workHourSmoothingFactorRange = [[#{workHour.smoothingFactor.range}]];
+    var workHourBaudRateCalculateNumberNull = [[#{workHour.baudRateCalculateNumber.null}]];
+    var workHourBaudRateCalculateNumberInteger = [[#{workHour.baudRateCalculateNumber.integer}]];
+    var workHourBaudRateCalculateNumberRange = [[#{workHour.baudRateCalculateNumber.range}]];
+    var workHourBaudRateThresholdNull = [[#{workHour.baudRateThreshold.null}]];
+    var workHourBaudRateThresholdInteger = [[#{workHour.baudRateThreshold.integer}]];
+    var workHourBaudRateThresholdRange = [[#{workHour.baudRateThreshold.range}]];
+    var workSpeedThresholdNull = [[#{workHour.speedThreshold.null}]];
+    var workSpeedThresholdInteger = [[#{workHour.speedThreshold.integer}]];
+    var workSpeedThresholdRange = [[#{workHour.speedThreshold.range}]];
+</script>
+<script src="/clbs/resources/js/loadManagementSettingList.js" ></script>
+<!--<script src="/clbs/resources/js/loadManagementSettingParameters.js"></script>-->
+</html>

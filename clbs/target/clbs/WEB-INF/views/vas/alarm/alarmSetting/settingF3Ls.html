@@ -1,0 +1,183 @@
+<form th:action="@{/a/alarmSetting/setting.gsp}" id="settingForm" role="form" action="#" method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">报警参数设置</h4>
+	</div>
+      <div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<input id="referVehicleList" th:value="${referVehicleList}" type="hidden" />
+				<input id="f3PointAlarmList" th:value="${f3PointAlarmList}" type="hidden" />
+				<input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+				<div class="form-group">
+					<input id = "curBox" type="hidden" />
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer"  th:value="${vehicle.brand}" name = "brand" placeholder="请输入监控对象" class="form-control" readonly />
+						<input  th:field="${vehicle.id}" id="vehicleId" name = "vehicleId" type="text" hidden="false"/>
+					</div>
+					<label class="col-md-2 control-label"> 参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+                <div class="col-md-12">
+                       <div class="panel-heading">
+                           <div class="dropdown panel-title fwb">
+                               <ul class="nav nav-tabs">
+                                   <li class="active" id="TabCarBox"><a href="#home1" data-toggle="tab">F3超长待机</a></li>
+                                   <li id="TabCarBox"><a href="#home2" data-toggle="tab">平台报警</a></li>
+                               </ul>
+                           </div>
+                       </div>
+                       <div class="panel-body">
+                          <div class="tab-content">
+							<div id="home1" class="tab-pane active">
+								<div class="col-md-12">
+									<ul class="widget-todo">
+										<div id="textinfo"><span class="noneset">无</span><span class="partset" style="margin-left:2px;">局部</span><span class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+										<div id="textline"><span style="margin-left:-2px;">|</span><span style="margin-left:3px;">|</span><span style="margin-left:4px;"> | </span></div>
+										<li class="clearfix" th:each="alarmType:${f3longAlarmList}">
+											<div class="form-group">
+												<div class="col-md-2">
+													<div th:if = "${alarmType.paramCode == 'param1'}">
+														<div  class="leftselectbutton">
+			 												<input name="selectinfo" class="selectvalue" hidden="true"  th:value="${alarmType.alarmPush}" th:id="${alarmType.id}"/>
+															<span class="selectbutton" style="width:20px;height:20px;position:absolute;left:24px;top:7px;"></span>
+															<span class="button1" style="position:absolute;top:7px;width:20px;height:20px;left:24px;cursor:pointer;"></span>
+															<span class="button2" style="position:absolute;top:7px;width:20px;height:20px;left:70px;cursor:pointer;"></span>
+													        <span class="button3" style="position:absolute;top:7px;width:20px;height:20px;left:118px;cursor:pointer;"></span>
+												        </div>
+											        </div>
+											        <div th:if = "${alarmType.paramCode != 'param1'}">
+														<div  class="leftselectbutton" hidden = "true">
+			 												<input name="selectinfo" class="selectvalue" hidden="true"  th:value="${alarmType.alarmPush}" th:id="${alarmType.id}"/>
+			 												<span class="selectbutton" style="width:20px;height:20px;position:absolute;left:24px;top:7px;"></span>
+															<span class="button1" style="position:absolute;top:7px;width:20px;height:20px;left:24px;cursor:pointer;"></span>
+															<span class="button2" style="position:absolute;top:7px;width:20px;height:20px;left:70px;cursor:pointer;"></span>
+													        <span class="button3" style="position:absolute;top:7px;width:20px;height:20px;left:118px;cursor:pointer;"></span>
+														</div>
+													</div>
+												</div>
+										        <div class="col-md-2 alarmSet">
+													<div class="checkbox-outline" th:if = "${alarmType.paramCode == 'param1'}"> 
+														<label class="typeName" readonly style="text-decoration: none;" th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>	
+													</div>
+										        </div>
+												<div class="col-md-8 alarmLeftPadding">
+													<div class="checkbox-outline" th:if = "${alarmType.sendFlag == '1'}">
+														<div class="col-md-4 alarmLeftPadding">
+															<input type = "text" id = "parameterValue" th:value="${alarmType.parameterValue}" name = "parameterValue" 
+																placeholder="请输入参数值" class="form-control" onkeyup= "value=value.replace(/[^\d]/g,'')"/> 
+														</div>
+														<label class="col-md-6 alarmLeftPadding" readonly style="text-decoration: none;padding-top:7px;" th:text="${alarmType.description}"></label>
+													</div>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div id="home2" class="tab-pane">
+								<div class="col-md-12">
+									<ul class="widget-todo">
+										<div id="textinfo"><span class="noneset">无</span><span class="partset" style="margin-left:2px;">局部</span><span class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+										<div id="textline"><span style="margin-left:-2px;">|</span><span style="margin-left:3px;">|</span><span style="margin-left:4px;"> | </span></div>
+										<li class="clearfix" th:each="alarmType:${f3longPlatAlarmList}">
+											<div class="form-group">
+												<div class="col-md-2">
+													<div th:if = "${alarmType.paramCode == 'param1'}">
+														<div  class="leftselectbutton">
+			 												<input name="selectinfo" class="selectvalue" hidden="true"  th:value="${alarmType.alarmPush}" th:id="${alarmType.id}"/>
+															<span class="selectbutton" style="width:20px;height:20px;position:absolute;left:24px;top:7px;"></span>
+															<span class="button1" style="position:absolute;top:7px;width:20px;height:20px;left:24px;cursor:pointer;"></span>
+															<span class="button2" style="position:absolute;top:7px;width:20px;height:20px;left:70px;cursor:pointer;"></span>
+													        <span class="button3" style="position:absolute;top:7px;width:20px;height:20px;left:118px;cursor:pointer;"></span>
+												        </div>
+											        </div>
+											        <div th:if = "${alarmType.paramCode != 'param1'}">
+														<div  class="leftselectbutton" hidden = "true">
+			 												<input name="selectinfo" class="selectvalue" hidden="true"  th:value="${alarmType.alarmPush}" th:id="${alarmType.id}"/>
+			 												<span class="selectbutton" style="width:20px;height:20px;position:absolute;left:24px;top:7px;"></span>
+															<span class="button1" style="position:absolute;top:7px;width:20px;height:20px;left:24px;cursor:pointer;"></span>
+															<span class="button2" style="position:absolute;top:7px;width:20px;height:20px;left:70px;cursor:pointer;"></span>
+													        <span class="button3" style="position:absolute;top:7px;width:20px;height:20px;left:118px;cursor:pointer;"></span>
+														</div>
+													</div>
+												</div>
+												<div class="col-md-2 alarmSet">
+													<div class="checkbox-outline" th:if = "${alarmType.paramCode == 'param1'}"> 
+														<label class="typeName" readonly style="text-decoration: none;" th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>	
+													</div>
+										        </div>
+										        <div class="col-md-8 alarmLeftPadding">
+													<div class="checkbox-outline" th:if = "${alarmType.id == '5b9b6he9-bc26-11e6-a4a6-cec0c932ce01'}">
+														<div class="col-md-4 alarmLeftPadding">
+															<input type = "text" id = "parameterValue" th:value="${alarmType.parameterValue}" name = "parameterValue" 
+																placeholder="请输入参数值" class="form-control" min="10" max="50" onkeyup= "value=value.replace(/[^\d]/g,'')"/>
+														</div>
+														<label class="col-md-6 alarmLeftPadding" readonly style="text-decoration: none;padding-top:7px;" th:text="${alarmType.description}"></label>
+													</div>
+												</div>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+							<input id="checkedParams" name="checkedParams" type="hidden" />
+							<input id="deviceType" name="deviceType" type="hidden" />
+						</div>
+					</div>
+				</div>
+			</div>
+      </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" onclick="alarmSettings.doSubmit()">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+</script>
+<script src="/resources/js/alarmSettingF3Ls.js" th:src="@{/resources/js/alarmSettingF3Ls.js}"></script>
+<style>
+ .selectbutton{
+ display:inline-block;height:20px;width:20px;background-color:#6ED1F9;border-radius:50%;z-index:9999;box-shadow:1px 1px 1px #C6C6C6;}
+ #textinfo span{
+ display:inline-block;
+ width:43px;
+ height:20px;
+ text-align:center;
+ }
+  #textline span{
+ display:inline-block;
+ width:43px;
+ height:10px;
+ text-align:center;
+ overflow:hidden;
+ }
+ .leftselectbutton{
+    background-image:url(../../resources/img/slipbutton.svg);width:120px;height:30px;background-repeat:no-repeat;
+ background-position:15px 14px;
+ }
+ </style>

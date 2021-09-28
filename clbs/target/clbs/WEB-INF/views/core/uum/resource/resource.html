@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>导航栏管理</title>
+	<div th:replace="fragments/header">header</div>
+	<style>
+		.priority-group input{
+			vertical-align: -2px;
+		}
+		.priority-group .control-label{
+			padding-top: 0;
+		}
+		#list{
+			height: 60%;
+		}
+	</style>
+	<script src="/clbs/resources/js/zTree/js/jquery.ztree.core.js" type="text/javascript"></script>
+	<script src="/clbs/resources/js/zTree/js/jquery.ztree.excheck.js" type="text/javascript"></script>
+	<script src="/clbs/resources/js/zTree/js/jquery.ztree.exedit.js" type="text/javascript"></script>
+	<script src="/clbs/resources/js/zTree/js/jquery.ztree.exhide.js" type="text/javascript"></script>
+	<script src="/clbs/resources/js/zTree/js/ztreeSearch.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="modal-header">
+	<button type="button" id="doXAdd" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+	<h4 class="modal-title">导航栏管理</h4>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<label class="col-md-3 control-label"> 导航栏：</label>
+				<div class="col-md-7">
+					<div class="treeArea">
+						<ul id="permissionDemo" name="fenceTree" class="ztree"></ul>
+					</div>
+				</div>
+			</div>
+		<div class="form-group">
+			<div class="col-md-7">
+				<input type="button" value="添加" class="btn" id = "add" />
+				<input type="button" value="修改" class="btn" id = "update" />
+				<input type="button" value="删除" class="btn" id="delete"/>
+			</div>
+		</div>
+	</div>
+		<div id="list" style="display: none;">
+			<div class="col-md-12">
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+							class="text-danger">*</label> 导航栏名称： </label>
+					<div class="col-md-7">
+						<input name="roleName" placeholder="请输入导航栏名称" type="text" id = "name"
+							   class="form-control" />
+					</div>
+				</div>
+
+				<!--<div  class="form-group">-->
+					<!--<label class="col-md-3 control-label"><label-->
+					<!--class="text-danger">*</label> 请选择父导航栏 </label>-->
+					<!--<div class="col-md-7">-->
+						<!--<select class="select">-->
+						<!--<option value="全部">全部</option>-->
+						<!--</select>-->
+					<!--</div>-->
+				<!--</div>-->
+
+			</div>
+			<div class="col-md-12">
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+							class="text-danger"></label>资源类型</label>
+					<div class="col-md-7">
+						<select id="type">
+							<option value="0">有链接</option>
+							<option value="1">无链接</option>
+						</select>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+							class="text-danger"></label>父导航栏</label>
+					<div class="col-md-7">
+						<select id="daohang">
+							<option value="0">全部</option>
+						</select>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<label class="col-md-3 control-label"><label
+						class="text-danger"></label> 链接 </label>
+				<div class="col-md-7">
+					<input name="roleName" placeholder="" type="text" id="permValue"
+						   class="form-control" />
+				</div>
+			</div>
+			<div class="col-md-12">
+				<label class="col-md-3 control-label"><label
+						class="text-danger"></label> 描述 </label>
+				<div class="col-md-7">
+					<input name="roleName" placeholder="" type="text" id="description"
+						   class="form-control" />
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+					class="text-danger"></label> 编码： </label>
+					<div class="col-md-7">
+						<input name="roleName" placeholder="请输入编码" type="text" id="codeNum"
+						class="form-control" />
+					</div>
+				</div>
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+					class="text-danger"></label> 图标： </label>
+					<div class="col-md-7">
+						<input name="roleName" placeholder="请输入图标" type="text" id="iconCls"
+						class="form-control" />
+					</div>
+				</div>
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+							class="text-danger"></label> 是否可编辑 </label>
+					<div class="col-md-7">
+						<input name="roleName" type="checkbox" id = "editable"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div  class="form-group">
+					<label class="col-md-3 control-label"><label
+							class="text-danger"></label> 是否可用 </label>
+					<div class="col-md-7">
+						<input name="roleName"  type="checkbox" id="enabled"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<label class="col-md-3 control-label"><label
+						class="text-danger">*</label> 排序： </label>
+				<div class="col-md-7">
+					<input name="roleName" placeholder="" type="number" id="sortOrder"
+						   class="form-control" />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button id="doSubmitAdd" class="btn btn-primary" type="button">
+					<strong>提 交</strong>
+				</button>
+				<button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+					<strong>关 闭</strong>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+<script type="text/javascript">
+    //是否显示导航栏的信息
+    function displayGroup(is,lujing){
+        showList(is);
+        if(lujing!=""){
+            url = lujing;
+		}
+    };
+
+    function showList(is){
+		if(is){
+            $("#list").show();
+		}else{
+            $("#list").hide();
+		}
+	}
+	// 请求的路径
+    var url = "";
+	var type = true;
+	var thisid = "";
+	var updatepid = "";
+	//删除
+	$("#delete").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/clbs/r/resource/deleteResource",
+            data:{
+                id:getIdByNode()
+            },
+            dataType: "json",
+            success: function (data) {
+                if(data.success = true){
+                    alert(data.msg);
+                    location.reload();
+                }else{
+                    alert(data.msg);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    });
+	//根据ID获取信息
+    $("#update").click(function(){
+        thisid = getIdByNode();
+        if(thisid==undefined){
+			return ;
+		}
+        showList(true);
+        $.ajax({
+            type: "GET",
+            url: "/clbs/r/resource/findById",
+            data:{
+                id:thisid
+            },
+            dataType: "json",
+            success: function (data) {
+                if(data.success = true){
+                    url = "/clbs/r/resource/updateResource";
+                    var obj = data.obj;
+                    console.log(obj)
+                    $("#name").val(obj.resourceName);
+                    $("#permValue").val(obj.permValue);
+                    $("#codeNum").val(obj.codeNum);
+                    $("#iconCls").val(obj.iconCls);
+                    $("#sortOrder").val(obj.sortOrder);
+                    $("#description").val(obj.description);
+                    if(obj.editable==1){
+                        $("#editable").attr("checked","true");
+                    }
+                    if(obj.enabled==1){
+                        $("#enabled").attr("checked","true");
+                    }
+                    if(obj.parentId!=null&&obj.parentId!=""){
+                        $("#daohang").val(obj.parentId);
+					}
+                    $("#type").val(obj.type);
+                }else{
+                    alert(data.msg);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+
+    });
+	//如果是点击了添加按钮则上面导航栏不是必填选项
+	$("#add").click(function(){
+	    showList(true);
+	    type = false;
+	    if(getIdByNode()!=null){
+            $("#daohang").val(getIdByNode());
+		}
+	    url = "/clbs/r/resource/addResource";
+	});
+    $("#doCloseAdd").click(function(){
+        $("#list").hide();
+    });
+    //获取单选的ID
+    function getIdByNode(){
+        var checkNodes = $.fn.zTree.getZTreeObj("permissionDemo").getCheckedNodes(true);
+        if (checkNodes != null && checkNodes.length > 0) {
+            return checkNodes[0].id;
+        }
+	}
+    //获取单选的PID
+    function getPIdByNode(){
+        var checkNodes = $.fn.zTree.getZTreeObj("permissionDemo").getCheckedNodes(true);
+        if (checkNodes != null && checkNodes.length > 0) {
+            return checkNodes[0].parentId;
+        }else{
+            alert("导航栏必须选择");
+        }
+    }
+
+    // window.onload = function(){
+        var roleAdd = {
+            //初始化
+            init: function(){
+                //操作权限
+                var setpermission = {
+                    async : {
+                        url : "/clbs/r/resource/roleList",
+                        type : "get",
+                        enable : true,
+                        // autoParam : [ "id" ],
+                        dataType : "json",
+                    },
+                    check : {
+                        enable : true,
+                        chkStyle : "radio",
+                        // chkboxType : {
+                        //     "Y" : "ps",
+                        //     "N" : "ps"
+                        // },
+                        radioType : "all"
+                    },
+                    view : {
+                        dblClickExpand : false
+                    },
+                    data : {
+                        simpleData : {
+                            enable : true
+                        }
+                    },
+                    callback : {
+                        beforeClick : roleAdd.beforeClickPermission,
+                        beforeCheck: roleAdd.zTreeBeforeCheck,
+                        onCheck : roleAdd.onCheckPermission
+                    }
+                }
+                $.fn.zTree.init($("#permissionDemo"), setpermission, null);
+                $(".modal-body").addClass("modal-body-overflow");
+            },
+            zTreeBeforeCheck: function(treeId, treeNode){
+                var flag;
+                var zTree = $.fn.zTree.getZTreeObj("permissionDemo");
+                if(treeNode.isParent){
+                    flag = true;
+                }else{
+                    flag = false;
+                    zTree.checkNode(treeNode, !treeNode.checked, !treeNode.checked);
+                };
+                return flag;
+            },
+            beforeClickPermission: function(treeId, treeNode){
+                var zTree = $.fn.zTree.getZTreeObj("permissionDemo");
+                zTree.checkNode(treeNode, !treeNode.checked, true, true);
+                return false;
+            },
+            onCheckPermission: function(e, treeId, treeNode){
+                if(!treeNode.isParent){
+                    return false;
+                };
+                var zTree = $.fn.zTree.getZTreeObj("permissionDemo");
+                var nodes = zTree.getCheckedNodes(true);
+                var v = "";
+                for (var i = 0, l = nodes.length; i < l; i++) {
+                    v += nodes[i].name + ",";
+                };
+            },
+            //提交
+            doSubmit: function(){
+                var id = "";
+                var pid = "";
+                //修改
+                if(type){
+                    id =  thisid;
+                    pid = $("#daohang").val();
+				}
+                var checkNodes = $.fn.zTree.getZTreeObj("permissionDemo").getCheckedNodes(true);
+                if (checkNodes != null && checkNodes.length > 0) {
+                    //添加
+                    if(!type){
+                        pid = checkNodes[0].id;
+					}
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+					data:{
+                        id:id,
+                        parentId:pid,
+                        resourceName:$("#name").val(),
+                        permValue:$("#permValue").val(),
+                        codeNum:$("#codeNum").val(),
+                        iconCls:$("#iconCls").val(),
+                        sortOrder:$("#sortOrder").val(),
+                        description:$("#description").val(),
+                        permValue:$("#permValue").val(),
+                        permValue:$("#permValue").val(),
+                        editable:$("#editable").is(':checked')?1:0,
+                        enabled:$("#enabled").is(':checked')?1:0,
+                        type: $("#type").val()
+					},
+                    success: function (result) {
+                        if(result.success){
+                            if(type){
+                                alert("修改成功");
+							}else{
+                                alert("添加成功");
+							}
+                            location.reload();
+                        }else{
+                            alert(result.msg);
+						}
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+                return ;
+                $("#permissionTree").val(JSON.stringify(list));
+                if(roleAdd.validates()){
+                    $("#addForm").ajaxSubmit(function(data) {
+                        if (data != null) {
+                            var result = $.parseJSON(data);
+                            if (result.success) {
+                                if (result.obj.flag == 1){
+                                    $("#commonSmWin").modal("hide");
+                                    layer.msg("添加成功！",{move:false});
+                                    myTable.requestData();
+                                }else{
+                                    layer.msg(result.obj.errMsg,{move:false});
+                                }
+                            }else{
+                                layer.msg(result.msg,{move:false});
+                            }
+                        }
+                    });
+                }
+            },
+            //校验
+            validates: function(){
+                return $("#addForm").validate({
+                    rules : {
+                        roleName : {
+                            required : true,
+                            maxlength : 20
+                        },
+                        description : {
+                            maxlength : 140
+                        }
+                    },
+                    messages : {
+                        roleName : {
+                            required : roleNameNull,
+                            maxlength : publicSize20
+                        },
+                        description : {
+                            maxlength : publicSize140
+                        }
+                    }
+                }).form();
+            },
+        }
+        $(function(){
+            roleAdd.init();
+            // $('input').inputClear();
+            //优先级策略单选组选择
+            $(".priority-group").on("click","input",function () {
+                $(".priority-group input").prop("checked",false);
+                $(this).prop("checked",true)
+            });
+            $.ajax({
+                type: "GET",
+                url: "/clbs/r/resource/roleList",
+                dataType: "json",
+                success: function (data) {
+                    if(data !=null){
+                        $.each(data, function (n, value) {
+                            $("#daohang").append("<option value=\""+value.id+"\">"+value.name+"</option>");
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+            $("#doSubmitAdd").on("click",roleAdd.doSubmit);
+        })
+    // };
+</script>
+</html>

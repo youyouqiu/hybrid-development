@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasRiskDisposeRecordDao">
+
+    <select id="searchRiskDisposeRecords"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskDisposeRecordQuery"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskDisposeRecordForm">
+        SELECT temp3.id, temp3.risk_number
+        AS riskNumber,temp3.risk_type AS
+        riskType,temp3.status,
+        temp3.address,
+        temp3.deal_id AS dealUser,temp3.job,temp3.warning_time AS warTime,
+        temp3.file_time AS fileTime,
+        temp3.deal_time AS
+        dealTime,temp3.risk_result AS
+        riskResult,rl.risk_level AS riskLevel,
+        temp3.driver,
+        temp3.visitTime,
+        temp3.vehicle_id,
+        temp3.formatted_address
+        FROM (SELECT
+        cam.id,cam.vehicle_id,cam.risk_number,cam.risk_level,cam.risk_type,cam.`status`,cam.address,
+        cam.deal_id,cam.driver_id,cam.job,DATE_FORMAT(cam.warning_time,'%Y-%m-%d
+        %H:%i:%s') AS
+        warning_time,DATE_FORMAT(cam.file_time,'%Y-%m-%d
+        %H:%i:%s') AS
+        file_time,DATE_FORMAT(cam.deal_time,'%Y-%m-%d %H:%i:%s')
+        AS
+        deal_time, cam.risk_result,
+        vis.visitTime,vis.driver,cam.formatted_address
+        FROM zw_m_risk_campaign cam
+        LEFT JOIN
+        (SELECT rv.risk_id,group_concat(DISTINCT(proi.name)) AS driver,MAX(visit_order) AS visitTime from zw_m_risk_visit rv
+        LEFT JOIN  zw_m_professionals_info proi on rv.driver_id = proi.id and proi.flag=1
+        where  rv.flag = 1
+        GROUP BY rv.risk_id) vis on vis.risk_id =cam.id
+        WHERE
+        unix_timestamp(cam.warning_time) BETWEEN
+        unix_timestamp(#{query.startTime}) AND unix_timestamp(
+        #{query.endTime}) AND cam.flag = 1
+        <if test="query.vehicleIds != null and query.vehicleIds != ''">
+            AND cam.vehicle_id IN
+            <foreach collection="query.vehicleIds.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.riskNumber != null and query.riskNumber != ''">
+            AND cam.risk_number LIKE
+            CONCAT('%',#{query.riskNumber},'%')
+        </if>
+        <if test="query.riskType != null and query.riskType != ''">
+            AND cam.risk_type = #{query.riskType}
+        </if>
+        <if test="query.status != null and query.status != ''">
+            AND cam.status = #{query.status}
+        </if>
+        <if test="query.dealUser != null and query.dealUser != ''">
+            AND cam.deal_id LIKE CONCAT('%',#{query.dealUser},'%')
+        </if>
+        <if test="query.riskResult != null and query.riskResult != ''">
+            AND cam.risk_result = #{query.riskResult}
+        </if>
+        <if test="query.riskLevel != null and query.riskLevel != ''">
+            AND cam.risk_level = #{query.riskLevel}
+        </if>
+        <if test="query.driver != null and query.driver != ''">
+            AND vis.driver LIKE CONCAT('%',#{query.driver},'%')
+        </if>
+        <if test="query.visitTime != null and query.visitTime != ''">
+            AND vis.visitTime = #{query.visitTime}
+        </if>
+        ) AS temp3
+        LEFT JOIN zw_m_risk_level AS rl ON temp3.risk_level = rl.risk_value and rl.flag=1 order by temp3.warTime DESC
+
+    </select>
+
+    <select id="queryRiskDisposeRecords"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskDisposeRecordQuery"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskDisposeRecordForm">
+        SELECT  temp3.risk_number
+        AS riskNumber,temp3.risk_type AS
+        riskType,temp3.status,
+        ra.event_number AS eventNumber,
+        re.risk_event AS riskEvent,DATE_FORMAT(ra.event_time,'%Y-%m-%d %H:%i:%s') AS eventTime,
+        temp3.address,
+        temp3.deal_id AS dealUser,temp3.job,temp3.warning_time AS warTime,
+        temp3.file_time AS fileTime,
+        temp3.deal_time AS
+        dealTime,temp3.risk_result AS
+        riskResult,rl.risk_level AS riskLevel,
+        temp3.formatted_address ,
+        temp3.driver,
+        temp3.visitTime,
+        temp3.vehicle_id
+        FROM (SELECT
+        cam.id,cam.vehicle_id,cam.risk_number,cam.risk_level,cam.risk_type,cam.`status`,cam.address,
+        cam.deal_id,cam.driver_id,cam.job,DATE_FORMAT(cam.warning_time,'%Y-%m-%d
+        %H:%i:%s') AS
+        warning_time,DATE_FORMAT(cam.file_time,'%Y-%m-%d
+        %H:%i:%s') AS
+        file_time,DATE_FORMAT(cam.deal_time,'%Y-%m-%d %H:%i:%s')
+        AS
+        deal_time, cam.risk_result,
+        vis.visitTime,vis.driver,
+        cam.formatted_address
+        FROM zw_m_risk_campaign cam
+        LEFT JOIN
+        (SELECT rv.risk_id,group_concat(DISTINCT(proi.name)) AS driver,MAX(visit_order) AS visitTime from zw_m_risk_visit rv
+        LEFT JOIN  zw_m_professionals_info proi on rv.driver_id = proi.id and proi.flag=1
+        where  rv.flag = 1
+        GROUP BY rv.risk_id) vis on vis.risk_id =cam.id
+        WHERE
+        unix_timestamp(cam.warning_time) BETWEEN
+        unix_timestamp(#{query.startTime}) AND unix_timestamp(
+        #{query.endTime}) AND cam.flag = 1
+        <if test="query.vehicleIds != null and query.vehicleIds != ''">
+            AND cam.vehicle_id IN
+            <foreach collection="query.vehicleIds.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.riskNumber != null and query.riskNumber != ''">
+            AND cam.risk_number LIKE
+            CONCAT('%',#{query.riskNumber},'%')
+        </if>
+        <if test="query.riskType != null and query.riskType != ''">
+            AND cam.risk_type = #{query.riskType}
+        </if>
+        <if test="query.status != null and query.status != ''">
+            AND cam.status = #{query.status}
+        </if>
+        <if test="query.dealUser != null and query.dealUser != ''">
+            AND cam.deal_id LIKE CONCAT('%',#{query.dealUser},'%')
+        </if>
+        <if test="query.riskResult != null and query.riskResult != ''">
+            AND cam.risk_result = #{query.riskResult}
+        </if>
+        <if test="query.riskLevel != null and query.riskLevel != ''">
+            AND cam.risk_level = #{query.riskLevel}
+        </if>
+        <if test="query.driver != null and query.driver != ''">
+            AND vis.driver LIKE CONCAT('%',#{query.driver},'%')
+        </if>
+        <if test="query.visitTime != null and query.visitTime != ''">
+            AND vis.visitTime = #{query.visitTime}
+        </if>
+        ) AS temp3
+        LEFT JOIN zw_m_risk_level AS rl ON temp3.risk_level = rl.risk_value and rl.flag = 1
+        inner join zw_m_risk_alarm ra on ra.risk_id = temp3.id and  ra.flag = 1
+        inner join zw_m_risk_event re on re.function_id = ra.event_id and re.flag = 1
+        order by ra.event_number
+    </select>
+    <select id="searchVisitTime" parameterType="java.lang.String"
+            resultType="java.lang.Integer">
+		select count(*) from zw_m_risk_visit riv where riv.risk_id
+		= #{riskId} and riv.isvisit =1 and
+		flag = 1
+	</select>
+    <select id="searchRiskVisit" resultType="java.util.Map">
+		select cam.id as
+		riskId,rv.id as visitId from zw_m_risk_campaign
+		cam,zw_m_risk_visit rv
+		where cam.flag = 1 and rv.flag = 1 and cam.id =
+		rv.risk_id
+	</select>
+    <select id="searchEventByRiskId" parameterType="java.lang.String"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskEventAlarmForm">
+		SELECT
+		ra.id,
+		ra.event_number AS eventNumber,
+		DATE_FORMAT(ra.event_time,'%Y-%m-%d %H:%i:%s') AS eventTime,
+		re.risk_event AS riskEvent
+		FROM
+		zw_m_risk_campaign cam, zw_m_risk_alarm
+		ra, zw_m_risk_event re
+		WHERE cam.id = #{riskId} AND cam.id = ra.risk_id
+		AND ra.event_id =
+		re.function_id order by ra.event_time
+    </select>
+
+    <select id="searchEventByRiskId2" parameterType="java.lang.String"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskEventAlarmReportForm">
+		SELECT
+		ra.event_number AS eventNumber,
+		DATE_FORMAT(ra.event_time,'%Y-%m-%d %H:%i:%s') AS eventTime,
+		re.risk_event AS riskEvent,
+		re.risk_type as riskType
+		FROM
+		zw_m_risk_campaign cam, zw_m_risk_alarm
+		ra, zw_m_risk_event re
+		WHERE cam.id = #{riskId} AND cam.id = ra.risk_id
+		AND ra.event_id =
+		re.function_id order by ra.event_time
+	</select>
+    <!-- 查询风险报告doc导出的信息 -->
+    <select id="searchRiskReportFormById"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskReportForm"
+            parameterType="string">
+		SELECT DISTINCT
+		cam.id,
+		cam.risk_number as riskNumber,
+		cam.warning_time as warningTime,
+		vinf.brand as brand,
+		cam.risk_type as
+		riskType,
+		rlevel.risk_level as riskLevel,
+		cam.speed as speed,
+		cam.address as address,
+        vinf.group_id as groupId,
+		vtype.vehicle_type as
+		vehicleType,
+		cate.vehicle_category as vehicleCategory,
+		ass.telephone as groupPhone,
+		cam.deal_id as dealId,
+		cam.risk_result as riskResult
+		FROM
+		zw_m_risk_campaign cam,
+		zw_m_vehicle_info vinf,
+		zw_m_vehicle_type vtype,
+		zw_m_assignment ass,
+		zw_m_risk_level rlevel,
+		zw_m_vehicle_category cate
+		WHERE
+		cam.vehicle_id =
+		vinf.id
+		AND vtype.id =
+		vinf.vehicle_type
+		AND rlevel.risk_value = cam.risk_level
+		AND cate.id = vtype.vehicle_category
+		AND ass.id IN (
+		SELECT
+		asv.assignment_id
+		FROM
+		zw_m_assignment_vehicle asv
+		WHERE
+		asv.vehicle_id = cam.vehicle_id and asv.flag =1 
+		) and cam.id = #{id} and cam.flag = 1 and vinf.flag =1 
+		and vtype.flag =1 and ass.flag =1
+		and rlevel.flag =1 and cate.flag =1 
+	</select>
+
+    <!-- 根据风险事件的id获取司机 -->
+    <select id="searchDrivers" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+
+		SELECT DISTINCT
+		pro.*
+		FROM
+		zw_m_professionals_info pro,
+		zw_m_risk_visit
+		rvisit
+		WHERE
+		pro.id = rvisit.driver_id
+		AND rvisit.risk_id = #{riskId}
+		AND
+		pro.flag = 1 and rvisit.flag = 1
+	
+	</select>
+    <!-- 根据回访表的司机id查找司机 -->
+    <!-- 获取司机 -->
+    <select id="searchDriver" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+
+		SELECT
+		pro.*
+		FROM
+		zw_m_professionals_info pro,
+		zw_m_risk_visit
+		rvisit
+		WHERE
+		pro.id = rvisit.driver_id
+		AND rvisit.id = #{id}
+		AND
+		pro.flag = 1
+	</select>
+    <!-- 获取处理和回访的记录 -->
+    <select id="searchRiskVisitForms" parameterType="string"
+            resultType="com.zw.adas.domain.riskManagement.form.AdasRiskVisitReportForm">
+SELECT DISTINCT
+	rvisit.*, pro. NAME AS driverName
+	FROM
+	zw_m_risk_visit rvisit
+	LEFT JOIN zw_m_professionals_info pro ON rvisit.driver_id = pro.id
+	WHERE
+	rvisit.risk_id = #{riskId}
+	AND rvisit.flag = 1 and rvisit.visit_order is not null
+ORDER BY
+	rvisit.visit_order ASC
+	</select>
+    <select id="findMediaInfo" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT
+        al.id AS eventId,
+        al.media_id AS mediaId,
+        cam.id AS riskId,
+        cam.vehicle_id AS vehicleId
+        FROM
+        zw_m_risk_alarm al LEFT JOIN zw_m_risk_campaign cam ON al.risk_id = cam.id
+        WHERE al.flag = cam.flag = 1
+        <if test="isEvent == true">
+            AND al.id = #{downLoadId}
+        </if>
+        <if test="isEvent == false">
+            AND cam.id = #{downLoadId}
+        </if>
+    </select>
+
+
+    <!-- 查询风控表所有记录 -->
+    <select id="findAllRiskCopaign" resultType="java.util.Map">
+      SELECT cam.id as id,cam.address as address from zw_m_risk_campaign cam where cam.flag = 1
+    </select>
+    <!-- 将经纬度转换成具体的地址 -->
+    <update id="updateAddress" parameterType="string">
+        UPDATE zw_m_risk_campaign cam set cam.formatted_address=#{address}
+        WHERE cam.id = #{id}
+    </update>
+
+    <select id="orderByCampaignRiskType" resultType="map">
+        select id ,risk_type  as riskType from zw_m_risk_campaign where flag =1
+    </select>
+
+    <!-- 查询是否有终端视频-->
+    <select id="findTerminalVideo" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT DISTINCT
+            m.id
+        FROM
+            zw_m_media m
+        WHERE
+            m.flag = 1
+            AND m.risk_event_id IN (
+                SELECT
+                    al.id
+                FROM
+                    zw_m_risk_alarm al
+                    LEFT JOIN zw_m_risk_campaign cam ON al.risk_id = cam.id
+                WHERE
+                    al.flag = cam.flag = 1
+        <if test="isEvent == true">
+            AND al.id = #{downLoadId}
+        </if>
+        <if test="isEvent == false">
+            AND cam.id = #{downLoadId}
+        </if>
+            )
+            AND m.type = 2
+    </select>
+
+    <!-- 查询是否有终端图片-->
+    <select id="findTerminalPic" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT DISTINCT
+        al.media_id
+        FROM
+        zw_m_risk_alarm al
+        LEFT JOIN zw_m_risk_campaign cam ON al.risk_id = cam.id
+        WHERE
+        al.flag = cam.flag = 1
+        <if test="isEvent == true">
+            AND al.id = #{downLoadId}
+        </if>
+        <if test="isEvent == false">
+            AND cam.id = #{downLoadId}
+        </if>
+        and al.media_id != ''
+    </select>
+
+    <select id="findRiskByRiskNumber" parameterType="string" resultType="com.zw.adas.domain.riskManagement.form.AdasRiskDisposeRecordForm">
+        SELECT * from zw_m_risk_campaign where flag =1 and status = 6 and risk_number=#{riskNumber}
+
+    </select>
+</mapper>

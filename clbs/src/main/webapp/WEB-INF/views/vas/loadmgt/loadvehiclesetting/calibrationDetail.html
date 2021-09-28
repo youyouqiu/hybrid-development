@@ -1,0 +1,74 @@
+<form th:action="@{/v/oilmassmgt/fueltankmgt/editOilCal}" id="oilCalForm" role="form" action="#" method="post" class="form-horizontal" enctype="multipart/form-data">
+	<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">载重标定数据</h4>
+    </div>
+    <div class="modal-body modal-alarmSetting-body">
+		<table id="dataTable" class="table table-bordered table-hover calibrationDetails" cellspacing="0" width="100%">
+	        <thead>
+	            <tr>
+	                <th class="text-center">序号</th>
+	                <th class="text-center">AD值</th>
+	                <th class="text-center">实际载重(kg)</th>
+	            </tr>
+	        </thead>
+	        <tbody id="dataListV2">
+	        </tbody>
+	    </table>
+    </div>
+	<div class="modal-footer" style="border-top: none;">
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script th:inline="javascript">
+(function(window,$) {
+    calibrationDetail = {
+        init:function () {
+            if ($("#curBox").val() == 1) { // 载重1
+                var listValue = $("#listValue").val();
+                $("#dataListV2").empty();
+                if (listValue != null && listValue != '') {
+                    var list = JSON.parse(listValue);
+                    if (list != null) {
+                        for (var i = 0; i < list.length; i++) {
+                            var str = "";
+                            str += "<tr class='odd'>";
+                            str += "<td class='text-center'>" + (i + 1) + "</td>"; // 序号
+                            str += "<td class='text-center'><input class='adValue text-center' name='adValue' value='" + parseInt(list[i].adValue == '' ? 0 : list[i].adValue) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>";
+                            str += "<td class='text-center'><input class='adActualValue text-center' name='adActualValue' value='" + parseFloat(list[i].adActualValue == '' ? 0 : list[i].adActualValue).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>";
+                            str += "</tr>";
+                            $("#dataListV2").append(str);
+                        }
+
+                    }
+
+                }
+            } else { // 载重2
+                var listValue = $("#listValue2").val();
+                $("#dataListV2").empty();
+                if (listValue != null && listValue != '') {
+                    var list = JSON.parse(listValue);
+                    if (list != null) {
+                        for (var i = 0; i < list.length; i++) {
+                            var str = "";
+                            str += "<tr class='odd'>";
+                            str += "<td class='text-center'>" + (i + 1) + "</td>"; // 序号
+                            str += "<td class='text-center'><input class='adValue text-center' name='adValue' value='" + parseInt(list[i].adValue == '' ? 0 : list[i].adValue) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>";
+                            str += "<td class='text-center'><input class='adActualValue text-center' name='adActualValue' value='" + parseFloat(list[i].adActualValue == '' ? 0 : list[i].adActualValue).toFixed(1) + "' style='border:none;background-color:transparent;' readonly='readonly' /></td>";
+                            str += "</tr>";
+                            $("#dataListV2").append(str);
+                        }
+
+                    }
+
+                }
+            }
+        }
+	}
+    $(function () {
+        calibrationDetail.init();
+    });
+})(window,$)
+</script>

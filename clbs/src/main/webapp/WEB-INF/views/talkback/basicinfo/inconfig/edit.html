@@ -1,0 +1,197 @@
+<form th:action="@{/talkback/inconfig/infoinput/edit.gsp}" id="editIntercomForm" role="form" method="post" class="form-horizontal" xmlns:th="http://www.w3.org/1999/xhtml">
+  <div class="modal-header">
+    <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">修改对讲终端</h4>
+    <style>
+      .checkLabel {
+        padding-top: 7px;
+        font-weight: normal;
+        cursor: pointer;
+      }
+
+      .checkLabel input {
+        vertical-align: -2px;
+      }
+    </style>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <input type="hidden" name="configId" th:value="${intercomObject.configId}">
+        <input type="hidden" id="monitorType" name="monitorType" th:value="${intercomObject.monitorType}">
+        <input type="hidden" id="simCardInfoList" th:value="${simCardInfoList}">
+        <input type="hidden" id="originalModelList" th:value="${originalModelList}">
+        <input type="hidden" id="vehicleInfoList" th:value="${vehicleInfoList}">
+        <input type="hidden" id="peopleInfoList" th:value="${peopleInfoList}">
+        <input type="hidden" id="thingInfoList" th:value="${thingInfoList}">
+        <input type="hidden" id="checkedAssginmentId" th:value="${intercomObject.assignmentId}">
+        <!--<input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">-->
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 终端手机号：
+          </label>
+          <div class="col-md-7">
+            <div style="position:relative;">
+              <div class="input-group i-dropdown-container" id="quickSimsContainerEdit">
+                <input id="sims" th:value="${intercomObject.simcardNumber}" name="sims" type="text" maxlength="20"
+                       placeholder="请新增或选择终端手机号" class="form-control i-input-field"
+                       autocomplete="off"/>
+                <div class="input-group-btn i-arrow">
+                  <button type="button" class="btn btn-white dropdown-toggle" data-toggle="">
+                    <i class="caret"></i>
+                  </button>
+<!--                  <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>-->
+                </div>
+                <div class="i-list-container">
+                  <div class="i-list-wraper">
+                    <div class="i-list"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input id="simcardId" name="simID" class="hidden" th:value="${intercomObject.simcardId}"/>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 对讲设备标识：
+          </label>
+          <div class="col-md-7">
+            <input id="originalModelId" name="originalModelId" type="hidden" th:value="${intercomObject.originalModelId}" />
+            <div class="col-md-6" style="padding: 0">
+              <div class="input-group">
+                <input id="originalModel" name="modelId"
+                th:value="${intercomObject.modelId}" type="text" maxlength="20"
+                  placeholder="原始机型"
+                    readonly
+                  class="form-control brands"
+                  autocomplete="off"
+                  style="background: #fafafa"
+                />
+                <div class="input-group-btn" style="right: -2px">
+                  <button type="button" class="btn btn-white dropdown-toggle" style="border-radius: 0;margin-left: -3px" data-toggle="">
+                    <i class="caret"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6" style="padding: 0">
+              <input type="text" class="form-control"
+                th:value="${intercomObject.intercomDeviceId}"
+                style="border-top-left-radius: 0;border-bottom-left-radius: 0;margin-left: 0"
+                autocomplete="off"
+                maxlength="7"
+                id="equipmentIdentity" name="devices"
+                placeholder="请输入设备标识">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 设备密码：
+          </label>
+          <div class="col-md-7">
+            <input th:value="${intercomObject.devicePassword}" name="devicePassword" id="devicePwd" maxlength="8" autocomplete="off" placeholder="设备密码" type="text"
+              class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 监控对象：
+          </label>
+          <div class="col-md-7">
+            <div style="position:relative;">
+              <div class="input-group">
+                <input id="monitorName" th:value="${intercomObject.monitorName}" name="brands" type="text" maxlength="20" placeholder="请新增或选择监控对象" class="form-control brands"
+                  autocomplete="off" style="z-index: 0" />
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-white dropdown-toggle" data-toggle=""><i class="caret"></i></button>
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
+                </div>
+              </div>
+              <input id="monitorId" th:value="${intercomObject.monitorId}" name="brandID" class="hidden" />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" data-original-title="黄色图标表示企业，蓝色图标表示群组(可在群组管理中创建)"></i>
+            <label class="text-danger">*</label> 群组：
+          </label>
+          <div class="col-md-7 has-feedback">
+            <input class="form-control" id="editGroupId"
+              th:value="${intercomObject.assignmentName}"
+              name="assignmentName" type="text"
+              style="background-color: #fafafa; cursor: pointer;"
+              readonly
+              autocomplete="off"
+              value="" />
+            <span class="fa fa-chevron-down form-control-feedback" aria-hidden="true" style="cursor: pointer;pointer-events: none"></span>
+            <div id="EditMenuContent" class="menuContent">
+              <ul id="editTree" class="ztree"></ul>
+            </div>
+            <input id="editCitySelidVal" name="citySelID" class="form-control" type="hidden" th:value="${intercomObject.assignmentId}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 优先级：
+          </label>
+          <div class="col-md-7">
+            <select name="priority" id="priority" class="form-control">
+              <option value="1" th:selected="${intercomObject.priority==1}">1</option>
+              <option value="2" th:selected="${intercomObject.priority==2}">2</option>
+              <option value="3" th:selected="${intercomObject.priority==3}">3</option>
+              <option value="4" th:selected="${intercomObject.priority==4}">4</option>
+              <option value="5" th:selected="${intercomObject.priority==5}">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            <label class="text-danger">*</label> 功能：
+          </label>
+          <div class="col-md-7">
+            <div class="col-md-4 noPadding">
+              <label class="checkLabel">
+                <input type="checkbox" name="textEnable" id="txtInfo" th:value="${intercomObject.textEnable}" th:checked="${intercomObject.textEnable==1}"> 文本信息
+              </label>
+            </div>
+            <div class="col-md-4 noPadding">
+              <label class="checkLabel">
+                <input type="checkbox" name="imageEnable" id="imgInfo" th:value="${intercomObject.imageEnable}" th:checked="${intercomObject.imageEnable==1}"> 图片信息
+              </label>
+            </div>
+            <div class="col-md-4 noPadding">
+              <label class="checkLabel">
+                <input type="checkbox" name="audioEnable" id="offlineVoiceInfo" th:value="${intercomObject.audioEnable}" th:checked="${intercomObject.audioEnable==1}"> 离线语音信息
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" id="doSubmit">
+      <strong>提 交</strong>
+    </button>
+    <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script th:inline="javascript">
+  var simNumberError = [[#{sim.number.error}]];
+  var simNumberSelect = [[#{sim.number.select}]];
+  var simFirstNumberNot0 = [[#{sim.firstNumber.not0}]];
+  var simNumberExists = [[#{sim.number.exists}]];
+  var originalModelNull = [[#{originalModel.null}]];
+  var equipmentIdentityNull = [[#{equipmentIdentity.null}]];
+  var equipmentIdentityLegality = [[#{equipmentIdentity.legality}]];
+  var quickDevicePasswordNull = [[#{quickDevicePassword.null}]];
+  var quickDevicePasswordLegality = [[#{quickDevicePassword.legality}]];
+  var groupsNameNull = [[#{groups.name.null}]];
+</script>
+<script src="/wro/infoinputEditForDispatch.js" th:src="@{/wro/infoinputEditForDispatch.js}"></script>

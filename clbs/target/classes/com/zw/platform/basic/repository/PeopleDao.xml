@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.PeopleDao">
+    <select id="getSortList" resultType="string">
+        SELECT id
+        from zw_m_people_info
+        where flag = 1
+        ORDER BY create_data_time
+    </select>
+
+    <select id="initCacheList" resultType="com.zw.platform.basic.dto.PeopleDTO" parameterType="string">
+        select peo.id,peo.people_number `name`,peo.`name` alias,peo.org_id,'1' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,peo.remark,
+        cofig.id configId,cofig.device_id,device.device_number, cofig.sim_card_id,simcard.simcard_number simCardNumber,
+        simcard.real_id realSimCardNumber,device.device_type,device.functional_type, device.terminal_type_id,
+        terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        GROUP_CONCAT(DISTINCT zwa.`name`) groupName,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate,
+        DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,
+        DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,
+        cofig.service_lifecycle_id,cofig.intercom_info_id, device.org_id deviceOrgId, simcard.org_id simCardOrgId,
+        cofig.vehicle_password,
+        intercom.intercom_device_id intercomDeviceNumber, intercom.user_id,intercom.number
+        callNumber,terminal.support_video_flag isVideo,device.manufacturer_id,simcard.auth_code
+        from zw_m_people_info peo
+        LEFT JOIN zw_m_config cofig on peo.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on peo.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_assignment zwa on assign.assignment_id = zwa.id and zwa.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag =1
+        where peo.flag = 1
+        and peo.id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY peo.id
+    </select>
+    <select id="getIconList" resultType="com.zw.platform.basic.dto.PeopleDTO">
+       SELECT v.id,icon.ico_name iconName,v.people_number `name`, v.people_icon iconId
+         from zw_m_people_info v
+    LEFT JOIN zw_c_ico_config icon on v.people_icon = icon.id
+        where v.flag = 1
+          and v.people_icon<![CDATA[<>]]>''
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.PeopleDO">
+        INSERT INTO zw_m_people_info
+        (
+        id,
+        `name`,
+        birthday,
+        gender,
+        `identity`,
+        phone,
+        address,
+        email,
+        flag,
+        create_data_time,
+        create_data_username,
+        update_data_time,
+        update_data_username,
+        people_number,
+        remark,
+        people_icon,
+        identity_card_photo,
+        is_incumbency,
+        job_id,
+        nation_id,
+        blood_type_id,
+        qualification_id,
+        org_id
+        )
+        values (
+        #{id},
+        #{name},
+        #{birthday},
+        #{gender},
+        #{identity},
+        #{phone},
+        #{address},
+        #{email},
+        #{flag},
+        #{createDataTime},
+        #{createDataUsername},
+        #{updateDataTime},
+        #{updateDataUsername},
+        #{peopleNumber},
+        #{remark},
+        #{peopleIcon},
+        #{identityCardPhoto},
+        #{isIncumbency},
+        #{jobId},
+        #{nationId},
+        #{bloodTypeId},
+        #{qualificationId},
+        #{orgId}
+        )
+    </insert>
+
+    <update id="updateIcon" parameterType="string">
+        UPDATE zw_m_people_info
+        set people_icon =
+        <choose>
+            <when test="iconId != null and iconId !=''">
+                #{iconId,jdbcType=VARCHAR}
+            </when>
+            <otherwise>
+                ''
+            </otherwise>
+        </choose>
+        where
+        flag = 1
+        and id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.PeopleDO">
+        UPDATE zw_m_people_info
+        <set>
+            `name` = #{name},
+            birthday = #{birthday},
+            gender = #{gender},
+            `identity` = #{identity},
+            phone = #{phone},
+            address = #{address},
+            <if test='null != email'>email = #{email},</if>
+            <if test='null != flag'>flag = #{flag},</if>
+            <if test='null != createDataTime'>create_data_time = #{createDataTime},</if>
+            <if test='null != createDataUsername'>create_data_username = #{createDataUsername},</if>
+            <if test='null != updateDataTime'>update_data_time = #{updateDataTime},</if>
+            <if test='null != updateDataUsername'>update_data_username = #{updateDataUsername},</if>
+            people_number = #{peopleNumber},
+            remark = #{remark},
+            <if test='null != peopleIcon'>people_icon = #{peopleIcon},</if>
+            <if test='null != identityCardPhoto'>identity_card_photo = #{identityCardPhoto},</if>
+            <if test='null != nationId'>nation_id = #{nationId},</if>
+            <if test='null != isIncumbency'>is_incumbency = #{isIncumbency},</if>
+            <if test='null != jobId'>job_id = #{jobId},</if>
+            <if test='null != bloodTypeId'>blood_type_id = #{bloodTypeId},</if>
+            <if test='null != qualificationId'>qualification_id = #{qualificationId},</if>
+            <if test='null != orgId'>org_id = #{orgId},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+    <select id="getById" resultType="com.zw.platform.basic.domain.PeopleDO">
+        SELECT
+        *
+        FROM zw_m_people_info
+        WHERE id = #{id}
+        and flag = 1
+    </select>
+
+    <select id="getByNumber" resultType="com.zw.platform.basic.domain.PeopleDO">
+        SELECT
+        *
+        FROM zw_m_people_info
+        WHERE people_number = BINARY #{number}
+        and flag = 1
+        limit 1
+    </select>
+
+    <update id="delete" parameterType="string">
+        update zw_m_people_info
+        set flag = 0
+        where flag = 1
+        and id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <insert id="addBaseInfo" parameterType="com.zw.platform.basic.domain.PeopleBasicDO">
+        insert into zw_m_people_basic_info
+        (id,people_id,basic_id,type,flag,create_data_time,create_data_username)
+        values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id},#{item.peopleId},#{item.basicId},#{item.type},#{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBaseInfo" parameterType="string">
+        DELETE from zw_m_people_basic_info
+        where flag = 1
+        and people_id IN
+        <foreach collection="peopleIds" item="peopleId" open="(" close=")" separator=",">
+            #{peopleId}
+        </foreach>
+    </delete>
+
+    <select id="getDetailById" parameterType="string" resultType="com.zw.platform.basic.dto.PeopleDTO">
+        select peo.id,peo.people_number `name`,peo.`name` alias,peo.org_id,'1' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,peo.remark,
+        cofig.id configId, cofig.device_id,device.device_number, cofig.sim_card_id,simcard.simcard_number simCardNumber,
+        simcard.real_id realSimCardNumber,device.device_type,device.functional_type, device.terminal_type_id,
+        terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate,
+        DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,
+        DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,
+        intercom.intercom_device_id intercomDeviceNumber, intercom.user_id,intercom.number callNumber,
+        peo.gender,peo.birthday,peo.identity,peo.phone,peo.address,peo.email,peo.identity_card_photo,
+        peo.is_incumbency,peo.job_id,job.job_name,peo.nation_id,peo.blood_type_id,peo.qualification_id,
+        GROUP_CONCAT(DISTINCT base.basic_id) skillIds,GROUP_CONCAT(DISTINCT skill.name) skillNames,
+        GROUP_CONCAT(DISTINCT driver.basic_id) driverTypeIds,GROUP_CONCAT(DISTINCT dc.value) driverTypeNames,simcard.auth_code
+        from zw_m_people_info peo
+        LEFT JOIN zw_m_config cofig on peo.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on peo.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag =1
+        LEFT JOIN zw_m_job_info job on peo.job_id = job.id
+        LEFT JOIN zw_m_people_basic_info base on peo.id = base.people_id and base.flag = 1 and base.type = 1
+        LEFT JOIN zw_m_people_basic_info driver on peo.id = driver.people_id and driver.flag = 1 and driver.type = 2
+        LEFT JOIN zw_m_skill skill on base.basic_id = skill.id
+        left Join zw_c_dictionary dc on driver.basic_id = dc.id
+        where peo.flag = 1
+        and peo.id = #{id}
+        GROUP BY peo.id
+    </select>
+
+
+    <select id="getDetailByNumber" parameterType="string" resultType="com.zw.platform.basic.dto.PeopleDTO">
+         select peo.id,peo.people_number `name`,peo.`name` alias,peo.org_id,'1' as monitorType,
+        case WHEN cofig.vehicle_id <![CDATA[<>]]>'' then 1 else 0 end as bindType,peo.remark,
+        cofig.id configId,cofig.device_id,device.device_number, cofig.sim_card_id,simcard.simcard_number simCardNumber,
+        simcard.real_id realSimCardNumber,device.device_type,device.functional_type, device.terminal_type_id,
+        terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate,
+        DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,
+        DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,
+        intercom.intercom_device_id intercomDeviceNumber, intercom.user_id,intercom.number callNumber,
+        peo.gender,peo.birthday,peo.identity,peo.phone,peo.address,peo.email,peo.identity_card_photo,
+        peo.is_incumbency,peo.job_id,job.job_name,peo.nation_id,peo.blood_type_id,peo.qualification_id,cofig.intercom_info_id,
+        GROUP_CONCAT(DISTINCT base.basic_id) skillIds,GROUP_CONCAT(DISTINCT skill.name) skillNames,
+        GROUP_CONCAT(DISTINCT driver.basic_id) driverTypeIds,GROUP_CONCAT(DISTINCT dc.value) driverTypeNames
+        from zw_m_people_info peo
+        LEFT JOIN zw_m_config cofig on peo.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on peo.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag =1
+        LEFT JOIN zw_m_job_info job on peo.job_id = job.id
+        LEFT JOIN zw_m_people_basic_info base on peo.id = base.people_id and base.flag = 1 and base.type = 1
+        LEFT JOIN zw_m_people_basic_info driver on peo.id = driver.people_id and driver.flag = 1 and driver.type = 2
+        LEFT JOIN zw_m_skill skill on base.basic_id = skill.id
+        left Join zw_c_dictionary dc on driver.basic_id = dc.id
+        where peo.flag = 1
+        and peo.people_number = BINARY #{number}
+        GROUP BY peo.id
+    </select>
+    <select id="getByDeviceNum" parameterType="string" resultType="com.zw.platform.basic.dto.PeopleDTO">
+        select peo.id,peo.people_number `name`,peo.`name` alias,peo.org_id,'1' as monitorType,
+        case WHEN cofig.vehicle_id <![CDATA[<>]]>'' then 1 else 0 end as bindType,peo.remark,
+        cofig.id configId,cofig.device_id,device.device_number, cofig.sim_card_id,simcard.simcard_number simCardNumber,
+        simcard.real_id realSimCardNumber,device.device_type,device.functional_type, device.terminal_type_id,
+        terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate,
+        DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,
+        DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,
+        peo.gender,peo.birthday,peo.identity,peo.phone,peo.address,peo.email,peo.identity_card_photo,
+        peo.is_incumbency,peo.job_id,job.job_name,peo.nation_id,peo.blood_type_id,peo.qualification_id,cofig.intercom_info_id,
+        GROUP_CONCAT(DISTINCT base.basic_id) skillIds,GROUP_CONCAT(DISTINCT skill.name) skillNames,
+        GROUP_CONCAT(DISTINCT driver.basic_id) driverTypeIds,GROUP_CONCAT(DISTINCT dc.value) driverTypeNames
+        from zw_m_people_info peo
+        INNER JOIN zw_m_config cofig on peo.id = cofig.vehicle_id and cofig.flag = 1
+        INNER JOIN zw_m_device_info device on cofig.device_id = device.id and device.device_number = BINARY #{deviceNum}
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on peo.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_job_info job on peo.job_id = job.id
+        LEFT JOIN zw_m_people_basic_info base on peo.id = base.people_id and base.flag = 1 and base.type = 1
+        LEFT JOIN zw_m_people_basic_info driver on peo.id = driver.people_id and driver.flag = 1 and driver.type = 2
+        LEFT JOIN zw_m_skill skill on base.basic_id = skill.id
+        left Join zw_c_dictionary dc on driver.basic_id = dc.id
+        where peo.flag = 1
+        GROUP BY peo.id
+    </select>
+
+    <select id="getDetailByIds" parameterType="string" resultType="com.zw.platform.basic.dto.PeopleDTO">
+        select peo.id,peo.people_number `name`,peo.`name` alias,peo.org_id,'1' as monitorType,
+        case WHEN cofig.vehicle_id<![CDATA[<>]]>'' then 1 else 0 end as bindType,peo.remark,
+        cofig.id configId, cofig.device_id,device.device_number, cofig.sim_card_id,simcard.simcard_number simCardNumber,
+        simcard.real_id realSimCardNumber,device.device_type,device.functional_type, device.terminal_type_id,
+        terminal.terminal_type,terminal.terminal_manufacturer,GROUP_CONCAT(DISTINCT assign.assignment_id) groupId,
+        DATE_FORMAT(cofig.create_data_time,'%Y-%m-%d') AS bindDate,
+        DATE_FORMAT(cofig.update_data_time,'%Y-%m-%d') AS updateBindDate,
+        DATE_FORMAT(service.billing_date,'%Y-%m-%d') AS billing_date,
+        DATE_FORMAT(service.expire_date,'%Y-%m-%d') AS expire_date,
+        intercom.intercom_device_id intercomDeviceNumber, intercom.user_id,intercom.number callNumber,
+        peo.gender,peo.birthday,peo.identity,peo.phone,peo.address,peo.email,peo.identity_card_photo,
+        peo.is_incumbency,peo.job_id,job.job_name,peo.nation_id,peo.blood_type_id,peo.qualification_id,
+        GROUP_CONCAT(DISTINCT base.basic_id) skillIds,GROUP_CONCAT(DISTINCT skill.name) skillNames,
+        GROUP_CONCAT(DISTINCT driver.basic_id) driverTypeIds,GROUP_CONCAT(DISTINCT dc.value) driverTypeNames,simcard.auth_code
+        from zw_m_people_info peo
+        LEFT JOIN zw_m_config cofig on peo.id = cofig.vehicle_id and cofig.flag = 1
+        LEFT JOIN zw_m_device_info device on cofig.device_id = device.id
+        LEFT JOIN zw_m_sim_card_info simcard on cofig.sim_card_id = simcard.id
+        LEFT JOIN zw_m_terminal_type terminal on device.terminal_type_id = terminal.id and terminal.flag=1
+        LEFT JOIN zw_m_assignment_vehicle assign on peo.id = assign.vehicle_id and assign.flag = 1
+        LEFT JOIN zw_m_service_lifecycle service on cofig.service_lifecycle_id = service.id
+        LEFT JOIN zw_m_intercom_info intercom on cofig.intercom_info_id = intercom.id and intercom.flag =1
+        LEFT JOIN zw_m_job_info job on peo.job_id = job.id
+        LEFT JOIN zw_m_people_basic_info base on peo.id = base.people_id and base.flag = 1 and base.type = 1
+        LEFT JOIN zw_m_people_basic_info driver on peo.id = driver.people_id and driver.flag = 1 and driver.type = 2
+        LEFT JOIN zw_m_skill skill on base.basic_id = skill.id
+        left Join zw_c_dictionary dc on driver.basic_id = dc.id
+        where peo.flag = 1
+        and peo.id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY peo.id
+    </select>
+
+    <select id="getAllPeople" resultType="com.zw.platform.basic.domain.PeopleDO">
+    select id, `name`,birthday,gender,`identity`,phone,address,email,flag,people_number,remark,people_icon,
+           identity_card_photo,nation_id,is_incumbency,job_id,blood_type_id,qualification_id, org_id from zw_m_people_info
+     where flag = 1
+    </select>
+
+    <select id="getByNumbers" resultType="com.zw.platform.basic.dto.MonitorBaseDTO">
+        SELECT p.id,p.`name` as alias,p.org_id,p.people_number as `name`,case when c.vehicle_id <![CDATA[<>]]> '' then
+        '1' else '0' end as bindType,case when c.intercom_info_id <![CDATA[<>]]> '' then
+        '1' else '0' end as intercomBindType
+        from zw_m_people_info p
+        left join zw_m_config c ON p.id = c.vehicle_id and c.flag = 1
+        where p.flag = 1
+        <if test="peopleNumList!=null and peopleNumList.size() > 0">
+            and p.people_number in
+            <foreach collection="peopleNumList" item="peopleNum" open="(" close=")" separator=",">
+                #{peopleNum}
+            </foreach>
+        </if>
+    </select>
+
+    <insert id="addByBatch" parameterType="com.zw.platform.basic.domain.PeopleDO">
+        INSERT INTO zw_m_people_info
+        (
+        id, `name`, birthday, gender, `identity`, phone, address, email, flag, create_data_time,
+        create_data_username, update_data_time, update_data_username, people_number, remark, people_icon,
+        identity_card_photo, nation_id, is_incumbency, job_id, blood_type_id, qualification_id, org_id
+        )
+        values
+        <foreach collection="peopleList" item="item" index="index" separator=",">
+            (
+            #{item.id},#{item.name},#{item.birthday},#{item.gender},#{item.identity},#{item.phone},#{item.address},#{item.email},
+            #{item.flag},#{item.createDataTime},#{item.createDataUsername},#{item.updateDataTime},#{item.updateDataUsername},
+            #{item.peopleNumber},#{item.remark},#{item.peopleIcon},#{item.identityCardPhoto},#{item.nationId},#{item.isIncumbency},
+            #{item.jobId},#{item.bloodTypeId},#{item.qualificationId},#{item.orgId}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updatePartField" parameterType="com.zw.platform.basic.domain.PeopleDO">
+        update zw_m_people_info
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test='null != email'>email = #{email},</if>
+            <if test='null != flag'>flag = #{flag},</if>
+            <if test='null != updateDataTime'>update_data_time = #{updateDataTime},</if>
+            <if test='null != updateDataUsername'>update_data_username = #{updateDataUsername},</if>
+            <if test='null != peopleNumber'>people_number = #{peopleNumber},</if>
+            <if test='null != remark'>remark = #{remark},</if>
+            <if test='null != peopleIcon'>people_icon = #{peopleIcon},</if>
+            <if test='null != identityCardPhoto'>identity_card_photo = #{identityCardPhoto},</if>
+            <if test='null != nationId'>nation_id = #{nationId},</if>
+            <if test='null != isIncumbency'>is_incumbency = #{isIncumbency},</if>
+            <if test='null != jobId'>job_id = #{jobId},</if>
+            <if test='null != bloodTypeId'>blood_type_id = #{bloodTypeId},</if>
+            <if test='null != qualificationId'>qualification_id = #{qualificationId},</if>
+            <if test='null != orgId'>org_id = #{orgId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByBatch">
+        update zw_m_people_info
+        <set>
+            <if test="people.name != null">`name` = #{people.name},</if>
+            <if test="people.birthday != null">birthday = #{people.birthday},</if>
+            <if test="people.gender != null">gender = #{people.gender},</if>
+            <if test="people.phone != null">phone = #{people.phone},</if>
+            <if test="people.address != null">address = #{people.address},</if>
+            <if test='people.email != null'>email = #{people.email},</if>
+            <if test='null != people.flag'>flag = #{people.flag},</if>
+            <if test='null != people.updateDataTime'>update_data_time = #{people.updateDataTime},</if>
+            <if test='null != people.updateDataUsername'>update_data_username = #{people.updateDataUsername},</if>
+            <if test='null != people.peopleNumber'>people_number = #{people.peopleNumber},</if>
+            <if test='null != people.remark'>remark = #{people.remark},</if>
+            <if test='null != people.peopleIcon'>people_icon = #{people.peopleIcon},</if>
+            <if test='null != people.identityCardPhoto'>identity_card_photo = #{people.identityCardPhoto},</if>
+            <if test='null != people.nationId'>nation_id = #{people.nationId},</if>
+            <if test='null != people.isIncumbency'>is_incumbency = #{people.isIncumbency},</if>
+            <if test='null != people.jobId'>job_id = #{people.jobId},</if>
+            <if test='null != people.bloodTypeId'>blood_type_id = #{people.bloodTypeId},</if>
+            <if test='null != people.qualificationId'>qualification_id = #{people.qualificationId},</if>
+            <if test='null != people.orgId'>org_id = #{people.orgId},</if>
+        </set>
+        where id in
+        <foreach collection="ids" item="id" close=")" separator="," open="(">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getPeopleByIdentity" resultType="com.zw.platform.basic.dto.PeopleDTO">
+        SELECT
+        *
+        FROM zw_m_people_info
+        WHERE identity = #{identity}
+        and flag = 1
+        limit 1
+    </select>
+
+    <select id="getScanByNumber" parameterType="string" resultType="string">
+        SELECT people_number FROM zw_m_people_info
+        WHERE people_number LIKE CONCAT('扫_',#{number}) AND flag=1
+    </select>
+
+    <update id="updatePersonIdentityCardInfo"
+            parameterType="com.zw.app.entity.appOCR.PersonnelIdentityInfoUploadEntity">
+        UPDATE
+            zw_m_people_info
+        SET name                 = #{name},
+            gender=#{gender},
+            birthday             = #{birthday},
+            identity             = #{identity},
+            identity_card_photo  = #{identityCardPhoto},
+            address              = #{address},
+            update_data_time     = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        WHERE id = #{monitorId}
+          AND flag = 1
+    </update>
+
+    <select id="getLeaveJobPersonnelList" resultType="com.zw.talkback.domain.basicinfo.LeaveJobPersonnel">
+        SELECT zmlja.people_id AS peopleId, zmlja.assignment_id AS assignmentId,
+        zmpi.people_number AS peopleNumber,zma.name AS assignmentName
+        FROM zw_m_leave_job_assignment zmlja
+        INNER JOIN zw_m_people_info zmpi ON zmpi.id = zmlja.people_id AND zmpi.flag = 1
+        INNER JOIN zw_m_assignment zma ON zma.id = zmlja.assignment_id AND zma.flag = 1
+        WHERE zmlja.flag = 1
+        AND zmlja.assignment_id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

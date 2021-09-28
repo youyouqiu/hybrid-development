@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>里程报表</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        .charts-total {
+            text-align: center;
+        }
+
+        .charts-total .item {
+            display: inline-block;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">对讲管理</li>
+                        <li class="active">业务类报表</li>
+                        <li class="active">里程报表</li>
+                    </ul>
+                    <h1 class="h1">里程报表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="searchForm" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label">排班：</label>
+                                            <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                                <select name="schedule" id="schedule" class="form-control"
+                                                        placeholder="请选择排班">
+                                                    <!--<option value="-1">请选择</option>-->
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                            <div class="col-md-2 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       placeholder="请设置时间范围"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="timeInterval" name="timeInterval" readonly/>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label">人员：</label>
+                                            <div class="has-feedback fastClear col-md-2 col-sm-8">
+                                                <input autocomplete="off"
+                                                       style="cursor: pointer; background-color: #fafafa;" type="text"
+                                                       name="groupSelect" placeholder="请选择"
+                                                       class="form-control"
+                                                       id="groupSelect" readonly/>
+                                                <span class="fa fa-chevron-down form-control-feedback"
+                                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                      id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="treeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label class="checkbox-inline" for="isIncumbency"><input checked
+                                                                                                         id="isIncumbency"
+                                                                                                         name="isIncumbency"
+                                                                                                         type="checkbox"
+                                                                                                         value="1"/>
+                                                    包含离职人员</label>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"><i
+                                                        class="glyphicon glyphicon-search"></i>查询
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--图形展示-->
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">图形展示</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-up" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch2-body" style="display:none;">
+                                <div id="chartsWrap" style="height:600px;width:100%;"></div>
+                                <div class="charts-total">
+                                    <div class="item">最高: <span id="max">0%</span></div>
+                                    <div class="item">最低: <span id="min">0%</span></div>
+                                    <div class="item">平均: <span id="average">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--报表-->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel-default">
+                                <div class="panel-heading clearfix" style="padding-bottom: 0">
+                                    <ul class="nav nav-tabs pull-left" style="border-bottom: none">
+                                        <li id="panelTab1" class="active"><a href="#panel1" data-toggle="tab">汇总记录</a>
+                                        </li>
+                                        <li id="panelTab2" class=""><a href="#panel2" data-toggle="tab">所有明细</a>
+                                        <li id="panelTab3" class=""><a href="#panel3" data-toggle="tab">具体明细</a>
+                                        </li>
+                                    </ul>
+                                    <a th:href="@{/talkback/reportManagement/scheduledMileageReport/exportSummary}"
+                                       id="alarmExport0" disabled="disabled"
+                                       class="btn btn-purple export-btn pull-right"><i
+                                            class="glyphicon glyphicon-log-out"></i>导出汇总记录</a>
+                                    <a th:href="@{/talkback/reportManagement/scheduledMileageReport/exportAll}"
+                                       id="alarmExport1" disabled="disabled"
+                                       class="btn btn-purple export-btn pull-right hide"><i
+                                            class="glyphicon glyphicon-log-out"></i>导出所有明细</a>
+                                    <a id="alarmExport2" disabled="disabled"
+                                       class="btn btn-purple export-btn pull-right hide"><i
+                                            class="glyphicon glyphicon-log-out"></i>导出具体明细</a>
+                                </div>
+                            </div>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="panel1">
+                                    <div class="panel panel-default">
+                                        <div class="panel-body fixed-table-body">
+                                            <table id="dataTable1"
+                                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                                   cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">序号</th>
+                                                    <th class="text-center">操作</th>
+                                                    <th class="text-center">监控对象</th>
+                                                    <th class="text-center">所属组织</th>
+                                                    <th class="text-center">所属分组</th>
+                                                    <th class="text-center">应工作总天数(天)</th>
+                                                    <th class="text-center">实际工作总天数(天)</th>
+                                                    <th class="text-center">实际工作有效总里程(km)</th>
+                                                    <th class="text-center">每天平均有效里程(km)</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="panel2">
+                                    <div class="panel panel-default">
+                                        <div class="panel-body fixed-table-body">
+                                            <table id="dataTable2"
+                                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                                   cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">序号</th>
+                                                    <th class="text-center">监控对象</th>
+                                                    <th class="text-center">所属组织</th>
+                                                    <th class="text-center">所属分组</th>
+                                                    <th class="text-center">日期</th>
+                                                    <th class="text-center">实际工作时段</th>
+                                                    <th class="text-center">当日有效里程(km)</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="panel3">
+                                    <div class="panel panel-default">
+                                        <div class="panel-body fixed-table-body">
+                                            <table id="dataTable3"
+                                                   class="table table-striped table-bordered table-hover noCheckTable"
+                                                   cellspacing="0" width="100%">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">序号</th>
+                                                    <th class="text-center">监控对象</th>
+                                                    <th class="text-center">所属组织</th>
+                                                    <th class="text-center">所属分组</th>
+                                                    <th class="text-center">日期</th>
+                                                    <th class="text-center">实际工作时段</th>
+                                                    <th class="text-center">当日有效里程(km)</th>
+                                                </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var inputEmpty = [[#{public.null}]];
+</script>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/scheduledMileageReport.js"></script>
+</html>

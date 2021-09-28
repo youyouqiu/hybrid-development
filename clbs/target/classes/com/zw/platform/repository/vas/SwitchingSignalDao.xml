@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.SwitchingSignalDao">
+
+    <!-- 查询  -->
+    <select id="findByPage" parameterType="com.zw.platform.util.common.BaseQueryBean" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT  DISTINCT v.id AS vehicle_id,c.id as seting_id,c.id as id, v.brand, vt.vehicle_type, v.group_id groups
+        FROM zw_m_vehicle_info v
+        INNER JOIN `zw_m_config` con ON v.id =  con.vehicle_id AND con.flag = 1
+        INNER JOIN zw_m_device_info di ON con.device_id = di.id AND di.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        LEFT JOIN zw_m_switching_signal c ON c.vehicle_id = v.id AND c.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1
+        WHERE v.flag = 1
+        AND au.user_id = #{userId}
+        AND v.brand NOT LIKE '扫%'
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+                AND v.brand LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+            </if>
+            <if test="param.groupId != null and param.groupId!=''">
+                AND a.org_id = #{param.groupId}
+            </if>
+            <if test="param.assignmentId != null and param.assignmentId!=''">
+                AND a.id = #{param.assignmentId}
+            </if>
+            <if test="param.protocol != null and param.protocol!=''">
+                AND di.device_type = #{param.protocol}
+            </if>
+        </if>
+        ORDER BY v.create_data_time DESC,v.id ASC
+    </select>
+
+
+    <select id="findByPageRedis" parameterType="list" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT  DISTINCT v.id AS vehicle_id,v.monitorType,c.id as seting_id,c.id as id, v.brand
+        FROM
+        (select id,brand,0 as monitorType,create_data_time from zw_m_vehicle_info where flag = 1 union all
+         select id,people_number as brand,1 as monitorType,create_data_time from zw_m_people_info where flag = 1 union all
+         select id,thing_number as brand,2 as monitorType,create_data_time from zw_m_thing_info where flag = 1) v
+        LEFT JOIN zw_m_io_vehicle_config c ON c.vehicle_id = v.id AND c.flag = 1
+        <if test="list != null and list.size() > 0">
+	        WHERE v.id IN
+	        <foreach item="item" collection="list" open="(" separator="," close=")">
+	            #{item}
+	        </foreach>
+        </if>
+        GROUP BY v.`id`
+        ORDER BY v.create_data_time DESC,v.id ASC
+    </select>
+
+
+    <!-- 通过id得到一个 -->
+    <select id="findByVehicleId" parameterType="string" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT sig.*,v.brand,zero.name as signal_zero_name,zero.identify as zeroId,
+         one.name as signal_one_name,one.identify as oneId,
+         two.name as signal_two_name,two.identify as twoId,
+         three.name as signal_three_name ,three.identify as threeId
+		 FROM zw_m_switching_signal sig
+         LEFT JOIN 
+         (
+			SELECT car.id, car.brand FROM zw_m_vehicle_info car WHERE car.flag = 1
+			UNION ALL
+			SELECT peo.id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag = 1
+			UNION ALL 
+			SELECT th.id, th.thing_number brand FROM zw_m_thing_info th WHERE th.flag = 1
+         )v ON v.id=sig.vehicle_id 
+         left join zw_m_switch_type zero on zero.id=sig.signal_zero and zero.flag=1
+         left join zw_m_switch_type one on one.id=sig.signal_one and one.flag=1
+         left join zw_m_switch_type two on two.id=sig.signal_two and two.flag=1
+         left join zw_m_switch_type three on three.id=sig.signal_three and three.flag=1
+         WHERE sig.flag=1 and sig.vehicle_id = #{vehicleId}
+    </select>
+    <!-- 通过id得到一个 -->
+    <select id="findById" parameterType="string" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT sig.*,v.brand,zero.name as signal_zero_name,
+        one.name as signal_one_name,
+        two.name as signal_two_name,
+        three.name as signal_three_name FROM zw_m_switching_signal sig
+        left join zw_m_vehicle_info v on v.id=sig.vehicle_id and v.flag=1
+        left join zw_m_switch_type zero on zero.id=sig.signal_zero and zero.flag=1
+        left join zw_m_switch_type one on one.id=sig.signal_one and one.flag=1
+        left join zw_m_switch_type two on two.id=sig.signal_two and two.flag=1
+        left join zw_m_switch_type three on three.id=sig.signal_three and three.flag=1
+        WHERE sig.flag=1 and sig.id = #{id}
+    </select>
+    <!-- 查询轮询参数设置了的车辆 -->
+    <select id="findVehicleSensorSetting" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT distinct ap.vehicle_id vehicleId, v.brand as brand
+        FROM zw_m_io_vehicle_config ap
+        INNER JOIN
+        (select id,brand from zw_m_vehicle_info where flag = 1 union all
+         select id,people_number as brand from zw_m_people_info where flag = 1 union all
+         select id,thing_number from zw_m_thing_info where flag = 1) v ON ap.vehicle_id = v.id
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        WHERE ap.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and di.device_type IN
+        <foreach collection="protocols" item="protocol" open="(" separator="," close=")">
+            #{protocol}
+        </foreach>
+        ORDER BY ap.create_data_time DESC
+    </select>
+
+
+    <!-- 新增 -->
+    <insert id="addSwitchingSignal" parameterType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        INSERT INTO zw_m_switching_signal (
+        id, vehicle_id,signal_zero,zero_type,signal_one,one_type,signal_two,two_type,signal_three,three_type,flag,create_data_time,create_data_username
+        )
+        VALUES(
+         #{id}, #{vehicleId}, #{signalZero},#{zeroType}, #{signalOne},#{oneType}, #{signalTwo},#{twoType}
+         , #{signalThree},#{threeType}, #{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+
+    <!-- 修改 -->
+    <update id="updateSwitchingSignal" parameterType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        UPDATE zw_m_switching_signal SET
+         signal_zero = #{signalZero},
+         zero_type = #{zeroType},
+        signal_one = #{signalOne},
+        one_type = #{oneType},
+         signal_three = #{signalThree},
+        three_type = #{threeType},
+         signal_two = #{signalTwo},
+         two_type = #{twoType},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据id删除一个 Peopel -->
+    <update id="deleteById" parameterType="string">
+        UPDATE zw_m_switching_signal set flag=0 WHERE id = #{id}
+    </update>
+
+    <!-- 批量解除外设信息 -->
+    <update id="deleteBatchByIds"  parameterType="java.util.List">
+        update zw_m_switching_signal
+        set flag = 0
+        where
+        flag = 1
+        and id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据vehcileid删除监测功能类型的绑定-->
+    <update id="deleteByVehicleId" parameterType="string">
+        UPDATE zw_m_switching_signal set flag=0 WHERE flag = 1 AND vehicle_id = #{vehicleId}
+    </update>
+
+    <!-- 获取车辆绑定IO传感器所有高低电频信息 -->
+    <select id="getIoSensorConfigInfo" parameterType="String" resultType="com.zw.app.domain.monitor.IoSensorConfigInfo">
+        SELECT st.`name`,vc.high_signal_type,vc.low_signal_type,st.state_one,st.state_two,vc.io_type,vc.io_site
+        FROM zw_m_io_vehicle_config vc
+        INNER JOIN zw_m_switch_type st ON st.id = vc.function_id AND st.flag = 1
+        WHERE vc.vehicle_id = #{monitor} AND vc.flag = 1
+    </select>
+
+    <select id="getBindSwitchSignalVehicle" resultType="com.zw.platform.domain.vas.switching.SwitchSignalStatisticsInfo">
+        SELECT
+             DISTINCT ivc.vehicle_id,vi.brand
+        FROM
+            zw_m_io_vehicle_config ivc
+        INNER JOIN zw_m_vehicle_info vi ON ivc.vehicle_id = vi.id AND vi.flag = 1
+        INNER JOIN zw_m_switch_type st ON ivc.function_id = st.id AND st.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON vi.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        WHERE
+            ivc.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        UNION
+        SELECT
+        DISTINCT ivc.vehicle_id,vi.people_number as brand
+        FROM
+        zw_m_io_vehicle_config ivc
+        INNER JOIN zw_m_people_info vi ON ivc.vehicle_id = vi.id AND vi.flag = 1
+        INNER JOIN zw_m_switch_type st ON ivc.function_id = st.id AND st.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON vi.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        WHERE
+        ivc.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        UNION
+        SELECT
+        DISTINCT ivc.vehicle_id,vi.thing_number as brand
+        FROM
+        zw_m_io_vehicle_config ivc
+        INNER JOIN zw_m_thing_info vi ON ivc.vehicle_id = vi.id AND vi.flag = 1
+        INNER JOIN zw_m_switch_type st ON ivc.function_id = st.id AND st.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON vi.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        WHERE
+        ivc.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getFunctionIdBingIoSite" resultType="com.zw.platform.domain.vas.alram.IoVehicleConfigInfo">
+        SELECT
+            vc.vehicle_id,
+            st.name,
+            vc.io_site AS ioSite,
+            vc.io_type AS ioType,
+            vc.high_signal_type AS highSignalType,
+            vc.low_signal_type AS lowSignalType,
+            st.state_one AS stateOne,
+            st.state_two AS stateTwo,
+            st.identify
+        FROM
+            zw_m_io_vehicle_config vc
+        LEFT JOIN
+            zw_m_switch_type st ON st.id = vc.function_id
+        WHERE
+            vc.flag = 1
+        AND st.flag = 1
+        AND vc.vehicle_id = #{vehicleId}
+    </select>
+
+    <update id="deleteBatchByMonitorIds">
+        UPDATE zw_m_switching_signal set flag=0 WHERE flag = 1 and vehicle_id in
+        <foreach collection="list" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,63 @@
+<form th:action="@{/talkback/basicinfo/monitoring/job/add}" id="addForm" role="form" action="#" method="post"
+    class="form-horizontal">
+  <div class="modal-header">
+    <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 class="modal-title">新增职位</h4>
+    <style>
+      .modal-dialog {
+        width: 40%;
+      }
+    </style>
+  </div>
+  <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+      id="avoidRepeatSubmitToken">
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label class="col-md-2 control-label"><label class="text-danger">*</label> 职位名称： </label>
+          <div class="col-md-9">
+            <input id="jobName" name="jobName" placeholder="请输入职位名称" type="text" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label"> <label class="text-danger">*</label> 图标： </label>
+          <div class="col-md-9">
+            <div>
+              <img id="preview" src="">
+            </div>
+            <input name="jobIconName" id="jobIconName" type="hidden" />
+            <div class="inpFilePhoto">
+              <input type="file" accept="image/png" name="file" id="doc" style="width: 202px;"
+                  onchange="jobAdd.setImagePreview();" />
+              <label class="changeFile" for="doc" title="未选择文件。">点击选择照片</label>
+            </div>
+            <p>注：图标格式为png，大小建议35*42，范围为：[30-40]*[37-47]。</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label">备注：</label>
+          <div class="col-md-9">
+            <textarea name="remark" type="text" class="form-control" placeholder="请输入备注" maxlength="100"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="button" id="doSubmitAdd">
+      <strong>提 交</strong>
+    </button>
+    <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+      <strong>关 闭</strong>
+    </button>
+  </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+  var publicNull = [[#{public.null}]];
+  var nameNull = [[#{job.name.null}]];
+  var jobNameError = [[#{job.name.error}]];
+  var jobNameExist = [[#{job.name.exist}]];
+</script>
+<script src="/clbs/resources/js/jobAdd.js"></script>

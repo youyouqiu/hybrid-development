@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.energy.TravelEnergyDao">
+    <select id="find" parameterType="string" resultType="com.zw.platform.domain.energy.TravelEnergy">
+     SELECT  id,vehicle_id as vehicleId,
+     start_time AS startTime,
+     end_time as endTime,
+     travel_time as travelTime,
+     travel_mile as tavelMile,
+     travel_fuel as tavelFuel,
+     travel_base as travelBaseFuel,
+     travel_base_cap as travelBaseCapacity
+      from zw_m_energy_travel where  vehicle_id=#{vehicleId} and flag=1 ORDER BY create_data_time DESC
+    </select>
+    <!-- 根据车辆id查询行驶最大基准时间 -->
+    <select id="findBaseTimeByVehicleId" resultType="java.util.Date" parameterType="string">
+    SELECT end_time baseTime FROM zw_m_energy_travel WHERE vehicle_id=#{vehicleId} and flag = 1 ORDER BY start_time DESC LIMIT 1
+    </select>
+    <delete id="delete" parameterType="string">
+        DELETE FROM zw_m_energy_travel  where id=#{id}
+    </delete>
+    <insert id="add" parameterType="com.zw.platform.domain.energy.TravelEnergy">
+        insert into zw_m_energy_travel  (
+        id,
+        vehicle_id,
+        start_time,
+        end_time,
+        travel_time,
+        travel_mile,
+        travel_fuel,
+        travel_base,
+        travel_base_cap,
+        create_data_time,
+        create_data_username)
+		VALUES(#{param.id},
+		#{param.vehicleId},
+		#{param.startTime},
+		#{param.endTime},
+		#{param.travelTime},
+		#{param.tavelMile},
+		#{param.tavelFuel},
+		#{param.travelBaseFuel},
+		#{param.travelBaseCapacity},
+		#{param.createDataTime},
+		#{param.createDataUsername})
+    </insert>
+<!--=====================================查询设置基准表======================================-->
+    <select id="getEnergy" parameterType="string" resultType="com.zw.platform.domain.energy.Energy">
+        SELECT travel_mile,travel_total,travel_base_list,avg_speed,travel_total_cap,travel_base_cap from zw_m_energy
+        where vehicle_id=#{vehicleId} and flag=1
+    </select>
+    <update id="update" parameterType="com.zw.platform.domain.energy.Energy">
+        UPDATE zw_m_energy  SET
+        travel_mile = #{param.travelMile},
+        travel_total = #{param.travelTotal},
+        travel_base_list=#{param.travelBaseList},
+        avg_speed=#{param.avgSpeed},
+        travel_total_cap=#{param.travelTotalCap},
+        travel_base_cap=#{param.travelBaseCap},
+        update_data_time =#{param.updateDataTime},
+        update_data_username =#{param.updateDataUsername}
+        WHERE vehicle_id = #{param.vehicleId} and flag = 1
+    </update>
+    <insert id="insert" parameterType="com.zw.platform.domain.energy.Energy">
+        insert into zw_m_energy (
+        id,
+        vehicle_id,
+        travel_mile,
+        travel_total,
+        travel_base_list,
+        avg_speed,
+        travel_total_cap,
+        travel_base_cap,
+        create_data_time,
+        create_data_username)
+        values
+        (#{param.id},
+        #{param.vehicleId},
+        #{param.travelMile},
+        #{param.travelTotal},
+        #{param.travelBaseList},
+        #{param.avgSpeed},
+        #{param.travelTotalCap},
+        #{param.travelBaseCap},
+        #{param.createDataTime},
+        #{param.createDataUsername})
+    </insert>
+    <select id="">
+
+
+    </select>
+</mapper>

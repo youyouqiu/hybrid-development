@@ -1,0 +1,110 @@
+<form th:action="@{/m/basicinfo/monitoring/personnel/edit.gsp}" th:object="${result}" id="editForm" action="#" role="form" method="post"  class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改人员信息</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" type="text" hidden="true" />
+                <input th:value="*{bindId}" id="bindId" type="hidden"/>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 编号： </label>
+                    <div class="col-md-7">
+                        <input th:field="*{peopleNumber}" name="peopleNumber" id="peopleNumber" placeholder="请输入编号" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                	<label class="col-md-3 control-label"><label
+						class="text-danger">*</label> 所属企业：</label>
+					<div class="has-feedback col-md-7 fastClear">
+                        <input th:field="*{groupName}" name="groupName" style="background-color: #fafafa; cursor: pointer;"
+                            class="form-control" id="zTreeCitySel" placeholder="请选择所属企业"
+                            type="text" value="" autocomplete="off"/>
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback" aria-hidden="true"></span>
+                        <input class="form-control hidden" name="groupId" id="groupId" th:field="*{groupId}" />
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"> 姓名：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{name}"  placeholder="请输入姓名" type="text" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"> 身份证号：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{identity}" placeholder="请输入身份证号" type="text" class="form-control" id="identity"/>
+                        <input th:value="*{identity}" id="scn" type="hidden"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">性别：</label>
+                    <div class="col-md-7">
+                        <div th:field="*{gender}">
+	                        <label class="radio-inline radioLabel"><input type="radio" th:field="*{gender}" name="gender" value="1"/> 男</label>
+	                        <label class="radio-inline radioLabel"><input type="radio" th:field="*{gender}" name="gender" value="2"/> 女</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">电话号码：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{phone}" placeholder="请输入电话号码" type="text" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">邮 箱：</label>
+                    <div class="col-md-7">
+                        <input th:field="*{email}" placeholder="请输入邮箱" type="text" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">备注：</label>
+                    <div class="col-md-7">
+                        <input  th:field="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+                    </div>
+                </div>
+                <div class="form-group" id="identityCardPhotoGroup">
+                    <label class="col-md-3 control-label">身份证照片：</label>
+                    <div class="col-md-7">
+                        <img id="identityCardImg" src="" style="width: 100%; height: 200px">
+                        <input id="identityCardPhoto"  th:field="*{identityCardPhoto}" type="hidden" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id = "bindMsg" hidden="true" style="text-align:left;color:red;">
+			<p> 注 ： 该人员绑定终端和终端手机号，人员编号不允许修改，如需修改请先解除绑定！</p>
+		</div>
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var identityError = [[#{identity.error}]];
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var emailError = [[#{email.error}]];
+    var publicSize8=[[#{public.size8.length}]];
+    var publicSize20=[[#{public.size20.length}]];
+    var publicSize50=[[#{public.size50.length}]];
+    var publicNull = [[#{public.null}]];
+    var publicSelectGroupNull = [[#{public.selectGroup.null}]];
+    var PersonnelNameNull = [[#{Personnel.name.null}]];
+    var personnelNumberNull = [[#{personnel.number.null}]];
+    var personnelIdentityExists = [[#{personnel.identity.exists}]];
+    var personnelNumberError = [[#{personnel.number.error}]];
+    var personnelNumberExists = [[#{personnel.number.exists}]];
+</script>
+<script src="/wro/personnelEdit.js" th:src="@{/wro/personnelEdit.js}"></script>

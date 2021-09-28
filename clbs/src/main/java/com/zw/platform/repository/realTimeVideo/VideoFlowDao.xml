@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoFlowDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoTrafficInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="channel" property="channel" jdbcType="INTEGER" />
+    <result column="flow_value" property="flowValue" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, vehicle_id, channel, flow_value, start_time, end_time, flag, create_data_time, 
+    create_data_username, update_data_time, update_data_username
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from zw_m_video_flow
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from zw_m_video_flow
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.zw.platform.domain.realTimeVideo.VideoTrafficInfo" >
+    insert into zw_m_video_flow (id, vehicle_id, channel, 
+      flow_value, start_time, end_time, stop_flag,
+      flag, create_data_time, create_data_username, 
+      update_data_time, update_data_username)
+    values (#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR}, #{channel,jdbcType=INTEGER}, 
+      #{flowValue,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{stopFlag,jdbcType=INTEGER}, 
+      #{flag,jdbcType=SMALLINT}, #{createDataTime,jdbcType=TIMESTAMP}, #{createDataUsername,jdbcType=VARCHAR}, 
+      #{updateDataTime,jdbcType=TIMESTAMP}, #{updateDataUsername,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zw.platform.domain.realTimeVideo.VideoTrafficInfo" >
+    insert into zw_m_video_flow
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="vehicleId != null" >
+        vehicle_id,
+      </if>
+      <if test="channel != null" >
+        channel,
+      </if>
+      <if test="flowValue != null" >
+        flow_value,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="flag != null" >
+        flag,
+      </if>
+      <if test="createDataTime != null" >
+        create_data_time,
+      </if>
+      <if test="createDataUsername != null" >
+        create_data_username,
+      </if>
+      <if test="updateDataTime != null" >
+        update_data_time,
+      </if>
+      <if test="updateDataUsername != null" >
+        update_data_username,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="vehicleId != null" >
+        #{vehicleId,jdbcType=VARCHAR},
+      </if>
+      <if test="channel != null" >
+        #{channel,jdbcType=INTEGER},
+      </if>
+      <if test="flowValue != null" >
+        #{flowValue,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="flag != null" >
+        #{flag,jdbcType=SMALLINT},
+      </if>
+      <if test="createDataTime != null" >
+        #{createDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDataUsername != null" >
+        #{createDataUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDataTime != null" >
+        #{updateDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDataUsername != null" >
+        #{updateDataUsername,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zw.platform.domain.realTimeVideo.VideoTrafficInfo" >
+    update zw_m_video_flow
+    <set >
+      <if test="vehicleId != null" >
+        vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+      </if>
+      <if test="channel != null" >
+        channel = #{channel,jdbcType=INTEGER},
+      </if>
+      <if test="flowValue != null" >
+        flow_value = #{flowValue,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="flag != null" >
+        flag = #{flag,jdbcType=SMALLINT},
+      </if>
+      <if test="createDataTime != null" >
+        create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDataUsername != null" >
+        create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDataTime != null" >
+        update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDataUsername != null" >
+        update_data_username = #{updateDataUsername,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zw.platform.domain.realTimeVideo.VideoTrafficInfo" >
+    update zw_m_video_flow
+    set vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+      channel = #{channel,jdbcType=INTEGER},
+      flow_value = #{flowValue,jdbcType=INTEGER},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      flag = #{flag,jdbcType=SMALLINT},
+      create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+      create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+      update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+      update_data_username = #{updateDataUsername,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

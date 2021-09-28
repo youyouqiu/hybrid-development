@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoSpecialSettingDao">
+    <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoSpecialSetting">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="video_play_time" property="videoPlayTime" jdbcType="INTEGER"/>
+        <result column="video_request_time" property="videoRequestTime" jdbcType="INTEGER"/>
+        <result column="ftp_storage" property="ftpStorage" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="flag" property="flag" jdbcType="SMALLINT"/>
+        <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP"/>
+        <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR"/>
+        <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP"/>
+        <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, video_play_time, video_request_time, ftp_storage, type,  flag, create_data_time,
+        create_data_username, update_data_time, update_data_username
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from zw_m_video_special_setting
+    </select>
+
+
+    <insert id="insert" parameterType="com.zw.platform.domain.realTimeVideo.VideoSpecialSetting">
+        insert into zw_m_video_special_setting (id, video_play_time, video_request_time, ftp_storage, type,  flag, create_data_time,
+        create_data_username
+        )
+        values (#{id,jdbcType=VARCHAR}, #{videoPlayTime,jdbcType=INTEGER}, #{videoRequestTime,jdbcType=INTEGER},
+        #{ftpStorage,jdbcType=INTEGER}, #{type,jdbcType=INTEGER}, #{flag,jdbcType=SMALLINT}, #{createDataTime,jdbcType=TIMESTAMP},
+        #{createDataUsername,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.realTimeVideo.VideoSpecialSetting">
+        update zw_m_video_special_setting
+        <set>
+            video_play_time = #{videoPlayTime,jdbcType=INTEGER},
+
+            video_request_time = #{videoRequestTime,jdbcType=INTEGER},
+
+            ftp_storage = #{ftpStorage,jdbcType=INTEGER},
+
+            type = #{type,jdbcType=INTEGER},
+
+            flag = #{flag,jdbcType=INTEGER},
+
+            update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+
+            update_data_username = #{updateDataUsername,jdbcType=VARCHAR}
+
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

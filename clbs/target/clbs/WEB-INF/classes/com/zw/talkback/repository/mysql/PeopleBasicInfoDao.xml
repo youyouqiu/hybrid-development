@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.PeopleBasicInfoDao">
+
+    <select id="getAllDriverType" resultType="com.zw.talkback.domain.basicinfo.BasicInfo">
+        select id, value as name
+        from zw_c_dictionary
+        where
+        type = 'DRVING_LICENCE_CATEGORY'
+    </select>
+
+    <select id="getAllQualification" resultType="com.zw.talkback.domain.basicinfo.BasicInfo">
+        select id, value as name
+        from zw_c_dictionary
+        where
+        type = 'CERTIFICATION_CATEGORY'
+    </select>
+
+    <select id="getAllBloodType" resultType="com.zw.talkback.domain.basicinfo.BasicInfo">
+        select id, value as name
+        from zw_c_dictionary
+        where
+        type = 'BLOOD_TYPE'
+    </select>
+
+    <select id="getAllNation" resultType="com.zw.talkback.domain.basicinfo.BasicInfo">
+        select id, value as name
+        from zw_c_dictionary
+        where
+        type = 'NATION'
+    </select>
+
+    <select id="getAllEducation" resultType="com.zw.talkback.domain.basicinfo.BasicInfo">
+        select id, value as name
+        from zw_c_dictionary
+        where
+        type = 'EDUCATION'
+    </select>
+
+    <insert id="addPeopleBasicInfo" parameterType="com.zw.talkback.domain.basicinfo.PeopleBasicInfo">
+        insert into zw_m_people_basic_info
+        (id,people_id,basic_id,type,flag)
+        values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id},#{item.peopleId},#{item.basicId},#{item.type},#{item.flag})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBasicInfo" parameterType="string">
+        delete from zw_m_people_basic_info
+        where people_id in
+        <foreach collection="peopleIdList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,146 @@
+<style>
+    .schedule-list{border:1px solid #eee;padding:0 20px;margin-bottom:20px;/*max-height:260px;overflow: hidden;overflow-y: auto;*/}
+    .zw-title{background:#eee;padding:5px;height:38px;margin-top:20px;}
+    .zw-title .control-label{padding-top:0;height:28px;line-height:28px;}
+    .stayMinute{width:40px;height:20px;line-height:20px;text-align: center;}
+    .inputStyleHide{padding:0;}
+    .peopleList{max-height:200px;overflow:hidden;padding-top:8px;padding-bottom:6px;overflow-y: auto;word-break: break-all;}
+</style>
+<form th:object="${result}"
+      id="detailForm"
+      role="form"
+      class="form-horizontal"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">排班详情</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="hidden" id="result" th:value="${details}">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班名称：</label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.scheduledName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班开始日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.startDateStr}" readonly="readonly" type="text" class="form-control inputStyleHide"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班结束日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.endDateStr}" readonly="readonly" type="text" class="form-control inputStyleHide"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label>  日期重复类型：</label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.dateDuplicateType.indexOf('8')!= -1 ? '每天' : '周期'}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                        <input type="hidden" id="dateDuplicateType" th:value="${schedulingInfo.dateDuplicateType}" />
+                    </div>
+                </div>
+
+                <div th:class="${schedulingInfo.dateDuplicateType.indexOf('8')!= -1 ? 'form-group hide' : 'form-group'}">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline" for="week1"><input id="week1" name="week" type="checkbox" disabled value="1"/> 周一</label>
+                        <label class="checkbox-inline" for="week2"><input id="week2" name="week" type="checkbox" disabled value="2"/> 周二</label>
+                        <label class="checkbox-inline" for="week3"><input id="week3" name="week" type="checkbox" disabled value="3"/> 周三</label>
+                        <label class="checkbox-inline" for="week4"><input id="week4" name="week" type="checkbox" disabled value="4"/> 周四</label>
+                        <label class="checkbox-inline" for="week5"><input id="week5" name="week" type="checkbox" disabled value="5"/> 周五</label>
+                        <label class="checkbox-inline" for="week6"><input id="week6" name="week" type="checkbox" disabled value="6" /> 周六</label>
+                        <label class="checkbox-inline" for="week7"><input id="week7" name="week" type="checkbox" disabled value="7" /> 周日</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label>  选择对象：</label>
+                    <div class="col-md-10 peopleList">
+                        <div id="peopleNames" th:data-value="${monitorNameList}"></div>
+                    </div>
+                </div>
+
+                <ul id="schedule-list" class="schedule-list">
+                    <li class="item" th:each="SchedulingItemInfos:${schedulingItemList}">
+                        <div class="zw-title clearfix">
+                            <label class="control-label pull-left"><label
+                                    class="text-danger">*</label> 排班项 </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 控制类型： </label>
+                            <div class="col-md-10">
+                                <label class="radio-inline"><input disabled class="controlType" type="radio"  th:name="${SchedulingItemInfos.startTime}" value="1" checked>围栏</label>
+                                <!--<label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="2" disabled>RFID</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="3" disabled>NFC</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="4" disabled>二维码</label>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 围栏： </label>
+                            <div class="col-md-4 has-feedback">
+                                <input th:value="${SchedulingItemInfos.fenceName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 开始时间： </label>
+                            <div class="col-md-4">
+                                <input  th:value="${SchedulingItemInfos.startTime}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 结束时间： </label>
+                            <div class="col-md-4">
+                                <input  th:value="${SchedulingItemInfos.endTime}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 关联报警： </label>
+                            <div class="col-md-10">
+                                <label class="checkbox-inline"><input class="relationAlarm" value="1" type="checkbox" disabled th:checked="${SchedulingItemInfos.relationAlarm.indexOf('1') != -1}"/> 上班未到岗</label>
+                                <label class="checkbox-inline"><input class="relationAlarm" value="2" type="checkbox" disabled th:checked="${SchedulingItemInfos.relationAlarm.indexOf('2') != -1}"/> 上班离岗</label>
+                                <label class="checkbox-inline">
+                                    <input class="relationAlarm" disabled value="3" type="checkbox"  th:checked="${SchedulingItemInfos.relationAlarm.indexOf('3') != -1}"/> 超时长停留
+                                    <input readonly class="form-control stayMinute inputStyleHide" name="residenceTime" type="text" th:value="${SchedulingItemInfos.residenceTime}">
+                                    分钟
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注： </label>
+                    <div class="col-md-10">
+                        <div th:text="${schedulingInfo.remark}" style="padding-top: 8px"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+    	<span>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">
+	            <strong>关 闭</strong>
+	        </button>
+    	</span>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/schedulingCenter/schedulingManagement/scheduleDetails.js"></script>

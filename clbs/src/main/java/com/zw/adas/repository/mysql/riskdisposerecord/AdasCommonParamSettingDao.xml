@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasCommonParamSettingDao">
+    <resultMap id="BaseResultMap" type="com.zw.adas.domain.define.setting.AdasCommonParamSetting">
+        <id column="id" jdbcType="VARCHAR" property="vehicleId"/>
+        <result column="vehicle_id" jdbcType="VARCHAR" property="vehicleId"/>
+        <result column="camera_resolution" jdbcType="VARCHAR" property="cameraResolution"/>
+        <result column="video_resolution" jdbcType="VARCHAR" property="videoResolution"/>
+        <result column="alarm_volume" jdbcType="VARCHAR" property="alarmVolume"/>
+        <result column="touch_status" jdbcType="VARCHAR" property="touchStatus"/>
+        <result column="photograph_number" jdbcType="INTEGER" property="photographNumber"/>
+        <result column="photograph_time" jdbcType="INTEGER" property="photographTime"/>
+        <result column="timing_photo_interval" jdbcType="VARCHAR" property="timingPhotoInterval"/>
+        <result column="distance_photo_interval" jdbcType="VARCHAR" property="distancePhotoInterval"/>
+        <result column="flag" jdbcType="TINYINT" property="flag"/>
+        <result column="speed_limit" jdbcType="DOUBLE" property="speedLimit"/>
+        <result column="protocol_type" jdbcType="INTEGER" property="protocolType"/>
+        <result column="param_type" jdbcType="VARCHAR" property="paramType"/>
+        <result property="sensitivity" column="sensitivity" jdbcType="INTEGER"/>
+        <result property="recordingTime" column="recording_time" jdbcType="INTEGER"/>
+        <result property="channelOne" column="channel_one" jdbcType="INTEGER"/>
+        <result property="channelTwo" column="channel_two" jdbcType="INTEGER"/>
+        <result property="channelThree" column="channel_three" jdbcType="INTEGER"/>
+        <result property="dynamicContrastInterval" column="dynamic_contrast_interval" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id,vehicle_id, camera_resolution, video_resolution, alarm_volume, touch_status, photograph_number,
+    photograph_time, timing_photo_interval, distance_photo_interval, flag, speed_limit,
+    protocol_type, param_type,sensitivity,recording_time,channel_one,channel_two,channel_three,dynamic_contrast_interval
+  </sql>
+    <select id="selectByVehicleId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from zw_m_adas_common_param_setting
+        where vehicle_id = #{vehicleId,jdbcType=VARCHAR} and flag = 1
+    </select>
+    <!-- 查询 -->
+    <select id="findReferVehicle" resultType="map">
+        SELECT
+        vehicle_id,
+        brand
+        FROM
+        (
+        SELECT DISTINCT
+        com.vehicle_id AS vehicle_id,
+        v.brand AS brand,
+        v.create_data_time
+        FROM
+        ${tableName} com
+        INNER JOIN zw_m_vehicle_info v ON com.vehicle_id = v.id
+        AND v.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id
+        AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id
+        AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id
+        AND au.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = au.assignment_id
+        AND a.flag = 1
+        WHERE
+        com.flag = 1
+        AND com.protocol_type = #{protocol}
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        UNION
+        SELECT DISTINCT
+        pla1.vehicle_id AS vehicle_id,
+        v1.brand AS brand,
+        v1.create_data_time
+        FROM
+        zw_m_adas_platform_param_setting pla1
+        INNER JOIN zw_m_vehicle_info v1 ON pla1.vehicle_id = v1.id
+        AND v1.flag = 1
+        INNER JOIN zw_m_config c1 ON c1.vehicle_id = v1.id
+        AND c1.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av1 ON v1.id = av1.vehicle_id
+        AND av1.flag = 1
+        INNER JOIN zw_m_assignment_user au1 ON av1.assignment_id = au1.assignment_id
+        AND au1.flag = 1
+        INNER JOIN zw_m_assignment a1 ON a1.id = au1.assignment_id
+        AND a1.flag = 1
+        INNER JOIN zw_m_device_info d1 ON d1.id = c1.device_id
+        AND d1.flag = 1
+        WHERE
+        au1.user_id = #{userId}
+        AND d1.device_type = #{protocol}
+        AND a1.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ) t1
+        ORDER BY
+        t1.create_data_time DESC
+    </select>
+    <!-- 查询 -->
+    <select id="findVehicleExit"
+            resultType="string">
+        SELECT com.vehicle_id
+        FROM zw_m_adas_common_param_setting com
+        where com.vehicle_id = #{vehicleId} and com.flag =1
+    </select>
+
+    <update id="updateCommonParamById">
+        update zw_m_adas_common_param_setting
+        <set>
+            flag=1,
+            <if test="adascom.cameraResolution != null">
+                camera_resolution = #{adascom.cameraResolution,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.videoResolution != null">
+                video_resolution = #{adascom.videoResolution,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.alarmVolume != null">
+                alarm_volume = #{adascom.alarmVolume,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.touchStatus != null">
+                touch_status = #{adascom.touchStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.photographNumber != null">
+                photograph_number = #{adascom.photographNumber,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.photographTime != null">
+                photograph_time = #{adascom.photographTime,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.timingPhotoInterval != null">
+                timing_photo_interval = #{adascom.timingPhotoInterval,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.distancePhotoInterval != null">
+                distance_photo_interval = #{adascom.distancePhotoInterval,jdbcType=VARCHAR},
+            </if>
+            <if test="adascom.speedLimit != null">
+                speed_limit = #{adascom.speedLimit,jdbcType=DOUBLE},
+            </if>
+            <if test="adascom.sensitivity != null">
+                sensitivity = #{adascom.sensitivity,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.recordingTime != null">
+                recording_time = #{adascom.recordingTime,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.channelOne != null">
+                channel_one = #{adascom.channelOne,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.channelTwo != null">
+                channel_two = #{adascom.channelTwo,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.channelThree != null">
+                channel_three = #{adascom.channelThree,jdbcType=INTEGER},
+            </if>
+            <if test="adascom.dynamicContrastInterval != null">
+                dynamic_contrast_interval = #{adascom.dynamicContrastInterval,jdbcType=INTEGER},
+            </if>
+        </set>
+        where vehicle_id = #{vid} and param_type = #{adascom.paramType} and flag = 1
+    </update>
+
+
+    <insert id="insertCommonParamBatch" parameterType="com.zw.adas.domain.define.setting.AdasCommonParamSetting">
+        insert into zw_m_adas_common_param_setting (id,vehicle_id, camera_resolution, video_resolution,
+        alarm_volume, touch_status, photograph_number,
+        photograph_time, timing_photo_interval, distance_photo_interval,
+        flag, speed_limit, protocol_type,
+        param_type,sensitivity,recording_time,channel_one,channel_two,channel_three,dynamic_contrast_interval
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},#{item.vehicleId}, #{item.cameraResolution}, #{item.videoResolution},
+            #{item.alarmVolume}, #{item.touchStatus}, #{item.photographNumber},
+            #{item.photographTime}, #{item.timingPhotoInterval}, #{item.distancePhotoInterval},
+            #{item.flag}, #{item.speedLimit}, #{item.protocolType},
+            #{item.paramType}, #{item.sensitivity}, #{item.recordingTime}, #{item.channelOne},
+            #{item.channelTwo}, #{item.channelThree},#{item.dynamicContrastInterval}
+            )
+        </foreach>
+    </insert>
+    <select id="selectParamList" resultType="com.zw.adas.domain.define.setting.AdasSettingListDo">
+        SELECT DISTINCT f.id AS vehicleId, f.brand, GROUP_CONCAT(DISTINCT c.protocol_type SEPARATOR ',') as bindId,
+        f.create_data_time AS createDataTime
+        FROM
+        zw_m_vehicle_info f
+        LEFT JOIN zw_m_adas_common_param_setting c ON f.id = c.vehicle_id and c.flag =1
+        WHERE
+        f.id IN
+        <foreach item="item" collection="params.list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY f.id ORDER BY f.create_data_time DESC, f.id DESC
+    </select>
+
+    <select id="selectDirect" resultType="string">
+        SELECT
+        zw.monitor_object_id as vehicleId
+        FROM
+        zw_m_directive zw
+        WHERE
+        flag = 1
+        AND zw.parameter_name = #{pName}
+        <if test="status!=-1">
+            And zw.status = #{status}
+        </if>
+        and zw.parameter_type = #{ptype}
+    </select>
+    <select id="selectDirectByList" resultType="string">
+        SELECT
+        zw.monitor_object_id as vehicleId
+        FROM
+        zw_m_directive zw
+        WHERE
+        flag = 1
+        AND zw.parameter_name in
+        <foreach item="idItem" collection="list" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        <if test="status!=-1">
+            And zw.status = #{status}
+        </if>
+        and zw.parameter_type = #{ptype}
+    </select>
+    <select id="selectDirectVid" resultType="string">
+    SELECT DISTINCT
+        zw.monitor_object_id as vid
+    FROM
+        zw_m_directive zw
+    WHERE
+        zw.parameter_type = #{protocol}
+        AND flag = 1
+    </select>
+    <delete id="deleteCommonByBatch">
+        delete from zw_m_adas_common_param_setting WHERE vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+    <delete id="deleteCommonByParamType">
+        delete from zw_m_adas_common_param_setting WHERE vehicle_id in
+        <foreach item="idItem" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+        and param_type in
+        <foreach item="paramType" collection="paramTypeSet" open="(" separator=","
+                 close=")">
+            #{paramType}
+        </foreach>
+    </delete>
+    <select id="selectDirectStatus" resultType="com.zw.platform.basic.domain.BaseKvDo">
+        SELECT
+        concat(zw.monitor_object_id,zw.parameter_name) as keyName,
+        zw.status as firstVal
+        FROM
+        zw_m_directive zw
+        WHERE
+        zw.monitor_object_id IN
+        <foreach item="idItem" collection="vehicleIds" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        and zw.parameter_type = #{protocol}
+        AND zw.flag = 1
+    </select>
+    <select id="selectProtocolByVid" resultType="integer">
+        select com.protocol_type from zw_m_adas_common_param_setting com where com.flag = 1 and com.vehicle_id = #{vid} limit 1
+    </select>
+    <update id="updateDirectiveByVidAndProtocol">
+        SELECT id FROM zw_m_directive
+        WHERE parameter_type = #{protocol}
+        AND monitor_object_id IN
+        <foreach item="idItem" collection="vehicleIds" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        FOR UPDATE;
+
+        UPDATE zw_m_directive zw
+        SET zw.flag = 0
+        WHERE
+        zw.parameter_type = #{protocol}
+        AND zw.monitor_object_id IN
+        <foreach item="idItem" collection="vehicleIds" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </update>
+    <select id="findadasParam" resultType="string">
+         SELECT com.vehicle_id
+        FROM zw_m_adas_common_param_setting com
+        where com.vehicle_id = #{vehicleId}
+         and com.param_type = #{paramType}
+         and com.protocol_type = #{protocolType}
+         and com.flag =1
+    </select>
+    <select id="findDefaultCom" resultType="com.zw.adas.domain.define.setting.AdasCommonParamSetting">
+        SELECT
+	        *
+        FROM
+	zw_m_adas_common_param_setting
+    WHERE
+	    vehicle_id = "default"
+	    AND protocol_type = #{start}
+	    AND flag =1
+    </select>
+    <select id="findDefaultAlarm" resultType="com.zw.adas.domain.define.setting.AdasAlarmParamSetting">
+    SELECT
+        *
+    FROM
+        zw_m_adas_alarm_param_setting
+    WHERE
+        vehicle_id = "default"
+        AND param_type = #{paramType}
+        and risk_function_id LIKE CONCAT(#{protocol},'%')
+        AND flag =1
+    </select>
+</mapper>

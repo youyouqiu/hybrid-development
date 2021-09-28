@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.VehicleSubTypeDao">
+    <!-- 新增子类型-->
+    <insert id="addSubType" parameterType="com.zw.platform.domain.basicinfo.form.VehicleSubTypeForm">
+      INSERT INTO zw_m_vehicle_type(id,vehicle_category,vehicle_type,description,create_data_time,create_data_username,pid,ico_id,vehicle_subtypes,driving_way)
+      VALUES (#{id},#{vehicleCategory},#{vehicleType},#{description},#{createDataTime},#{createDataUsername},#{pid},#{icoId},#{vehicleSubtypes},#{drivingWay})
+    </insert>
+
+    <!--重复验证-->
+    <select id="getSubTypeBy" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleSubTypeInfo">
+        SELECT * FROM zw_m_vehicle_type vt
+        WHERE vt.flag = 1 AND vt.pid IS NOT NULL AND vt.vehicle_type = BINARY #{vehicleType}
+        AND vt.vehicle_subtypes = BINARY #{vehicleSubType}
+    </select>
+
+    <select id="getVehicleSubTypeById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleSubTypeInfo">
+        SELECT vt.*,ico.ico_name AS icoName FROM zw_m_vehicle_type vt
+        LEFT JOIN zw_c_ico_config ico ON ico.id = vt.ico_id
+        WHERE vt.flag = 1 AND vt.id = #{id}
+    </select>
+
+    <!--分页列表-->
+    <select id="findVehicleSubTypePage" parameterType="com.zw.platform.domain.basicinfo.query.VehicleSubTypeQuery"
+            resultType="com.zw.platform.domain.basicinfo.VehicleSubTypeInfo">
+        SELECT vt.id,vt.vehicle_category,vt.vehicle_type AS subVehicleType,vt.description,vt.create_data_time,
+        vt.create_data_username,vt.update_data_time,vt.update_data_username,vt.flag,vt.pid,vt.ico_id,vt.vehicle_subtypes,vt.driving_way,
+        ico.ico_name AS icoName,vc.vehicle_category category,vpt.vehicle_type AS vehicleType FROM zw_m_vehicle_type vt
+        LEFT JOIN zw_c_ico_config ico ON ico.id = vt.ico_id AND ico.flag = 1
+        INNER JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        INNER JOIN zw_m_vehicle_type vpt ON vpt.id = vt.pid AND vpt.flag = 1
+        WHERE
+        vt.flag = 1 AND vt.pid IS NOT NULL
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and vt.vehicle_subtypes LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY vt.create_data_time DESC
+    </select>
+
+    <!--修改子类型-->
+    <update id="updateSubType" parameterType="com.zw.platform.domain.basicinfo.form.VehicleSubTypeForm">
+      UPDATE zw_m_vehicle_type SET
+      vehicle_category = #{vehicleCategory},vehicle_type = #{vehicleType},description = #{description},
+      update_data_time = #{updateDataTime}, update_data_username = #{updateDataUsername},
+      pid = #{pid},ico_id = #{icoId}, vehicle_subtypes = #{vehicleSubtypes},driving_way = #{drivingWay}
+      WHERE id = #{id}
+    </update>
+
+    <select id="checkVehicleSubTypeIsBinding" parameterType="string" resultType="boolean">
+      SELECT COUNT(*) FROM zw_m_vehicle_type vt
+      INNER JOIN zw_m_vehicle_info vi ON vt.id = vi.vehicle_sub_type_id AND vi.flag = 1
+      WHERE vt.flag = 1 AND vt.pid IS NOT NULL AND vt.id = #{id}
+    </select>
+
+    <delete id="deleteSubType" parameterType="string">
+        UPDATE zw_m_vehicle_type SET flag = 0 WHERE flag =1 AND id = #{id}
+    </delete>
+    <select id="getSubTypeBySubName" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleSubTypeInfo">
+        SELECT * FROM zw_m_vehicle_type vt
+        WHERE vt.flag = 1 AND vt.pid IS NOT NULL AND vt.vehicle_subtypes = #{vehicleSubType}
+    </select>
+
+    <select id="getSubTypeByVehicleId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleSubTypeInfo">
+        SELECT conf.ico_name AS icoName FROM zw_m_vehicle_info vei
+        INNER JOIN zw_m_vehicle_type sub ON sub.id=vei.vehicle_sub_type_id AND sub.flag = 1
+        INNER JOIN zw_c_ico_config conf ON conf.id = sub.ico_id AND conf.flag = 1
+        WHERE vei.flag = 1 AND vei.id = #{vehicleId}
+        GROUP BY vei.id
+    </select>
+</mapper>

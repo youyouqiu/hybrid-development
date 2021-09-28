@@ -1,0 +1,137 @@
+<form th:action="@{/m/basicinfo/monitoring/vehicle/insurance/edit.gsp}" id="editForm" th:object="${result}"
+	  role="form" action="#" method="post" class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+	<div class="modal-header">
+		<button id="doXAdd" type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;
+		</button>
+		<h4 class="modal-title">修改保险单号</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<input th:field="*{id}" id="vId" type="text" hidden="true" />
+				<input th:value="*{insuranceId}" id="oldInsuranceId" type="text" hidden="true" />
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label
+							class="text-danger">*</label> 保险单号：</label>
+					<div class="col-md-4">
+						<input name="insuranceId" th:field="*{insuranceId}" onblur="this.value=this.value.toUpperCase()" placeholder="请输入保险单号" type="text" id="insuranceId"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label"><label
+							class="text-danger">*</label> 车牌号：</label>
+					<div class="col-md-4">
+						<div class="input-group">
+							<input type="text" th:field="*{brand}" class="form-control"
+								   id="brand" placeholder="- 请选择车牌号 -"
+								   onkeyup="this.value=this.value.replace(/(^\s+)|(\s+$)/g,'')">
+							<div class="input-group-btn">
+								<button id="objectMonitoring" type="button" style="margin-bottom: 0"
+										class="btn btn-white dropdown-toggle disabled loading-state-button"
+										data-toggle="dropdown">
+									<i class="fa fa-spinner loading-state"></i>
+								</button>
+								<ul id="charNumList" class="dropdown-menu dropdown-menu-right"
+									role="menu">
+								</ul>
+							</div>
+						</div>
+						<input id="vehicleId" th:value="*{vehicleId}" name="vehicleId" class="hidden">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">保险类型：</label>
+					<div class="col-md-4">
+						<input name="insuranceType" th:field="*{insuranceType}" placeholder="请输入保险类型" type="text" id="insuranceType"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">保险公司：</label>
+					<div class="col-md-4">
+						<input name="company" th:field="*{company}" placeholder="请输入保险公司" type="text" id="company"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">保险开始时间：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer;  background-color: #fafafa;"
+							   class="form-control layer-date laydate-icon" placeholder="请选择保险开始时间"
+							   id="startTime" name="startTime" th:field="*{startTime}" autocomplete="off" />
+					</div>
+					<label class="col-md-2 control-label">保险到期时间：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer;  background-color: #fafafa;"
+							   class="form-control layer-date laydate-icon" placeholder="请选择保险到期时间"
+							   id="endTime" name="endTime" th:field="*{endTime}" autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">提前提醒天数：</label>
+					<div class="col-md-4">
+						<input name="preAlert" th:field="*{preAlert}" placeholder="请输入提前提醒天数" type="text" id="preAlert"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">保险金额：</label>
+					<div class="col-md-4">
+						<input name="amountInsured" th:field="*{amountInsured}" placeholder="请输入保险金额" type="text" id="amountInsured"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">折扣率(%)：</label>
+					<div class="col-md-4">
+						<input name="discount" th:field="*{discount}" placeholder="请输入折扣率" type="text" id="discount"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">实际费用：</label>
+					<div class="col-md-4">
+						<input name="actualCost" th:field="*{actualCost}" placeholder="请输入实际费用" type="text" id="actualCost"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">代理人：</label>
+					<div class="col-md-4">
+						<input name="agent" th:field="*{agent}" placeholder="请输入代理人" type="text" id="agent"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">电话：</label>
+					<div class="col-md-4">
+						<input name="phone" th:field="*{phone}" placeholder="请输入电话" type="text" id="phone"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">备注：</label>
+					<div class="col-md-4">
+						<input name="remark" th:field="*{remark}" placeholder="请输入备注" type="text" id="remark"
+							   class="form-control"/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="editDoSubmits">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script th:inline="javascript">
+    var insuranceIdExists = [[#{vehicleInsurance。insuranceId.exists}]];
+    var vehicleInsuranceId = [[#{vehicleInsurance。insuranceId}]];
+    var vehicleBrand = [[#{vehicleInsurance.brand}]];
+    var vehiclePreAlert = [[#{vehicleInsurance.preAlert}]];
+    var vehicleDiscount = [[#{vehicleInsurance.discount}]];
+    var publicSize9 = [[#{public.size9.length}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize30 = [[#{public.size30.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var mustInt = [[#{public.number.int}]];
+    var mustPositiveNumber = [[#{public.number.positiveNumber}]];
+
+</script>
+<script src="/resources/js/vehicleInsuranceEdit.js" th:src="@{/resources/js/vehicleInsuranceEdit.js}"></script>

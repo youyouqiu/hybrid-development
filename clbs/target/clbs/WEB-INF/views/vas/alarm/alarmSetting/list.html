@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>报警参数设置</title>
+<div th:replace="fragments/header">header</div>
+<style type="text/css">
+	.mult-check-ul{
+		margin:0px;
+		padding:0px;
+		border:1px solid #cccccc;
+		max-height:677px;
+		overflow-y:auto;
+	}
+	.mult-check-ul li{
+		display:table;
+		width:100%;
+		padding:0px;
+	}
+	.mult-check-ul input[type="checkbox"]{
+
+    	margin-left: 5px;
+		display:table-cell;
+	}
+	.mult-check-ul li span:hover{
+		background-color:#eeeeee;
+	}
+	.mult-check-ul li span{
+		margin:0px;
+		position:relative;
+		display:table-cell;
+		width:100%;
+		padding-left:4px;
+		padding-bottom:2px;
+	}
+	.lower-checkbox{
+		position:relative;
+		top:2px;
+		margin-right:3px;
+	}
+	.mult-check-ul li.title{
+		background-color:#ececec;
+		font-weight:bold;
+		padding:2px 5px;
+	}
+	.mult-check-ul li span.chosen{
+		background-color:#d6f3ff;
+	}
+	.show-more-title{
+		cursor:pointer;
+	}
+	.show-more-wrapper{
+		border-bottom:1px solid #e5e5e5;
+	}
+	#alarmLinkageMore input{
+		margin: 0 6px 0 0;
+	}
+	.fastMessage {
+		cursor: default;
+		width: 80px;
+		background: #757575;
+		height: 22px;
+		border-radius: 2px;
+		color: #fff;
+		text-align: center;
+		line-height: 22px;
+		opacity: 0.7;
+		position: absolute;
+		right: 18px;
+		bottom: 8px;
+	}
+	.tunnelID input{
+		/*background: url('/clbs/resources/img/down.svg') no-repeat scroll right center transparent;*/
+		/*background-color: #fafafa;*/
+	}
+	#wayIdBox:hover #multiOptions{
+		display: block;
+	}
+	#multiOptions {
+		position: absolute;
+		display: none;
+		z-index: 10;
+		background: rgb(255, 255, 255);
+		width: calc(100% - 30px);
+		box-shadow: 0px 0px 2px;
+		max-height: 186px;
+		overflow: auto;
+		top: 37px;
+	}
+	#multiOptions > label{
+		display: block;
+		margin: 4px 10px 4px 10px;
+		padding-bottom: 2px;
+		border-bottom: 1px solid #cfcfcf;
+		font-weight: normal;
+	}
+	#multiOptions > label > input{margin-right: 7px;}
+	#fastMessageTable_length{
+		display: none;
+	}
+	#fastMessageTable_info {
+		display: none;
+	}
+</style>
+<style>
+	.slider-box{
+		position: relative;
+		height: 23px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+		top: 7px;
+	}
+	.slider-line{
+		height: 2px;
+		background: #8a8a8a;
+		width: 100%;
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.middle-box{
+		position: relative;
+		top: 8px;
+	}
+	.small-dot{
+		width: 6px;
+		height: 6px;
+		background: #8a8a8a;
+		border-radius: 50px;
+		position: relative;
+		cursor: pointer;
+	}
+	.small-dot:before {
+		content: '';
+		position: absolute;
+		top: -5px;
+		right: -5px;
+		bottom: -5px;
+		left: -5px;
+	}
+	.slider-big-dot{
+		transition: all .3s ease;
+		width: 20px;
+		height: 20px;
+		position: absolute;
+		border-radius: 50%;
+		background: #6ED1F9;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+		box-shadow: 1px 1px 1px #c6c6c6;
+	}
+	.label-title{
+		text-decoration: none;
+		padding-left: 36px;
+		width: 180px;
+		cursor: pointer;
+		user-select: none;
+		color: rgb(93, 95, 99);
+	}
+	.label-title:hover{
+		color: rgb(109, 207, 246);
+	}
+	.label1{
+
+	}
+	.box1{
+		display: flex;
+		margin-bottom: 20px;
+	}
+	.rightBox{
+		width: 100%;
+	}
+	.rightItemBox{
+		display: flex;
+		margin-bottom: 11px;
+	}
+	.rightItemBox:last-child{
+		margin-bottom: 0px;
+	}
+	.rightItemBox > div{
+		width: 40%;
+		position: relative;
+	}
+	.rightItemBox > label{
+		width: 50%;
+		margin-left: 27px;
+		line-height: 35px;
+	}
+	.alarmLevel{
+		cursor: pointer;
+		font-size: 14px;
+		display: inline-block;
+		text-align: center;
+		position: relative;
+		width: 44px;
+	}
+	.alarmLevel:after{
+		content: '|';
+		position: absolute;
+		bottom: -16px;
+		left: 0;
+		right: 0;
+		transform: scaleY(0.5);
+		margin: auto;
+	}
+	.alarmLevel:hover {
+		color: #6dcff6;
+	}
+	.toolbarBox{
+		display: flex;
+		position: relative;
+		align-items: center;
+		left: -22px;
+		margin-bottom: 25px;
+	}
+	.toolbarBox .level{
+		margin-left: 3px;
+
+	}
+	.toolbarBox .fa-question-circle{
+		position: relative;
+		right: -3px;
+		top: 1px;
+	}
+	#panel_liBox li{
+		display: none;
+	}
+</style>
+</head>
+<body>
+	<section id="container">
+		<div th:replace="fragments/nav">nav</div>
+		<section class="main-content-wrapper">
+			<div th:replace="fragments/menu">menu</div>
+			<section id="main-content">
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">报警中心</li>
+							<li class="active">报警参数设置</li>
+						</ul>
+						<h1 class="h1 ">报警参数设置</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="leftTreeBox fuelConsumption">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title fwb">组织架构</h3>
+									<div class="actions pull-right listActions">
+										<i class="fa fa-chevron-down"></i>
+									</div>
+								</div>
+								<div class="panel-body" style="padding: 0px;">
+									<div class="form-group" style="margin-top: 15px;">
+										<div class="col-md-9">
+											<input autocomplete="off" id="search_condition" name="search" class="form-control" style="margin-bottom: 10px;" type="text" placeholder="请输入分组名称" />
+										</div>
+										<div class="col-md-3 btnPadding">
+											<div class="columns btn-group pull-right">
+					                            <div class="keep-open btn-group">
+					                                <button id="customizeColumns" style="padding-top:8px" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					                                    <span class="glyphicon glyphicon-align-justify"></span> <span class="caret"></span>
+					                                </button>
+					                                <ul class="dropdown-menu alarmSettingDropdown protocol-dropdown-menu" role="menu" id="Ul-menu-text-v"></ul>
+					                            </div>
+					                        </div>
+										</div>
+									</div>
+									<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+										style="padding: 0px; height:630px!important;">
+										<ul id="treeDemo" class="ztreee" style="height:615px!important;overflow:auto;"></ul>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+							<div class="panel panel-default">
+								<div class="panel-heading" id="stretch" >
+									<h3 class="panel-title fwb"  >报警参数设置列表</h3>
+									<div class="actions pull-right listActions">
+										<i class="fa chevron-down" id="stretch-chevron"></i>
+									</div>
+								</div>
+								<div class="panel-body fixed-table-body"  id="stretch-body">
+				                    <div class="ToolPanel">
+				                        <div class="bars pull-left">
+				                            <div class="btn-group pull-left barsMargin" role="group">
+				                                 <form role="form">
+				                                   <label><input autocomplete="off" type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" style="width:300px" placeholder="请输入监控对象关键字"></label>
+                                                     <button type="button" id="search_button"
+                                                             onclick="myTable.requestData()"
+                                                             class="btn btn-outline btn-default">搜索
+                                                     </button>
+				                                   <input id="hiddenText" type="text" style="display:none" />
+				                                 </form>
+				                            </div>
+				                            <div th:if="${hasRole}" class="dropdown pull-left">
+				                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+				                                </button>
+				                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+				                                	<li><a id = "settingMoreBtn"><i class="glyphicon glyphicon-wrench icoPaddingLeft"></i>批量设置</a></li>
+				                                 	<li><a href="javascript:void(0);" id="send_model"><i class="glyphicon glyphicon-circle-arrow-down icoPaddingLeft"></i>批量下发</a></li>
+													<li>
+														<a href="#" id="batchTactics" data-toggle="modal" data-target="#commonWin"><img src="../../resources/img/BatchLinkageIcon.svg" style="width:14px;height:14px;margin-right: 4px" />批量联动</a>
+													</li>
+				                                    <li><a href="#" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量清空</a></li>
+
+				                                </ul>
+				                            </div>
+				                        </div>
+				                        <div class="columns btn-group pull-right fuelConsumptionS">
+				                            <button id="refreshTable" class="btn btn-default" type="button" name="refresh" title="刷新">
+				                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+				                            </button>
+				                            <div class="keep-open btn-group" title="定制显示列">
+				                                <button id="customizeColumnsTwo" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				                                    <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+				                                </button>
+				                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+				                                </ul>
+				                            </div>
+				                        </div>
+				                    </div>
+									<table id="dataTable"
+										class="table table-striped table-bordered table-hover checkTable"
+										cellspacing="0" width="100%">
+										<thead>
+											<tr>
+												<th></th>
+												<th><input
+													type="checkbox" id="checkAll"></th>
+												<th>操作设置</th>
+												<th>下发状态</th>
+												<th>监控对象</th>
+												<th>通讯类型</th>
+												<th>所属企业</th>
+												<th>对象类型</th>
+											</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</section>
+	</section>
+	<!-- 应答 -->
+	<div class="modal fade" id="goTraceResponse" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+	     aria-labelledby="myModalLabel">
+	    <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+
+	            <div class="modal-header">
+	                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+	                <h4 class="modal-title" id="traceParameterResponse"><span id="msgTitle"></span></h4>
+	            </div>
+	            <div class="modal-body">
+	                <div class="row">
+	                    <div class="form-group">
+	                        <label class="col-md-4 control-label"><span id="question"></span></label>
+	                        <div class=" col-md-7">
+	                            <input type="hidden" id="infoId">
+	                            <input type="hidden" id="msgDataType">
+	                            <input type="hidden" id="objectType">
+	                            <input type="hidden" id="objectId">
+	                            <input type="text" placeholder="请输入应答" class="form-control" name="interval"
+	                                   id="answer"/>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="modal-footer">
+	                <button type="button" id="parametersResponse" class="btn btn-primary" >确定</button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+	<!--报警设置、修改弹窗-->
+	<div class="modal fade" id="alarmSettingModal" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog  modal-lg" role="document" style="width: 60%">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+					<h4 class="modal-title" >报警参数设置</h4>
+				</div>
+				<div class="modal-body" style="overflow: auto;max-height: 630px;">
+					<div class="col-md-12" style="margin-bottom: 12px;">
+						<div class="form-group">
+							<label class="col-md-2 control-label" style="position: relative;top: 10px;text-align: right;">
+								<span>
+									<label class="text-danger">*</label> 监控对象：
+								</span>
+							</label>
+							<div class="col-md-4">
+								<input id="monitorName" style="cursor: pointer;min-height:36px;" name="brand" placeholder="请输入监控对象" class="form-control" readonly/>
+							</div>
+							<label class="col-md-2 control-label"  style="position: relative;top: 10px;text-align: right;">
+								<span>参考对象：</span>
+							</label>
+							<div class="col-md-4">
+								<div class="input-group" style="margin-right:15px;">
+									<input name="brands" type="text" class="form-control" id="brands" style="min-height:36px;">
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+											<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu dropdown-menu-right" role="menu" style="max-width:300px"></ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="panel-heading">
+							<div class="dropdown panel-title fwb">
+								<ul class="nav nav-tabs" id="panel_liBox">
+									<li class="active"><a href="#alertList" data-toggle="tab">预警</a></li>
+									<li><a href="#driverAlarmList" data-toggle="tab">驾驶员引起报警</a></li>
+									<li><a href="#vehicleAlarmList" data-toggle="tab">车辆报警</a></li>
+									<li><a href="#faultAlarmList" data-toggle="tab">故障报警</a></li>
+									<li><a href="#highPrecisionAlarmList" data-toggle="tab">F3高精度报警</a></li>
+									<li><a href="#sensorAlarmList" data-toggle="tab">F3传感器报警</a></li>
+									<li><a href="#IOAlarm" data-toggle="tab">I/O报警</a></li>
+									<li><a href="#platAlarmList" data-toggle="tab">平台报警</a></li>
+
+									<li><a href="#peopleAlarmList" data-toggle="tab">BDTD-SM</a></li>
+									<li><a href="#peoplePlatAlarmList" data-toggle="tab">平台报警</a></li>
+									<li><a href="#asolongAlarmList" data-toggle="tab">ZYM</a></li>
+									<li><a href="#asolongPlatAlarmList" data-toggle="tab">平台报警</a></li>
+									<li><a href="#f3longAlarmList" data-toggle="tab">F3超长待机</a></li>
+									<li><a href="#f3longPlatAlarmList" data-toggle="tab">平台报警</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="panel-body" style="min-height: 150px" id="settingBody">
+							<div class="tab-content" style="padding-left: 9px;">
+								<div class="tab-pane active isDevice" id="alertList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="driverAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="vehicleAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="faultAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="highPrecisionAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="sensorAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="IOAlarm">
+									<div class="tab-pane" id="IOAlarmBox">
+										<div class="panel-heading" style="padding: 0 0 10px 0">
+											<div class="dropdown panel-title fwb">
+												<ul class="nav nav-tabs">
+													<li class="active"><a href="#deviceIoAlarmList" data-toggle="tab">终端I/O</a></li>
+													<li><a href="#ioCollectionOneAlarmList" data-toggle="tab">I/O采集1</a></li>
+													<li><a href="#ioCollectionTwoAlarmList" data-toggle="tab">I/O采集2</a></li>
+												</ul>
+											</div>
+										</div>
+										<div class="tab-content">
+											<div class="tab-pane active" id="deviceIoAlarmList">
+												<div class="toolbarBox">
+													<div class="level">
+														<span class="alarmLevel">屏蔽</span>
+														<span class="alarmLevel">无</span>
+														<span class="alarmLevel">局部</span>
+														<span class="alarmLevel">全局</span>
+														<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+														<span class="alarmLevel" style="margin-left: 200px;">状态</span>
+													</div>
+												</div>
+											</div>
+											<div class="tab-pane" id="ioCollectionOneAlarmList">
+												<div class="toolbarBox">
+													<div class="level">
+														<span class="alarmLevel">屏蔽</span>
+														<span class="alarmLevel">无</span>
+														<span class="alarmLevel">局部</span>
+														<span class="alarmLevel"> 全局 </span>
+														<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+														<span class="alarmLevel" style="margin-left: 200px;">状态</span>
+													</div>
+												</div>
+											</div>
+											<div class="tab-pane" id="ioCollectionTwoAlarmList">
+												<div class="toolbarBox">
+													<div class="level">
+														<span class="alarmLevel">屏蔽</span>
+														<span class="alarmLevel">无</span>
+														<span class="alarmLevel">局部</span>
+														<span class="alarmLevel"> 全局 </span>
+														<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+														<span class="alarmLevel" style="margin-left: 200px;">状态</span>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div style="color: red;" id="ioTip">
+											<p> 注 ： 请先在【应用管理】的【I/O监测设置】中设置I/O即可查看</p>
+										</div>
+									</div>
+								</div>
+								<div class="tab-pane isDevice" id="platAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">屏蔽</span>
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+										<i class="fa fa-question-circle fa-lg infoTitle"  data-toggle="tooltip"  data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+									</div>
+								</div>
+								<!--BDTD-SM-->
+								<div class="tab-pane isDevice" id="peopleAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+								<!--BDTD-SM 平台报警-->
+								<div class="tab-pane isDevice" id="peoplePlatAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+								<!--ZYM-->
+								<div class="tab-pane isDevice" id="asolongAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+								<!--ZYM 平台报警-->
+								<div class="tab-pane isDevice" id="asolongPlatAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+								<!--F3超长待机-->
+								<div class="tab-pane isDevice" id="f3longAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+								<!--F3超长待机 平台报警-->
+								<div class="tab-pane isDevice" id="f3longPlatAlarmList">
+									<div class="toolbarBox">
+										<div class="level">
+											<span class="alarmLevel">无</span>
+											<span class="alarmLevel">局部</span>
+											<span class="alarmLevel"> 全局 </span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-primary pull-left" type="button" id="defaultParam">
+						<strong>默认值</strong>
+					</button>
+					<button class="btn btn-primary readFlag" type="button" id="readParam">
+						<strong>读取</strong>
+					</button>
+					<button class="btn btn-primary" type="button" id="submitButton">
+						<strong>提 交</strong>
+					</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<strong>关 闭</strong>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<label id="error_label" class='error' style='display: none;'></label>
+	<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+	var sendCommandComplete = [[#{send.command.complete}]];
+	var selectItem = [[#{select.item}]];
+	var settingMoreUrl = /*[[@{/a/alarmSetting/settingmore.gsp}]]*/'url';
+</script>
+<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
+<script src="/wro/alarmSettingList.js" th:src="@{/wro/alarmSettingList.js}"></script>
+<script src="/clbs/resources/js/alarmSettingConfig.js"></script>
+<script src="/clbs/resources/js/alarmSettingUtils.js"></script>
+</html>

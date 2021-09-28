@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>里程标定</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/default.css" th:href="@{/resources/css/default.css}" />
+    <style>
+        label.control-label{
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+    	<div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">应用管理</li>
+                        <li class="active">里程监测</li>
+                        <li class="active">里程标定</li>
+                    </ul>
+                    <h1 class="h1 ">里程标定</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                	<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">查询</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" id="stretch2-body">
+                            <form id="oilist" class="form-horizontal" action="#"
+                                  method="post" role="form">
+                                <div class="form-group">
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect"><label class="text-danger">*</label> 监控对象：</label>
+                                    <div class="col-md-2 col-sm-8 searchListSelect">
+                                        <div style="position:relative;">
+                                             <div class="input-group">
+
+                                             	<input name="charSelect" type="text" class="form-control" maxlength="20" id="charSelect">
+                                             	<div class="input-group-btn">
+                                                 <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                                                     <span class="caret"></span>
+                                                 </button>
+                                                 <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                                 </ul>
+                                             	</div>
+                                         	</div>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+									<div class="col-md-4 col-sm-8 searchListSelect">
+										<input style="cursor: pointer; background-color: #fafafa;"
+											class="form-control layer-date laydate-icon"
+											id="timeInterval" name="timeInterval" readonly />
+									</div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control-label">
+                                        <input id="vehicleId" type="hidden" />
+                                        <input id="lastVehicleId" type="hidden">
+                                        <button id="todayClick" type="button" class="btn btn-primary">今天</button>
+                                        <button id="yesterdayClick" type="button" class="btn btn-primary">前一天 </button>
+                                        <button id="inquireClick" type="button" class="btn btn-primary">查询 </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default" id="graphArea">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb" style="position:reative">
+                            	图形展示
+								<div class="carName" style="display:none;">
+									<i id="leftClickVehicle" class="toopTip-btn-left"  style="display: inline-block;">
+										<img data-toggle="tooltip" data-placement="left" width="16" src="../../../../clbs/resources/img/car-left.svg" data-original-title="上一辆">
+									</i>
+									&nbsp;&nbsp;&nbsp;
+									<span id="carName"></span>
+									&nbsp;&nbsp;&nbsp;
+									<i id="rightClickVehicle" class="toopTip-btn-right"  style="display: inline-block;">
+										<img data-toggle="tooltip" data-placement="right" width="16" src="../../../../clbs/resources/img/car-right.svg" data-original-title="下一辆">
+									</i>
+								</div>
+                            </h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-up" id="faChevronDown"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="display:none;" id="graphShow">
+                        	<div class="container-area">
+	                            <div id="mileageChart" style="height: 600px;width:100%; margin: 0 auto;"></div>
+	                            <i class="right-btn" id="leftArrow"></i>
+	                            <i class="left-btn" id="rightArrow"></i>
+                            </div>
+                            <div class="col-md-12 item-title">
+                                <ul>
+                                    <li>行驶时长：<span id="travelTime">0小时0分0秒</span></li>
+                                    <li>怠速时长：<span id="stopTime">0小时0分0秒</span></li>
+                                    <li>总里程：<span id="totalMileage">0km</span></li>
+                                    <li>平均速度：<span id="averageSpeed">0km/h</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="demarcateData">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+						<div class="panel-heading" id="stretch">
+							<h3 class="panel-title fwb">里程数据</h3>
+							<div class="actions pull-right">
+								<i class="fa chevron-down" id="stretch-chevron"></i>
+							</div>
+						</div>
+                        <div class="panel-body form-horizontal" id="stretch-body">
+                       		<div class="form-group">
+                        		<div class="col-md-12">
+                        			<div class="col-md-6">
+	                        			<label class="col-md-3 control-label">开始里程(km)：</label>
+	                        			<div class="col-md-3">
+                                            <input type="hidden" name="vehicleId" id="form_vehicleId"/>
+                                            <input type="hidden" name="endTime" id="form_endTime"/>
+	                        				<input id="startMiles" name="" readonly="readonly" class="form-control" placeholder="开始里程(km)" />
+	                        			</div>
+	                        			<label class="col-md-3 control-label">结束里程(km)：</label>
+	                        			<div class="col-md-3">
+	                        				<input id="endMiles" name="" readonly="readonly" class="form-control" placeholder="结束里程(km)" />
+	                        			</div>
+	                        		</div>
+	                        		<div class="col-md-6">
+	                        			<label class="col-md-3 control-label">行驶里程(km)：</label>
+	                        			<div class="col-md-3">
+	                        				<input id="drivenDistance" name="" readonly="readonly" class="form-control" placeholder="行驶里程(km)" />
+	                        			</div>
+	                        			<label class="col-md-3 control-label">实际里程(km)：</label>
+	                        			<div class="col-md-3">
+	                        				<input id="actualMileage" name="" maxlength="20" onkeyup="value=value.replace(/[^0-9.]/g,'')" class="form-control" placeholder="实际里程(km)" />
+                                            <input id="actualRollingRadius" type="hidden" class="form-control" placeholder="实际修正系数" />
+	                        			</div>
+	                        		</div>
+                        		</div>
+                        	</div>
+                        	<div class="form-group">
+                        		<div class="col-md-12 control-label btnStylePadding">
+                        			<div th:if="${hasRole}">
+                                    <input id="msgSN" type="hidden">
+                       				<button id="submit_btn" type="button" class="btn btn-primary btn-default" disabled>修正下发</button>
+                                  	<button id="cancle_btn" type="button" class="btn btn-default">取消修正</button>
+                        			</div>
+                        		</div>
+                        	</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+<script type="text/javascript" src="/wro/mileage-calibration.js" th:src="@{/resources/js/mileageDemarcate.js}"></script>
+</html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.ItemNameDao">
+
+    <insert id="addItemName" parameterType="com.cb.platform.domain.ItemNameEntity">
+      insert into zw_m_item_name(id,name,danger_type,unit,remark,flag,create_data_time,create_data_username) values (#{entity.id},#{entity.name},#{entity.dangerType},
+      #{entity.unit},#{entity.remark},#{entity.flag},#{entity.createDataTime},#{entity.createDataUsername})
+    </insert>
+
+    <select id="findList" resultType="com.cb.platform.domain.ItemNameEntity">
+        select * from zw_m_item_name where flag = 1
+    </select>
+
+    <select id="findById" parameterType="string" resultType="com.cb.platform.domain.ItemNameEntity">
+        select * from zw_m_item_name where id = #{id} and flag = 1
+    </select>
+    <select id="findByIdList" parameterType="list" resultType="com.cb.platform.domain.ItemNameEntity">
+        select * from zw_m_item_name where flag = 1 and id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findByName" parameterType="string" resultType="com.cb.platform.domain.ItemNameEntity">
+        select * from zw_m_item_name where flag = 1 and name = BINARY #{name}
+    </select>
+    <!--根据车牌号查询-->
+    <select id="searchItemName" parameterType="com.cb.platform.domain.ItemNameQuery" resultType="com.cb.platform.domain.ItemNameEntity">
+        select * from zw_m_item_name where flag = 1
+        <if test="query.name!=null and query.name!=''">
+            and name like BINARY CONCAT('%',#{query.name},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <select id="findExportByName" parameterType="String" resultType="com.cb.platform.domain.ItemNameExportEntity">
+        select name,case when unit = 1 then 'kg' when unit = 2 then 'L' end unit,remark,d.value as danger_type from zw_m_item_name item LEFT JOIN zw_c_dictionary d on item.danger_type = d.code and d.type = 'DANGER_TYPE' where flag = 1
+        <if test="name!=null and name!=''">
+            and name like CONCAT('%',#{name},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+    <!--获取危险品类别-->
+    <select id="selectType" resultType="map">
+        select * from zw_c_dictionary where type = 'DANGER_TYPE'
+    </select>
+    <update id="updateItemName" parameterType="com.cb.platform.domain.ItemNameEntity">
+        update zw_m_item_name set name = #{entity.name},danger_type = #{entity.dangerType},unit = #{entity.unit},remark = #{entity.remark},
+         update_data_time = #{entity.updateDataTime},update_data_username = #{entity.updateDataUsername} where id = #{entity.id}
+    </update>
+    <!--批量删除-->
+    <update id="deleteItemName" parameterType="list">
+        update zw_m_item_name set flag = 0 where id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </update>
+    <!--批量添加-->
+    <insert id="insertList" parameterType="list">
+        insert into zw_m_item_name(id,name,danger_type,unit,remark,flag,create_data_time,create_data_username) values
+        <foreach collection="list" item="item" separator="," >
+            (#{item.id},#{item.name},#{item.dangerType},
+            #{item.unit},#{item.remark},#{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+</mapper>

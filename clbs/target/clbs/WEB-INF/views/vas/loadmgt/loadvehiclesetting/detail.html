@@ -1,0 +1,390 @@
+<form
+ id="detailForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXDetail" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">载重管理设置详情</h4>
+	</div>
+      <div class="modal-body">
+      	<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="col-md-3 control-label">监控对象：</label>
+					<div class="col-md-7">
+						<input th:value="${vehicleLoadSetting.plateNumber}" class="form-control inputStyleHide" readonly />
+					</div>
+				</div>
+			</div>
+		</div>
+		  <div class="row">
+			  <div class="col-md-12">
+				  <div class="panel-heading">
+					  <div class="dropdown panel-title fwb">
+						  <ul class="nav nav-tabs">
+							  <li class="active" id="egine1Title"><a href="#egine1" data-toggle="tab">1#载重</a></li>
+							  <li id="egine2Title"><a href="#egine2" data-toggle="tab">2#载重</a></li>
+						  </ul>
+                          <input id = "curBox" type="hidden" />
+                          <input id="type" th:value="${type}" hidden>
+					  </div>
+				  </div>
+				  <div class="panel-body">
+					  <div class="tab-content">
+						  <!-- 载重1 -->
+						  <div class="form-group">
+							  <label class="col-sm-2 control-label">
+								  传感器基本参数
+							  </label>
+							  <span style="float: right; margin-right: 100px;">
+								  <a class="btn btn-primary" type="button"  onclick="detail.setValue()" th:href="@{/v/loadmgt/loadvehiclesetting/calibrationDetail}" data-toggle="modal" data-target="#commonSmWin" >
+									  <strong>标定数据</strong>
+                                      <input name="listValue" id="listValue" type="hidden" th:value="${vehicleLoadSetting.adParamJson}"/>
+                                      <input name="listValue2" id="listValue2" type="hidden" th:value="${vehicleLoadSetting.twoAdParamJson}"/>
+								  </a>
+							  </span>
+
+						  </div>
+						  <div class="tab-pane active" id="egine1">
+							  <div class="form-group">
+								  <label class="col-md-2 control-label"> <label
+										  class="text-danger">*</label> 传感器型号：
+								  </label>
+								  <div class="col-md-4">
+									  <input th:value="${vehicleLoadSetting.sensorNumber}" class="form-control inputStyleHide" readonly />
+								  </div>
+							  </div>
+
+							  <div class="form-group">
+								  <label class="col-md-2 control-label"> 补偿使能：
+								  </label>
+								  <div class="col-md-4">
+									  <select  name="compensate" id="compensate" th:field="*{vehicleLoadSetting.compensate}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="2">禁用</option>
+										  <option value="1">使能</option>
+									  </select>
+								  </div>
+								  <label class="col-md-2 control-label"> 奇偶校验：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="oddEvenCheck" th:field="*{vehicleLoadSetting.oddEvenCheck}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="3">无校验</option>
+										  <option value="1">奇校验</option>
+										  <option value="2">偶校验</option>
+									  </select>
+								  </div>
+							  </div>
+							  <div class="form-group">
+								  <label class="col-md-2 control-label"> 波特率：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="baudRate" th:field="*{vehicleLoadSetting.baudRate}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="1">2400</option>
+										  <option value="2">4800</option>
+										  <option value="3">9600</option>
+										  <option value="4">19200</option>
+										  <option value="5">38400</option>
+										  <option value="6">57600</option>
+										  <option value="7">115200</option>
+									  </select>
+								  </div>
+								  <label class="col-md-2 control-label"> 滤波系数：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="filterFactor" th:field="*{vehicleLoadSetting.filterFactor}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="2">平滑</option>
+										  <option value="3">平稳</option>
+										  <option value="1">实时</option>
+									  </select>
+								  </div>
+							  </div>
+
+
+							  <hr/>
+							  <div class="form-group">
+								  <label class="col-sm-2 control-label">
+									  个性参数
+								  </label>
+							  </div>
+							  <div id="yaPerson1">
+								  <div class="form-group">
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 载重测量方法：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <select th:if="${vehicleLoadSetting.personLoadParam != null}" th:field="*{vehicleLoadSetting.personLoadParam.loadMeterWay}" disabled
+                                             class="form-control inputStyleHide" style="background-color: #fafafa" readonly>
+                                             <option selected="selected" value="0">单计重</option>
+                                             <option value="1">双计重</option>
+                                             <option value="2">四计重</option>
+                                         </select>
+                                     </div>
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 传感器重量单位：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <select th:if="${vehicleLoadSetting.personLoadParam != null}" th:field="*{vehicleLoadSetting.personLoadParam.loadMeterUnit}" disabled
+                                             class="form-control inputStyleHide" style="background-color: #fafafa" readonly>
+                                             <option value="0">0.1kg</option>
+                                             <option value="1">1kg</option>
+                                             <option value="2">10kg</option>
+                                             <option value="3" selected="selected">100kg</option>
+                                         </select>
+                                     </div>
+                                 </div>
+                                 <div class="form-group">
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 空载阈值（kg）：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.noLoadValue}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 空载阈值偏差（%）：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.noLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label class="col-md-2 control-label"> <label
+                                             class="text-danger">*</label> 轻载阈值（kg）：
+                                     </label>
+                                      <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.lightLoadValue}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 轻载阈值偏差（%）：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.lightLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label class="col-md-2 control-label"> <label
+                                             class="text-danger">*</label> 满载阈值（kg）：
+                                     </label>
+                                      <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.fullLoadValue}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 满载阈值偏差（%）：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.fullLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                 </div>
+
+                                 <div class="form-group">
+                                     <label class="col-md-2 control-label"> <label
+                                             class="text-danger">*</label> 超载阈值（kg）：
+                                     </label>
+                                      <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.overLoadValue}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                     <label class="col-md-2 control-label"><label
+                                             class="text-danger">*</label> 超载阈值偏差（%）：
+                                     </label>
+                                     <div class="col-md-4">
+                                         <input th:if="${vehicleLoadSetting.personLoadParam != null}" th:value="${vehicleLoadSetting.personLoadParam.overLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                     </div>
+                                 </div>
+							  </div>
+						  </div>
+						  <!-- 载重2 -->
+						  <div class="tab-pane" id="egine2">
+							  <div class="form-group">
+								  <label class="col-md-2 control-label"> <label
+										  class="text-danger">*</label> 传感器型号：
+								  </label>
+								  <div class="col-md-4">
+									  <input th:field="${vehicleLoadSetting.twoSensorNumber}" class="form-control inputStyleHide" readonly />
+								  </div>
+							  </div>
+							  <div class="form-group">
+
+								  <label class="col-md-2 control-label"> 补偿使能：
+								  </label>
+								  <div class="col-md-4">
+									  <select  name="twoCompensate" id="twoCompensate" th:field="*{vehicleLoadSetting.twoCompensate}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="2">禁用</option>
+										  <option value="1">使能</option>
+									  </select>
+								  </div>
+								  <label class="col-md-2 control-label"> 奇偶校验：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="oddEvenCheck" th:field="*{vehicleLoadSetting.twoOddEvenCheck}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="3">无校验</option>
+										  <option value="1">奇校验</option>
+										  <option value="2">偶校验</option>
+									  </select>
+								  </div>
+							  </div>
+							  <div class="form-group">
+								  <label class="col-md-2 control-label"> 波特率：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="baudRate" th:field="*{vehicleLoadSetting.twoBaudRate}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="1">2400</option>
+										  <option value="2">4800</option>
+										  <option value="3">9600</option>
+										  <option value="4">19200</option>
+										  <option value="5">38400</option>
+										  <option value="6">57600</option>
+										  <option value="7">115200</option>
+									  </select>
+								  </div>
+								  <label class="col-md-2 control-label"> 滤波系数：
+								  </label>
+								  <div class="col-md-4">
+									  <select name="filterFactor" th:field="*{vehicleLoadSetting.twoFilterFactor}" disabled class="form-control inputStyleHide">
+										  <option value="0" selected></option>
+										  <option value="2">平滑</option>
+										  <option value="3">平稳</option>
+										  <option value="1">实时</option>
+									  </select>
+								  </div>
+							  </div>
+
+
+							  <hr/>
+							  <div class="form-group">
+								  <label class="col-sm-2 control-label">
+									  个性参数
+								  </label>
+							  </div>
+							  <div id="yaPerson2">
+                                  <div class="form-group">
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 载重测量方法：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <select th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:field="*{vehicleLoadSetting.twoPersonLoadParam.loadMeterWay}" disabled
+                                                        class="form-control inputStyleHide" style="background-color: #fafafa" readonly>
+                                               <option selected="selected" value="0">单计重</option>
+                                               <option value="1">双计重</option>
+                                               <option value="2">四计重</option>
+                                           </select>
+                                       </div>
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 传感器重量单位：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <select th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:field="*{vehicleLoadSetting.twoPersonLoadParam.loadMeterUnit}" disabled
+                                                    class="form-control inputStyleHide" style="background-color: #fafafa" readonly>
+                                               <option value="0">0.1kg</option>
+                                               <option value="1">1kg</option>
+                                               <option value="2">10kg</option>
+                                               <option value="3" selected="selected">100kg</option>
+                                           </select>
+                                       </div>
+                                   </div>
+                                   <div class="form-group">
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 空载阈值（kg）：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.noLoadValue}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 空载阈值偏差（%）：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.noLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                   </div>
+
+                                   <div class="form-group">
+                                       <label class="col-md-2 control-label"> <label
+                                               class="text-danger">*</label> 轻载阈值（kg）：
+                                       </label>
+                                        <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.lightLoadValue}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 轻载阈值偏差（%）：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.lightLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                   </div>
+
+                                   <div class="form-group">
+                                       <label class="col-md-2 control-label"> <label
+                                               class="text-danger">*</label> 满载阈值（kg）：
+                                       </label>
+                                        <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.fullLoadValue}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 满载阈值偏差（%）：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null}" th:value="${vehicleLoadSetting.twoPersonLoadParam.fullLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                   </div>
+
+                                   <div class="form-group">
+                                       <label class="col-md-2 control-label"> <label
+                                               class="text-danger">*</label> 超载阈值（kg）：
+                                       </label>
+                                        <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null }" th:value="${vehicleLoadSetting.twoPersonLoadParam.overLoadValue}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                       <label class="col-md-2 control-label"><label
+                                               class="text-danger">*</label> 超载阈值偏差（%）：
+                                       </label>
+                                       <div class="col-md-4">
+                                           <input th:if="${vehicleLoadSetting.twoPersonLoadParam != null }" th:value="${vehicleLoadSetting.twoPersonLoadParam.overLoadThreshold}" class="form-control inputStyleHide" readonly/>
+                                       </div>
+                                   </div>
+                                </div>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
+      </div>
+      <div class="modal-footer">
+		<button id="doCloseDetail" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	  </div>
+</form>
+<style>
+select::-ms-expand {display: none;}
+select{background:none !important;}
+</style>
+<script th:inline="javascript">
+(function(window,$){
+    detail = {
+        setValue:function () {
+			if($("#egine1Title").hasClass("active")){
+			    $("#curBox").val(1);
+			}else {
+                $("#curBox").val(2);
+			}
+        }
+	}
+	$(function(){
+        var type = $("#type").val();
+		if(type == 1) {
+            $('#egine1Title').removeClass('active');
+            $('#egine1').removeClass('active');
+            $('#egine2Title').addClass('active');
+            $('#egine2').addClass('active');
+		}
+	})
+})(window,$)
+</script>

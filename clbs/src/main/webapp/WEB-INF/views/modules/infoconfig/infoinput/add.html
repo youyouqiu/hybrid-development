@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head th:fragment="header">
+    <title>流程录入</title>
+    <div th:replace="fragments/header">header</div>
+    <style type="text/css">
+        #step7 .form-group .col-md-3.control-label {
+            padding-right: 0px;
+        }
+
+        .dropdown-menu {
+            /*display:block !important;*/
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <!--main content start-->
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">信息配置</li>
+                        <li class="active">信息列表</li>
+                        <li class="active">流程录入</li>
+                    </ul>
+                    <h1 class="h1">流程录入</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">流程录入</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <section class="fuelux">
+                                <div id="myWizard" class="wizard">
+                                    <ul class="steps">
+                                        <li data-target="#step1" class="active"><span
+                                                class="badge badge-info">1</span>监控对象<span class="asterisk">*</span>
+                                            <span class="chevron"></span>
+                                        </li>
+                                        <li data-target="#step2"><span class="badge">2</span>分组<span
+                                                class="asterisk">*</span>
+                                            <span class="chevron"></span></li>
+                                        <li data-target="#step3"><span class="badge">3</span>终端号<span
+                                                class="asterisk">*</span>
+                                            <span class="chevron"></span></li>
+                                        <!-- 新添加 -->
+                                        <li data-target="#step4"><span class="badge">4</span>终端手机号<span class="asterisk">*</span>
+                                            <span class="chevron"></span></li>
+                                        <li data-target="#step5"><span class="badge">5</span>服务期限
+                                            <span class="chevron"></span></li>
+                                        <li id="personList" data-target="#step6"><span class="badge">6</span>从业人员
+                                            <span class="chevron"></span></li>
+                                        <li id="allShowList" data-target="#step7"><span class="badge">7</span>综合展示
+                                            <span class="chevron"></span></li>
+                                    </ul>
+                                </div>
+                                <div class="step-content">
+                                    <form th:action="@{/m/infoconfig/infoinput/add}"
+                                          class="form-horizontal" id="addForm1" action="#"
+                                          method="post" role="form">
+                                        <div class="step-pane active" id="step1">
+                                            <div id="checkChar" class="form-group-list">
+                                                <div class="form-group" id="addNew">
+                                                    <div class="col-md-2 lab-group">
+                                                        <div class="col-sm-6 col-md-4 text-center"
+                                                             style="margin:-4px 0px 0px 0px;">
+                                                            <input type="radio" name="monitorType" checked="checked"
+                                                                   id="chooseCar" value="0" class="monitoringSelect"/>
+                                                            <label for="chooseCar" id="chooseCarLab"
+                                                                   class="monitoringSelect selectCar activeIcon"
+                                                                   data-toggle="tooltip" data-placement="top"
+                                                                   title="车"></label>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-4 text-center"
+                                                             style="margin:-4px 0px 0px 0px;">
+                                                            <input type="radio" name="monitorType" id="choosePeople"
+                                                                   value="1" class="monitoringSelect"/>
+                                                            <label for="choosePeople" id="choosePeopleLab"
+                                                                   class="monitoringSelect selectPeople"
+                                                                   data-toggle="tooltip" data-placement="top"
+                                                                   title="人"></label>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-4 text-center"
+                                                             style="margin:-4px 0px 0px 0px;">
+                                                            <input type="radio" name="monitorType" id="chooseThing"
+                                                                   value="2" class="monitoringSelect"/>
+                                                            <label for="chooseThing" id="chooseThingLab"
+                                                                   class="monitoringSelect selectThing"
+                                                                   data-toggle="tooltip" data-placement="top"
+                                                                   title="物"></label>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-sm-2 col-md-1 control-label">
+                                                        <label class="text-danger">*</label> 监控对象：
+                                                    </label>
+                                                    <div class="col-sm-7 col-md-3">
+                                                        <div class="input-group">
+                                                            <input name="brands" type="text" class="form-control"
+                                                                   disabled
+                                                                   id="brands" placeholder="请新增或选择监控对象">
+                                                            <div class="input-group-btn">
+                                                                <button id="objectMonitoring" type="button"
+                                                                        class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                                                        data-toggle="dropdown">
+                                                                    <i class="fa fa-spinner loading-state"></i>
+                                                                    <!-- <span class="caret"></span> -->
+                                                                </button>
+                                                                <ul id="charNumList"
+                                                                    class="dropdown-menu dropdown-menu-right"
+                                                                    role="menu"
+                                                                    style="right:none;width:100%!important;min-width:100%;max-width:100%;">
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <input id="brandVal" name="brandID" class="hidden">
+                                                    </div>
+                                                    <div class="col-sm-3 col-md-1">
+                                                        <button id="charBtn" type="button" value="test"
+                                                                class="btn btn-primary addIcon"><span
+                                                                class="glyphicon glyphicon-plus"></span>新增
+                                                        </button>
+                                                        <button style="display:none;" id="detailBtn" type="button"
+                                                                value="test"
+                                                                class="btn btn-primary detailIcon"><span
+                                                                class="glyphicon glyphicon-eye-open"></span>详情
+                                                        </button>
+                                                    </div>
+                                                    <input id="monitorType" class="hidden">
+                                                    <div class="col-sm-11 col-md-4 control-label"
+                                                         style="padding-top:0;">
+                                                        <button type="button"
+                                                                class="btn btn-primary nextBtnBrand">下一步
+                                                        </button>
+                                                        <button type="button"
+                                                                onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                                class="btn btn-default btn-cancel-width">取消
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!--  车牌号详细信息 -->
+                                                <div class="detailMessage">
+                                                    <div class="monitoringObj-car-details">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_groupName"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">车牌颜色：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_plate_color"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">车主：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_owner"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">车主电话：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_owner_phone"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">别名：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_aliases"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">车辆类型：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_vehicle_type"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">车架号：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_chassis_number"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">发动机号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_engine_number"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">区域属性：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_area_attribute"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">省、直辖市：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_province"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">市、区：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="vehicle_city"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">燃料类型：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="vehicle_fuel_type"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="monitoringObj-people-details">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">编号：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="peo_number"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="peo_groupName"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">姓名：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="peo_name"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">身份证号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="peo_identity"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">性别：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="peo_gender"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 iPad control-label">电话号码：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad textShow xsiPad">
+                                                                        <span id="peo_phone"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">邮箱：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="peo_email"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="monitoringObj-thing-details">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_groupName"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">物品名称：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_name"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">物品类别：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_category"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">物品类型：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_type"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">型号：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_model"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">制造商：</label>
+                                                                    <div class="col-sm-8 col-md-2 textShow">
+                                                                        <span id="thing_manufacturer"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--  车牌号详细信息  end -->
+                                                <div class="charNew" id="charNew">
+                                                    <div class="monitoringObj-car-add">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="car_groupName" name="car_groupName"
+                                                                               class="form-control" readonly="readonly"
+                                                                               style="background-color: #fafafa; cursor: pointer;"
+                                                                               placeholder="请选择所属企业" type="text"/>
+                                                                        <input id="car_groupId" name="car_groupId"
+                                                                               type="hidden">
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">车牌颜色：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <select name="plateColor" placeholder="请选择车牌颜色"
+                                                                                class="form-control">
+                                                                            <option value="1">蓝</option>
+                                                                            <option selected="selected" value="2">黄
+                                                                            </option>
+                                                                            <option value="3">黑</option>
+                                                                            <option value="4">白</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">车辆别名：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input name="aliases" placeholder="请输入车辆别名"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">车架号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input name="chassisNumber" placeholder="请输入车架号"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">车主：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input name="vehicleOwner" id="vehicleOwnerIn"
+                                                                               placeholder="请输入车主"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">车主电话：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input name="vehicleOwnerPhone"
+                                                                               id="vehicleOwnerPhoneIn"
+                                                                               placeholder="请车主电话"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">
+                                                                        <label class="text-danger">*</label> 车辆类别：
+                                                                    </label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="category" placeholder="请输入车辆类别"
+                                                                                id="category" class="form-control">
+                                                                        </select>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label">
+                                                                        <label class="text-danger">*</label> 车辆类型：
+                                                                    </label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="vehicleType" placeholder="请输入车辆类型"
+                                                                                id="vehicleType" class="form-control">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">燃料类型：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="fuelType" placeholder="请选择燃料类型"
+                                                                                id="fuelType"
+                                                                                class="form-control">
+                                                                            <optgroup label="柴油" id="dieselOil">
+                                                                            </optgroup>
+                                                                            <optgroup label="汽油" id="gasoline">
+                                                                            </optgroup>
+                                                                            <optgroup label="天然气" id="naturalGas">
+                                                                            </optgroup>
+                                                                        </select>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">发动机号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input name="engineNumber" placeholder="请输入发动机号"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">区域属性：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="areaAttribute"
+                                                                                placeholder="请选择区域属性"
+                                                                                class="form-control">
+                                                                            <option value="省内">省内</option>
+                                                                            <option value="跨省">跨省</option>
+                                                                            <option value="进京报备">进京报备</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <!--<div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">省、直辖市：</label>
+                                                                    <div class="col-sm-9 col-md-7"
+                                                                        data-toggle="distpicker">
+                                                                        <div class="col-md-4 col-sm-11 paddingLeft">
+                                                                            <label class="sr-only" for="province1">Province</label>
+                                                                            <select class="form-control" name="province"
+                                                                                id="province"></select>
+                                                                        </div>
+                                                                        <div class="col-md-4 col-sm-11 citySelectOnly iPad">
+                                                                            <label class="sr-only" for="city1">City</label> <select
+                                                                                class="form-control" name="city" id="city"></select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="monitoringObj-people-add">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="monitoringObjPeopleAdd"
+                                                                               name="peo_groupName"
+                                                                               class="form-control" readonly="readonly"
+                                                                               style="background-color: #fafafa; cursor: pointer;"
+                                                                               placeholder="请选择所属企业" type="text"/>
+                                                                        <input id="peo_groupId" name="peo_groupId"
+                                                                               type="hidden">
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">姓名：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="name" name="name" placeholder="请输入姓名"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">身份证号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input id="identity" name="identity"
+                                                                               placeholder="请输入身份证号"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">性别：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select id="gender" name="gender"
+                                                                                placeholder="请选择性别"
+                                                                                class="form-control">
+                                                                            <option value="1">男</option>
+                                                                            <option value="2">女</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">电话号码：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input id="phone" name="phone"
+                                                                               placeholder="请输入电话号码"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">邮箱：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="email" name="email"
+                                                                               placeholder="请输入邮箱"
+                                                                               type="text"
+                                                                               class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="monitoringObj-thing-add">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                                            class="text-danger">*</label> 所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="monitoringObjThingAdd"
+                                                                               name="thing_groupName"
+                                                                               class="form-control" readonly="readonly"
+                                                                               style="background-color: #fafafa; cursor: pointer;"
+                                                                               placeholder="请选择所属企业" type="text"/>
+                                                                        <input id="thing_groupId" name="thing_groupId"
+                                                                               type="hidden">
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">物品名称：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="thingName" name="thingName"
+                                                                               placeholder="请输入物品名称"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">物品类别：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="thingCategory" id="thingCategory"
+                                                                                class="form-control">
+                                                                            <option th:each="c:${session.thingCategoryList}"
+                                                                                    th:value="${c.code}"
+                                                                                    th:text="${c.value}"
+                                                                                    th:select="${c.value=='其他物品'}"></option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">物品类型：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <select name="thingType" id="thingType"
+                                                                                class="form-control">
+                                                                            <option th:each="c:${session.thingTypeList}"
+                                                                                    th:value="${c.code}"
+                                                                                    th:text="${c.value}"
+                                                                                    th:select="${c.value=='其他物品'}"></option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">型号：</label>
+                                                                    <div class="col-sm-8 col-md-3 iPad">
+                                                                        <input id="thingModel" name="thingModel"
+                                                                               placeholder="请输入型号"
+                                                                               type="text" class="form-control"/>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-1 control-label">制造商：</label>
+                                                                    <div class="col-sm-8 col-md-3">
+                                                                        <input id="thingManufacturer"
+                                                                               name="thingManufacturer"
+                                                                               placeholder="请输入制造商"
+                                                                               type="text"
+                                                                               class="form-control"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 车 end-->
+                                        </div>
+                                        <!-- 分组 -->
+                                        <div class="step-pane" id="step2">
+                                            <div class="form-group form-group-list">
+                                                <div id="groupingArea">
+                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                            class="text-danger">*</label> 分组：</label>
+                                                    <div class="has-feedback col-sm-5 col-md-3">
+                                                        <div class="searchListSelect has-feedback">
+                                                            <input id="citySel" name="citySel"
+                                                                   class="form-control zTreeCommon"
+                                                                   readonly="readonly"
+                                                                   style="background-color: #fafafa; cursor: pointer;"
+                                                                   placeholder="请选择分组" type="text"/>
+                                                            <input id="groupPid" class="groupPid" name="groupPid"
+                                                                   type="hidden"/>
+                                                            <span class="fa fa-chevron-down form-control-feedback"
+                                                                  style="top: 0; right: 10px!important;cursor:pointer;"
+                                                                  aria-hidden="true" id="groupSelectSpan"></span>
+                                                        </div>
+                                                        <!--<input id="citySel" name="citySel" class="form-control zTreeCommon"
+                                                            readonly="readonly"
+                                                            style="background-color: #fafafa; cursor: pointer;"
+                                                            placeholder="请选择分组" type="text"/>
+                                                        <input id="groupPid" name="groupPid" type="hidden" />-->
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-sm-4 topSpace">
+                                                    <button id="grouping-add-btn" type="button"
+                                                            class="btn btn-primary addIcon">
+                                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-primary optionalListMessage detailIcon">
+                                                        <span class="glyphicon glyphicon-eye-open"></span>详情</span>
+                                                    </button>
+                                                </div>
+                                                <div class="col-sm-12 col-md-3 control-label" style="padding-top:0;">
+                                                    <button type="button" class="btn btn-primary upBtn"
+                                                            data-dismiss="modal">上一步
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary nextBtnGroup"
+                                                            data-dismiss="modal">下一步
+                                                    </button>
+                                                    <button type="button"
+                                                            onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                            class="btn btn-default btn-cancel-width">取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!--  组织详细信息 -->
+                                            <div id="groupMessage" style="display:none;">
+                                                <div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">分组名称：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_name"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">所属企业：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_parent"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">联系人：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_principal"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">联系电话：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_phone"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group hidden">
+                                                                <label class="col-sm-3 col-md-3 control-label">地址：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_address"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">描述：</label>
+                                                                <div class="col-sm-8 col-md-2 textShow">
+                                                                    <span id="group_description"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--  组织详细信息  end -->
+                                            <div id="addGrouping"></div>
+                                            <div class="col-sm-12 col-md-12" style="padding-top:25px;">
+                                                <lable style="color:red;">*</lable>
+                                                注：<i class="info-isCompany"></i> 表示企业
+                                                &nbsp;&nbsp;<i class="info-isGroup"></i> 表示分组，在分组管理中创建
+                                            </div>
+                                            <input id="citySelidVal" name="citySelID" class="form-control hidden">
+                                            <div class="form-group">
+                                            </div>
+                                        </div>
+                                        <!-- 终端编号 -->
+                                        <div class="step-pane" id="step3">
+                                            <div class="form-group form-group-list" id="addNew2">
+                                                <label class="col-sm-3 col-md-3 control-label"><label
+                                                        class="text-danger">*</label> 终端号：</label>
+                                                <div class="col-sm-6 col-md-3">
+                                                    <div class="input-group" id="ssss">
+                                                        <input name="devices" type="text" class="form-control"
+                                                               id="devices" placeholder="请新增或选择终端号">
+                                                        <div class="input-group-btn">
+                                                            <button type="button"
+                                                                    class="btn btn-white dropdown-toggle"
+                                                                    data-toggle="dropdown">
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul id="devicesList"
+                                                                class="dropdown-menu dropdown-menu-right"
+                                                                role="menu">
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input id="deviceVal" name="deviceID" class="hidden">
+                                                <div class="col-sm-3 col-md-1">
+                                                    <button id="terminalBtn" type="button" value="test"
+                                                            class="btn btn-primary addIcon"><span
+                                                            class="glyphicon glyphicon-plus"></span>新增
+                                                    </button>
+
+                                                    <button style="display:none;" id="devDetailBtn" type="button"
+                                                            value="test"
+                                                            class="btn btn-primary detailIcon"><span
+                                                            class="glyphicon glyphicon-eye-open"></span>详情
+                                                    </button>
+                                                </div>
+                                                <div class="col-sm-11 col-md-4 control-label" style="padding-top:0;">
+                                                    <button type="button" class="btn btn-primary upBtn"
+                                                            data-dismiss="modal">上一步
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-primary nextBtnDevice"
+                                                            data-dismiss="modal">下一步
+                                                    </button>
+                                                    <button type="button"
+                                                            onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                            class="btn btn-default btn-cancel-width">取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!--  终端编号详细信息 -->
+                                            <div class="equipmentMessage" style="display:none;">
+                                                <div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="device_groupName"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label iPad">终端名称：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="device_device_name"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label iPad">通讯类型：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="device_device_type"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">启停状态：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="device_is_start"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label iPad">功能类型：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="device_functional_type"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">通道数：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="device_channel_number"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label iPad">是否视频：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="device_is_video"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label">条码：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="device_bar_code"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label iPad">制造商：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="device_manu_facturer"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--  终端编号详细信息  end -->
+                                            <div class="terminalNew" id="terminalNew">
+                                                <div class="messageArea">
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 col-md-3 control-label"><label
+                                                                class="text-danger">*</label> 所属企业：</label>
+                                                        <div class="col-sm-8 col-md-3">
+                                                            <input id="device_pgroupName" name="device_pgroupName"
+                                                                   class="form-control" readonly="readonly"
+                                                                   style="background-color: #fafafa; cursor: pointer;"
+                                                                   placeholder="请选择所属企业" type="text"/>
+                                                            <input id="device_groupId" name="device_groupId"
+                                                                   type="hidden"/>
+                                                        </div>
+                                                        <label class="col-sm-3 col-md-2 control-label iPad">终端名称：</label>
+                                                        <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                            <input id="deviceNameIn" name="deviceName"
+                                                                   placeholder="请输入终端名称" type="text"
+                                                                   class="form-control"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 col-md-3 control-label iPad">
+                                                            <label class="text-danger">*</label> 通讯类型：
+                                                        </label>
+                                                        <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                            <select id="deviceTypeIn" name="deviceType"
+                                                                    placeholder="请选择通讯类型" class="form-control">
+                                                                <option value="0">交通部JT/T808-2011(扩展)</option>
+                                                                <option value="1" selected>交通部JT/T808-2013</option>
+                                                                <option value="2">移为</option>
+                                                                <option value="3">天禾</option>
+                                                                <option value="5">BDTD-SM</option>
+                                                                <option value="6">KKS</option>
+                                                                <option value="8">BSJ-A5</option>
+                                                                <option value="9">ASO</option>
+                                                                <option value="10">F3超长待机</option>
+                                                            </select>
+                                                        </div>
+                                                        <label class="col-sm-3 col-md-2 control-label">是否视频：</label>
+                                                        <div class="col-sm-8 col-md-3">
+                                                            <label class="checkbox-inline">
+                                                                <input type="radio" id="isVideo_yes" name="isVideo"
+                                                                       value="1" checked>是
+                                                            </label>
+                                                            <label class="checkbox-inline">
+                                                                <input type="radio" id="isVideo_no" name="isVideo"
+                                                                       value="0">否
+                                                            </label>
+                                                            <input type="hidden" id="isVideos" name="isVideos"
+                                                                   value="1"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 col-md-3 control-label iPad"><label
+                                                                class="text-danger">*</label> 功能类型：</label>
+                                                        <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                            <select id="functionalTypeIn" name="functionalType"
+                                                                    placeholder="请选择功能类型" class="form-control">
+                                                                <option value="1">简易型车机</option>
+                                                                <option value="2">行车记录仪</option>
+                                                                <option value="3">对讲设备</option>
+                                                                <option value="4">手咪设备</option>
+                                                                <option value="5">超长待机设备</option>
+                                                                <option value="6">定位终端</option>
+                                                            </select>
+                                                        </div>
+                                                        <label class="col-sm-3 col-md-2 control-label">条码：</label>
+                                                        <div class="col-sm-8 col-md-3">
+                                                            <input name="barCode" placeholder="请输入条码" type="text"
+                                                                   class="form-control"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 col-md-3 control-label iPad xsiPad">通道数：</label>
+                                                        <div class="col-sm-8 col-md-3 iPad">
+                                                            <select name="channelNumber" placeholder="请输入通道数"
+                                                                    class="form-control">
+                                                                <option selected="selected" value="1">4</option>
+                                                                <option value="2">5</option>
+                                                                <option value="3">8</option>
+                                                                <option value="4">16</option>
+                                                            </select>
+                                                        </div>
+                                                        <label class="col-sm-3 col-md-2 control-label">启停状态：</label>
+                                                        <div class="col-sm-8 col-md-3">
+                                                            <select id="isStart" name="isStart" class="form-control">
+                                                                <option selected="selected" value='1'>启用</option>
+                                                                <option value="0">停用</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-3 col-md-3 control-label iPad">制造商：</label>
+                                                        <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                            <input id="manuFacturerIn" name="manuFacturer"
+                                                                   placeholder="请输入制造商" type="text"
+                                                                   class="form-control"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                            </div>
+                                            <!--</form>-->
+                                        </div>
+                                        <!-- 终端手机号 -->
+                                        <div class="step-pane" id="step4">
+                                            <div class="form-horizontal">
+                                                <div class="form-group" id="addNew3">
+                                                    <label class="col-sm-3 col-md-3 control-label"><label
+                                                            class="text-danger">*</label> 终端手机号：</label>
+                                                    <div class="col-sm-6 col-md-3">
+                                                        <div class="input-group">
+                                                            <input name="sims" type="text" class="form-control "
+                                                                   id="sims" placeholder="请新增或选择终端手机号">
+                                                            <div class="input-group-btn">
+                                                                <button type="button"
+                                                                        class="btn btn-white dropdown-toggle"
+                                                                        data-toggle="dropdown">
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul id="SIMList"
+                                                                    class="dropdown-menu dropdown-menu-right"
+                                                                    role="menu">
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <input id="simVal" name="simID" class="hidden">
+                                                    <div class="col-sm-3 col-md-1">
+                                                        <button id="SIMBtn" type="button" value="test"
+                                                                class="btn btn-primary addIcon"><span
+                                                                class="glyphicon glyphicon-plus"></span>新增
+                                                        </button>
+
+                                                        <button style="display:none;" id="SIMDetailBtn" type="button"
+                                                                value="test"
+                                                                class="btn btn-primary detailIcon"><span
+                                                                class="glyphicon glyphicon-eye-open"></span>详情
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-sm-11 col-md-4 control-label"
+                                                         style="padding-top:0;">
+                                                        <button type="button" class="btn btn-primary upBtn"
+                                                                data-dismiss="modal">上一步
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary nextBtnSim"
+                                                                data-dismiss="modal">下一步
+                                                        </button>
+                                                        <button type="button"
+                                                                onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                                class="btn btn-default btn-cancel-width">取消
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <!--  终端手机号详细信息 -->
+                                                <div class="SIMMessage" style="display:none;">
+                                                    <div>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="simcard_groupName"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">启停状态：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="simcard_is_start"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">ICCID：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="iccid"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">IMSI：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="imsi"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">运营商：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="simcard_operator"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">IMEI：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="imei"></span>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">修正系数：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="correction_coefficient"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">预警系数：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="forewarning_coefficient"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-sm-3 col-md-3 control-label">容量：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="simcard_capacity"></span>
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label iPad">月预警流量(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="simcard_alerts_flow"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">套餐流量(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="simcard_sim_flow"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">小时流量阈值(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="hour_threshold_value"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">日流量阈值(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="day_threshold_value"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">月流量阈值(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="month_threshold_value"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label">流量月结日：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="monthly_statement"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">当日流量(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="day_real_value"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">当月流量(M)：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="month_real_value"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">激活日期：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow">
+                                                                        <span id="simcard_open_card_time"></span>
+                                                                    </div>
+                                                                    <label class="col-sm-3 col-md-2 control-label iPad">到期时间：</label>
+                                                                    <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                        <span id="simcard_end_time"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--  终端手机号详细信息  end -->
+                                                <div class="SIMNew" id="SIMNew">
+                                                    <div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label"><label
+                                                                    class="text-danger">*</label> 所属企业：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input id="sim_groupName" name="sim_groupName"
+                                                                       class="form-control" readonly="readonly"
+                                                                       style="background-color: #fafafa; cursor: pointer;"
+                                                                       placeholder="请选择所属企业" type="text"/>
+                                                                <input id="sim_groupId" name="sim_groupId"
+                                                                       type="hidden"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label iPad">启停状态：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                                <label class="checkbox-inline"> <input
+                                                                        type="radio" name="isStart" id="isRadio"
+                                                                        value="1"
+                                                                        checked> 启用
+                                                                </label> <label class="checkbox-inline"> <input
+                                                                    type="radio" name="isStart" id="noRadio" value="0">
+                                                                停用
+                                                            </label>
+                                                                <input type="hidden" id="isStart_sim" name="isStart_sim"
+                                                                       value="1">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label"><label
+                                                                    class="text-danger"></label>ICCID：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad">
+                                                                <input name="iccid" id="iccid" placeholder="请输入ICCID"
+                                                                       type="text"
+                                                                       class="form-control" maxlength="20"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label"><label
+                                                                    class="text-danger"></label>IMSI：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input name="imsi" id="imsi"
+                                                                       placeholder="请输入IMSI" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">运营商：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <select id="operatorIn" name="operator"
+                                                                        placeholder="请选择运营商" class="form-control">
+                                                                    <option selected="selected" value="中国移动">中国移动
+                                                                    </option>
+                                                                    <option value="中国联通">中国联通</option>
+                                                                    <option value="中国电信">中国电信</option>
+                                                                </select>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label iPad">IMEI：</label>
+                                                            <div class="col-sm-8 col-md-3 textShow iPad xsiPad"
+                                                                 style="padding-top: 0;">
+                                                                <input name="imei" id="imei"
+                                                                       placeholder="请输入IMEI" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">修正系数：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad">
+                                                                <input name="correctionCoefficient"
+                                                                       id="correctionCoefficient" value=100
+                                                                       placeholder="请输入修正系数" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label">预警系数：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input id="forewarningCoefficient"
+                                                                       name="forewarningCoefficient"
+                                                                       value=90 placeholder="请输入预警系数" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">激活日期：</label>
+                                                            <div class="col-sm-8 col-md-3 has-feedback">
+                                                                <input id="openCardTime" name="openCardTime"
+                                                                       placeholder="请输入激活日期"
+                                                                       class="form-control layer-date laydate-icon"
+                                                                       style="cursor: pointer;  background-color: #fafafa;"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label iPad">套餐流量(M)：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                                <input id="simFlowIn" name="simFlow"
+                                                                       onblur="this.value=value.replace(/[^\d]/g,'')"
+                                                                       placeholder="请输入套餐流量" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">到期时间：</label>
+                                                            <div class="col-sm-8 col-md-3 has-feedback">
+                                                                <input id="endTime" name="endTime"
+                                                                       placeholder="请输入到期日期"
+                                                                       class="form-control layer-date laydate-icon"
+                                                                       style="cursor: pointer;  background-color: #fafafa;"/>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">流量月结日(M)：</label>
+                                                            <div class="col-sm-8 col-md-3 has-feedback">
+                                                                <input id="monthlyStatement" name="monthlyStatement"
+                                                                       onblur="this.value=value.replace(/[^\d]/g,'')"
+                                                                       placeholder="默认为每月1号" value="01" readonly
+                                                                       type="text" class="form-control"
+                                                                />
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label">月预警流量(M)：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input id="alertsFlow" name="alertsFlow"
+                                                                       placeholder="月预警流量 = 月流量阈值(M) * 预警系数" readonly
+                                                                       type="text" class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">小时流量阈值(M)：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad">
+                                                                <input name="hourThresholdValue" placeholder="请输入小时流量阈值"
+                                                                       type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label">日流量阈值(M)：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input name="dayThresholdValue"
+                                                                       placeholder="请输入日流量阈值" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">月流量阈值(M)：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad">
+                                                                <input id="monthThresholdValue"
+                                                                       name="monthThresholdValue" placeholder="请输入月流量阈值"
+                                                                       type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label iPad">流量最后更新时间：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                                <input id="monthTrafficDeadline" readonly
+                                                                       name="monthTrafficDeadline"
+                                                                       placeholder="流量最后更新时间" type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-3 col-md-3 control-label">当日流量(M)：</label>
+                                                            <div class="col-sm-8 col-md-3">
+                                                                <input name="dayRealValue"
+                                                                       placeholder="当日流量" readonly type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                            <label class="col-sm-3 col-md-2 control-label iPad">当月流量(M)：</label>
+                                                            <div class="col-sm-8 col-md-3 iPad xsiPad">
+                                                                <input name="monthRealValue"
+                                                                       placeholder="当月流量" readonly type="text"
+                                                                       class="form-control"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 服务期限 -->
+                                        <div class="step-pane" id="step5">
+                                            <div class="form-group form-group-list">
+                                                <!--	<label class="col-sm-2 col-md-1 control-label">计费日期:</label>
+                                                    <div class="has-feedback col-sm-4 col-md-3">
+                                                        <input id="billingDate" name="billingDate"
+                                                            placeholder="计费日期"
+                                                            class="form-control layer-date laydate-icon"
+                                                            onclick="laydate({format: 'YYYY-MM-DD'})">
+                                                    </div>
+                                                    <label class="col-sm-2 col-md-1 control-label">到期日期:</label>
+                                                    <div class="has-feedback col-sm-4 col-md-3">
+                                                        <input id="dueDate" name="dueDate" placeholder="到期日期"
+                                                            class="form-control layer-date laydate-icon"
+                                                            onclick="laydate({format: 'YYYY-MM-DD'})">
+                                                    </div> -->
+                                                <label class="col-md-3 col-sm-3 control-label searchListSelect">服务期限：</label>
+                                                <input id="billingDate" name="billingDate" type="hidden"/>
+                                                <input id="dueDate" name="dueDate" type="hidden"/>
+                                                <div class="col-md-4 col-sm-8 searchListSelect">
+                                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                                           class="form-control layer-date laydate-icon"
+                                                           id="timeInterval" name="timeInterval" readonly/>
+                                                </div>
+                                                <div class="col-sm-12 col-md-4 control-label topSpace"
+                                                     style="padding-top:0;">
+                                                    <button type="button" class="btn btn-primary upBtn"
+                                                            data-dismiss="modal">上一步
+                                                    </button>
+                                                    <button type="button" class="btn btn-primary nextBtnData"
+                                                            data-dismiss="modal">下一步
+                                                    </button>
+                                                    <button type="button"
+                                                            onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                            class="btn btn-default btn-cancel-width">取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- 从业人员 -->
+                                        <div class="step-pane" id="step6">
+                                            <div class="form-group form-group-list">
+                                                <div id="workPeople">
+                                                    <label class="col-sm-3 col-md-3 control-label">从业人员：</label>
+                                                    <div class="col-sm-5 col-md-3">
+                                                        <div class="input-group">
+                                                            <input name="professionals" type="text"
+                                                                   class="form-control" id="professionals"
+                                                                   readonly="readonly"
+                                                                   style="background-color: #fafafa; cursor: pointer;"
+                                                                   placeholder="请选择从业人员"/> <input
+                                                                name="professionalsID" id="professionalsID"
+                                                                type="hidden"/>
+                                                            <div class="input-group-btn">
+                                                                <button type="button"
+                                                                        class="btn btn-white dropdown-toggle"
+                                                                        data-toggle="dropdown">
+                                                                    <span class="caret"></span>
+                                                                </button>
+                                                                <ul class="dropdown-menu dropdown-menu-right"
+                                                                    role="menu">
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-sm-4" style="padding-top:0;">
+                                                    <button id="people-add-btn" type="button"
+                                                            class="btn btn-primary addIcon">
+                                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                                    </button>
+
+                                                    <button type="button"
+                                                            class="btn btn-primary peopleListMessage detailIcon">
+                                                        <span class="glyphicon glyphicon-eye-open"></span>详情</span>
+                                                    </button>
+                                                </div>
+                                                <div class="col-sm-11 col-md-3 control-label" style="padding-top:0;">
+                                                    <button type="button" class="btn btn-primary upBtn"
+                                                            data-dismiss="modal">上一步
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-primary nextBtnPeoList"
+                                                            data-dismiss="modal">下一步
+                                                    </button>
+                                                    <button type="button"
+                                                            onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                            class="btn btn-default btn-cancel-width">取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- 从业人员详细信息 -->
+                                            <div id="peopleMessage" style="display:none;">
+                                                <div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">姓名：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="people_name"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label iPad">性别：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="people_gender"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">出生日期：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="people_birthday"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label iPad">身份证号：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="people_identity"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">电话号码：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="people_phone"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label iPad">邮箱：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="people_email"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">岗位类型：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="people_position_type"></span>
+                                                                </div>
+                                                                <label class="col-sm-3 col-md-2 control-label iPad">工号：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow iPad xsiPad">
+                                                                    <span id="people_job_number"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-sm-3 col-md-3 control-label">卡号：</label>
+                                                                <div class="col-sm-8 col-md-3 textShow">
+                                                                    <span id="people_card_number"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- 从业人员详细信息  end -->
+                                            <div id="people-add-area"></div>
+                                            <div class="form-group" style="padding-top: 20px;">
+                                            </div>
+                                        </div>
+                                        <!-- 从业人员   end-->
+                                        <!-- 综合展示 -->
+                                        <div class="step-pane" id="step7">
+                                            <div class="form-group" style="margin-top:23px;">
+                                                <div class="col-sm-10 col-md-11 control-label">
+                                                    <button type="button" class="btn btn-primary upBtn"
+                                                            data-dismiss="modal">上一步
+                                                    </button>
+                                                    <button id="submits" type="button"
+                                                            class="btn btn-primary btn-cancel-width"
+                                                            data-dismiss="modal"
+                                                            style="padding-left:15px;padding-right:15px;">完成
+                                                    </button>
+                                                    <button type="button"
+                                                            onclick="window.location.href='/clbs/m/infoconfig/infoinput/list'"
+                                                            class="btn btn-default btn-cancel-width"
+                                                            data-dismiss="modal">取消
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-one show_group"
+                                                 style="margin-right:0px !important">
+                                                <div style="width:75%;margin:auto">
+                                                    <div>
+                                                        <div class="col-sm-5 col-md-4">
+                                                            <label class="col-sm-4 col-md-4 col-md-offset-4 col-sm-offset-4">监控对象*</label>
+                                                            <div class="col-sm-12 col-md-12 object-area">
+                                                                <div id="carDetails">
+                                                                    <div class="form-group  form-object">
+                                                                        <label class="col-sm-3 col-md-3 control-label">监控对象：</label>
+
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="brandNumber"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">车主：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="vehicleOwner"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">车主电话：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="vehicleOwnerPhone"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">车辆类型：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="vehicleType_show"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="peopleDetails">
+                                                                    <div class="form-group  form-object">
+                                                                        <label class="col-sm-3 col-md-3 control-label">监控对象：</label>
+
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="people_Number"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">身份证号：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="peopleIdentity"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">性别：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="peopleGender"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">电话号码：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="peoplePhone"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="thingDetails">
+                                                                    <div class="form-group  form-object">
+                                                                        <label class="col-sm-3 col-md-3 control-label">监控对象：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="thing_Number"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="thing_enterprise"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">物品名称：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="thing_name1"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-sm-3 col-md-3 control-label">物品类型：</label>
+                                                                        <div class="col-sm-9 col-md-9">
+                                                                            <p class="form-control-static"
+                                                                               id="thing_type_value"></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-5">
+                                                            <label class="col-sm-4 col-md-4 col-md-offset-4 col-sm-offset-4">分组*</label>
+                                                            <div class="col-sm-12 col-md-12 object-area">
+                                                                <div class="form-group form-object">
+                                                                    <label class="col-sm-3 col-md-3 control-label">分组：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static" id="comName"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-sm-3 col-md-3 control-label">所属企业：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="parentName"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-sm-3 col-md-3 control-label">负责人：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static" id=""></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-sm-3 col-md-3 control-label">电话：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static" id=""></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-5 ">
+                                                            <label class="col-sm-4 col-md-4 col-md-offset-4 col-sm-offset-4">终端*</label>
+                                                            <div class="col-sm-12 col-md-12 object-area">
+                                                                <div class="form-group form-object">
+                                                                    <label class="col-sm-3 col-md-3 control-label">终端号：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="deviceNumber"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">终端名称：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="deviceName"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">通讯类型：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="deviceType"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">功能类型：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="functionalType"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-sm-3 col-md-3 control-label">制造商：</label>
+                                                                    <div class="col-sm-7 col-md-7">
+                                                                        <p class="form-control-static"
+                                                                           id="manuFacturer"></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="col-sm-5 col-md-4  infoInputMarTop">
+                                                            <label class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">终端手机号*</label>
+                                                            <div class="col-md-12 col-sm-12 object-area">
+                                                                <div class="form-group form-object">
+                                                                    <label class="col-md-3 col-sm-3 control-label">终端手机号：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static"
+                                                                           id="simcardNumber"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-sm-3 col-md-3 control-label">ICCID：</label>
+                                                                    <div class="col-sm-9 col-md-9">
+                                                                        <p class="form-control-static"
+                                                                           id="iccid_show"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-3 col-sm-3 control-label">所属企业：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static"
+                                                                           id="groupName_show"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-3 col-sm-3 control-label">运营商：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static"
+                                                                           id="operator"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-md-3 col-sm-3 control-label conLabLeftTxt">套餐流量：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static" id="simFlow"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group hidden">
+                                                                    <label class="col-md-3 col-sm-3 control-label conLabLeftTxt">激活日期：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static"
+                                                                           id="openCardTime_show"></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-sm-5 infoInputMarTop">
+                                                            <label class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">服务期限</label>
+                                                            <div class="col-md-12 col-sm-12 object-area">
+                                                                <div class="form-group form-object">
+                                                                    <label class="col-md-3 col-sm-3 control-label">计费日期：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static" id="jiData"></p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-3 col-sm-3 control-label">到期日期：</label>
+                                                                    <div class="col-md-9 col-sm-9">
+                                                                        <p class="form-control-static" id="daoData"></p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id="allShowPeopleArea"
+                                                             class="col-md-4 col-sm-5 infoInputMarTop">
+                                                            <label class="col-md-4 col-sm-4 col-md-offset-4 col-sm-offset-4">从业人员</label>
+                                                            <div class="col-md-12 col-sm-12 object-area">
+                                                                <div class="form-group form-object">
+                                                                    <div id="showPeopleList">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div id="zTreeGroupArea">
+    <div id="menuContent" class="menuContent ">
+        <ul id="ztreeDemo" class="ztree"></ul>
+        <ul id="ztreeDemo1" class="ztree"></ul>
+    </div>
+</div>
+<label id="error_label" class='error' style='display: none;'></label>
+<div th:replace="fragments/footer">footer</div>
+<script th:inline="javascript">
+    var vehicleBrandNull = [[#{vehicle.brand.null}]];
+    var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+    var vehicleBrandError = [[#{vehicle.brand.error}]];
+    var vehicleBrandMaxlength = [[#{vehicle.brand.maxlength}]];
+    var vehicleTypeNull = [[#{vehicle.type.null}]];
+    var vehicleNumberMaxlength = [[#{vehicle.vehicleNumber.maxlength}]];
+    var vehicleOwnerNull = [[#{vehicle.vehicleOwner.null}]];
+    var vehicleOwnerMaxlength = [[#{vehicle.vehicleOwner.maxlength}]];
+    var vehicleAlisasMaxlength = [[#{vehicle.asiales.maxlength}]];
+    var vehiclChassisNumberNull = [[#{vehicle.chassisNumber.null}]];
+    var vehicleChassisMaxlength = [[#{vehicle.chassis.maxlength}]];
+    var vehicleEngineNumber = [[#{vehicle.engineNumber.null}]];
+    var vehicleEngineNumberMaxlength = [[#{vehicle.engineNumber.maxlength}]];
+    var vehiclePlateColorNull = [[#{vehicle.plateColor.null}]];
+    var vehicleAreaAttributeNull = [[#{vehicle.areaAttribute.null}]];
+    var vehicleCityNull = [[#{vehicle.city.null}]];
+    var vehicleProvinceNull = [[#{vehicle.province.null}]];
+    var vehicleFuelTypeNull = [[#{vehicle.fuelType.null}]];
+
+    var personnelNumberNull = [[#{personnel.number.null}]];
+    var personnelNumberError = [[#{personnel.number.error}]];
+    var personnelNumberExists = [[#{personnel.number.exists}]];
+    var publicSize8Length = [[#{public.size8.length}]];
+
+    var deviceNumberNull = [[#{device.number.null}]];
+    var deviceNumberExists = [[#{device.number.exists}]];
+    var deviceNumberError = [[#{device.number.error}]];
+    var deviceNumberMaxlength = [[#{device.number.maxlength}]];
+    var deviceGroupNameNul = [[#{device.groupName.null}]];
+    var deviceNameMaxlength = [[#{device.name.maxlength}]];
+    var deviceTypeNull = [[#{device.deviceType.null}]];
+    var deviceIsVideoNull = [[#{device.isVideo.null}]];
+    var deviceBarCodeNull = [[#{device.barCode.null}]];
+    var deviceBarCodeMaxlength = [[#{device.barCode.maxlength}]];
+    var deviceChannelNumberNull = [[#{device.channelNumber.null}]];
+    var deviceIsStartNull = [[#{device.isStart.null}]];
+    var deviceManuFacturerNull = [[#{device.manuFacturer.null}]];
+    var deviceManuFacturerMaxlength = [[#{device.manuFacturer.maxlength}]];
+    var deviceNumberSelect = [[#{device.number.select}]];
+
+    var simNumberNull = [[#{sim.number.null}]];
+    var simNumberError = [[#{sim.number.error}]];
+    var simNumberExists = [[#{sim.number.exists}]];
+    var simNumberMaxlength = [[#{sim.number.maxlength}]];
+    var simOperatorNull = [[#{sim.operator.null}]];
+    var simOpenCardTimeNull = [[#{sim.openCardTime.null}]];
+    var simCapacityNull = [[#{sim.capacity.null}]];
+    var simCapacityMaxlength = [[#{sim.capacity.maxlength}]];
+    var simNetworkTypeNull = [[#{sim.networkType.null}]];
+    var simNetworkTypeMaxlength = [[#{sim.networkType.maxlength}]];
+    var simFlowNull = [[#{sim.simFlow.null}]];
+    var simFlowMaxlength = [[#{sim.simFlow.maxlength}]];
+    var simUseFlowNull = [[#{sim.useFlow.null}]];
+    var simUseFlowMaxlength = [[#{sim.useFlow.maxlength}]];
+    var simEndTimeNull = [[#{sim.endTime.null}]];
+    var simEndTimeCampareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+
+    var billingDateNull = [[#{infoinput.processinput.billingDate.null}]];
+    var dueDateNull = [[#{infoinput.processinput.dueDate.null}]];
+    var dueDateCompareBillingDate = [[#{infoinput.processinput.dueDate.compareBillingDate}]];
+    var groupNameNull = [[#{group.name.null}]];
+    var repeateChooseAssignment = [[#{infoinput.processinput.repeateChooseAssignment}]];
+    var repeateChooseProfession = [[#{infoinput.processinput.repeateChooseProfession}]];
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var systemError = [[#{systemError}]];
+    var emailError = [[#{email.error}]];
+    var systemError = [[#{system.error}]];
+    // var assignmentMaxCarNum = [[#{infoinput.assignment.maxCarNum}]];
+    var confirmMsg = [[#{infoinput.processinput.add.confirm}]];
+    var confirmSureBtn = [[#{infoinput.processinput.add.sureBtn}]];
+    var confirmCancleBtn = [[#{infoinput.processinput.add.cancleBtn}]];
+
+    var publicSize20 = [[#{public.size20.length}]];
+    var thingExists = [[#{vehicle.thing.exists}]];
+</script>
+<script src="/wro/processEntry.js" th:src="@{/wro/processEntry.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+</body>
+</html>

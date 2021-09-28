@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>从业人员管理</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        .disableClick.editBtn:hover {
+            background-color: #ccc;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <!--main content start-->
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">企业管理</li>
+                        <li class="active">从业人员管理</li>
+                    </ul>
+                    <h1 class="h1 ">从业人员管理</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="orgPannel">
+                                <h3 class="panel-title fwb">组织架构</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="orgPannel-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;" id="orgPannel-body">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-12">
+                                        <input autocomplete="off" id="search_condition" name="search" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" placeholder="请输入组织名称"/>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px;height:699px!important">
+                                    <ul id="treeDemo" class="ztreee" style="overflow:auto;height:684px!important"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="cursor:pointer;" id="stretch">
+                                <h3 class="panel-title fwb">岗位类型<span class="caret"></span></h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-up" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" style="display: none;" id="stretch-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                              id="typeQuery"
+                                                              onkeydown="professionalsList.findType(event)"
+                                                              placeholder="请输入岗位类型"></label>
+                                                <button type="button" id="search_buttonTwo"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1Two" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <li onclick="professionalsList.clearVal()"><a id="addIdTwo"
+                                                                                              data-toggle="modal"
+                                                                                              data-target="#addType"><i
+                                                        class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+                                                <li><a th:href="@{/m/basicinfo/enterprise/professionals/exportType}"
+                                                       id="exportIdTwo"><i
+                                                        class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                </li>
+                                                <li><a id="del_modelTwo"><i
+                                                        class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                </li>
+                                                <li><a th:href="@{/m/basicinfo/enterprise/professionals/importTwo}"
+                                                       id="importIdTwo" data-toggle="modal"
+                                                       data-target="#commonSmWin"><i
+                                                        class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTables"
+                                       class="table table-striped table-bordered table-hover text-center checkTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <div th:if="${hasRole}">
+                                        <tr>
+                                            <th></th>
+                                            <th class="text-center"><input
+                                                    type="checkbox" id="checkAllTwo"
+                                                    onclick="professionalsList.checkAllTwo(this)"></th>
+                                            <th class="text-center">操作设置</th>
+                                            <th class="text-center">岗位类型</th>
+                                            <th class="text-center">类型描述</th>
+                                        </tr>
+                                    </div>
+                                    <div th:if="!${hasRole}">
+                                        <tr>
+                                            <th></th>
+                                            <th class="text-center">岗位类型</th>
+                                            <th class="text-center">类型描述</th>
+                                        </tr>
+                                    </div>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">从业人员列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <!--工具面板-->
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              placeholder="请输入姓名/身份证号/状态"></label>
+                                                <button type="button" id="search_button"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <li><a th:href="@{/m/basicinfo/enterprise/professionals/add}" id="addId"
+                                                       data-toggle="modal" data-target="#commonWin"><i
+                                                        class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+                                                <li><a th:href="@{/m/basicinfo/enterprise/professionals/export}"
+                                                       id="exportId"><i
+                                                        class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                </li>
+                                                <li><a href="javascript:void(0);" id="del_model"><i
+                                                        class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                </li>
+                                                <li><a th:href="@{/m/basicinfo/enterprise/professionals/import}"
+                                                       id="importId" data-toggle="modal" data-target="#commonSmWin"><i
+                                                        class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right practitionersM">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="overflow:auto">
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover checkTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th><input
+                                                    type="checkbox" id="checkAll"
+                                                    onclick="professionalsList.checkAll(this)"></th>
+                                            <th>操作设置</th>
+                                            <th>姓名</th>
+                                            <th>所属企业</th>
+                                            <th>服务企业</th>
+                                            <th>岗位类型</th>
+                                            <th>身份证号</th>
+                                            <th>入职时间</th>
+                                            <th>状态</th>
+                                            <th>工号</th>
+                                            <th>从业资格证号</th>
+                                            <th>从业资格类别</th>
+                                            <th>发证机关</th>
+                                            <th>发证日期</th>
+                                            <th>证件有效期</th>
+                                            <th>性别</th>
+                                            <th>生日</th>
+                                            <th>所属地域</th>
+                                            <th>籍贯</th>
+                                            <th>民族</th>
+                                            <th>文化程度</th>
+                                            <th>照片</th>
+                                            <th>手机1</th>
+                                            <th>手机2</th>
+                                            <th>手机3</th>
+                                            <th>座机</th>
+                                            <th>紧急联系人</th>
+                                            <th>紧急联系人电话</th>
+                                            <th>邮箱</th>
+                                            <th>地址</th>
+                                            <th>操作证号</th>
+                                            <th>操作证发证机关</th>
+                                            <th>驾驶证号</th>
+                                            <th>驾驶证发证机关</th>
+                                            <th>准驾车型</th>
+                                            <th>准驾有效期起</th>
+                                            <th>准驾有效期至</th>
+                                            <th>提前提醒天数</th>
+                                            <th>证件照片</th>
+                                            <th>驾驶员人脸信息ID</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="photoDiv" tabindex="-1" role="dialog"
+                         aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">查看照片</h4>
+                                </div>
+                                <div class="modal-body" style="text-align: center;">
+                                    <img id="photoImg" class="img-rounded"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!----------新增岗位类型--------->
+                <div class="modal fade" id="addType" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                     role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form th:action="@{/m/basicinfo/enterprise/professionals/addType}" id="addLimit" role="form"
+                                  action="#" method="post" class="form-horizontal">
+                                <input type="hidden" name="avoidRepeatSubmitToken" id="formToken">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    <h4 class="modal-title" id="add">新增岗位类型</h4>
+                                    <input class="hidden" id="vid9" name="vid" value="">
+                                    <input class="hidden" name="orderType" value="9">
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label"><label class="text-danger">*</label>
+                                                岗位类型：</label>
+                                            <div class=" col-md-7">
+                                                <input autocomplete="off" type="text" placeholder="请输入岗位类型" class="form-control"
+                                                       id="professionalstype" name="professionalstype"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">类型描述：</label>
+                                            <div class=" col-md-7">
+                                                <textarea rows="3" cols="20" placeholder="请输入类型说明" class="form-control"
+                                                          id="addDescription" name="addDescription"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="goOverspeedSettings" class="btn btn-primary">提交</button>
+                                    <button type="button" id="addClose" class="btn btn-default btn-off"
+                                            data-dismiss="modal">关闭
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!----------修改岗位类型--------->
+                <div class="modal fade" id="updateType" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                     role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form th:action="@{/m/basicinfo/enterprise/professionals/editJobType}" id="updateLimit"
+                                  role="form" action="#" method="post" class="form-horizontal">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    <h4 class="modal-title" id="update">修改岗位类型</h4>
+                                    <input class="hidden" id="vid" name="vid" value="">
+                                    <input class="hidden" name="orderType" value="9">
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label"><label class="text-danger">*</label>
+                                                岗位类型：</label>
+                                            <div class=" col-md-7">
+                                                <input autocomplete="off" type="text" placeholder="请输入岗位类型" class="form-control"
+                                                       id="jobType" name="jobType"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">类型描述：</label>
+                                            <div class=" col-md-7">
+                                                <textarea rows="3" cols="20" placeholder="请输入类型说明" class="form-control"
+                                                          id="jobDescription" name="jobDescription"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="updatePostType" class="btn btn-primary">提交</button>
+                                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal"
+                                            id="updateButtonClose">关闭
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </section>
+    <!--main content end-->
+</section>
+<div class="modal fade" tabindex="-1" role="dialog" id="practitionersPhotoModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">查看照片</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="practitionersInfoPhotoTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                            <tr style="height: 200px">
+                                <td class="col-md-4" id="identityCardImage" align="center">
+                                    <div>
+                                        <img height="200px" id="identityCardImageUrl" src="">
+                                    </div>
+                                </td>
+                                <td class="col-md-4" id="qualificationCertificateImage" align="center">
+                                    <div>
+                                        <img height="200px" id="qualificationCertificateImageUrl" src="">
+                                    </div>
+                                </td>
+                                <td class="col-md-4" id="driverLicenseImage" align="center">
+                                    <div>
+                                        <img height="200px" id="driverLicenseImageUrl" src="">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" id="identityCardText">
+                                    <span>身份证</span>
+                                </td>
+                                <td align="center" id="qualificationCertificateText">
+                                    <span>从业资格证</span>
+                                </td>
+                                <td align="center" id="driverLicenseText">
+                                    <span>驾驶证</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="modal-footer">-->
+            <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+            <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/footer">footer</div>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+    var selectItem = [[#{select.item}]];
+    var publicDelete = [[#{public.delete}]];
+    var publicAddSuccess = [[#{public.add.success}]];
+    var publicEditSuccess = [[#{public.edit.success}]];
+    var professionalsJobTypeError = [[#{professionals.jobType.error}]];
+    var professionalsJobTypeNull = [[#{professionals.jobType.null}]];
+    var publicMinSize2Length = [[#{public.minSize2.length}]];
+    var publicSize20Length = [[#{public.size20.length}]];
+    var publicSize30Length = [[#{public.size30.length}]];
+    var professionalsJobTypeExists = [[#{professionals.jobType.exists}]];
+</script>
+<script src="/wro/professionalsList.js" th:src="@{/wro/professionalsList.js}"></script>
+</body>
+</html>

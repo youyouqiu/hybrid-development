@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ProfessionalsGroupDao">
+    <!-- 查询从业人员 -->
+    <select id="findProfessionalsWithGroup" resultType="java.util.HashMap">
+        SELECT
+        pg.group_id AS groupName, p.id AS id, p.name, p.position_type AS
+        positionType,
+        p.identity AS identity,
+        p.job_number AS jobNumber,
+        p.card_number AS cardNumber,p.gender AS gender,
+        p.birthday AS birthday,
+        p.hiredate AS hiredate,
+        p.state,
+        p.photograph AS photograph, p.phone AS phone, p.emergency_contact AS emergencyContact, p.emergency_contact_phone
+        AS emergencyContactPhone, p.email AS email,
+        p.phone_two as phoneTwo,p.phone_three as phoneThree,p.landline,p.driving_license_no as drivingLicenseNo,
+        p.driving_agencies as drivingAgencies,p.operation_number as operationNumber,p.operation_agencies as
+        operationAgencies,
+        p.driving_type as drivingType,p.driving_start_date as drivingStartDate,p.driving_end_date as
+        drivingEndDate,p.remind_days as remindDays,
+        p.ic_card_end_date as icCardEndDate,p.ic_card_agencies as icCardAgencies,p.service_company as serviceCompany,
+        p.qualification_category as qualificationCategory,p.issue_certificate_date as issueCertificateDate,p.address,
+        p.nation_id as nationId, p.education_id as educationId,
+        (SELECT professionals_type from zw_m_professionals_type where id=p.position_type and flag=1) type,p.native_place
+        as nativePlace,p.regional as regional
+        FROM
+        zw_m_professionals_info p
+        INNER JOIN zw_c_professionals_group pg ON
+        pg.professionals_id = p.id
+        WHERE p.flag = 1
+        AND pg.flag = 1
+        AND pg.group_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+                AND ( p.name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                OR
+                p.identity LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+            <if test="param.state != null and param.state!=''">
+                AND(p.state LIKE CONCAT('%',#{param.state},'%'))
+            </if>
+            <if test="param.groupName != null and param.groupName != ''">
+                AND pg.group_id = #{param.groupName}
+            </if>
+        </if>
+        ORDER BY p.create_data_time DESC
+    </select>
+
+    <!-- 根据id查询从业人员 -->
+    <select id="findProGroupById" parameterType="string" resultType="java.util.HashMap">
+		SELECT
+		p.org_id AS groupName, p.id AS id, p.name, p.position_type AS
+		positionType,
+		p.face_id AS faceId,
+		p.nation_id AS nationId,
+		p.education_id AS educationId,
+		p.identity AS identity,
+		p.job_number AS jobNumber,
+		p.card_number AS cardNumber,p.gender AS gender,
+		p.birthday AS birthday,
+		p.hiredate AS hiredate,
+		p.state,
+		p.lock_type as lockType,
+		p.address as address,
+		p.photograph AS photograph, p.phone AS phone, p.emergency_contact AS emergencyContact, p.emergency_contact_phone AS emergencyContactPhone, p.email AS email,
+		p.phone_two as phoneTwo,p.phone_three as phoneThree,p.landline,p.driving_license_no as drivingLicenseNo,
+		p.driving_agencies as drivingAgencies,p.operation_number as operationNumber,p.operation_agencies as operationAgencies,
+		p.driving_type as drivingType,p.driving_start_date as drivingStartDate,p.driving_end_date as drivingEndDate,
+		p.remind_days as remindDays,p.ic_card_end_date as icCardEndDate,p.ic_card_agencies as icCardAgencies,
+		p.service_company as serviceCompany,p.qualification_category as qualificationCategory,p.issue_certificate_date as issueCertificateDate,
+		p.address,
+		(SELECT professionals_type from zw_m_professionals_type where id=p.position_type) type,p.native_place as nativePlace,p.regional as regional
+		FROM
+		zw_m_professionals_info p
+		WHERE p.flag = 1
+		AND p.id = #{id}
+	</select>
+
+    <!-- 新增从业人员 -->
+    <insert id="addProfessionsGroup"
+            parameterType="com.zw.platform.domain.basicinfo.form.ProfessionalsGroupForm">
+		insert into zw_c_professionals_group (id, group_id,
+		professionals_id, flag, create_data_time, create_data_username)
+		values
+		(#{id}, #{groupId}, #{professionalsId}, #{flag},
+		#{createDataTime},
+		#{createDataUsername})
+	</insert>
+
+    <!-- 批量新增从业人员 -->
+    <insert id="addProFessionsGroupByBatch"
+            parameterType="com.zw.platform.domain.basicinfo.form.ProfessionalsGroupForm">
+        insert into zw_c_professionals_group (id, group_id,
+        professionals_id,
+        flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.groupId},
+            #{item.professionalsId},
+            #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+
+    <!-- 修改从业人员 -->
+    <update id="updateProGroupByProId">
+        update zw_c_professionals_group
+        <set>
+            <if test="groupId != null">
+                group_id = #{groupId},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+        </set>
+        where professionals_id = #{professionalsId}
+        and flag = 1
+    </update>
+
+    <!-- 查询从业人员,组和车 -->
+    <select id="findProfessionalsAndVehicle" resultType="java.util.HashMap">
+        SELECT
+        t.vehicle_id AS vehicleId, pg.group_id AS groupId, p.id AS id, p.name, p.position_type AS
+        positionType,
+        p.identity AS identity,
+        p.job_number AS jobNumber,
+        p.card_number AS cardNumber,p.gender AS gender,
+        p.birthday AS birthday,
+        p.photograph AS photograph, p.phone AS phone, p.email AS email,
+        p.phone_two as phoneTwo,p.phone_three as phoneThree,p.landline,p.driving_license_no as drivingLicenseNo,
+        p.driving_agencies as drivingAgencies,p.operation_number as operationNumber,p.operation_agencies as
+        operationAgencies,
+        p.driving_type as drivingType,p.driving_start_date as drivingStartDate,p.driving_end_date as
+        drivingEndDate,p.remind_days as remindDays
+        FROM
+        zw_m_professionals_info p
+        INNER JOIN zw_c_professionals_group pg ON
+        pg.professionals_id = p.id AND pg.flag = 1
+        INNER JOIN
+        (SELECT config.vehicle_id, cp.professionals_id FROM zw_m_config config
+        INNER JOIN zw_m_config_professionals cp ON config.id = cp.config_id AND cp.flag =1
+        WHERE config.flag = 1) t
+        ON t.professionals_id = p.id
+        WHERE p.flag = 1
+        AND pg.group_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY p.create_data_time DESC
+    </select>
+
+    <!-- 删除从业人员和组织关联 -->
+    <update id="deleteProGroupByProId">
+		update zw_c_professionals_group set flag = 0 WHERE professionals_id = #{id}
+	</update>
+
+    <!-- 批量删除从业人员和组织关联表 -->
+    <update id="deleteProGroupByBacth">
+        update zw_c_professionals_group set flag = 0 WHERE professionals_id in
+        <foreach item="idItem" collection="list" open="(" separator=","
+                 close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <!-- 查询从业人员组织id -->
+    <select id="findProfessionalsGroupId" parameterType="string" resultType="string">
+	    select
+	        pg.group_id 
+	    from 
+	        zw_c_professionals_group pg 
+	    left join zw_m_professionals_info p 
+	    on pg.professionals_id = p.id
+	    where p.id = #{id}
+	</select>
+</mapper>

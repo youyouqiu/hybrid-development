@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html class="no-js" lang="" xmlns="http://www.w3.org/1999/xhtml" data-desktop="1" data-mobile="2" data-landscape="3"
+      style="box-sizing: border-box;">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon"  id="icoLink" name="favicon.ico" href="/clbs/resources/img/favicon.ico" type="image/x-icon"/>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>运营看板</title>
+    <link rel="stylesheet" href="/resources/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}" />
+    <link rel="stylesheet" href="/clbs/resources/css/Kaspersky.min.css">
+    <link rel="stylesheet" href="/clbs/resources/css/planet.css">
+    <style>
+        .tooltip {
+            position:absolute;
+            z-index:1030;
+            display:block;
+            visibility:visible;
+            font-size:12px;
+            line-height:1.4;
+            opacity:0;
+            filter:alpha(opacity=0)
+        }
+        .tooltip.in {
+            opacity:.9;
+            filter:alpha(opacity=90)
+        }
+        .tooltip.top {
+            margin-top:-3px;
+            padding:5px 0
+        }
+        .tooltip.right {
+            margin-left:3px;
+            padding:0 5px
+        }
+        .tooltip.bottom {
+            margin-top:3px;
+            padding:5px 0
+        }
+        .tooltip.left {
+            margin-left:-3px;
+            padding:0 5px
+        }
+        .tooltip-inner {
+            max-width:200px;
+            padding:3px 8px;
+            color:#fff;
+            text-align:center;
+            text-decoration:none;
+            background-color:#000;
+            border-radius:4px
+        }
+        .tooltip-arrow {
+            position:absolute;
+            width:0;
+            height:0;
+            border-color:transparent;
+            border-style:solid
+        }
+        .tooltip.top .tooltip-arrow {
+            bottom:0;
+            left:50%;
+            margin-left:-5px;
+            border-width:5px 5px 0;
+            border-top-color:#000
+        }
+        .tooltip.top-left .tooltip-arrow {
+            bottom:0;
+            left:5px;
+            border-width:5px 5px 0;
+            border-top-color:#000
+        }
+        .tooltip.top-right .tooltip-arrow {
+            bottom:0;
+            right:5px;
+            border-width:5px 5px 0;
+            border-top-color:#000
+        }
+        .tooltip.right .tooltip-arrow {
+            top:50%;
+            left:0;
+            margin-top:-5px;
+            border-width:5px 5px 5px 0;
+            border-right-color:#000
+        }
+        .tooltip.left .tooltip-arrow {
+            top:50%;
+            right:0;
+            margin-top:-5px;
+            border-width:5px 0 5px 5px;
+            border-left-color:#000
+        }
+        .tooltip.bottom .tooltip-arrow {
+            top:0;
+            left:50%;
+            margin-left:-5px;
+            border-width:0 5px 5px;
+            border-bottom-color:#000
+        }
+        .tooltip.bottom-left .tooltip-arrow {
+            top:0;
+            left:5px;
+            border-width:0 5px 5px;
+            border-bottom-color:#000
+        }
+        .tooltip.bottom-right .tooltip-arrow {
+            top:0;
+            right:5px;
+            border-width:0 5px 5px;
+            border-bottom-color:#000
+        }
+    </style>
+</head>
+
+<body>
+<div style="display: none">
+    <!-- 用户所属组织id -->
+    <input id="userGroupId" th:value="${session.groupId}" type="text" hidden="true"/>
+    <span id="userName" th:text="${session.userName}"></span>
+</div>
+<div class="kaspersky-app">
+    <!-- <div class="modal modal_static">
+      <div class="modal__content">
+        <div class="modal__ui modal-message pattern pattern_lines-4 modal__ui_visible" data-no-close="">
+          <div class="pattern__content">
+            <div class="modal-message__title" data-localization="index.no_webgl"></div>
+            <p class="modal-message__body"></p>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <div class="main-container">
+        <script id="earth-popup" type="text/x-handlebars-template">
+            <div class="earth-popup">
+                {{#each this}}
+                <div class="earth-popup__item  earth-popup__item_{{@index}}">
+                    <div class="earth-popup__item-shadow"></div>
+                    <div class="earth-popup__preview-hexagon">
+                        <div class="hexagon  earth-popup__preview">
+                            <div class="hexagon__in1">
+                                <div class="hexagon__in2">
+                                    <div class="earth-popup__hover">
+                                        <div class="hexagon__image" style="background-image: url('{{preview}}')"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="earth-popup__flag-container">
+                        <div class="earth-popup__flag">
+                            <svg version="1.0" class="hexagon-svg" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="89" height="77" viewBox="0 0 89 77" xml:space="preserve">
+                            <path style="fill:none;stroke:#FFFFFF;stroke-miterlimit:10;" d="M88.5,38.5l-22,38h-44l-22-38l22-38h44L88.5,38.5z"/>
+                          </svg>                        <div class="earth-popup__flag-hexagon">
+                            <div class="hexagon">
+                                <div class="hexagon__in1">
+                                    <div class="hexagon__in2">
+                                        <div class="hexagon__image" style="background-image: url('{{country.flag}}')"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="earth-popup__info">
+                                <div class="earth-popup__city">{{name}}</div>
+                                <div class="earth-popup__briefs-count">{{briefs_text}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </script>
+        <div class="help">
+            <div class="help__cont" data-localization="index.helper"></div>
+        </div>
+        <canvas width="1920" height="960" style="width: 1920px; height: 960px;"></canvas>
+
+        <div class="time-clock">
+            <div class="time-block" id="timeHour1">0</div>
+            <div class="time-block" id="timeHour2" style="margin-right:0px">0</div>
+            <div class="time-seperator" id="time-seperator"></div>
+            <div class="time-block" id="timeMinute1">0</div>
+            <div class="time-block" id="timeMinute2" style="margin-right:0px">0</div>
+        </div>
+        <div class="zw-logo">
+            <a href="/clbs/home">
+                <img src="" id="logoImg"/>
+            </a>
+        </div>
+        <div class="content content-left">
+            <div class="left-top">
+                <div class="section-title">实时报警数(主动安全)</div>
+                <div class="real-alarm-num">---</div>
+                <div class="yestoday">
+                    昨日整天报警数(主动安全)：<span id="yestodayAlarm">---</span>
+                </div>
+                <div class="yestoday">
+                    <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="今天0点至此时的主动安全报警数与昨日同时段环比所得"></i>
+                    环比<span id="compareText"></span>：<span id="comparePercent">---</span><span class="green-red"></span>
+                </div>
+                <div class="three-card">
+                    <div class="card">
+                        <div>
+                            <div class="card-number" id="tall">---</div>
+                            <div class="card-text">入网总数</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div>
+                            <div class="card-number" id="tline">---</div>
+                            <div class="card-text">在线数</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div>
+                            <div class="card-number" id="tmiss">---</div>
+                            <div class="card-text">离线数</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="left-middle">
+                <div class="doughnut-container" id="doughnut-container"></div>
+            </div>
+            <div class="left-bottom">
+                <div class="dot-list">
+                    <div class="dot-list-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dot-list-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dot-list-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dot-list-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dot-list-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="dot-list-text">
+
+                                </div>
+                                <div class="dot-list-dot">......</div>
+                                <div class="dot-list-percentage doughnut-color1">
+                                    <span class="dot-list-num"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content content-right">
+            <div class="right-top">
+
+            </div>
+            <div class="right-middle">
+                <div class="section-title">在线率</div>
+                <div class="onlineRate-container" id="onlineRate-container"></div>
+            </div>
+            <div class="right-bottom">
+                <div class="section-title">报警昨日排名</div>
+                <div class="alarm-container">
+                    <!-- <div class="alarm-row">
+                      <div class="alarm-row-wraper">
+                        <div class="alarm-index alarm-index-color1">01</div>
+                        <div class="alarm-bg">
+                          <div style="width:100%"></div>
+                        </div>
+                        <div class="alarm-brand">蒙B56083</div>
+                        <div class="alarm-num alarm-num-color1">
+                          <span>86</span>
+                          <span class="alarm-unit">次</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="alarm-row">
+                      <div class="alarm-row-wraper">
+                        <div class="alarm-index alarm-index-color2">02</div>
+                        <div class="alarm-bg">
+                          <div style="width:80%"></div>
+                        </div>
+                        <div class="alarm-brand">蒙B56083</div>
+                        <div class="alarm-num alarm-num-color1">
+                          <span>65</span>
+                          <span class="alarm-unit">次</span>
+                        </div>
+                      </div>
+                    </div> -->
+                    <div class="alarm-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alarm-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alarm-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alarm-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alarm-row">
+                        <div class="fliper">
+                            <div class="flip front">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                            <div class="flip backend">
+                                <div class="alarm-index"></div>
+                                <div class="alarm-bg">
+                                    <div style="width:0%"></div>
+                                </div>
+                                <div class="alarm-brand"></div>
+                                <div class="alarm-num">
+                                    <span class="alarm-value"></span>
+                                    <span class="alarm-unit">次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<script>
+    var FileAPI = {
+        debug: false,
+        staticPath: '/assets/fileapi'
+    };
+    window.langUrl = '/';
+</script>
+
+<script src="/clbs/resources/js/echarts.min.js"></script>
+<script src="/clbs/resources/js/planet/assets.min.js"></script>
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="/clbs/resources/js/planet/three.min.js"></script>
+<script src="/clbs/resources/js/planet/Kaspersky.min.js"></script>
+<script src="/clbs/resources/js/planet/hexasphere.min.js"></script>
+<script src="/clbs/resources/js/layui/layer/layer.js"></script>
+<script src="/clbs/resources/js/planet/planet.js"></script>
+<script src="/clbs/resources/js/jquery.validate.min.js"></script>
+<script src="/clbs/resources/js/tg_util.js"></script>
+<script src="/clbs/resources/js/personalized.js"></script>
+</body>
+
+</html>

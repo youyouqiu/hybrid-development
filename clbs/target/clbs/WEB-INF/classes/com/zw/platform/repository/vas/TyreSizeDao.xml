@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.TyreSizeDao">
+
+    <!-- 根据查询条件查询信息 -->
+    <select id="findByQuery" parameterType="com.zw.platform.domain.vas.mileageSensor.TyreSizeQuery"
+            resultType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        select
+        t.*
+        from zw_m_tyre_size t
+        WHERE flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (tire_type LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR size_name LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+            OR remark LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+            OR rolling_radius LIKE CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time DESC,id DESC
+    </select>
+
+    <!-- 根据查询条件查询信息 -->
+    <select id="findAll"  resultType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        select
+        t.*
+        from zw_m_tyre_size t
+        WHERE flag = 1
+        ORDER BY t.size_name asc
+    </select>
+
+
+
+    <!--  根据ID查询TyreSize -->
+    <select id="findById" parameterType="string"  resultType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        SELECT * FROM zw_m_tyre_size WHERE flag = 1 AND id = #{id}
+    </select>
+    <!--  根据类型及名称查询轮胎规格 -->
+    <select id="findByTypeAndName" parameterType="string"  resultType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        SELECT * FROM zw_m_tyre_size WHERE flag = 1 AND tire_type = #{tireType} and size_name= BINARY #{sizeName}
+    </select>
+    <!--  根据id检查是否被绑定 -->
+    <select id="checkConfig" parameterType="string"  resultType="String">
+      	SELECT c.size_name FROM zw_m_tyre_size c
+        INNER JOIN zw_m_mileage_sensor_config sc on sc.tyre_size_id=c.id and sc.flag=1
+        WHERE c.flag = 1  AND c.id = #{id} GROUP BY c.size_name
+    </select>
+
+
+    <!-- 增TyreSize -->
+    <insert id="addTyreSize" parameterType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        INSERT INTO
+        zw_m_tyre_size (
+        id, tire_type, size_name,remark,
+        rolling_radius, flag, create_data_time,
+        create_data_username)
+        VALUES
+        (#{id}, #{tireType}, #{sizeName}, #{remark}, #{rollingRadius},
+         #{flag},
+        #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <!-- 批量新增车辆 -->
+    <insert id="addBatchTyreSize" parameterType="java.util.List">
+        INSERT INTO
+        zw_m_tyre_size (
+        id, tire_type, size_name,remark,
+        rolling_radius, flag, create_data_time,
+        create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.tireType}, #{item.sizeName}, #{item.remark}, #{item.rollingRadius}, #{item.flag},#{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 修改  -->
+    <update id="updateTyreSize" parameterType="com.zw.platform.domain.vas.mileageSensor.TyreSize">
+        update zw_m_tyre_size
+        set
+        <if test="rollingRadius != null">
+            rolling_radius = #{rollingRadius},
+        </if>
+        <if test="sizeName != null and sizeName!=''">
+            size_name = #{sizeName},
+        </if>
+            remark = #{remark},
+        <if test="tireType != null and tireType!=''">
+            tire_type = #{tireType},
+        </if>
+
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where id = #{id}
+    </update>
+
+
+    <!-- 根据id批量删除一个 车辆 -->
+    <update id="deleteBatchTyreSize">
+        update zw_m_tyre_size
+        set flag = 0
+        where flag = 1
+        and id in
+        <foreach item="item" collection="tyreSizesids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>

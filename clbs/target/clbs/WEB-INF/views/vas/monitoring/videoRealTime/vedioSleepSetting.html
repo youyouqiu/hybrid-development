@@ -1,0 +1,156 @@
+<!-- 右键菜单  设置休眠唤醒 -->
+<form id="settingForm" role="form" action="#" method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">休眠唤醒设置：<span th:text="${brand}"></span></h4>
+		<input type="hidden" th:value="${vehicleId}" id="obtainVid"/>
+	</div>
+    <div class="modal-body">
+      	<div class="row">
+      		<div class="form-group">
+			    <label class="col-md-3 control-label">手动唤醒：</label>
+			    <div class="col-md-3">
+			      	<select class="form-control" id="makeUpManually">
+			      		<option value="1">启用</option>
+			      		<option value="0">停用</option>
+			      	</select>
+			    </div>
+      		</div>
+      		<div class="form-group">
+			    <label class="col-md-3 control-label">条件唤醒：</label>
+			    <div class="col-md-3">
+			      	<select class="form-control" id="awakeningConditions" onchange="vedioSleepSettingLoad.awakeningConditionsChangeFn()">
+			      		<option value="0">停用</option>
+			      		<option value="1">启用</option>
+			      	</select>
+			    </div>
+      		</div>
+      		
+      		<div class="form-group hidden" id="conditionAlarmType">
+			    <label class="col-md-3 control-label"></label>
+			    <div class="col-md-9" id="conditionWakeSett">
+		      		<label class="control-label checkbox-inline">
+					  	<input type="checkbox" id="emergencyAlarm"> 紧急报警
+					</label>
+					<label class="control-label checkbox-inline">
+					  	<input type="checkbox" id="collisionRolloverAlarm"> 碰撞侧翻报警
+					</label>
+					<label class="control-label checkbox-inline">
+					  	<input type="checkbox" id="openTheCar"> 车辆开门
+					</label>
+				</div>
+      		</div>
+      		
+      		<div class="form-group">
+			    <label class="col-md-3 control-label">定时唤醒：</label>
+			    <div class="col-md-3">
+			      	<select class="form-control" id="wakeUpRegularly" onchange="vedioSleepSettingLoad.wakeUpRegularlyChangeFn()">
+			      		<option value="0">停用</option>
+			      		<option value="1">启用</option>
+			      	</select>
+			    </div>
+      		</div>
+      		<div class="hidden" id="wakeUpRegularlyAlarmType">
+	      		<div class="form-group">
+				    <label class="col-md-3 control-label">定时唤醒日设置：</label>
+				    <div class="col-md-9" id="timingWakeUpSett">
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_1"> 周一
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_2"> 周二
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_3"> 周三
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_4"> 周四
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_5"> 周五
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_6"> 周六
+						</label>
+			      		<label class="control-label checkbox-inline">
+						  	<input type="checkbox" id="regularly_7"> 周日
+						</label>
+				    </div>
+	      		</div>
+	      		
+	      		<div class="form-group">
+		      		<label class="col-md-3 control-label cursor-style">
+			      		<label class="checkbox-inline checkbox-inline-margin">
+						  	<input type="checkbox" class="disabled-attribute" id="regularlyOneTime" disabled="disabled">
+						</label> 
+						时间段1唤醒时间：
+					</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute startTime" id="wakeOpenOneTime" name="wakeOpenOneTime" readonly disabled="disabled"/>
+				    </div>
+				    <label class="col-md-2 control-label">时间段1关闭时间：</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute endTime" id="wakeCloseOneTime" name="wakeCloseOneTime" readonly disabled="disabled"/>
+				    </div>
+	      		</div>
+	      		
+	      		<div class="form-group">
+		      		<label class="col-md-3 control-label cursor-style">
+			      		<label class="checkbox-inline checkbox-inline-margin">
+						  	<input type="checkbox" class="disabled-attribute" id="regularlyTwoTime" disabled="disabled">
+						</label> 
+						时间段2唤醒时间：
+					</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute startTime" id="wakeOpenTwoTime"  name="wakeOpenTwoTime" readonly disabled="disabled"/>
+				    </div>
+				    <label class="col-md-2 control-label">时间段2关闭时间：</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute endTime" id="wakeCloseTwoTime" name="wakeCloseTwoTime" readonly disabled="disabled"/>
+				    </div>
+	      		</div>
+	      		
+	      		<div class="form-group">
+		      		<label class="col-md-3 control-label cursor-style">
+			      		<label class="checkbox-inline checkbox-inline-margin">
+						  	<input type="checkbox" class="disabled-attribute" id="regularlyThreeTime" disabled="disabled">
+						</label> 
+						时间段3唤醒时间：
+					</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute startTime" id="wakeOpenThreeTime" name="wakeOpenThreeTime" readonly disabled="disabled"/>
+				    </div>
+				    <label class="col-md-2 control-label">时间段3关闭时间：</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute endTime" id="wakeCloseThreeTime" name="wakeCloseThreeTime" readonly disabled="disabled"/>
+				    </div>
+	      		</div>
+	      		
+	      		<div class="form-group">
+		      		<label class="col-md-3 control-label cursor-style">
+			      		<label class="checkbox-inline checkbox-inline-margin">
+						  	<input type="checkbox" class="disabled-attribute" id="regularlyFourTime" disabled="disabled">
+						</label> 
+						时间段4唤醒时间：
+					</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute startTime" id="wakeOpenFourTime" name="wakeOpenFourTime" readonly disabled="disabled"/>
+				    </div>
+				    <label class="col-md-2 control-label">时间段4关闭时间：</label>
+				    <div class="col-md-3">
+				    	<input type="text" class="form-control time-background disabled-attribute endTime" id="wakeCloseFourTime"  name="wakeCloseFourTime" readonly disabled="disabled"/>
+				    </div>
+	      		</div>
+      		</div>
+      	</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="sendSubmit">
+			<strong>下 发</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script src="/clbs/resources/js/vedioSleepSettingLoad.js" th:src="@{/resources/js/vedioSleepSettingLoad.js}"></script>

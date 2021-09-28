@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status="OFF"，可以去掉，它的含义为是否记录log4j2本身的event信息，默认是OFF -->
+<Configuration monitorInterval="60">
+	<!-- ****************日志存放的路径等**************** -->
+	<Properties>
+		<!-- 应用名称 -->
+		<Property name="APPLICATION_NAME">clbs</Property>
+		<!-- 日志基本配置 -->
+		<Property name="ROOT_LEVEL">INFO</Property>
+		<Property name="LOG_HOME">${sys:catalina.home}/log4j</Property>
+		<Property name="LOG_DATEFORMAT_PATTERN">yyyy-MM-dd HH:mm:ss.SSS</Property>
+		<Property name="LOG_PATTERN">%d{${LOG_DATEFORMAT_PATTERN}} %5p --- [%t] %-40.40c{1.} : %m%n%xEx</Property>
+
+	</Properties>
+	<!-- ****************Appenders**************** -->
+	<Appenders>
+		<!-- ######日志输出到窗口 target可以是"SYSTEM_OUT"或者"SYSTEM_ERR".默认是"SYSTEM_ERR".###### -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+			<PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}" />
+		</Console>
+
+
+		<!-- debug级别日志 -->
+		<RollingFile name="debug_appender" fileName="${LOG_HOME}/debug.log"
+					 filePattern="${LOG_HOME}/debug/debug-%d{yyyy-MM-dd-HH}-%i.log.gz">
+			<PatternLayout pattern="${LOG_PATTERN}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="6"  modulate="true"/>
+			</Policies>
+			<Filters><!-- 此Filter意思是，只输出debug级别的数据 -->
+				<!-- DENY，日志将立即被抛弃不再经过其他过滤器；
+                       NEUTRAL，有序列表里的下个过滤器过接着处理日志；
+                       ACCEPT，日志会被立即处理，不再经过剩余过滤器。 -->
+				<ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<DefaultRolloverStrategy max="30">
+				<Delete basePath="${LOG_HOME}" maxDepth="2">
+					<IfFileName glob="*/debug-*.log.gz">
+						<IfLastModified age="3d">
+							<IfAny>
+								<IfAccumulatedFileSize exceeds="10 KB" />
+							</IfAny>
+						</IfLastModified>
+					</IfFileName>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+
+
+		<!-- INFO级别日志 -->
+		<RollingFile name="info_appender" fileName="${LOG_HOME}/info.log"
+					 filePattern="${LOG_HOME}/info/info-%d{yyyy-MM-dd-HH}-%i.log.gz">
+			<PatternLayout pattern="${LOG_PATTERN}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="6"  modulate="true"/>
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="warn" onMatch="DENY"  onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<DefaultRolloverStrategy max="30">
+				<Delete basePath="${LOG_HOME}" maxDepth="2">
+					<IfFileName glob="*/info-*.log.gz">
+						<IfLastModified age="5d">
+							<IfAny>
+								<IfAccumulatedFileSize exceeds="100 MB" />
+							</IfAny>
+						</IfLastModified>
+					</IfFileName>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<!-- WARN级别日志 -->
+
+		<RollingFile name="warn_appender" fileName="${LOG_HOME}/warn.log"
+					 filePattern="${LOG_HOME}/warn/warn-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout pattern="${LOG_PATTERN}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"  modulate="true"/>
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="error" onMatch="DENY"  onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<DefaultRolloverStrategy max="30">
+				<Delete basePath="${LOG_HOME}" maxDepth="2">
+					<IfFileName glob="*/warn-*.log.gz">
+						<IfLastModified age="15d">
+							<IfAny>
+								<IfAccumulatedFileSize exceeds="30 MB" />
+							</IfAny>
+						</IfLastModified>
+					</IfFileName>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<!-- ERROR级别日志 -->
+		<RollingFile name="error_appender" fileName="${LOG_HOME}/error.log"
+					 filePattern="${LOG_HOME}/error/error-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout pattern="${LOG_PATTERN}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"  modulate="true"/>
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
+			<DefaultRolloverStrategy max="30">
+				<Delete basePath="${LOG_HOME}" maxDepth="2">
+					<IfFileName glob="*/error-*.log.gz">
+						<IfLastModified age="30d">
+							<IfAny>
+								<IfAccumulatedFileSize exceeds="50 MB" />
+							</IfAny>
+						</IfLastModified>
+					</IfFileName>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<Async name="AsyncDebugAppenderFile">
+			<AppenderRef ref="debug_appender" />
+		</Async>
+		<Async name="AsyncInfoAppenderFile">
+			<AppenderRef ref="info_appender" />
+		</Async>
+		<Async name="AsyncWarnAppenderFile">
+			<AppenderRef ref="warn_appender" />
+		</Async>
+		<Async name="AsyncErrorAppenderFile">
+			<AppenderRef ref="error_appender" />
+		</Async>
+
+	</Appenders>
+	<!-- ****************Loggers**************** -->
+	<Loggers>
+		<Logger name="com.zw" level="${ROOT_LEVEL}" additivity="false"
+			includeLocation="true">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="debug_appender" />
+			<AppenderRef ref="info_appender" />
+			<AppenderRef ref="warn_appender" />
+			<AppenderRef ref="error_appender" />
+		</Logger>
+
+		<!-- 第三方日志 AsyncLogger暂时不能用 -->
+
+		<Logger name="org.apache.http" level="${ROOT_LEVEL}" additivity="false"/>
+		<Logger name="org.springframework" level="${ROOT_LEVEL}"/>
+		<Logger name="org.mybatis" level="${ROOT_LEVEL}"/>
+		<Logger name="org.quartz" level="${ROOT_LEVEL}" additivity="false"/>
+		<Logger name="org.apache.commons" level="${ROOT_LEVEL}" additivity="false"/>
+		<!-- 调试sql日志 -->
+		<Logger name="com.ibatis" level="${ROOT_LEVEL}"/>
+		<Logger name="com.ibatis.common.jdbc.SimpleDataSource" level="${ROOT_LEVEL}"/>
+		<Logger name="org.apache.ibatis.jdbc.ScriptRunner" level="${ROOT_LEVEL}"/>
+		<Logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.Connection" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.Statement" level="${ROOT_LEVEL}"/>
+		<Logger name="java.sql.PreparedStatement" level="${ROOT_LEVEL}"/>
+
+		 <Root level="${ROOT_LEVEL}" includeLocation="false">
+			 <AppenderRef ref="Console"/>
+			 <AppenderRef ref="AsyncDebugAppenderFile"/>
+			 <AppenderRef ref="AsyncInfoAppenderFile"/>
+			 <AppenderRef ref="AsyncWarnAppenderFile"/>
+			 <AppenderRef ref="AsyncErrorAppenderFile"/>
+		 </Root>
+
+	</Loggers>
+</Configuration>

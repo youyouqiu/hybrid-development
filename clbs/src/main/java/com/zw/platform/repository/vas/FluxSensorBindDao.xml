@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.FluxSensorBindDao">
+
+	<!-- 查询流量传感器(管理员) -->
+	<select id="findVehicleSensor" parameterType="com.zw.platform.domain.vas.oilmgt.query.FluxSensorBindQuery"
+		resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*, v.id AS vId, v.brand, vt.vehicle_type, v.group_id groups,
+		<!-- d.status,  -->
+		ow.id AS oilWearId, ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en, ow.filter_factor,
+		<!-- d.id AS paramId,  -->
+		v.create_data_time AS createDataTime FROM zw_m_vehicle_info v
+		INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+		INNER JOIN zw_m_device_info di ON c.device_id = di.id AND di.flag = 1
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+		LEFT JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1
+		LEFT JOIN zw_o_oil_wear_vehicle ov ON ov.vehicle_id = v.id AND ov.flag = 1
+		LEFT JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		<!-- LEFT JOIN zw_m_directive d ON d.parameter_name = ov.id AND d.flag =1 AND d.parameter_type = 2 -->
+		WHERE v.flag = 1
+		AND au.user_id = #{userId}
+		AND v.brand NOT LIKE '扫%'
+		AND a.org_id IN
+		<foreach item="item" collection="groupList" open="(" separator=","
+				close=")">
+				#{item}
+		</foreach>
+		<if test="param != null">
+		 	<if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+	            AND (v.brand LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+	            	 OR ow.oil_wear_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+	            	)
+	        </if>
+	        <if test="param.groupId != null and param.groupId!=''">
+				AND a.org_id = #{param.groupId}
+			</if>
+			<if test="param.assignmentId != null and param.assignmentId!=''">
+				AND a.id = #{param.assignmentId}
+			</if>
+			<if test="param.protocol != null and param.protocol!=''">
+				AND di.device_type = #{param.protocol}
+			</if>
+			<if test="param.vehicleId != null and param.vehicleId!=''">
+				AND v.id = #{param.vehicleId}
+			</if>
+		</if>
+		ORDER BY createDataTime DESC,v.id ASC
+	</select>
+	
+	<select id="findVehicleSensorRedis" parameterType="list"
+		resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*, v.id AS vId, v.brand,v.monitorType,
+		<!-- d.status,  -->
+		ow.id AS oilWearId, ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en, ow.filter_factor,
+		<!-- d.id AS paramId,  -->
+		v.create_data_time AS createDataTime FROM
+		(select id,brand,0 as monitorType,create_data_time from zw_m_vehicle_info where flag = 1 union all
+		select id,people_number as brand,1 as monitorType,create_data_time from zw_m_people_info where flag = 1 union all
+		select id,thing_number,2 as monitorType,create_data_time from zw_m_thing_info where flag = 1) v
+		LEFT JOIN zw_o_oil_wear_vehicle ov ON ov.vehicle_id = v.id AND ov.flag = 1
+		LEFT JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		<!-- LEFT JOIN zw_m_directive d ON d.parameter_name = ov.id AND d.flag =1 AND d.parameter_type = 2 -->
+		WHERE 1 = 1
+		AND v.id IN
+		<foreach item="item" collection="list" open="(" separator=","
+				close=")">
+				#{item}
+		</foreach>
+		ORDER BY createDataTime DESC,v.id ASC
+	</select>
+	
+	
+	<select id="findBindingOilMonitor" resultType="map">
+	  select v.id,ow.oil_wear_number as type from  zw_m_vehicle_info v
+		INNER JOIN zw_o_oil_wear_vehicle ov ON ov.vehicle_id = v.id AND ov.flag = 1
+		INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+         WHERE v.flag = 1
+		AND v.brand NOT LIKE '扫%'  ORDER BY  v.create_Data_Time DESC,v.id ASC
+	</select>
+
+	<!-- 根据车辆查询油耗车辆设置(管理员) -->
+	<select id="findFuelVehicle"
+		resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*,v.id AS vId,v.brand,
+		ow.id AS oilWearId, ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en,ow.device_number,ow.filter_factor,ow.ranges,ow.fuel_select,ow.metering_schemes 
+		FROM zw_o_oil_wear_vehicle ov
+		INNER JOIN
+		(select id,brand from zw_m_vehicle_info where flag = 1 union all
+		select id,people_number as brand from zw_m_people_info where flag = 1 union all
+		select id,thing_number from zw_m_thing_info where flag = 1) v ON v.id = ov.vehicle_id
+		INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+		INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+		WHERE ov.flag = 1
+		AND au.user_id = #{userId}
+		AND a.org_id IN
+		<foreach item="item" collection="groupList" open="(" separator=","
+				close=")">
+				#{item}
+		</foreach>
+		AND di.device_type IN
+		<foreach collection="reportDeviceTypes" item="deviceType" open="(" separator="," close=")">
+			#{deviceType}
+		</foreach>
+	</select>
+
+
+	<!-- 根据车辆查询油耗车辆设置(管理员) -->
+	<select id="findFuelVehicleIds"
+			resultType="java.lang.String">
+		SELECT DISTINCT ov.vehicle_id
+		FROM zw_o_oil_wear_vehicle ov
+		INNER JOIN
+		(select id,brand from zw_m_vehicle_info where flag = 1 union all
+		select id,people_number as brand from zw_m_people_info where flag = 1 union all
+		select id,thing_number from zw_m_thing_info where flag = 1) v ON v.id = ov.vehicle_id
+		INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+		INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+		WHERE ov.flag = 1
+		AND au.user_id = #{userId}
+		AND a.org_id IN
+		<foreach item="item" collection="groupList" open="(" separator=","
+				 close=")">
+			#{item}
+		</foreach>
+		AND di.device_type IN
+		<foreach collection="reportDeviceTypes" item="deviceType" open="(" separator="," close=")">
+			#{deviceType}
+		</foreach>
+	</select>
+
+	<!-- 根据id查询车辆查询油耗车辆设置 -->
+	<select id="findFuelVehicleById"
+		resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*,v.brand,v.id as vId,ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en,ow.device_number,
+		ow.filter_factor,ow.ranges,ow.fuel_select,ow.metering_schemes,ft.fuel_category AS fuelSelect
+		FROM zw_o_oil_wear_vehicle ov
+		INNER JOIN
+		(select id,brand,fuel_type from zw_m_vehicle_info where  flag = 1 union all
+     	 select id,people_number as brand,'' as fuel_type from zw_m_people_info where  flag = 1 union all
+     	 select id,thing_number as brand,'' as fuel_type from zw_m_thing_info where  flag = 1) v ON v.id = ov.vehicle_id
+		INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		left join zw_m_fuel_type ft on ft.id = v.fuel_type and ft.flag = 1
+		WHERE ov.flag = 1
+		AND ov.id = #{id}
+	</select>
+
+	<!-- 根据车辆id查询车辆查询油耗车辆设置 -->
+	<select id="findFuelVehicleByVid"
+		resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*,v.brand,ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en,ow.device_number,ow.filter_factor,ow.ranges,ow.fuel_select,ow.metering_schemes
+		FROM
+		(select id,brand from zw_m_vehicle_info where id = #{vehicleId} and flag = 1 union all
+         select id,people_number as brand from zw_m_people_info where id = #{vehicleId} and flag = 1 union all
+         select id,thing_number as brand from zw_m_thing_info where id = #{vehicleId} and flag = 1) v
+		LEFT JOIN zw_o_oil_wear_vehicle ov ON v.id = ov.vehicle_id AND ov.flag = 1
+		LEFT JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+	</select>
+
+	<!-- 新增绑定 -->
+	  <insert id="addFluxSensorBind" parameterType="com.zw.platform.domain.vas.oilmgt.form.FluxSensorBindForm" >
+	    insert into zw_o_oil_wear_vehicle (id, oil_wear_id, vehicle_id, output_correction_b, auto_upload_time,
+	      output_correction_k, flag, create_data_time, create_data_username)
+	    values (#{id}, #{oilWearId}, #{vehicleId}, #{outputCorrectionB}, #{autoUploadTime},
+	      #{outputCorrectionK}, #{flag}, #{createDataTime}, #{createDataUsername})
+	  </insert>
+
+	  <!-- 修改 -->
+	   <update id="updateFluxSensorBind" parameterType="com.zw.platform.domain.vas.oilmgt.form.FluxSensorBindForm" >
+	    update zw_o_oil_wear_vehicle
+	    set oil_wear_id = #{oilWearId},
+	      vehicle_id = #{vehicleId},
+	      output_correction_b = #{outputCorrectionB},
+	      auto_upload_time = #{autoUploadTime},
+     	  output_correction_k = #{outputCorrectionK},
+	      update_data_time = #{updateDataTime},
+	      update_data_username = #{updateDataUsername}
+	    where id = #{id}
+	  </update>
+
+	    <!--删除 -->
+	   <update id="deleteFluxSensorBind" parameterType="String" >
+	    update zw_o_oil_wear_vehicle
+	    set flag = 0
+	    where id = #{id}
+	    and flag = 1
+	  </update>
+
+	 <!-- 根据id查询流量传感器 -->
+	<select id="findFluxSensorByBindId" parameterType="String"
+		resultType="com.zw.platform.domain.vas.oilmgt.FluxSensor">
+		SELECT DISTINCT ow.*, ov.vehicle_id FROM zw_o_oil_wear ow
+		INNER JOIN zw_o_oil_wear_vehicle ov ON ow.id = ov.oil_wear_id AND ov.flag = 1
+		WHERE ow.flag = 1
+        AND ov.id =  #{bindId}
+	</select>
+
+	<!--删除 -->
+    <update id="deleteFluxSensorByVid" parameterType="String" >
+	    update zw_o_oil_wear_vehicle
+	    set flag = 0
+	    where vehicle_id = #{vehicleId}
+	    and flag = 1
+    </update>
+     
+     <select id ="findBySensorId" parameterType="String"  resultType="string">
+	      SELECT  z.vehicle_id as vehicleId  from   zw_o_oil_wear_vehicle  z
+	      INNER  JOIN zw_m_vehicle_info v on v.id =z. vehicle_id and v.flag='1'
+	 	  WHERE  oil_wear_id=#{sensorId} and z.flag='1'
+     </select>
+	<select id="findFuelVehicleByProtocols" resultType="com.zw.platform.domain.vas.oilmgt.FuelVehicle">
+		SELECT DISTINCT ov.*,v.id AS vId,v.brand,
+		ow.id AS oilWearId, ow.oil_wear_number, ow.baud_rate, ow.parity, ow.inertia_comp_en,ow.device_number,ow.filter_factor,ow.ranges,ow.fuel_select,ow.metering_schemes
+		FROM zw_o_oil_wear_vehicle ov
+		INNER JOIN
+		(select id,brand from zw_m_vehicle_info where flag = 1 union all
+		select id,people_number as brand from zw_m_people_info where flag = 1 union all
+		select id,thing_number from zw_m_thing_info where flag = 1) v ON v.id = ov.vehicle_id
+		INNER JOIN zw_o_oil_wear ow ON ow.id = ov.oil_wear_id AND ow.flag = 1
+		INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+		INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+		WHERE ov.flag = 1
+		AND au.user_id = #{userId}
+		AND a.org_id IN
+		<foreach item="item" collection="groupList" open="(" separator=","
+				 close=")">
+			#{item}
+		</foreach>
+		and di.device_type IN
+		<foreach collection="protocols" item="protocol" open="(" separator="," close=")">
+			#{protocol}
+		</foreach>
+	</select>
+</mapper>

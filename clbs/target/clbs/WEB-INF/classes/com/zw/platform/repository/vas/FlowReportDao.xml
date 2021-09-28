@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.FlowReportDao">
+    <!--查询流量报表信息 -->
+    <select id="getFlowReports" resultType="com.zw.platform.domain.reportManagement.FlowReport">
+    	SELECT a.*,b.videoCount FROM 
+        (SELECT DISTINCT
+        flow.vehicle_id,veh.brand plateNumber,
+        GROUP_CONCAT(DISTINCT ass.NAME SEPARATOR ',') assignmentNames,
+        veh.plate_color plateColor,
+        sim.simcard_number simcardNumber,
+        (sum(unix_timestamp(flow.end_time) - unix_timestamp(flow.start_time))/COUNT(DISTINCT ass.NAME)) previewTime,
+        (sum(flow.flow_value)/COUNT(DISTINCT ass.NAME)) flowValue
+        FROM
+        zw_m_video_flow AS flow,
+        zw_m_vehicle_info AS veh,
+        zw_m_config AS config,
+        zw_m_assignment AS ass,
+        zw_m_sim_card_info AS sim,
+        zw_m_assignment_vehicle AS assveh
+        WHERE
+        unix_timestamp(flow.start_time) &gt;= unix_timestamp(#{query.startTime})
+        AND
+        unix_timestamp(flow.end_time) &lt;= unix_timestamp(#{query.endTime})
+        AND unix_timestamp(#{query.startTime}) &lt;= unix_timestamp(#{query.endTime})
+        <if test="query.vehicleIds != null and query.vehicleIds != ''">
+            AND flow.vehicle_id IN
+            <foreach collection="query.vehicleIds.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.plateNumber != null and query.plateNumber != ''">
+            OR veh.brand LIKE
+            CONCAT('%',#{query.plateNumber},'%')
+        </if>
+        <if test="query.simcardNumber != null and query.simcardNumber != ''">
+            OR sim.simcard_number LIKE
+            CONCAT('%',#{query.simcardNumber},'%')
+        </if>
+        AND flow.vehicle_id = veh.id
+        AND config.vehicle_id = flow.vehicle_id
+        AND sim.id = config.sim_card_id
+        AND ass.id = assveh.assignment_id
+        AND assveh.vehicle_id = flow.vehicle_id
+        AND flow.flag = 1
+        AND veh.flag = 1
+        AND config.flag = 1
+        AND sim.flag = 1
+        AND ass.flag = 1
+        AND assveh.flag = 1
+        GROUP BY
+        flow.vehicle_id) a
+        LEFT JOIN (SELECT fl.vehicle_id,COUNT(1) videoCount FROM zw_m_video_flow fl
+        WHERE 
+        fl.flag = 1
+        AND fl.stop_flag = 1
+      	AND
+        unix_timestamp(fl.start_time) &gt;= unix_timestamp(#{query.startTime})
+        AND
+        unix_timestamp(fl.end_time) &lt;= unix_timestamp(#{query.endTime})
+        AND unix_timestamp(#{query.startTime}) &lt;= unix_timestamp(#{query.endTime})
+        GROUP BY vehicle_id
+        ) b ON  b.vehicle_id = a.vehicle_id 
+    </select>
+</mapper>

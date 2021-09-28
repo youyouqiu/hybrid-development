@@ -1,0 +1,79 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <description>Spring 事务</description>
+
+    <!-- 事务 Transaction -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="mysqlDataSource"/>
+    </bean>
+
+    <!-- 建议使用声明式容器管理事务，注解容器管理事务太分布式了，采用声明式容器管理事务一般只对service层进行处理。 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="save*" rollback-for="java.lang.Exception"/>
+            <tx:method name="add*" rollback-for="java.lang.Exception"/>
+            <tx:method name="update*" rollback-for="java.lang.Exception"/>
+            <tx:method name="change*" rollback-for="java.lang.Exception"/>
+            <tx:method name="reset*" rollback-for="java.lang.Exception"/>
+            <tx:method name="del*" rollback-for="java.lang.Exception"/>
+            <tx:method name="listen*" rollback-for="java.lang.Exception"/>
+            <tx:method name="unbind*" rollback-for="java.lang.Exception"/>
+            <tx:method name="remove*" rollback-for="java.lang.Exception"/>
+            <tx:method name="enable*" rollback-for="java.lang.Exception"/>
+            <tx:method name="disable*" rollback-for="java.lang.Exception"/>
+            <tx:method name="upload*" rollback-for="java.lang.Exception"/>
+            <tx:method name="import*" rollback-for="java.lang.Exception"/>
+            <tx:method name="login*" rollback-for="java.lang.Exception"/>
+            <tx:method name="send*" rollback-for="java.lang.Exception"/>
+            <tx:method name="insert*" rollback-for="java.lang.Exception"/>
+            <tx:method name="log*" rollback-for="java.lang.Exception"/>
+            <tx:method name="migrate*" rollback-for="java.lang.Exception"/>
+            <tx:method name="confirm*" rollback-for="java.lang.Exception"/>
+            <tx:method name="finish*" rollback-for="java.lang.Exception"/>
+            <tx:method name="batch*" rollback-for="java.lang.Exception"/>
+            <tx:method name="deal*" rollback-for="java.lang.Exception"/>
+            <tx:method name="set*" rollback-for="java.lang.Exception"/>
+            <tx:method name="export*" rollback-for="java.lang.Exception"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="list*" read-only="true"/>
+            <tx:method name="updateSendParam" propagation="NOT_SUPPORTED" rollback-for="java.lang.Exception"/>
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 切面。 proxy-target-class="true"采用cglib代理 -->
+    <aop:config expose-proxy="true" proxy-target-class="true">
+        <!-- 只对业务逻辑层实施事务 -->
+        <aop:pointcut id="txPointcut"
+                      expression="(execution(public * com.zw.platform.service..*.*(..)))
+                                        or
+                                       (execution (public * com.zw.adas.service..*.*(..)))
+                                        or
+                                        (execution(public * com.zw.platform.basic.service..*.*(..)))
+                                       "/>
+        <aop:advisor id="txAdvisor" advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+
+
+    <!--app的事务处理，app事务是之后添加的，之前存在service命名不正确的情况，所以单独新增一个 -->
+    <tx:advice id="txAdvice1" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" rollback-for="java.lang.Exception"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config expose-proxy="true" proxy-target-class="true">
+        <!-- 只对业务逻辑层实施事务 -->
+        <aop:pointcut id="txPointcut1" expression="(execution (public * com.zw.app.service..*.*(..)))"/>
+        <aop:advisor id="txAdvisor1" advice-ref="txAdvice1" pointcut-ref="txPointcut1"/>
+    </aop:config>
+</beans>

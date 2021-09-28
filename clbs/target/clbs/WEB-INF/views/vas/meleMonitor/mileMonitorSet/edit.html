@@ -1,0 +1,198 @@
+<style type="text/css">
+  form#bindForm .dropdown-menu{min-width: 488px;}
+</style>
+<form  id="editForm"  th:object="${result}" th:action="@{/v/meleMonitor/mileMonitorSet/edit}" role="form" action="#" method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">里程监测设置修改</h4>
+	</div>
+      <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+      	<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input id="tyreSizelist" th:value="${tyreSizelist}" type="hidden" />
+						<input id="sensorList" th:value="${sensorList}" type="hidden" />
+						<input id="referVehicleList" th:value="${referVehicleList}" type="hidden" />
+						<input style="cursor: pointer"  th:value="${vehicle.brand}" name = "vehicleBrand" placeholder="请输入监控对象" class="form-control" readonly />
+						<input th:value="${vehicle.id}" name = "vehicleId" id="vehicleId" type="hidden"/>
+						<input  type="hidden"  class="form-control" id="brands_hidden"/>
+						<input id="id" name="id" th:value="${result.id}" type="hidden" />
+					</div>
+					<label class="col-md-2 control-label">参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands"/>
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;!important">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">里程测量方案：</label>
+					<div class="col-md-4">
+						<select id="measurementScheme"  name="measurementScheme" th:field="*{measuringScheme}" placeholder="请选择里程测量方案" class="form-control">
+							<option value="1">01、原车脉冲</option>
+							<option value="2">02、轮速传感器</option>
+							<option value="3">03、CAN总线</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+		             <div class="col-md-12">
+		                    <div class="panel-body">
+		                    <div class="tab-content" >
+								<hr/>
+		                    	<div class="form-group">
+									<label class="col-md-2 control-label">
+										传感器基本参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">
+										<label class="text-danger">*</label> 传感器型号：
+									</label>
+									<div class="col-md-4">
+										<div class="input-group">
+											<input type="hidden"  th:field="*{mileageSensorId}"  name="mileageSensorId" id="fluxSensor_hidden">
+											<input type="text"  th:field="*{sensorType}"  class="form-control" id="fluxSensor" placeholder="请选择传感器型号">
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+														data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;!important">
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">补偿使能：</label>
+									<div class="col-md-4">
+										<input type="hidden" id="compEn" name="compEn">
+										<input type="text" disabled class="form-control" id="compEnStr"/>
+									</div>
+									<label class="col-md-2 control-label">奇偶校验：</label>
+									<div class="col-md-4">
+										<input type="hidden" id="parityCheck" name="parityCheck">
+										<input type="text"  disabled class="form-control" id="parityCheckStr"/>
+									</div>
+								</div>
+								<div class="form-group">
+								<label class="col-md-2 control-label">波特率：</label>
+								<div class="col-md-4">
+									<input type="hidden" id="baudRate" name="baudRate">
+									<input type="text" disabled class="form-control" id="baudRateStr"/>
+								</div>
+								<label class="col-md-2 control-label">滤波系数：</label>
+								<div class="col-md-4">
+									<input type="hidden" id="filterFactor" name="filterFactor">
+									<input type="text" disabled class="form-control" id="filterFactorStr"/>
+								</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "autoUploadTime" name="uploadTime" placeholder="请选择自动上传时间" class="form-control">
+											<option  value="1">被动</option>
+											<option value="2">10</option>
+											<option value="3">20</option>
+											<option value="4">30</option>
+										</select>
+
+										<input id="autoUploadTime_hidden" th:field="*{uploadTime}" name="uploadTime" hidden="true" />
+									</div>
+									<label class="col-md-2 control-label"><label class="text-danger">*</label> 轮胎规格：</label>
+									<div class="col-md-4">
+										<div class="input-group">
+											<input name="tyreSizeId" th:field="*{tyreSizeId}" type="hidden" class="form-control" id="tyreSizeId_hidden">
+											<input type="text" class="form-control" th:field="*{tyreName}" id="tyreSizeId">
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+														data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%;!important">
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">轮胎滚动半径：</label>
+									<div class="col-md-4">
+										<input id="tyreRollingRadius" readonly   th:field="*{tireRollingRadius}" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">滚动半径修正系数：</label>
+									<div class="col-md-4">
+										<input id="rollingRadius" readonly="true"  th:field="*{rollingRadius}"  name="rollingRadius"  maxlength="5" minlength="4" onkeyup="this.value=this.value.replace(/\D/g,'')" value="10000"  placeholder="请输入滚动半径修正系数" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "outputCorrectionK" maxlength="3"  th:field="*{outputK}" name = "outputK" onkeyup="this.value=this.value.replace(/\D/g,'')" value = "100"  placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input  type="text" id = "outputCorrectionB" th:field="*{outputB}"  maxlength="3" name = "outputB" onkeyup="this.value=this.value.replace(/\D/g,'')" value = "100"  placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group hideDiv" style="display : none" >
+									<label class="col-md-2 control-label"><label class="text-danger">*</label> IG后桥速比：</label>
+									<div class="col-md-4">
+										<input id = "igRatio" type="text" th:field="*{igRatio}" name = "outputK"  placeholder="请输入IG后桥速比(范围:1.00~20.00)" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label"><label class="text-danger">*</label> 脉冲数比例：</label>
+									<div class="col-md-4">
+										<input id="pulseRatio" type="text" name="pulseRatio" th:field="*{pulseRatio}" placeholder="请输入脉冲数比例(范围:1~20)" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group hideDiv" style="display : none" >
+									<label class="col-md-2 control-label"><label class="text-danger">*</label> 修正系数：</label>
+									<div class="col-md-4">
+										<input id = "correctionFactor" type="text" th:field="*{correctionFactor}" name = "correctionFactor" placeholder="请输入修正系数(范围:0.97~1.01)" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">速比：</label>
+									<div class="col-md-4">
+										<input id="speedRatio" type="text" name="speedRatio" th:field="*{speedRatio}" readonly="true" class="form-control" />
+									</div>
+							    </div>
+							</div>
+					</div>
+				</div>
+			</div>
+	  </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmits">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_edit" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+</script>
+<script type="text/javascript" src="/resources/js/mileMonitorSetEdit.js" th:src="@{/resources/js/mileMonitorSetEdit.js}"></script>

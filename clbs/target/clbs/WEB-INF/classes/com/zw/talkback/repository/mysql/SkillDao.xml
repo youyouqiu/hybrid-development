@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.SkillDao">
+
+    <select id="getSkillsCategories" resultType="com.zw.talkback.domain.basicinfo.form.SkillsCategoriesForm"
+            parameterType="com.zw.talkback.domain.basicinfo.query.SkillQuery">
+        select id, name, remark
+        from zw_m_skill_categories
+        where flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and name like concat('%',#{simpleQueryParam},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <insert id="addSkillsCategories"
+            parameterType="com.zw.talkback.domain.basicinfo.form.SkillsCategoriesForm">
+        insert into zw_m_skill_categories
+        (id, name, remark, flag, create_data_time, create_data_username)
+        values
+        (#{id}, #{name}, #{remark}, #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <select id="findCategoriesByName" resultType="com.zw.talkback.domain.basicinfo.form.SkillsCategoriesForm"
+            parameterType="string">
+        select id, name, remark
+        from zw_m_skill_categories
+        where flag = 1
+        and name = #{name}
+    </select>
+
+    <select id="findCategoriesById" resultType="com.zw.talkback.domain.basicinfo.form.SkillsCategoriesForm"
+            parameterType="string">
+        select id, name, remark
+        from zw_m_skill_categories
+        where flag = 1
+        and id = #{id}
+    </select>
+
+    <update id="updateSkillsCategories"
+            parameterType="com.zw.talkback.domain.basicinfo.form.SkillsCategoriesForm">
+        update zw_m_skill_categories
+        set
+        name = #{name},
+        remark = #{remark},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where flag = 1
+        and id = #{id}
+    </update>
+
+    <select id="findSkillByCategoriesId" resultType="com.zw.talkback.domain.basicinfo.form.SkillForm"
+            parameterType="string">
+        select id, name, remark, categories_id
+        from zw_m_skill
+        where flag = 1
+        and categories_id = #{id}
+    </select>
+
+    <update id="deleteSkillsCategories" parameterType="string">
+        update zw_m_skill_categories
+        set
+        flag = 0
+        where id = #{id}
+        and flag = 1
+    </update>
+
+    <select id="getSkills" resultType="com.zw.talkback.domain.basicinfo.form.SkillForm"
+            parameterType="com.zw.talkback.domain.basicinfo.query.SkillQuery">
+        select s.id, s.name, s.remark, s.categories_id, c.name as categoriesName
+        from zw_m_skill s
+        inner join zw_m_skill_categories c on c.id = s.categories_id and c.flag = 1
+        where s.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            and s.name like concat('%',#{simpleQueryParam},"%")
+        </if>
+        order by s.create_data_time desc
+    </select>
+
+    <insert id="addSkill"
+            parameterType="com.zw.talkback.domain.basicinfo.form.SkillForm">
+        insert into zw_m_skill
+        (id, name, remark, categories_id, flag, create_data_time, create_data_username)
+        values
+        (#{id}, #{name}, #{remark}, #{categoriesId}, #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <select id="findSkillByName" resultType="com.zw.talkback.domain.basicinfo.form.SkillForm"
+            parameterType="string">
+        select id, name, remark, categories_id
+        from zw_m_skill
+        where flag = 1
+        and name = #{name}
+    </select>
+
+    <select id="findSkillById" resultType="com.zw.talkback.domain.basicinfo.form.SkillForm"
+            parameterType="string">
+        select id, name, remark, categories_id
+        from zw_m_skill
+        where flag = 1
+        and id = #{id}
+    </select>
+
+    <update id="updateSkill"
+            parameterType="com.zw.talkback.domain.basicinfo.form.SkillForm">
+        update zw_m_skill
+        set
+        name = #{name},
+        remark = #{remark},
+        categories_id = #{categoriesId},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where flag = 1
+        and id = #{id}
+    </update>
+
+    <select id="findPeopleIdBySkillId" resultType="string" parameterType="string">
+        select people_id
+        from zw_m_people_basic_info
+        where flag = 1
+        and type = 1
+        and basic_id = #{id}
+    </select>
+
+    <update id="deleteSkill"
+            parameterType="string">
+        update zw_m_skill
+        set
+        flag = 0
+        where
+        id = #{id}
+    </update>
+
+    <select id="getAllCategories" resultType="com.zw.talkback.domain.basicinfo.model.SkillsCategoriesInfo">
+        select id, name, remark
+        from zw_m_skill_categories
+        where flag = 1
+        order by create_data_time desc
+    </select>
+
+    <select id="getAllSkill" resultType="com.zw.talkback.domain.basicinfo.form.SkillForm">
+        select id, name, categories_id, remark
+        from zw_m_skill
+        where flag = 1
+        order by create_data_time desc
+    </select>
+    <select id="getAllSkillList" resultType="com.zw.talkback.domain.basicinfo.model.SkillInfo">
+        SELECT zms.id, zms.name skillName, zmsc.name skillCategoryName
+        FROM zw_m_skill_categories zmsc
+        INNER JOIN zw_m_skill zms ON zmsc.id = zms.categories_id AND zms.flag = 1
+        WHERE zmsc.flag = 1
+    </select>
+</mapper>

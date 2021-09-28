@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.FriendDao">
+    <select id="getByUserId" parameterType="long" resultType="com.zw.platform.basic.dto.FriendDTO">
+       select fri.user_id,fri.friend_id,type,c.monitor_type
+       from zw_m_friend fri
+       LEFT JOIN zw_m_intercom_info inc on fri.friend_id = inc.user_id
+       left join zw_m_config c on c.intercom_info_id = inc.id
+      where fri.user_id = #{userId}
+        and fri.flag = 1
+    </select>
+
+    <update id="deleteByUserId" parameterType="long">
+        update zw_m_friend set flag = 0 where user_id = #{userId}
+    </update>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.FriendDO">
+        INSERT INTO `zw_m_friend` (`id`, `user_id`, `friend_id`, `type`, `flag`, `create_data_time`,
+        `create_data_username`)
+        VALUES
+        <foreach collection="friends" item="friend" separator=",">
+            (#{friend.id}, #{friend.userId}, #{friend.friendId}, #{friend.type}, #{friend.flag},
+            #{friend.createDataTime}, #{friend.createDataUsername})
+        </foreach>
+    </insert>
+
+</mapper>

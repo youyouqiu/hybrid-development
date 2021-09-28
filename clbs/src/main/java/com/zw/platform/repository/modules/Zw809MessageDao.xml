@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.Zw809MessageDao">
+	<insert id = "insert" parameterType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+	    INSERT INTO zw_m_809_message (
+            id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+            supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+            `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+            source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+            supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+            protocol_type, server_ip,social_security_number,identity_number,dealer_telephone,answer_time,media_url)
+        VALUES (
+            #{id}, #{platformId}, #{groupId}, #{type}, #{brand}, #{plateColor}, #{warnType}, #{alarmType}, #{warnTime}, #{warnSrc},
+            #{supervisionLevel}, #{supervisor}, #{supervisionTel}, #{supervisionEmail}, #{infoContent}, #{enterprise},
+            #{time}, #{ackTime}, #{expireTime}, #{result}, #{ackContent}, #{dealer}, #{alarmStartTime},
+            #{sourceMsgSn}, #{sourceDataType}, #{eventId}, #{infoId}, #{monitorId}, #{objectId}, #{objectType},
+            #{supervisionId}, #{dataType}, #{handleId}, #{msgGnssCenterId}, #{msgId}, #{msgSn},
+            #{protocolType}, #{serverIp},#{socialSecurityNumber},#{identityNumber},#{dealerTelephone},#{answerTime},#{mediaUrl})
+	</insert>
+
+    <update id="updateMsgStatus" parameterType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        UPDATE
+        zw_m_809_message
+        SET ack_time = #{ackTime},
+        result = #{result},
+        ack_content = #{ackContent},
+        dealer = #{dealer}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getMsgStatus" parameterType="string" resultType="int">
+        select
+        result
+        from
+        zw_m_809_message
+        WHERE id = #{id}
+    </select>
+
+    <!-- 查询所有的未处理的消息 -->
+    <select id = "getAllUntreatedMsg" resultType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        select id,expire_time as expireTime from zw_m_809_message where result = 0
+    </select>
+
+    <!-- 将过期的数据的状态修改为已过期 -->
+    <select id="getAllUntreatedMsgIds" resultType="string">
+        select id from
+        zw_m_809_message
+        WHERE
+        result = 0
+        and expire_time <![CDATA[ <= ]]> #{time}
+    </select>
+
+    <!-- 将过期的数据的状态修改为已过期 -->
+    <update id="updatePastData" parameterType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        UPDATE
+        zw_m_809_message
+        SET
+        result = 2
+        WHERE
+        id IN
+        <foreach item="item" collection="msgIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="update" parameterType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        UPDATE zw_m_809_message SET
+        identity_number = #{identityNumber},
+        dealer_telephone = #{dealerTelephone},
+        ack_time=#{ackTime},
+        dealer= #{dealer},
+        media_url = #{mediaUrl},
+        social_security_number = #{socialSecurityNumber},
+        result = 1 WHERE id = #{id}
+    </update>
+
+    <!-- 查询用户权限下当天所有的未处理的上级平台消息 -->
+    <select id = "listByTime" resultType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        SELECT
+            id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+            supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+            `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+            source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+            supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+            protocol_type, server_ip
+        FROM
+        zw_m_809_message
+        WHERE
+        `time` BETWEEN #{startTime} AND #{endTime}
+        AND result = 0 AND group_id = #{groupId}
+    </select>
+
+    <!-- 根据条件查询用户权限下当天上级平台消息 -->
+     <select id = "getTheDayAllMsgByUser" resultType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        SELECT
+            id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+            supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+            `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+            source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+            supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+            protocol_type, server_ip
+        FROM
+        zw_m_809_message
+        WHERE
+        `time` BETWEEN #{startTime} AND #{endTime} AND group_id = #{groupId}
+        <choose>
+            <when test="msgType != null">
+                AND type = #{msgType}
+            </when>
+            <otherwise>
+                AND type not in (4)
+            </otherwise>
+        </choose>
+        <if test="status != null">
+            AND result = #{status}
+        </if>
+        ORDER BY `time` DESC
+    </select>
+
+    <!-- 根据条件查询用户权限下当天上级平台消息 -->
+    <select id = "getTheDayAllMsgByGroup" resultType="com.zw.platform.dto.platformInspection.Zw809MessageDTO">
+        SELECT
+            id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+            supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+            `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+            source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+            supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+            protocol_type, server_ip
+        FROM
+        zw_m_809_message
+        WHERE
+        `time` BETWEEN #{startTime} AND #{endTime}
+        <if test="groupId != null">
+            AND group_id in <foreach collection="groupId" open="(" close=")" separator="," item="item">
+                #{item}
+             </foreach>
+        </if>
+        <choose>
+            <when test="msgType != null">
+                AND type = #{msgType}
+            </when>
+            <otherwise>
+                AND type not in (4)
+            </otherwise>
+        </choose>
+        <if test="status != null">
+            AND result = #{status}
+        </if>
+        ORDER BY `time` DESC
+    </select>
+
+	<select id="listByTimeLaterThan" resultType="com.zw.platform.domain.reportManagement.SuperPlatformMsg">
+        SELECT id, platform_id, group_id, type, msg, time, ack_time, expire_time, result, ack_content, dealer
+        FROM zw_m_809_message_old WHERE time >= #{startTime}
+        ORDER BY time, id
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getMsgById" resultType="com.zw.platform.domain.reportManagement.Zw809MessageDO">
+        select id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+               supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+               `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+               source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+               supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+               protocol_type, server_ip,social_security_number,identity_number,
+               dealer_telephone, answer_time,media_url
+        from zw_m_809_message WHERE id = #{id}
+    </select>
+
+    <select id="getListByKeyWord" resultType="com.zw.adas.domain.report.inspectuser.InspectUserDTO">
+        select id,object_type,object_id,time as inspectTime,answer_time,ack_time ,result as answerStatus,dealer as answerUser,
+               dealer_telephone as answerUserTel,identity_number as answerUserIdentityNumber, social_security_number from zw_m_809_message where
+               time between #{inspectStartTime} and #{inspectEndTime} and type = 4
+               and group_id in
+               <foreach collection="orgIds" separator="," open="(" close=")" item="id">
+                #{id}
+               </foreach>
+               <if test="status != null and status != -1">
+                   and result = #{status}
+               </if>
+               <if test="answerUser != null and answerUser != ''">
+                   and dealer LIKE CONCAT('%',#{answerUser},'%')
+               </if>
+               order by time desc
+    </select>
+
+    <insert id="batchInsert">
+        INSERT IGNORE INTO zw_m_809_message (
+                id, platform_id, group_id, type, brand, plate_color, warn_type, alarm_type, warn_time, warn_src,
+                supervision_level, supervisor, supervision_tel, supervision_email, info_content, enterprise,
+                `time`, ack_time, expire_time, result, ack_content, dealer, alarm_start_time,
+                source_msg_sn, source_data_type, event_id, info_id, monitor_id, object_id, object_type,
+                supervision_id, data_type, handle_id, msg_gnss_center_id, msg_id, msg_sn,
+                protocol_type, server_ip, answer_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id}, #{item.platformId}, #{item.groupId}, #{item.type}, #{item.brand}, #{item.plateColor},
+            #{item.warnType}, #{item.alarmType}, #{item.warnTime}, #{item.warnSrc}, #{item.supervisionLevel}, #{item.supervisor},
+            #{item.supervisionTel}, #{item.supervisionEmail}, #{item.infoContent}, #{item.enterprise}, #{item.time},
+            #{item.ackTime}, #{item.expireTime}, #{item.result}, #{item.ackContent}, #{item.dealer},
+            #{item.alarmStartTime}, #{item.sourceMsgSn}, #{item.sourceDataType}, #{item.eventId},
+            #{item.infoId}, #{item.monitorId}, #{item.objectId}, #{item.objectType}, #{item.supervisionId},
+            #{item.dataType}, #{item.handleId}, #{item.msgGnssCenterId}, #{item.msgId}, #{item.msgSn},
+            #{item.protocolType}, #{item.serverIp}, #{item.answerTime})
+        </foreach>
+    </insert>
+
+	<delete id="deleteByTimeEarlierThan">
+        DELETE FROM zw_m_809_message WHERE time &lt; #{earliestTime}
+    </delete>
+</mapper>

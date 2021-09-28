@@ -1,0 +1,3330 @@
+<form id="editForm" th:action="@{/r/riskManagement/DefineSettings/edit}" action="#" role="form" method="post"
+	  class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">主动安全参数设置</h4>
+		<style>
+			.checkbox{
+				padding-left: 0;
+			}
+			#editForm label.control-label{
+				padding-left: 0;
+				padding-right: 0;
+			}
+			/*@media (max-width: ) {
+				
+			}*/
+			#editForm input.form-control{
+				padding: 6px 2px 6px 5px;
+			}
+			#editForm div.col-md-7{
+				padding-right: 10px;
+			}
+		</style>
+	</div>
+	<div class="modal-body" style="max-height:700px;overflow-y:auto">
+		<!-- 监控对象及参考车牌 -->
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<div class="form-group">
+					<label class="col-md-2 col-lg-2 control-label">监控对象：</label>
+					<div class="col-md-4 col-lg-4">
+						<input th:value="${referVehicleList}" id="referVehicleList" type="hidden"/>
+						<input th:value="${riskSettingList}" id="riskSettingList" type="hidden"/>
+						<input th:value="${riskLevelList}" id="riskLevelList" type="hidden"/>
+						<input th:value="${vehicleId}" id="vehicleId" name="vehicleId" type="hidden"/>
+						<input style="cursor: pointer" id="brand" th:value="${brand}" name="brand" placeholder="请选择监控对象"
+							   class="form-control" readonly/>
+					</div>
+					<label class="col-md-2 col-lg-2 control-label">参考对象：</label>
+					<div class="col-md-4 col-lg-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input type="text" class="form-control" id="riskReference">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+										data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 选项卡切换 -->
+		<div class="row">
+			<div class="col-md-12 col-lg-12">
+				<div class="panel-heading">
+					<div class="dropdown panel-title fwb">
+						<ul class="nav nav-tabs">
+							<li class="active"><a href="#fatigueDriving" data-toggle="tab">疑似疲劳</a></li>
+							<li><a href="#distractedDriving" data-toggle="tab">注意力分散</a></li>
+							<li><a href="#abnormalAlarm" data-toggle="tab">违规异常</a></li>
+							<li><a href="#dollisionRisk" data-toggle="tab">碰撞危险</a></li>
+							<li><a href="#captureSetting" data-toggle="tab">主动抓拍设置</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="tab-content">
+						<!-- 疑似疲劳 -->
+						<div class="tab-pane active" id="fatigueDriving">
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									多媒体参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-media"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-media-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" value="risk_6506" id="closeEyes_multiMediaSet">闭眼
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="closeEyes_video_text" name="closeEyes_video_text"
+												   class="form-control" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="closeEyes_photo_text" name="closeEyes_photo_text"
+												   class="form-control" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="closeEyes_photo_time_text"
+												   name="closeEyes_photo_time_text" class="form-control"
+												   placeholder="(0.5-2)单位秒" value="0.5">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" value="risk_6507" id="yawn_multiMediaSet">打哈欠
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="yawn_video_text" name="yawn_video_text"
+												   class="form-control" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5  col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="yawn_photo_text" name="yawn_photo_text"
+												   class="form-control" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="yawn_photo_time_text" name="yawn_photo_time_text"
+												   class="form-control" placeholder="(0.5-2)单位秒" value="0.5">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2" >
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="photo_video_volume_sensitivity">其他
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4" >
+										<label class="col-md-5 col-lg-5 control-label">拍照分辨率：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" name="camera_resolution_select_065"
+													id='camera_resolution_select_065'>
+												<option value='0x01' selected>352×288</option>
+												<option value='0x02'>704×288</option>
+												<option value='0x03'>704×576</option>
+												<option value='0x04'>640×480</option>
+												<option value='0x05'>1280×720</option>
+												<option value='0x06'>1920×1080</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4" >
+										<label class="col-md-6 col-lg-6 control-label">视频分辨率：</label>
+										<div class="col-md-6 col-lg-6">
+											<select class="form-control" name="video_resolution_select_065"
+													id="video_resolution_select_065">
+												<option value='0x01' selected>CIF</option>
+												<option value='0x02'>WCIF</option>
+												<option value='0x03'>D1</option>
+												<option value='0x04'>WD1</option>
+												<option value='0x05'>720P</option>
+												<option value='0x06'>1080P</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4 col-md-offset-3" style="margin-top: 20px">
+										<label class="col-md-5 col-lg-5 control-label">提示音量：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" name=""
+													id="video_volume_select">
+												<option value='0'>0</option>
+												<option value='1'>1</option>
+												<option value='2'>2</option>
+												<option value='3'>3</option>
+												<option value='4'>4</option>
+												<option value='5'>5</option>
+												<option value='6' selected>6</option>
+												<option value='7'>7</option>
+												<option value='8'>8</option>
+
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4" style="margin-top: 20px">
+										<label class="col-md-6 col-lg-6 control-label">灵敏度：</label>
+										<div class="col-md-6 col-lg-6">
+											<select class="form-control" name=""
+													id="video_sensitivity_select">
+												<option value='1'>1</option>
+												<option value='2' selected>2</option>
+												<option value='3'>3</option>
+												<option value='4'>4</option>
+												<option value='5'>5</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10 col-md-offset-1 col-lg-10" style="margin-top: 20px;padding: 0;">
+                                        <span class="glyphicon glyphicon-asterisk"
+											  style="color:#FFCC33;font-size:16px;vertical-align: middle;left:-2px;"></span>
+										该拍照分辨率、视频录制分辨率、提示音量、灵敏度的设定包括疑似疲劳、注意力分散、违规异常、碰撞危险4类主动安全报警信息，统一设定
+									</div>
+								</div>
+							</div>
+
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-grade"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-grade-content">
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" checked="checked" value="risk_6506" id="closeEyes_RiskLevelSet">闭眼
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_low_select"
+													name="">
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_high_select"
+													name="">
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_highSpeedRecording"
+													name="">
+												<option  value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="closeEyes_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="yawn_RiskLevelSet" value="risk_6507">打哈欠
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_low_select"
+													name="">
+												<option selected="selected" value="1">否</option>
+												<option value="0">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_high_select"
+													name="">
+												<option selected="selected" value="1">否</option>
+												<option value="0">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="yawn_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="time-interval" name="fatiguePValue" placeholder="时间间隔阈值（单位:s）"
+												   value="5" class="form-control" >
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">持续时长：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" id="time-continue" name="fatigueTValue" placeholder="持续时长阈值（单位:s）"
+												   value="30"  class="form-control" >
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件速度参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-parameter"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-parameter-content">
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" value="risk_6506" id="closeEyes_RiskParamSet">闭眼
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="closeEyes_highSpeed"
+												   name="closeEyes_risk_high_text" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" value="risk_6507" id="yawn_RiskParamSet">打哈欠
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="yawn_highSpeed"
+												   name="yawn_risk_high_text" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="allLowSpeed_checkbox" value="1">疑似疲劳、注意力分散、违规异常、碰撞危险
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="all_lowSpeed"
+												   name="all_LowSpeed_text" placeholder="(0-220)Km/h" value="30">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10 col-lg-10 col-md-offset-1">
+                                        <span class="glyphicon glyphicon-asterisk"
+											  style="color:#FFCC33;font-size:16px;vertical-align: middle;left:-2px"></span>
+										该低速阈值的设定包括疑似疲劳、注意力分散、违规异常、碰撞危险4类报警信息，统一设定
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 注意力分散 -->
+						<div class="tab-pane" id="distractedDriving">
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									多媒体参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-mediaTwo"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-mediaTwo-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="smoking_multiMediaSet" value="risk_6503">抽烟
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="smoking_video_text"
+												   name="smoking_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5  col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="smoking_photo_text"
+												   name="smoking_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="smoking_photo_time_text"
+												   name="smoking_photo_time_text" placeholder="(0.5-2)单位秒" value="0.5">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="answerThephone_multiMediaSet"
+													   value="risk_6502">接打手持电话
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="answerThephone_video_text"
+												   name="answerThephone_video_text" placeholder="(0-60)单位秒"
+												   value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="answerThephone_photo_text"
+												   name="answerThephone_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="answerThephone_photo_time_text"
+												   name="answerThephone_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="posture_multiMediaSet"
+													   value="risk_6508">长时间不目视前方
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3 ">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="posture_video_text"
+												   name="posture_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="posture_photo_text"
+												   name="posture_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="posture_photo_time_text"
+												   name="posture_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-gradeTwo"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-gradeTwo-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="smoking_RiskLevelSet" value="risk_6503">抽烟
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="smoking_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="180" id="smoking_timeInterval" name="smoking_timeInterval"/>
+										</div>
+									</div>
+									<div style="float: left;">
+										<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围 0~3600；缺省值为 180；表示在此时间间隔内仅触发一次吸烟报警"></i>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="answerThephone_RiskLevelSet"
+													   value="risk_6502">接打手持电话
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_low_select"
+													name="">
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_high_select"
+													name="">
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="answerThephone_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="120" id="answerThephone_timeInterval" name="answerThephone_timeInterval"/>
+										</div>
+									</div>
+									<div style="float: left;">
+										<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围 0~3600；缺省值为 120；表示在此时间间隔内仅触发一次报警"></i>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="posture_RiskLevelSet" value="risk_6508">长时间不目视前方
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="posture_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+                                <!--<hr/>-->
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="5" name="distractPValue" id="drive_time_interval" placeholder="时间间隔阈值（单位:s）"/>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">持续时长：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="30" name="distractTValue" id="drive_continue_time" placeholder="持续时长阈值（单位:s）"/>
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件速度参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-parameterTwo"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-parameterTwo-content">
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="smoking_RiskParamSet" value="risk_6503">抽烟
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="smoking_highSpeed"
+												   name="smoking_highSpeed" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="answerThephone_RiskParamSet"
+													   value="risk_6502">接打手持电话
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="answerThephone_highSpeed"
+												   name="answerThephone_highSpeed" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="posture_RiskParamSet"
+													   value="risk_6508">长时间不目视前方
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="posture_highSpeed"
+												   name="abnormalAlarm_risk_high_text" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- 违规异常 -->
+						<div class="tab-pane" id="abnormalAlarm">
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									多媒体参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-mediaThree"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-mediaThree-content">
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-lg-2 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="posture_multiMediaSet"-->
+													   <!--value="risk_6508">长时间不目视前方-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3 ">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">录制时间：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="posture_video_text"-->
+												   <!--name="posture_video_text" placeholder="(0-60)单位秒" value="10">-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="posture_photo_text"-->
+												   <!--name="posture_photo_text" placeholder="(0-10)张" value="3">-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="posture_photo_time_text"-->
+												   <!--name="posture_photo_time_text" placeholder="(0.5-2)单位秒"-->
+												   <!--value="0.5">-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="cover_multiMediaSet"
+													   value="risk_6511">遮挡/红外阻断
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3 ">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="cover_video_text"
+												   name="cover_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="cover_photo_text"
+												   name="cover_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="cover_photo_time_text"
+												   name="cover_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="witness_multiMediaSet"
+													   value="risk_6509">人证不符
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3 ">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="witness_video_text"
+												   name="witness_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="witness_photo_text"
+												   name="witness_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="witness_photo_time_text"
+												   name="witness_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noRightPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="driver_multiMediaSet"
+													   value="risk_6510">驾驶员不在驾驶位置
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3 ">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="driver_video_text"
+												   name="driver_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="driver_photo_text"
+												   name="driver_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="driver_photo_time_text"
+												   name="driver_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-gradeThree"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-gradeThree-content">
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-lg-2 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="posture_RiskLevelSet" value="risk_6508">长时间不目视前方-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">一级报警：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_oneLevelAlarmEnable"-->
+													<!--name="">-->
+												<!--<option value="1">开</option>-->
+												<!--<option value="0">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">二级报警：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_twoLevelAlarmEnable"-->
+													<!--name="">-->
+												<!--<option value="1">开</option>-->
+												<!--<option value="0">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_low_select"-->
+													<!--name="">-->
+												<!--<option value="0">开</option>-->
+												<!--<option value="1">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_high_select"-->
+													<!--name="">-->
+												<!--<option value="0">开</option>-->
+												<!--<option value="1">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_lowSpeedRecording"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">否</option>-->
+												<!--<option value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_highSpeedRecording"-->
+													<!--name="">-->
+												<!--<option value="0">否</option>-->
+												<!--<option selected="selected" value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_oneLevelVoiceEnable"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">关</option>-->
+												<!--<option value="1">开</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="posture_twoLevelVoiceEnable"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">关</option>-->
+												<!--<option value="1">开</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="cover_RiskLevelSet" value="risk_6511">遮挡
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="cover_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="infrared_RiskLevelSet" value="risk_6512">红外阻断
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="infrared_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="witness_RiskLevelSet" value="risk_6509">人证不符
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">定时检查：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="witness_check_switch"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="witness_voiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-4 col-lg-4 col-md-offset-3">
+										<label class="col-md-5 col-lg-5 control-label">间隔时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="10" id="witness_timeInterval" name="witness_timeInterval" placeholder="(0~240)单位分钟"/>
+										</div>
+									</div>
+                                    <div style="float: left;">
+                                        <i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位分(min)，取值范围 0~240；缺省值为 10；表示行驶时每次间隔多久判定一次驾驶员信息"></i>
+                                    </div>
+                                    <!--<div class="form-group">&ndash;&gt;-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<div class="col-md-4 col-lg-4" style="margin-left: -16px;">
+										<label class="col-md-5 col-lg-5 control-label">录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="witness_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="witness_highSpeedRecording"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">否</option>-->
+												<!--<option value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--</div>-->
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noRightPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="driver_RiskLevelSet" value="risk_6510">驾驶员不在驾驶位置
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">未检测到事件：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="driver_check_switch"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="driver_voiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="driver_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="driver_highSpeedRecording"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">否</option>-->
+												<!--<option value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								</div>
+								<hr/>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="driver-detection_time_text"
+												   name="abnormalPValue" placeholder="时间间隔阈值（单位:s）"
+												   value="5">
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">持续时长：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="driver-detection_time_duration"
+												   name="abnormalTValue" placeholder="持续时长（单位:s）"
+												   value="30">
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件速度参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-parameterThree"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-parameterThree-content">
+
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="cover_RiskParamSet"
+													   value="risk_6511">遮挡/红外阻断
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="cover_highSpeed"
+												   name="cover_risk_high_text" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-3 col-lg-3 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="posture_RiskParamSet"-->
+													   <!--value="risk_6508">长时间不目视前方-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="posture_highSpeed"-->
+												   <!--name="abnormalAlarm_risk_high_text" placeholder="(0-220)Km/h"-->
+												   <!--value="50">-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+							</div>
+						</div>
+						<!-- 碰撞危险 -->
+						<div class="tab-pane" id="dollisionRisk">
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									多媒体参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-mediaFour"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-mediaFour-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="forwardCollision_multiMediaSet"
+													   value="risk_6401">前向碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="forwardCollision_video_text"
+												   name="forwardCollision_video_text" placeholder="(0-60)单位秒"
+												   value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="forwardCollision_photo_text"
+												   name="forwardCollision_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control"
+												   id="forwardCollision_photo_time_text"
+												   name="forwardCollision_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="laneDeparture_multiMediaSet"
+													   value="risk_6402">车道偏离
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="laneDeparture_video_text"
+												   name="laneDeparture_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="laneDeparture_photo_text"
+												   name="laneDeparture_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="laneDeparture_photo_time_text"
+												   name="laneDeparture_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="tooClose_multiMediaSet" value="risk_6403">车距过近
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="tooClose_video_text"
+												   name="tooClose_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="tooClose_photo_text"
+												   name="tooClose_photo_text" placeholder="单位：(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="tooClose_photo_time_text"
+												   name="tooClose_photo_time_text" placeholder="(0.5-2)单位秒" value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="pedestrianCollision_multiMediaSet"
+													   value="risk_6404">行人碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="pedestrianCollision_video_text"
+												   name="pedestrianCollision_video_text" placeholder="(0-60)单位秒"
+												   value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="pedestrianCollision_photo_text"
+												   name="pedestrianCollision_photo_text" placeholder="(0-10)张"
+												   value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control"
+												   id="pedestrianCollision_photo_time_text"
+												   name="pedestrianCollision_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="frequentLaneChange_multiMediaSet"
+													   value="risk_6405">频繁变道
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="frequentLaneChange_video_text"
+												   name="frequentLaneChange_video_text" placeholder="(0-60)单位秒"
+												   value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="frequentLaneChange_photo_text"
+												   name="frequentLaneChange_photo_text" placeholder="(0-10)张"
+												   value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control"
+												   id="frequentLaneChange_photo_time_text"
+												   name="frequentLaneChange_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-lg-2 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="block_multiMediaSet" value="risk_6407">障碍物-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">录制时间：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="block_video_text"-->
+												   <!--name="block_video_text" placeholder="(0-60)单位秒" value="10">-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="block_photo_text"-->
+												   <!--name="block_photo_text" placeholder="(0-10)张" value="3">-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-3 col-lg-3">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="block_photo_time_text"-->
+												   <!--name="block_photo_time_text" placeholder="(0.5-2)单位秒" value="0.5">-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="hurry_multiMediaSet"
+													   value="risk_6408">急加/急减/急转弯
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="hurry_video_text"
+												   name="hurry_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="hurry_photo_text"
+												   name="hurry_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="hurry_photo_time_text"
+												   name="hurry_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="roadIdentifying_multiMediaSet"
+													   value="risk_6409">道路标识超限
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadIdentifying_video_text"
+												   name="roadIdentifying_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadIdentifying_photo_text"
+												   name="roadIdentifying_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadIdentifying_photo_time_text"
+												   name="roadIdentifying_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="roadrecognition_multiMediaSet"
+													   value="risk_6410">道路标识识别
+											</label>
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">录制时间：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadrecognition_video_text"
+												   name="laneDeparture_video_text" placeholder="(0-60)单位秒" value="10">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照张数：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadrecognition_photo_text"
+												   name="laneDeparture_photo_text" placeholder="(0-10)张" value="3">
+										</div>
+									</div>
+									<div class="col-md-3 col-lg-3">
+										<label class="col-md-5 col-lg-5 control-label">拍照间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="roadrecognition_photo_time_text"
+												   name="laneDeparture_photo_time_text" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-gradeFour"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-gradeFour-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="forwardCollision_RiskLevelSet"
+													   value="risk_6401">前向碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_low_select"
+													name="">
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_high_select"
+													name="">
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="forwardCollision_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<input value="2.7" readonly class="form-control" type="text" name="forwardCollision_interval" id="forwardCollision_timeInterval"/>
+										</div>
+									</div>
+									<!--<div style="float: left;">-->
+										<!--<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围1-5，缺省值3"></i>-->
+									<!--</div>-->
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="laneDeparture_RiskLevelSet"
+													   value="risk_6402">车道偏离
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_low_select"
+													name="">
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_high_select"
+													name="">
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="laneDeparture_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="tooClose_RiskLevelSet" value="risk_6403">车距过近
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_low_select"
+													name="">
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_high_select"
+													name="">
+
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="tooClose_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">距离阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" id="tooClose_timeInterval" name="nearlyDistance_interval" type="text" value="30" placeholder="(10~50)单位米"/>
+										</div>
+									</div>
+									<div style="float: left;">
+										<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位米(m)，取值范围10-50，缺省值30"></i>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="pedestrianCollision_RiskLevelSet"
+													   value="risk_6404">行人碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_low_select"
+													name="">
+
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_high_select"
+													name="">
+
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="pedestrianCollision_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<input  class="form-control" id="pedestrianCollision_timeInterval" name="peoplecrash_interval" type="text" value="3" placeholder="(1~10)单位秒"/>
+										</div>
+									</div>
+									<div style="float: left;">
+										<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围1-10，缺省值3"></i>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="frequentLaneChange_RiskLevelSet"
+													   value="risk_6405">频繁变道
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="frequentLaneChange_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group" style="position: relative;">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" type="text" value="60" id="frequentLaneChange_timeInterval" name="changelane_interval" placeholder="(30-120)单位秒"/>
+										</div>
+
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">次数阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<input  class="form-control" type="text" value="5" placeholder="(3~10)次" id="changelane_frequency" name="changelane_frequency"/>
+										</div>
+									</div>
+									<i style="z-index:999999;margin-top: 12px;position: absolute;left: 60%;top: 0;margin-left: -20px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位s(秒) 30~120；缺省值：60"></i>
+								</div>
+
+
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-lg-2 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="block_RiskLevelSet" value="risk_6407">障碍物-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">一级报警：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_oneLevelAlarmEnable"-->
+													<!--name="">-->
+												<!--<option value="1">开</option>-->
+												<!--<option value="0">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">二级报警：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_twoLevelAlarmEnable"-->
+													<!--name="">-->
+												<!--<option value="1">开</option>-->
+												<!--<option value="0">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_low_select"-->
+													<!--name="">-->
+												<!--<option value="0">开</option>-->
+												<!--<option value="1">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_high_select"-->
+													<!--name="">-->
+												<!--<option value="0">开</option>-->
+												<!--<option value="1">关</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_lowSpeedRecording"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">否</option>-->
+												<!--<option value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_highSpeedRecording"-->
+													<!--name="">-->
+												<!--<option value="0">否</option>-->
+												<!--<option selected="selected" value="1">是</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_oneLevelVoiceEnable"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">关</option>-->
+												<!--<option value="1">开</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<select class="form-control" id="block_twoLevelVoiceEnable"-->
+													<!--name="">-->
+												<!--<option selected="selected" value="0">关</option>-->
+												<!--<option value="1">开</option>-->
+											<!--</select>-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-2 col-md-offset-1 col-lg-2">-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">时间阈值：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input  class="form-control" value="3" placeholder="(1~10)单位秒" type="text" id="block_timeInterval" name="barrier_interval"/>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div style="float: left;">-->
+										<!--<i style="z-index:999999;margin-top: 12px;" class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="单位秒(s)，取值范围1-10，缺省值3"></i>-->
+									<!--</div>-->
+								<!--</div>-->
+
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="hurry_RiskLevelSet" value="risk_6408">急加/急减/急转弯
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<!--wjk-->
+											<select class="form-control" id="hurry_low_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速阈值：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_high_select"
+													name="">
+												<option value="0">开</option>
+												<option value="1">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">低速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="hurry_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="roadIdentifying_RiskLevelSet" value="risk_6409">道路标识超限
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_oneLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级报警：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_twoLevelAlarmEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">一级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_oneLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">二级语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_twoLevelVoiceEnable"
+													name="">
+												<option selected="selected" value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_lowSpeedRecording"
+													name="">
+												<option selected="selected" value="0">否</option>
+												<option value="1">是</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">录制视频：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadIdentifying_highSpeedRecording"
+													name="">
+												<option value="0">否</option>
+												<option selected="selected" value="1">是</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="roadrecognition_RiskLevelSet" value="risk_6410">道路标识识别
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">道路标识识别：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadrecognition_roadMarkAlarmEnable"
+													name="">
+												<option value="0">关</option>
+												<option value="1">开</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="roadrecognition_voiceEnable"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<hr/>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">时间间隔：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="5" placeholder="时间间隔阈值（单位:s）" id="collisionPValue" name="collisionPValue" type="text"/>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">持续时长：</label>
+										<div class="col-md-7 col-lg-7">
+											<input class="form-control" value="30" placeholder="持续时长（单位:s）" id="collisionTValue" name="collisionTValue" type="text"/>
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动安全报警事件速度参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-parameterFour"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-parameterFour-content">
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="forwardCollision_RiskParamSet"
+													   value="risk_6401">前向碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="forwardCollision_highSpeed"
+												   name="forwardCollision_risk_high_text" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="laneDeparture_RiskParamSet"
+													   value="risk_6402">车道偏离
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="laneDeparture_highSpeed"
+												   name="laneDeparture_risk_high_text" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="tooClose_RiskParamSet" value="risk_6403">车距过近
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="tooClose_highSpeed"
+												   name="tooClose_risk_high_text" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="pedestrianCollision_RiskParamSet"
+													   value="risk_6404">行人碰撞
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control"
+												   id="pedestrianCollision_highSpeed"
+												   name="pedestrianCollision_risk_high_text" placeholder="(0-220)Km/h"
+												   value="50">
+										</div>
+									</div>
+								</div>
+								<!--<div class="form-group">-->
+									<!--<div class="col-md-3 col-lg-3 col-md-offset-1">-->
+										<!--<div class="checkbox">-->
+											<!--<label class="control-label">-->
+												<!--<input type="checkbox" id="block_RiskParamSet" value="risk_6407">障碍物-->
+											<!--</label>-->
+										<!--</div>-->
+									<!--</div>-->
+									<!--<div class="col-md-4 col-lg-4">-->
+										<!--<label class="col-md-5 col-lg-5 control-label">高速：</label>-->
+										<!--<div class="col-md-7 col-lg-7">-->
+											<!--<input type="text" class="form-control" id="block_highSpeed"-->
+												   <!--name="block_risk_high_text" placeholder="(0-220)Km/h" value="50">-->
+										<!--</div>-->
+									<!--</div>-->
+								<!--</div>-->
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="frequentLaneChange_RiskParamSet" value="risk_6405">频繁变道
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="frequentLaneChange_highSpeed"
+												   name="frequent_risk_high_text" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-3 col-lg-3 col-md-offset-1">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="hurry_RiskParamSet" value="risk_6408">急加/急减/急转弯
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">高速：</label>
+										<div class="col-md-7 col-lg-7">
+											<input type="text" class="form-control" id="hurry_highSpeed"
+												   name="hurry_risk_high_text" placeholder="(0-220)Km/h" value="50">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--主动抓拍设置-->
+						<div class="tab-pane" id="captureSetting">
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									多媒体参数设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-mediaFive"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-mediaFive-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="adas-check"
+													   value="">前向监测系统(FMS)
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">定时拍照时间间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="capture_time_text"
+												   name="capture_time_text" placeholder="(5-240)单位分钟"
+												   value="30">
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">定距拍照距离间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="distancePhotoInterval" placeholder="(1-250)单位km"
+												   name="distancePhotoInterval" value="30">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-4 col-lg-4 col-md-offset-3">
+										<label class="col-md-6 col-lg-6 control-label">拍照张数：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="timingPhoto"  placeholder="(1-10)张"
+												   name="timingPhoto"
+												   value="1">
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">拍照间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="adastimeInterval"
+												   name="adastimeInterval" placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+
+
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="dsm-check"
+													   value="">驾驶员监测系统(DMS)
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">定时拍照时间间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control"  placeholder="(5-240)单位分钟"
+												   name="dsm_capture_time_text" id="dsm_capture_time_text"
+												   value="30">
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">定距拍照距离间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="dsm_distancePhotoInterval"  placeholder="(1-250)单位km"
+												   name="dsm_distancePhotoInterval" value="30">
+										</div>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-md-4 col-lg-4 col-md-offset-3">
+										<label class="col-md-6 col-lg-6 control-label">拍照张数：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="dsm_timingPhoto"  placeholder="(1-10)张"
+												   name="dsm_timingPhoto"
+												   value="1">
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-6 col-lg-6 control-label">拍照间隔：</label>
+										<div class="col-md-6 col-lg-6">
+											<input type="text" class="form-control" id="dsm_timeInterval"
+												   name="dsm_timeInterval"  placeholder="(0.5-2)单位秒"
+												   value="0.5">
+										</div>
+									</div>
+								</div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-3 col-lg-3 text-left">
+									主动抓拍设置
+								</label>
+								<div class="col-md-9 col-lg-9 control-label text-right">
+                                    <span class="hiddenparameter" id="bind-gradeFive"><font>隐藏参数</font><span
+											class="fa fa-chevron-up" aria-hidden="true"></span></span>
+								</div>
+							</div>
+							<div id="bind-gradeFive-content">
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="captureAdasSetting"
+													   value="">前向监测系统(FMS)
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">主动抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="capture-select"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="adas-voice-select"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">定时抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="timingCapture"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">定距抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="distanceCapture"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-lg-2 col-md-offset-1 noPadding">
+										<div class="checkbox">
+											<label class="control-label">
+												<input type="checkbox" id="dsm_captureCheck"
+													   value="risk_6402">驾驶员监测系统(DMS)
+											</label>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">主动抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="capture-select-dsm"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">语音提醒：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="adas-voice-select-dsm"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-2 col-md-offset-1 col-lg-2">
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">定时抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="timingCapture-dsm"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-md-4 col-lg-4">
+										<label class="col-md-5 col-lg-5 control-label">定距抓拍：</label>
+										<div class="col-md-7 col-lg-7">
+											<select class="form-control" id="distanceCapture-dsm"
+													name="">
+												<option value="1">开</option>
+												<option value="0" selected="selected">关</option>
+											</select>
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+							<hr/>
+							<!--<div class="form-group">-->
+							<!--<div class="col-md-10 col-lg-10 col-md-offset-1">-->
+							<!--<span class="glyphicon glyphicon-asterisk"-->
+							<!--style="color:#FFCC33;font-size:16px;vertical-align: middle;left:-2px"></span>-->
+							<!--该低速阈值的设定包括碰撞危险这1类风险预警信息中的6个风险事件，统一设定-->
+							<!--</div>-->
+							<!--</div>-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmits"><strong>提 交</strong></button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal"><strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label" class='error' style='display: none;'></label>
+</form>
+<script th:inline="javascript">
+    var publicNull = [[#{public.null}]];
+    var riskSize60Length = [[#{risk.size60.length}]];
+    var riskSize10Length = [[#{risk.size10.length}]];
+    var riskSize5Length = [[#{risk.size5.length}]];
+    var riskSize1To5Length = [[#{risk.size1To5.length}]];
+    var riskSize220Length = [[#{risk.size220.length}]];
+    var riskSize30Length = [[#{risk.size30.length}]];
+    var riskSize60 = [[#{risk.size60}]];
+    var riskSize600 = [[#{risk.size600}]];
+</script>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+<script type="text/javascript" src="/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/resources/js/definesettingedit.js" th:src="@{/wro/definesettingedit.js}"></script>

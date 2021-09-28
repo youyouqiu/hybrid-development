@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.AttendanceReportMysqlDao">
+
+    <select id="findPeopleByScheduled" parameterType="string" resultType="com.zw.platform.domain.basicinfo.Personnel">
+      select p.id, p.people_number, p.is_incumbency
+      from zw_m_people_info p
+      inner join zw_m_people_scheduled_info si on si.people_id = p.id
+      where si.flag in (1,2)
+      and p.flag = 1
+      and si.scheduled_info_id = #{id}
+    </select>
+
+    <select id="getSchedulingRelationMonitorInfoListById"
+            resultType="com.zw.talkback.domain.basicinfo.form.SchedulingRelationMonitor">
+        select zmmsi.*, moniotrInfo.id, moniotrInfo.monitorName,si.is_incumbency
+        from zw_m_monitor_scheduled_info zmmsi
+				left join zw_m_people_info si on si.id = zmmsi.monitor_id
+                left join (
+            SELECT zmvi.id, zmvi.brand AS monitorName
+            FROM zw_m_vehicle_info zmvi
+            where zmvi.flag = 1
+            UNION ALL
+            SELECT zmpi.id, zmpi.people_number AS monitorName
+            FROM zw_m_people_info zmpi
+            where zmpi.flag = 1
+            UNION ALL
+            SELECT zmti.id, zmti.thing_number AS monitorName
+            FROM zw_m_thing_info zmti
+            where zmti.flag = 1
+        ) moniotrInfo on moniotrInfo.id = zmmsi.monitor_id
+        where zmmsi.flag = 1
+          and zmmsi.scheduled_info_id =#{scheduledInfoId}
+    </select>
+
+    <select id="getScheduledList" parameterType="string" resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+      select si.id,si.scheduled_name, si.start_date, si.end_date
+      from zw_m_scheduled_info si
+      where
+      si.group_id in
+      <foreach collection="list" item="item" separator="," open="(" close=")">
+          #{item}
+      </foreach>
+      and si.flag = 1
+    </select>
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.LoadSensorDao">
+
+    <!-- 条件查询传感器信息 -->
+    <!-- 查询  -->
+    <select id="findListByQuery" parameterType="com.zw.platform.domain.basicinfo.query.LoadSensorQuery" resultType="com.zw.platform.domain.vas.loadmgt.ZwMSensorInfo">
+        SELECT * FROM zw_m_sensor_info info
+        WHERE info.flag=1 and info.sensor_type = 6
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and (sensor_number LIKE BINARY CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 查询  -->
+    <select id="findSensorById" parameterType="string"
+            resultType="com.zw.platform.domain.vas.loadmgt.ZwMSensorInfo">
+        SELECT zw.* FROM zw_m_sensor_info zw
+        WHERE flag = 1 and zw.sensor_type = 6
+        AND zw.id = #{id}
+    </select>
+    <!-- 新增单个传感器  -->
+    <insert id="add" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadSensorForm">
+        INSERT INTO zw_m_sensor_info (
+        id,sensor_number,baud_rate,odd_even_check,compensate,filter_factor,
+        sensor_type,remark,create_data_time,create_data_username)
+        VALUES
+	    (#{id},#{sensorNumber}, #{baudRate}, #{oddEvenCheck},#{compensate},
+	    #{filterFactor},#{sensorType},#{remark},#{createDataTime},#{createDataUsername})
+    </insert>
+    <update id="update" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadSensorForm">
+        UPDATE zw_m_sensor_info
+            -- 传感器型号
+            SET sensor_number = #{sensorNumber},
+            -- 滤波系数
+            filter_factor = #{filterFactor},
+            -- 波特率
+            baud_rate=#{baudRate},
+            -- 奇偶校验
+            odd_even_check=#{oddEvenCheck},
+            -- 滤补偿使能
+            compensate=#{compensate},
+            -- 更新时间
+            update_data_time = #{updateDataTime},
+            -- 更新人
+            update_data_username = #{updateDataUsername}
+            -- 备注
+            <if test="remark !=null and remark !=''">
+                ,remark=#{remark}
+            </if>
+            where id=#{id}
+    </update>
+    <update id="updateWorkHourSensorSomeField" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadSensorForm">
+        update zw_m_sensor_info
+        set
+        compensate = #{compensate},
+        filter_factor = #{filterFactor},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where id = #{id}
+    </update>
+    <!--根据传感器型号 查询传感器-->
+    <select id="findBySensorNumber" parameterType="string" resultType="com.zw.platform.domain.vas.loadmgt.ZwMSensorInfo">
+        SELECT * FROM zw_m_sensor_info WHERE flag = 1 and sensor_type =6 and sensor_number = BINARY #{sensorNumber}
+    </select>
+    <!--批量新增传感器-->
+    <insert id="addByBatch" parameterType="com.zw.platform.domain.vas.loadmgt.form.LoadSensorImportForm">
+        INSERT INTO zw_m_sensor_info (
+        id,
+        sensor_number,
+        sensor_type,
+        filter_factor,
+        baud_rate,
+        odd_even_check,
+        compensate,
+        create_data_time,
+        create_data_username,
+        remark)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">(
+            #{item.id},
+            #{item.sensorNumber},
+            #{item.sensorType},
+            #{item.filterFactor},
+            #{item.baudRate},
+            #{item.oddEvenCheck},
+            #{item.compensationCanMake},
+            #{item.createDataTime},
+            #{item.createDataUsername},
+            #{item.remark}
+        )
+        </foreach>
+    </insert>
+    <!-- 根据id删除一个 传感器 -->
+    <delete id="deleteById" parameterType="string">
+        UPDATE zw_m_sensor_info set flag=0 WHERE id = #{id}
+    </delete>
+</mapper>

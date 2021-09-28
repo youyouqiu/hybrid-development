@@ -1,0 +1,118 @@
+<form id="saveDefineUpgradeForm" role="form" method="post" class="form-horizontal"
+      th:action="@{/adas/standard/param/saveZhongWeiWirelessUp}">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel6">传感器远程升级/恢复</h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="col-md-3 control-label"><label class="text-danger">*</label> 监控对象：</label>
+            <div class="col-md-3">
+                <input type="hidden" id="readConventionalId" name="vehicleId" th:value="*{vehicleId}"/>
+                <input id="remoteUpgradeBrand" placeholder="请输入监控对象" th:value="*{brand}" class="form-control" readonly/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label text-center">参数信息</label>
+            <div class="col-md-9"></div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label"><label class="text-danger">*</label>控制类型：</label>
+            <div class="col-md-3">
+                <select name="controlType" id="controlType" class="form-control">
+                    <option value="">请选择控制类型</option>
+                    <option value="0">升级</option>
+                    <option value="1">恢复设置</option>
+                </select>
+            </div>
+            <label class="col-md-2 control-label"><label class="text-danger">*</label>升级/恢复类型：</label>
+            <div class="col-md-3">
+                <select name="restoreType" id="restoreType" class="form-control">
+                    <option value="">请选择升级/恢复类型</option>
+                    <option value="0x00">终端</option>
+                    <option value="0x0C">道路运输证IC卡读卡器</option>
+                    <option value="0x34">北斗定位模块</option>
+                    <option value="0xE1">前向监测系统</option>
+                    <option value="0xE2">驾驶员监测系统</option>
+                    <option value="0xE3">胎压监测系统</option>
+                    <option value="0xE4">盲区监测系统</option>
+                    <option value="0xE5">原车数据获取</option>
+                    <option value="0xE7">路网地图</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label">拨号点名称：</label>
+            <div class="col-md-3">
+                <input type="text" id="wDailName"  name="wDailName" placeholder="请输入拨号点名称" maxlength="20" class="form-control"/>
+
+            </div>
+            <label class="col-md-2 control-label"><label class="text-danger">*</label>连接方式：</label>
+            <div class="col-md-3">
+                <select class="form-control">
+                    <option value="0" selected>TCP</option>
+                    <option value="1">UDP</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label"><label class="text-danger">*</label>拨号用户名称：</label>
+            <div class="col-md-3">
+                <input type="text" id="wDailUserName"  name="wDailUserName" maxlength="20" placeholder="请输入拨号用户名称" class="form-control"/>
+            </div>
+            <label class="col-md-2 control-label"><label class="text-danger">*</label>拨号密码：</label>
+            <div class="col-md-3">
+                <input type="text" id="wDailPwd" name="wDailPwd" maxlength="20" placeholder="请输入拨号密码" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label"><label class="text-danger">*</label>地址：</label>
+            <div class="col-md-3">
+                <input type="text" id="wAddress" maxlength="15" name="wAddress" placeholder="请输入服务器地址IP或域名" class="form-control"/>
+            </div>
+            <label class="col-md-2 control-label"><label class="text-danger">*</label>端口：</label>
+            <div class="col-md-3">
+                <input type="text" id="wTcpPort" maxlength="5" name="wTcpPort" placeholder="请输入端口" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label">制造商ID：</label>
+            <div class="col-md-3">
+                <input type="text" id="manufactorId" maxlength="20" name="manufactorId" placeholder="请输入制造商ID" class="form-control"/>
+            </div>
+            <label class="col-md-2 control-label">硬件版本：</label>
+            <div class="col-md-3">
+                <input type="text" id="hardwareVersion" maxlength="20" name="hardwareVersion" placeholder="请输入硬件版本" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label"><label class="text-danger">*</label>固件版本：</label>
+            <div class="col-md-3">
+                <input type="text" id="firmwareVersion" name="firmwareVersion" placeholder="请输入固件版本" class="form-control"/>
+            </div>
+            <label class="col-md-2 control-label">升级模式：</label>
+            <div class="col-md-3">
+                <label class="radio-inline radioLabel">
+                    <input type="radio" name="wTimeLimit" value="0" checked> 增量升级
+                </label>
+                <label class="radio-inline radioLabel">
+                    <input type="radio" name="wTimeLimit" value="1"> 全量升级
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-3 control-label">升级结果：</label>
+            <div class="col-md-3">
+                <input type="text" style="cursor:pointer" name="" id="UUpgradeSendStatus" value="" class="form-control"
+                       readonly/>
+            </div>
+            <label class="col-md-2 control-label"></label>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="zwUpgrade.sendRemoteUpgrade()">下发</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/zwUpgrade.js"></script>

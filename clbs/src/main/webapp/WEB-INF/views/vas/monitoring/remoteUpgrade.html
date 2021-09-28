@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>传感器升级</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<style>
+    .modal-footer .btn + .btn {
+        margin: 0 0 3px 0;
+    }
+</style>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">应用管理</li>
+                        <li class="active">传感器配置</li>
+                        <li class="active">传感器升级</li>
+                    </ul>
+                    <h1 class="h1 ">传感器升级</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox oilMassVehicle"
+                         style="padding-right: 0px; padding-left: 0px;">
+                        <input type="text" id="sensorName" hidden>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">传感器类型列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-12">
+                                        <input id="search_condition" onkeyup="remoteUpgrade.searchTree(this)" name="search" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" placeholder="传感器类型"/>
+                                    </div>
+                                    <!--<div class="col-md-3 btnPadding">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group">
+                                                <button id="customizeColumnsTwo" style="padding-top:8px" type="button"
+                                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu alarmSettingDropdown" role="menu"
+                                                    id="Ul-menu-text-v">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px; height:630px !important;">
+                                    <ul id="treeDemo" class="ztreee"
+                                        style="height:615px !important;overflow:auto;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rightDataList" style="padding-right: 0px; padding-left: 10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">传感器升级列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch-body">
+                                <div class="ToolPanel">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form" class="syntheticBox">
+                                                <select name="searchType" id="searchType"
+                                                        class="Inlinesearch form-control" style="width: 125px">
+                                                    <option value="0">监控对象</option>
+                                                    <option value="1">分组</option>
+                                                    <option value="2">企业</option>
+                                                </select>
+                                                <label>
+                                                    <input type="text" class="Inlinesearch form-control"
+                                                           id="simpleQueryParam" name="simpleQueryParam"
+                                                           style="width: 300px" placeholder="请输入关键字">
+                                                </label>
+                                                <button type="button" id="search_button" onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display: none"/>
+                                            </form>
+                                        </div>
+                                        <div th:if="${hasRole}" class="dropdown pull-left">
+                                            <a id="allUpgradeSetting" href="javascript:void(0);" class="btn btn-outline btn-default">批量升级设置</a>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right oilMassVehicleList">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i><span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTable" class="table table-striped table-bordered table-hover checkTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th><input
+                                                type="checkbox" id="checkAll"></th>
+                                        <th>操作</th>
+                                        <th>最新升级日期</th>
+                                        <th>升级状态</th>
+                                        <th>传感器类型</th>
+                                        <th>监控对象</th>
+                                        <th>所属企业</th>
+                                        <th>分组</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script th:inline="javascript">
+    var sendCommandComplete = [[#{send.command.complete}]];
+    var selectItem = [[#{select.item}]];
+    var systemError = [[#{system.error}]];
+    var publicNull = [[#{public.null}]];
+</script>
+        <script src="/clbs/resources/js/remoteUpgrade.js"></script>
+</html>

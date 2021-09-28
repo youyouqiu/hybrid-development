@@ -1,0 +1,606 @@
+<form th:action="@{/c/group/edits.gsp}" th:object="${result}" id="editGroupForm" role="form" action="#" method="post"
+      class="form-horizontal">
+    <style>
+        .tooltip{
+            width: 190px;
+        }
+    </style>
+    <div class="modal-header">
+        <button type="button" id="doXGroupEdit" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改组织</h4>
+    </div>
+    <div class="modal-body">
+        <input type="text" th:field="*{cid}" class="hidden"/>
+        <input type="text" th:field="*{pid}" class="hidden"/>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"><label class="text-danger">*</label> 组织机构名称：</label>
+                        <div class="col-md-7">
+                            <input id="name" onkeydown="if(event.keyCode==32) return false" th:field="*{name}"
+                                   placeholder="请输入组织机构名称"
+                                   type="text" maxlength="25" class="form-control"/>
+                            <label id="name-error" style="display: none" class="error" for="name">不能为空</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{organizationCode}" placeholder="请输入组织机构代码" type="text"
+                                   maxlength="20" class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 上级组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{upOrganizationCode}" placeholder="请输入上级组织机构代码" type="text"
+                                   id="upOrganizationCode" name="upOrganizationCode"
+                                   maxlength="20" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 管理组织机构代码：</label>
+                        <div class="col-md-7">
+                            <input name="managerOrganizationCode" placeholder="请输入管理组织机构代码" type="text" maxlength="30"
+                                   class="form-control"
+                                   th:field="*{managerOrganizationCode}"
+                                   id="managerOrganizationCode"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营范围：</label>
+                        <div class="col-md-7">
+                            <select id="scopeOfOperation"
+                                    class="form-control selectpicker" multiple title="请选择经营范围">
+                            </select>
+                            <input id="scopeOfOperationInput" th:value="*{scopeOfOperationIds}" type="hidden"/>
+                            <input id="scopeOfOperationVal" name="scopeOfOperation" type="hidden"/>
+                            <input id="scopeOfOperationIds" name="scopeOfOperationIds" type="hidden"/>
+                            <input id="scopeOfOperationCodes" name="scopeOfOperationCodes" type="hidden"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">行业类别：</label>
+                        <div class="col-md-7">
+                            <select th:field="*{operation}" id="operation" class="form-control">
+                                <option th:text="*{operation}" selected="selected" th:value="*{operation}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 发证机关：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{issuingOrgan}" name="issuingOrgan" placeholder="请输入发证机关" type="text"
+                                   maxlength="50" class="form-control"
+                                   id="issuingOrgan"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证号：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{license}" name="license" placeholder="请输入经营许可证号" type="text"
+                                   maxlength="20" class="form-control"
+                                   id="license"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 经营许可证字别：</label>
+                        <div class="col-md-7">
+                            <select id="businessLicenseType" class="form-control"
+                                    name="businessLicenseType"
+                                    placeholder="请选择"></select>
+                            <input id="businessLicenseTypeValue" type="hidden" th:value="*{businessLicenseType}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 许可证有效期起：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" th:field="*{licenseValidityStartDate}"
+                                   id="licenseValidityStartDate" name="licenseValidityStartDate" placeholder="请输入起始日期"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 许可证有效期止：</label>
+                        <div class="col-md-7">
+                            <input style="cursor: pointer;  background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon" th:field="*{licenseValidityEndDate}"
+                                   id="licenseValidityEndDate" name="licenseValidityEndDate" placeholder="请输入截止日期"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">经营状态：</label>
+                        <div class="col-md-7">
+                            <select th:field="*{operatingState}" id="operatingState" class="form-control"
+                                    name="operatingState" placeholder="请选择经营状态">
+                                <option value="1" selected>营业</option>
+                                <option value="2">停业</option>
+                                <option value="3">整改</option>
+                                <option value="4">停业整顿</option>
+                                <option value="5">歇业</option>
+                                <option value="6">注销</option>
+                                <option value="7">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div data-toggle="distpicker">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">省、直辖市：</label>
+                            <input hidden th:value="*{provinceName}" id="hiddenProvinceName"/>
+                            <input hidden th:value="*{cityName}" id="hiddenCityName"/>
+                            <input hidden th:value="*{countyName}" id="hiddenCountyName"/>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="provinceName">Province</label>
+                                <select th:field="*{provinceName}" class="form-control" data-province="—— 省 ——"
+                                        name="provinceName"
+                                        id="provinceName">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">市、区：</label>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="cityName">City</label>
+                                <select th:value="*{cityName}" class="form-control" data-city="—— 市 ——" name="cityName"
+                                        id="cityName">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">县：</label>
+                            <div class="col-md-7">
+                                <label class="sr-only" for="cityName">County</label>
+                                <select th:value="*{countyName}" class="form-control" name="countyName"
+                                        data-district="—— 县 ——" id="countyName">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label"> 行政区划代码：</label>
+                            <div class="col-md-7">
+                                <input th:field="*{areaNumber}" name="areaNumber" placeholder="请输入行政区划代码" type="text"
+                                       maxlength="6" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">注册日期：</label>
+                        <div class="col-md-7">
+                            <input id="registerDateEdit" style="cursor: pointer; background-color: #fafafa;"
+                                   class="form-control layer-date laydate-icon"
+                                   th:field="*{registerDate}" placeholder="请选择注册日期"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 企业法人：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{principal}" placeholder="请输入企业法人" type="text" maxlength="20"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">法人电话号码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{principalPhone}" type="text"
+                                   maxlength="13"
+                                   class="form-control" placeholder="请输入法人电话号码"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 联系人：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{contactName}" name="contactName" id="contactName" type="text"
+                                   maxlength="20"
+                                   class="form-control" placeholder="请输入联系人"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 电话号码：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{phone}" placeholder="请输入电话号码" type="text" maxlength="13"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label"> 地址：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{address}" maxlength="50" placeholder="请输入地址" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">备注：</label>
+                        <div class="col-md-7">
+                            <input th:field="*{description}" maxlength="50" placeholder="请输入备注" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-4 control-label">查岗用户：
+                            <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip" data-placement="top"
+                               data-original-title="此处设置的查岗用户可接收本企业和子企业的查岗推送，其他用户仅可接收本企业查岗推送！">
+                            </i>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <input id="extraInspectionReceivers_value" th:field="*{extraInspectionReceivers}" class="hidden"/>
+                                <input type="text" class="form-control" id="extraInspectionReceivers" style="min-height:36px;" placeholder="请选择用户">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-white">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu" style="max-width:300px"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitGroupEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseGroupEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+        th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+            scopeOfOperationData = [];
+
+            //提交方法
+            function doSubmit() {
+                if (validates()) {
+                    if ($("#name").val() == '' || $("#name").val() == null) {
+                        $("#name-error").show();
+                        return false;
+                    }
+                    var scopeOfOperationVal = [];
+                    var scopeOfOperationIds = [];
+                    var scopeOfOperationCodes = [];
+                    if ($('#scopeOfOperationInput').val() !== '') {
+                        var scopeOfOperationIndex = $('#scopeOfOperationInput').val().split(',');
+                        for (var i = 0; i < scopeOfOperationIndex.length; i++) {
+                            var item = scopeOfOperationData[scopeOfOperationIndex[i]];
+                            if (item) {
+                                scopeOfOperationVal.push(item.value);
+                                scopeOfOperationIds.push(item.id);
+                                scopeOfOperationCodes.push(item.code);
+                            }
+                        }
+                    }
+                    $("#scopeOfOperationVal").val(scopeOfOperationVal.join(','));
+                    $("#scopeOfOperationIds").val(scopeOfOperationIds.join(','));
+                    $("#scopeOfOperationCodes").val(scopeOfOperationCodes.join(','));
+
+                    submissionFlag = true;
+                    addHashCode1($("#editGroupForm"));
+                    var formData = new FormData($("#editGroupForm")[0])
+                    // 该企业查岗额外用户的username数组
+                    var extraInspectionReceivers = $('#extraInspectionReceivers').data('id')
+                    formData.set('extraInspectionReceivers', extraInspectionReceivers)
+                    $.ajax({
+                        url: "/clbs/c/group/edits.gsp",
+                        type: "POST",
+                        data: formData,
+                        async: true,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            var result = JSON.parse(data);
+                            if (result.success) {
+                                /* 关闭弹窗 */
+                                $("#commonWin").modal("hide");
+                                groupUserManage.userTree();
+                                groupUserManage.refreshTable();
+                            } else {
+                                layer.msg(result.msg);
+                            }
+                        },
+                    })
+                }
+            }
+
+            //表单验证
+            function validates() {
+                return $("#editGroupForm").validate({
+                    rules: {
+                        name: {
+                            required: true,
+                            maxlength: 25
+                        },
+                        organizationCode: {
+                            maxlength: 20,
+                            remote: {
+                                type: "post",
+                                async: false,
+                                url: "/clbs/c/group/uniquenessOrganizationCode",
+                                data: {
+                                    organizationCode: function () {
+                                        if (organizationCodes == $("#organizationCode").val()) {
+                                            return null;
+                                        } else {
+                                            return $("#organizationCode").val();
+                                        }
+                                    }
+                                },
+                            }
+                        },
+                        upOrganizationCode: {
+                            maxlength: 20
+                        },
+                        managerOrganizationCode: {
+                            regularChar: true
+                        },
+                        // scopeOfOperation: {
+                        //     maxlength: 20
+                        // },
+                        license: {
+                            maxlength: 20
+                        },
+                        issuingOrgan: {
+                            maxlength: 50
+                        },
+                        areaNumber: {
+                            isDigits: true,
+                            minlength: 6,
+                            maxlength: 6
+                        },
+                        registerDate: {
+                            selectRegDate: true
+                        },
+                        principal: {
+                            isCN: true,
+                            maxlength: 20
+                        },
+                        phone: {
+                            isLandline: true
+                        },
+                        principalPhone: {
+                            isNewTel: true
+                        },
+                        address: {
+                            maxlength: 50
+                        },
+                        contactName: {
+                            maxlength: 20
+                        },
+                        licenseValidityEndDate: {
+                            compareDateCanNull: "#licenseValidityStartDate"
+                        }
+                    },
+                    messages: {
+                        name: {
+                            required: [[#{public.null}]],
+                            maxlength: [[#{public.size25.length}]]
+                        },
+                        organizationCode: {
+                            maxlength: [[#{public.size20.length}]],
+                            remote: [[#{group.code.exists}]]
+                        },
+                        upOrganizationCode: {
+                            maxlength: [[#{public.size20.length}]]
+                        },
+                        // scopeOfOperation: {
+                        //     maxlength: [[#{public.size20.length}]]
+                        // },
+                        license: {
+                            maxlength: [[#{public.size20.length}]]
+                        },
+                        issuingOrgan: {
+                            maxlength: [[#{public.size50.length}]]
+                        },
+                        areaNumber: {
+                            isDigits: '请输入6位整数',
+                            minlength: '请输入6位整数',
+                            maxlength: '请输入6位整数'
+                        },
+                        registerDate: {
+                            selectRegDate: [[#{group.registration.date}]]
+                        },
+                        principal: {
+                            isCN: [[#{group.name.error}]],
+                            maxlength: [[#{public.size20.length}]]
+                        },
+                        phone: {
+                            isLandline: [[#{telPhone.error}]]
+                        },
+                        principalPhone: {
+                            isNewTel: [[#{telPhone.error}]]
+                        },
+                        address: {
+                            maxlength: [[#{public.size50.length}]]
+                        },
+                        contactName: {
+                            maxlength: [[#{public.size20.length}]]
+                        },
+                        licenseValidityEndDate: {
+                            compareDateCanNull: "结束时间必须大于开始时间"
+                        }
+                    }
+                }).form();
+            }
+
+            var options = $('#operation option:selected').text();//页面加载时select控件默认选中的option的文本
+
+            if (options == null || options == undefined || options == "") {
+                $('#operation option:selected').text("请选择行业类别");
+            }
+            var organizationCodes = $("#organizationCode").val();//页面加载时organizationCode
+
+            var licenses = $("#license").val();
+
+            laydate.render({elem: '#registerDateEdit', theme: '#6dcff6', trigger: 'click'});
+            laydate.render({elem: '#licenseValidityStartDate', theme: '#6dcff6'});
+            laydate.render({elem: '#licenseValidityEndDate', theme: '#6dcff6'});
+
+            $.ajax({
+                url: '/clbs/c/group/findOperations',
+                type: 'POST',
+                data: null,
+                async: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success == true) {
+                        var operations = [];
+                        if (data.obj.operation != null || data.obj.operation.length > 0) {
+                            var calldata = data.obj.operation;
+                            var selector = $("#operation");
+                            for (var i = 0; i < calldata.length; i++) {
+                                if (calldata[i].operationType != options) {
+                                    selector.append('<option  value="' + calldata[i].operationType + '">' + calldata[i].operationType + '</option>');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            //运营资质类别(mysql)和组织(ldap)是两个数据库,如果添加组织时使用的运营资质类别被删除，那么修改组织时，该运营资质类别还会出现在页面上，这不合理。
+            //所以在页面加载后,获取option的默认选中的值，然后去数据库(mysql)查,如果没有,则将其添加组织时使用的后被删除的运营资质类别移除
+            $.ajax({
+                url: '/clbs/c/group/findOperationByoperation',
+                type: 'POST',
+                data: {"type": options},
+                async: true,
+                dataType: 'json',
+                success: function (datas) {
+                    if (datas.success == true) {//说明数据库没有这条数据了
+                        if (datas.obj == null) {
+                            $("#operation option[value=" + options + "]").remove();
+                            $("#operation").val("");
+                        }
+                    } else {
+                        if (datas.obj != null) {
+                            $("#operation").val(datas.obj.operation.operationType);
+                        }
+                    }
+                }
+            });
+
+
+            $("#doSubmitGroupEdit").on("click", doSubmit);
+
+            $('input').inputClear();
+
+            function setProvinceCity() {
+                var strProvince = $("#hiddenProvinceName").attr("value");
+                if (strProvince != null && strProvince.length > 0) {
+                    $("#provinceName").val(strProvince);
+                    $("#provinceName").trigger("change");
+                }
+                var strCity = $("#hiddenCityName").attr("value");
+                if (strCity != null && strCity.length > 0) {
+                    $("#cityName").val(strCity);
+                    $("#cityName").trigger("change");
+                }
+                var county = $("#hiddenCountyName").attr("value");
+                if (county != null && county.length > 0) {
+                    $("#countyName").val(county);
+                }
+            };
+            setProvinceCity();
+            /**
+             * 渲染经营范围字段选项
+             * @param data
+             */
+            json_ajax("POST", '/clbs/m/dictionary/businessScope', "json", false, null, function (data) {
+                if (data.success) {
+                    var result = data.obj;
+                    scopeOfOperationData = result;
+                    var operationValue = [];
+                    var scopeOfOperation = $('#scopeOfOperationInput').val().split(',');
+                    var optionHtml = '';
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        var index = scopeOfOperation.indexOf(item.id);
+                        if (index !== -1) {
+                            operationValue.push(i);
+                        }
+                        optionHtml += '<option value="' + i + '">' + item.value + '</option>'
+                    }
+                    $('#scopeOfOperation').html(optionHtml);
+                    $('#scopeOfOperation').selectpicker({
+                        'selectedText': 'cat',
+                    });
+                    $('#scopeOfOperation').selectpicker("val", operationValue).trigger("change");
+                    $('#scopeOfOperationInput').val(operationValue.join(','));
+                    $("#scopeOfOperation").change(function () {
+                        $('#scopeOfOperationInput').val($("#scopeOfOperation").val())
+                    });
+                }
+            });
+            /**
+             * 渲染经营许可证字别字段选项
+             * @param data
+             */
+            json_ajax("POST", '/clbs/m/dictionary/businessLicenseType', "json", false, null, function (data) {
+                if (data.success) {
+                    var result = data.obj;
+                    var optionHtml = '<option value="">请选择</option>';
+                    for (var i = 0; i < result.length; i++) {
+                        var item = result[i];
+                        optionHtml += '<option value="' + item.code + '">' + item.code + '</option>'
+                    }
+                    $('#businessLicenseType').html(optionHtml);
+                    $('#businessLicenseType').val($('#businessLicenseTypeValue').val());
+                }
+            });
+        $("[data-toggle='tooltip']").tooltip();
+        $('#extraInspectionReceivers').on('click',function () {
+            $("#editGroupForm .modal-body").css('overflow','hidden scroll')
+        })
+        json_ajax("GET", "/clbs/c/user/dropdown", "json", true, {orgDn:$('#pid').val()}, function (data) {
+            var datas = data.obj;
+            var dataList = {value: []}, i = datas.length;
+            while (i--) {
+                dataList.value.push({
+                    name: datas[i].name,
+                });
+            }
+            $("#extraInspectionReceivers").bsSuggest({
+                indexId: 'admin', //data.value 的第几个数据，作为input输入框的内容
+                indexKey: 0, //data.value 的第几个数据，作为input输入框的内容
+                idField: "name",
+                keyField: "name",
+                effectiveFields: ["name"],
+                searchFields: ["name"],
+                data: dataList
+            })
+            $('#extraInspectionReceivers')[0].value = $('#extraInspectionReceivers_value')[0].value
+            $('#extraInspectionReceivers')[0].setAttribute('data-id', $('#extraInspectionReceivers_value')[0].value)
+        });
+        }
+    );
+</script>

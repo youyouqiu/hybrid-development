@@ -1,0 +1,101 @@
+<form th:action="@{/m/basicinfo/monitoring/vehicle/type/updateSubType}" id="editSubType" role="form" action="#"
+      method="post" class="form-horizontal" th:object="${result}">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改车辆子类型</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:field="*{id}" name="id" type="text" hidden="true" id="cid"/>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">
+                        <label class="text-danger">*</label>车辆类型：
+                    </label>
+                    <div class="col-md-6">
+                        <input th:value="*{pid}" name="pid" type="text" hidden="true"/>
+                        <select disabled th:value="*{pid}" id="vehicleType" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">
+                        <label class="text-danger">*</label>车辆子类型：
+                    </label>
+                    <div class="col-md-6">
+                        <input class="form-control" th:field="*{vehicleSubtypes}" placeholder="请输入车辆子类型"
+                               name="vehicleSubtypes" type="text" id="vehicleSubtypes"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">
+                        <label class="text-danger">*</label>行驶方式：
+                    </label>
+                    <div class="col-md-6">
+                        <select name="drivingMode" th:field="*{drivingWay}" id="drivingWay" class="form-control">
+                            <option value="0">自行</option>
+                            <option value="1">运输</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">备注：</label>
+                    <div class="col-md-6">
+                        <input th:field="*{description}" class="form-control" placeholder="请输入备注" name="description"
+                               type="text"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label">图标：</label>
+                    <div class="col-md-6" id="vIcoManagement">
+                        <div class="col-md-12 vicopadd">
+                            <div class="inpVicoPhoto">
+                                <input type="file" accept="image/png" id="doc"
+                                       onchange="editVehicleSub.setImagePreviewIndex()">
+                                <img src="../../../../../resources/img/vico/addVIco.png" width="96px" height="96px"/>
+                            </div>
+                            <div class="thisVIcoInfo" id="thisVIcoInfo">
+                                <input id="ico" th:field="*{icoId}" name="icoId" type="hidden"/>
+                                <input id="icoName" th:field="*{icoName}" disabled type="hidden"/>
+                                <div class="vico" id="upIcoSize"><img id="preview" src=""></div>
+                            </div>
+                        </div>
+                        <ul class="col-md-12 vicopadd" id="vIcoTypeNum"></ul>
+                    </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4 text-center">
+                        <div class="btn-group btn-group-sm vIcoPages" role="group">
+                            <button type="button" class="btn btn-white" id="pro-arrow">上一页</button>
+                            <button type="button" class="btn btn-white" id="next-arrow">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="text-left">
+            <p style="color:#ff0000">注：图标大小不要超过67*37， 为保证显示效果，要求监控对象图标的朝向统一朝右；</p>
+        </div>
+        <button class="btn btn-primary" type="button" id="editSubmit">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    document.body.onselectstart = document.body.oncontextmenu = function () {
+        return false;
+    }
+    var vehicleCategoryNull = [[#{vehicle.category.null}]];
+    var vehicleCategoryExists = [[#{vehicle.category.exists}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var categoryIcoBind = [[#{vehicle.category.icoBind}]];
+    var categoryIco = [[#{vehicle.category.ico}]];
+</script>
+<script src="/clbs/resources/js/vehicleSubTypeIcoEdit.js" th:src="@{/resources/js/vehicleSubTypeIcoEdit.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

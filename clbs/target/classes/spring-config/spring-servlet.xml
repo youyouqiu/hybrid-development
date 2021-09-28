@@ -1,0 +1,160 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <description>Spring MVC</description>
+
+    <!-- 属性和配置文件读入 ,多个用逗号隔开 数据库参数和系统参数 -->
+    <!--<context:property-placeholder location="classpath:application.properties,classpath:messages/message.properties" />-->
+    <import resource="classpath:spring-config/spring-profiles.xml"/>
+    <!-- 只搜索@Controller和@ControllerAdvice标注的类 不搜索其他标注的类 -->
+    <context:component-scan
+            base-package="com.cb.platform.contorller,com.zw.platform.controller.**,com.sx.platform.contorller.**,
+            com.zw.platform.push.controller,com.zw.api.controller.**,com.zw.platform.util,com.zw.app.controller.**,
+            com.zw.api2.controller,com.zw.talkback.controller.**,com.zw.platform.basic.controller"
+
+            use-default-filters="false">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.RestController"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
+
+    <!-- 启动注解驱动的Spring MVC功能，注册请求url和注解POJO类方法的映射. 指定自己定义的validator -->
+    <mvc:annotation-driven conversion-service="conversionService" validator="validator">
+        <!-- 异步支持 默认30秒超时  -->
+        <!-- <mvc:async-support default-timeout="30000" task-executor="executor"  /> -->
+        <mvc:message-converters>
+            <!--用fastJson需要在这配置 -->
+            <ref bean="jsonConverter"/>
+            <!-- 方法直接返回字符串时，中文字符乱码。需要更改为URF-8-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8"/>
+            </bean>
+        </mvc:message-converters>
+        <mvc:argument-resolvers>
+            <bean class="com.zw.platform.push.config.BrandResolver"/>
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
+
+    <!--配置自定义日期转换器，并且在mvc:annotation-driven 标签中加上conversion-service属性-->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="com.zw.platform.basic.util.StringDateConvert"></bean>
+                <bean class="com.zw.platform.basic.util.LongDateConvert"></bean>
+                <bean class="com.zw.platform.commons.StringToLocalDateTimeConverter"/>
+            </list>
+        </property>
+    </bean>
+    <!-- 当在web.xml 中 DispatcherServlet使用 <url-pattern>/</url-pattern> 映射时，能映射静态资源 -->
+    <mvc:default-servlet-handler/>
+    <!-- 资源 映射 -->
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/files/**" location="/files/"/>
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+
+    <!-- thymeleaf templateResolver -->
+    <bean id="templateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="suffix" value=".html"/>
+        <property name="templateMode" value="HTML"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <!-- 开发时设置为false，上线设置为true -->
+        <property name="cacheable" value="${thymeleaf.cacheableAdmin}"/>
+        <property name="cacheablePatterns" value="/*"/>
+    </bean>
+
+    <bean name="/swaggerConfig" class="com.zw.api.config.SwaggerConfig"/>
+
+    <!-- thymeleaf templateEngine-->
+    <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <set>
+                <ref bean="templateResolver"/>
+            </set>
+        </property>
+        <property name="additionalDialects">
+            <set>
+                <bean class="com.zw.platform.commons.ThymeleafCoreProcessorDialect"/>
+            </set>
+        </property>
+    </bean>
+
+    <!-- thymeleaf thymeleafViewResolver-->
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver"
+          class="com.zw.platform.commons.MultipartResolver">
+        <property name="excludeUrl" value="controller.gsp"/>
+        <!-- 解析request的编码 ，默认是 ISO-8859-1 -->
+        <property name="defaultEncoding" value="UTF-8"/>
+        <!-- 设置最大允许的大小(字节)。-1表示没有限制(默认) 1024*1024*100=100MB -->
+        <property name="maxUploadSize" value="${system.maxUploadSize}"/>
+        <!--被允许的最大的内存的大小，Default is 10240 bytes -->
+        <property name="maxInMemorySize" value="20480"/>
+        <!-- 一个类似懒加载的属性.可以定义该属性.让解析文件的时候再抛异常,然后Controller中定义异常处理的方法 -->
+        <property name="resolveLazily" value="true"/>
+    </bean>
+
+
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <!-- 设置本地化信息的拦截器, 即请求参数中通过language设置语言 http://***?***&language=en_US-->
+        <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+            <property name="paramName" value="language"/>
+        </bean>
+        <!-- 配置Token拦截器，防止用户重复提交数据 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.zw.platform.util.common.SpringAvoidRepeatSubmitInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.zw.platform.commons.interceptor.AuthInterceptor"/>
+        </mvc:interceptor>
+        <!-- SQL/XSS注入拦截器 TODO 待主动安全参数设置传参(现在传的是json字符串)优化后在放开此功能-->
+<!--        <mvc:interceptor>-->
+<!--            <mvc:mapping path="/**"/>-->
+<!--            <bean class="com.zw.platform.commons.interceptor.InjectInterceptor"/>-->
+<!--        </mvc:interceptor>-->
+    </mvc:interceptors>
+
+    <mvc:cors>
+        <mvc:mapping path="/swagger/**"
+                     allowed-origins="*"
+                     allowed-methods="GET,POST,OPTIONS"
+                     max-age="3600"/>
+        <mvc:mapping path="/api/**"
+                     allowed-origins="*"
+                     allowed-methods="GET,POST"
+                     max-age="3600"/>
+        <mvc:mapping path="/getCaptchaString"
+                     allowed-origins="*"
+                     allowed-methods="GET"
+                     max-age="3600"/>
+    </mvc:cors>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="cacheSeconds" value="0"/>
+        <property name="webBindingInitializer">
+            <bean class="com.zw.platform.util.common.WebBinderInitializerUtils"/>
+        </property>
+    </bean>
+    <aop:aspectj-autoproxy expose-proxy="true"/>
+</beans>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.modules.AdasRiskManageDao">
+
+    <select id="getEventCount" resultType="java.util.Map">
+        SELECT
+        IFNULL(SUM(smoke), 0) '6503',
+        IFNULL(SUM(phone), 0) '6502',
+        IFNULL(SUM(left_offset), 0) '64021',
+        IFNULL(SUM(right_offset), 0) '64022',
+        IFNULL(SUM(change_lanes), 0) '6405',
+        IFNULL(SUM(eye_close), 0) '6506',
+        IFNULL(SUM(yawning), 0) '6507',
+        IFNULL(SUM(distance), 0) '6403',
+        IFNULL(SUM(pedestrian_collisions), 0) '6404',
+        IFNULL(SUM(accelerate), 0) '64081',
+        IFNULL(SUM(slow_down), 0) '64082',
+        IFNULL(SUM(turn), 0) '64083',
+        IFNULL(SUM(obstacles), 0) '6407',
+        IFNULL(SUM(abnormal_posture), 0) '6508',
+        IFNULL(SUM(inconformity_certificate),0) '6509',
+        IFNULL(SUM(no_driver_detected), 0) '6510',
+        IFNULL(SUM(vehicle_crash), 0) '6401',
+        IFNULL(SUM(road_mark_transfinite),0) '6409',
+        IFNULL(SUM(keep_out), 0) '6511',
+        IFNULL(SUM(infrared_blocking), 0) '6512'
+        FROM
+        zw_m_vehicle_adas_event e
+        WHERE
+        time = #{time}
+        AND EXISTS (
+        SELECT
+        vehicle_id
+        FROM
+        zw_m_assignment_vehicle v
+        WHERE
+        flag = 1
+        and
+        e.vid=v.vehicle_id
+        AND assignment_id IN
+        <foreach item="item" collection="assignSet" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <select id="getHistoryAlarmTimes" resultType="com.zw.adas.domain.leardboard.AdasAlarmTimesData">
+        SELECT
+        time,
+        SUM(abnormal_flame_out) abnormalFlameOut,
+        SUM(abnormal_posture) abnormalPosture,
+        SUM(accelerate) accelerate,
+        SUM(assist_failure) assistFailure,
+        SUM(change_lanes) changeLanes,
+        SUM(close_behind) closeBehind,
+        SUM(distance) distance,
+        SUM(distracted_driving) distractedDriving,
+        SUM(driver_behavior_monitor_failure) driverBehaviorMonitorFailure,
+        SUM(driver_exception) driverException,
+        SUM(engine_overdrive) engineOverdrive,
+        SUM(eye_close) eyeClose,
+        SUM(fatigue_driving) fatigueDriving,
+        SUM(high_tire_pressure) highTirePressure,
+        SUM(high_tire_temperature) highTireTemperature,
+        SUM(idle_speed) idleSpeed,
+        SUM(imbalance_tire_pressure) imbalanceTirePressure,
+        SUM(inconformity_certificate) inConformityCertificate,
+        SUM(infrared_blocking) infraredBlocking,
+        SUM(keep_out) keepOut,
+        SUM(left_blind_alert) leftBlindAlert,
+        SUM(left_offset) leftOffset,
+        SUM(left_rear_approach) leftRearApproach,
+        SUM(low_battery) lowBattery,
+        SUM(low_tire_pressure) lowTirePressure,
+        SUM(neutral_taxiing) neutralTaxiing,
+        SUM(no_driver_detected) noDriverDetected,
+        SUM(not_wearing_seat_belt) notWearingSeatBelt,
+        SUM(obstacles) obstacles,
+        SUM(off_wheel) offWheel,
+        SUM(pedestrian_collisions) pedestrianCollisions,
+        SUM(phone) phone,
+        SUM(quick_crossing) quickCrossing,
+        SUM(right_blind_alert) rightBlindAlert,
+        SUM(right_offset) rightOffset,
+        SUM(right_rear_approach) rightRearApproach,
+        SUM(road_mark_transfinite) roadMarkTransfinite,
+        SUM(sensor_anomaly) sensorAnomaly,
+        SUM(slow_down) slowDown,
+        SUM(slow_leak) slowLeak,
+        SUM(smoke) smoke,
+        SUM(timeout_driving) timeoutDriving,
+        SUM(turn) turn,
+        SUM(vehicle_crash) vehicleCrash,
+        SUM(yawning) yawning,
+        SUM(over_man) as overMan,
+        SUM(abormal_load) as  abormalLoad,
+        SUM(peripheral_state_exception) as  peripheralStateException,
+        SUM(network_speed) as  networkSpeed,
+        SUM(vehicle_offset) as  vehicleOffset,
+        SUM(blind_spot_monitoring) as  blindSpotMonitoring,
+        SUM(over_speed) as  overSpeed,
+        SUM(line_offset) as  lineOffset,
+        SUM(forbid) as  forbid,
+        SUM(equipment_abnormal) as  equipmentAbnormal,
+        SUM(left_offset_warning) as  leftOffsetWarning,
+        SUM(right_offset_warning) as  rightOffsetWarning,
+        SUM(other) as  other,
+        SUM(solid_line_change) as  solidLineChange
+        FROM
+        zw_m_vehicle_adas_event e
+        WHERE
+        time <![CDATA[ >= ]]> #{startTime} AND time <![CDATA[ <= ]]> #{endTime}
+        AND EXISTS (
+        SELECT
+        vehicle_id
+        FROM
+        zw_m_assignment_vehicle v
+        WHERE
+        flag = 1
+        and
+        e.vid=v.vehicle_id
+        AND assignment_id IN
+        <foreach item="item" collection="assignSet" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ) group by e.TIME asc
+    </select>
+
+</mapper>

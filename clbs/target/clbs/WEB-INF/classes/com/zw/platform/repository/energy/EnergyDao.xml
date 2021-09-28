@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.energy.EnergyDao">
+	<resultMap id="BaseResultMap" type="com.zw.platform.domain.energy.Energy">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+		<result column="travel_mile" property="travelMile" jdbcType="DOUBLE" />
+		<result column="travel_total" property="travelTotal" jdbcType="DOUBLE" />
+		<result column="travel_base" property="travelBase" jdbcType="DOUBLE" />
+		<result column="travel_base_list" property="travelBaseList"
+			jdbcType="DOUBLE" />
+		<result column="avg_speed" property="avgSpeed" jdbcType="DOUBLE" />
+		<result column="travel_total_cap" property="travelTotalCap"
+			jdbcType="DOUBLE" />
+		<result column="travel_base_cap" property="travelBaseCap"
+			jdbcType="DOUBLE" />
+		<result column="idle_time" property="idleTime" jdbcType="INTEGER" />
+		<result column="idle_total" property="idleTotal" jdbcType="DOUBLE" />
+		<result column="idle_base" property="idleBase" jdbcType="DOUBLE" />
+		<result column="idle_base_list" property="idleBaseList"
+			jdbcType="DOUBLE" />
+		<result column="idle_mile" property="idleMile" jdbcType="DOUBLE" />
+		<result column="idle_total_cap" property="idleTotalCap"
+			jdbcType="DOUBLE" />
+		<result column="idle_base_cap" property="idleBaseCap" jdbcType="DOUBLE" />
+		<result column="install_time" property="installTime" jdbcType="TIMESTAMP" />
+		<result column="idle_threshold" property="idleThreshold"
+			jdbcType="INTEGER" />
+		<result column="flag" property="flag" jdbcType="SMALLINT" />
+		<result column="create_data_time" property="createDataTime"
+			jdbcType="TIMESTAMP" />
+		<result column="create_data_username" property="createDataUsername"
+			jdbcType="VARCHAR" />
+		<result column="update_data_time" property="updateDataTime"
+			jdbcType="TIMESTAMP" />
+		<result column="update_data_username" property="updateDataUsername"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, vehicle_id, travel_mile, travel_total, travel_base,
+		travel_base_list,
+		avg_speed,
+		travel_total_cap, travel_base_cap,
+		idle_time, idle_total, idle_base, idle_base_list,
+		idle_mile,
+		idle_total_cap, idle_base_cap, install_time,
+		idle_threshold, flag,
+		create_data_time,
+		create_data_username, update_data_time,
+		update_data_username
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from zw_m_energy
+		where id = #{id,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByVehicleId" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from zw_m_energy
+		where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByCondition" resultMap="BaseResultMap"
+		parameterType="com.zw.platform.domain.energy.Energy">
+		select
+		<include refid="Base_Column_List" />
+		from zw_m_energy
+		<where>
+			<if test="vehicleId != null">and vehicle_id=
+				#{vehicleId,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		zw_m_energy
+		where id = #{id,jdbcType=VARCHAR}
+	</delete>
+
+	<update id="deleteBatch" parameterType="java.util.List">
+		UPDATE zw_m_energy SET flag = 0 WHERE id IN
+		<foreach collection="list" item="item" index="index" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<insert id="insert" parameterType="com.zw.platform.domain.energy.Energy">
+		insert into zw_m_energy (id,
+		vehicle_id, travel_mile,
+		travel_total, travel_base, travel_base_list,
+		avg_speed, travel_total_cap, travel_base_cap,
+		idle_time, idle_total,
+		idle_base,
+		idle_base_list, idle_mile, idle_total_cap,
+		idle_base_cap,
+		install_time, idle_threshold,
+		flag, create_data_time,
+		create_data_username,
+		update_data_time, update_data_username)
+		values
+		(#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR},
+		#{travelMile,jdbcType=DOUBLE},
+		#{travelTotal,jdbcType=DOUBLE},
+		#{travelBase,jdbcType=DOUBLE}, #{travelBaseList,jdbcType=DOUBLE},
+		#{avgSpeed,jdbcType=DOUBLE}, #{travelTotalCap,jdbcType=DOUBLE},
+		#{travelBaseCap,jdbcType=DOUBLE},
+		#{idleTime,jdbcType=INTEGER},
+		#{idleTotal,jdbcType=DOUBLE}, #{idleBase,jdbcType=DOUBLE},
+		#{idleBaseList,jdbcType=DOUBLE}, #{idleMile,jdbcType=DOUBLE},
+		#{idleTotalCap,jdbcType=DOUBLE},
+		#{idleBaseCap,jdbcType=DOUBLE},
+		#{installTime,jdbcType=TIMESTAMP}, #{idleThreshold,jdbcType=INTEGER},
+		#{flag,jdbcType=SMALLINT}, #{createDataTime,jdbcType=TIMESTAMP},
+		#{createDataUsername,jdbcType=VARCHAR},
+		#{updateDataTime,jdbcType=TIMESTAMP},
+		#{updateDataUsername,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.zw.platform.domain.energy.Energy">
+		insert into zw_m_energy
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="vehicleId != null">
+				vehicle_id,
+			</if>
+			<if test="travelMile != null">
+				travel_mile,
+			</if>
+			<if test="travelTotal != null">
+				travel_total,
+			</if>
+			<if test="travelBase != null">
+				travel_base,
+			</if>
+			<if test="travelBaseList != null">
+				travel_base_list,
+			</if>
+			<if test="avgSpeed != null">
+				avg_speed,
+			</if>
+			<if test="travelTotalCap != null">
+				travel_total_cap,
+			</if>
+			<if test="travelBaseCap != null">
+				travel_base_cap,
+			</if>
+			<if test="idleTime != null">
+				idle_time,
+			</if>
+			<if test="idleTotal != null">
+				idle_total,
+			</if>
+			<if test="idleBase != null">
+				idle_base,
+			</if>
+			<if test="idleBaseList != null">
+				idle_base_list,
+			</if>
+			<if test="idleMile != null">
+				idle_mile,
+			</if>
+			<if test="idleTotalCap != null">
+				idle_total_cap,
+			</if>
+			<if test="idleBaseCap != null">
+				idle_base_cap,
+			</if>
+			<if test="installTime != null">
+				install_time,
+			</if>
+			<if test="idleThreshold != null">
+				idle_threshold,
+			</if>
+			<if test="flag != null">
+				flag,
+			</if>
+			<if test="createDataTime != null">
+				create_data_time,
+			</if>
+			<if test="createDataUsername != null">
+				create_data_username,
+			</if>
+			<if test="updateDataTime != null">
+				update_data_time,
+			</if>
+			<if test="updateDataUsername != null">
+				update_data_username,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="vehicleId != null">
+				#{vehicleId,jdbcType=VARCHAR},
+			</if>
+			<if test="travelMile != null">
+				#{travelMile,jdbcType=DOUBLE},
+			</if>
+			<if test="travelTotal != null">
+				#{travelTotal,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBase != null">
+				#{travelBase,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBaseList != null">
+				#{travelBaseList,jdbcType=DOUBLE},
+			</if>
+			<if test="avgSpeed != null">
+				#{avgSpeed,jdbcType=DOUBLE},
+			</if>
+			<if test="travelTotalCap != null">
+				#{travelTotalCap,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBaseCap != null">
+				#{travelBaseCap,jdbcType=DOUBLE},
+			</if>
+			<if test="idleTime != null">
+				#{idleTime,jdbcType=INTEGER},
+			</if>
+			<if test="idleTotal != null">
+				#{idleTotal,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBase != null">
+				#{idleBase,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBaseList != null">
+				#{idleBaseList,jdbcType=DOUBLE},
+			</if>
+			<if test="idleMile != null">
+				#{idleMile,jdbcType=DOUBLE},
+			</if>
+			<if test="idleTotalCap != null">
+				#{idleTotalCap,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBaseCap != null">
+				#{idleBaseCap,jdbcType=DOUBLE},
+			</if>
+			<if test="installTime != null">
+				#{installTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="idleThreshold != null">
+				#{idleThreshold,jdbcType=INTEGER},
+			</if>
+			<if test="flag != null">
+				#{flag,jdbcType=SMALLINT},
+			</if>
+			<if test="createDataTime != null">
+				#{createDataTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDataUsername != null">
+				#{createDataUsername,jdbcType=VARCHAR},
+			</if>
+			<if test="updateDataTime != null">
+				#{updateDataTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDataUsername != null">
+				#{updateDataUsername,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByVehicleId" parameterType="com.zw.platform.domain.energy.Energy">
+		update zw_m_energy
+		<set>
+			<if test="vehicleId != null">
+				vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+			</if>
+			<if test="travelMile != null">
+				travel_mile = #{travelMile,jdbcType=DOUBLE},
+			</if>
+			<if test="travelTotal != null">
+				travel_total = #{travelTotal,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBase != null">
+				travel_base = #{travelBase,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBaseList != null">
+				travel_base_list = #{travelBaseList,jdbcType=DOUBLE},
+			</if>
+			<if test="avgSpeed != null">
+				avg_speed = #{avgSpeed,jdbcType=DOUBLE},
+			</if>
+			<if test="travelTotalCap != null">
+				travel_total_cap = #{travelTotalCap,jdbcType=DOUBLE},
+			</if>
+			<if test="travelBaseCap != null">
+				travel_base_cap = #{travelBaseCap,jdbcType=DOUBLE},
+			</if>
+			<if test="idleTime != null">
+				idle_time = #{idleTime,jdbcType=INTEGER},
+			</if>
+			<if test="idleTotal != null">
+				idle_total = #{idleTotal,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBase != null">
+				idle_base = #{idleBase,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBaseList != null">
+				idle_base_list = #{idleBaseList,jdbcType=DOUBLE},
+			</if>
+			<if test="idleMile != null">
+				idle_mile = #{idleMile,jdbcType=DOUBLE},
+			</if>
+			<if test="idleTotalCap != null">
+				idle_total_cap = #{idleTotalCap,jdbcType=DOUBLE},
+			</if>
+			<if test="idleBaseCap != null">
+				idle_base_cap = #{idleBaseCap,jdbcType=DOUBLE},
+			</if>
+			<if test="installTime != null">
+				install_time = #{installTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="idleThreshold != null">
+				idle_threshold = #{idleThreshold,jdbcType=INTEGER},
+			</if>
+			<if test="flag != null">
+				flag = #{flag,jdbcType=SMALLINT},
+			</if>
+			<if test="createDataTime != null">
+				create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createDataUsername != null">
+				create_data_username =
+				#{createDataUsername,jdbcType=VARCHAR},
+			</if>
+			<if test="updateDataTime != null">
+				update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateDataUsername != null">
+				update_data_username =
+				#{updateDataUsername,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.zw.platform.domain.energy.Energy">
+		update zw_m_energy
+		set vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+		travel_mile =
+		#{travelMile,jdbcType=DOUBLE},
+		travel_total =
+		#{travelTotal,jdbcType=DOUBLE},
+		travel_base =
+		#{travelBase,jdbcType=DOUBLE},
+		travel_base_list =
+		#{travelBaseList,jdbcType=DOUBLE},
+		avg_speed =
+		#{avgSpeed,jdbcType=DOUBLE},
+		travel_total_cap =
+		#{travelTotalCap,jdbcType=DOUBLE},
+		travel_base_cap =
+		#{travelBaseCap,jdbcType=DOUBLE},
+		idle_time =
+		#{idleTime,jdbcType=INTEGER},
+		idle_total =
+		#{idleTotal,jdbcType=DOUBLE},
+		idle_base = #{idleBase,jdbcType=DOUBLE},
+		idle_base_list = #{idleBaseList,jdbcType=DOUBLE},
+		idle_mile =
+		#{idleMile,jdbcType=DOUBLE},
+		idle_total_cap =
+		#{idleTotalCap,jdbcType=DOUBLE},
+		idle_base_cap =
+		#{idleBaseCap,jdbcType=DOUBLE},
+		install_time =
+		#{installTime,jdbcType=TIMESTAMP},
+		idle_threshold =
+		#{idleThreshold,jdbcType=INTEGER},
+		flag = #{flag,jdbcType=SMALLINT},
+		create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+		create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+		update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+		update_data_username = #{updateDataUsername,jdbcType=VARCHAR}
+		where id
+		= #{id,jdbcType=VARCHAR}
+	</update>
+	<update id="changeRelieveEnergy" parameterType="java.lang.String">
+		update
+		zw_m_energy
+		set travel_base = 0,idle_base=0
+		where
+		vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+	</update>
+
+	<!--根据车辆id查询节油产品安装日期 -->
+	<select id="findInstallTime" parameterType="string" resultType="java.util.Date">
+		select install_time installTime from zw_m_energy where vehicle_id =
+		#{vehicleId,jdbcType=TIMESTAMP} and flag=1
+	</select>
+
+	<!-- <select id=""> SELECT f.fuel_type,v.* FROM zw_m_vehicle_info v LEFT 
+		JOIN zw_m_fuel_type f ON v.fuel_type=f.id </select> -->
+	<!--根据车辆id查询车辆能耗基准和 -->
+	<select id="findEnergyAndFuelTypeByVehicleId" resultType="com.zw.platform.domain.energy.Energy"
+		parameterType="string">
+		SELECT a.*,f.fuel_category FROM (
+		select
+		v.brand,v.fuel_type
+		fuel_id,e.travel_base_list,e.idle_base_list,e.idle_threshold,e.install_time
+		from zw_m_energy e,zw_m_vehicle_info v WHERE
+		e.vehicle_id=#{vehicleId,jdbcType=TIMESTAMP} AND
+		e.vehicle_id=v.id) a
+		LEFT JOIN zw_m_fuel_type f ON a.fuel_id=f.id
+	</select>
+
+	<!-- 查询所有设置了基准的车辆能耗基础数据 -->
+	<select id="findIsSetEnergy" resultType="com.zw.platform.domain.energy.Energy">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM zw_m_energy WHERE idle_base != 0 AND travel_base != 0 and flag=1
+	</select>
+	<!-- 根据车辆id查询车辆信息 -->
+	<select id="findIsVehicleAllByVehicleId" parameterType="string"
+		resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+		SELECT
+		v.id,v.brand,v.aliases,v.vehicle_owner vehicleOwner,v.vehicle_owner_phone vehicleOwnerPhone,v.chassis_number
+		chassisNumber,v.engine_number engineNumber,v.plate_color
+		plateColor,v.area_attribute areaAttribute,
+		v.province,v.city,
+		t.vehicle_type vehicleType,
+		f.fuel_category fuelType
+		FROM
+		(
+		SELECT
+		id,
+		brand,
+		aliases,
+		vehicle_owner,
+		vehicle_owner_phone,
+		vehicle_type typeId,
+		chassis_number,
+		engine_number,
+		plate_color,
+		area_attribute,
+		province,
+		city,
+		fuel_type
+		FROM
+		zw_m_vehicle_info
+		WHERE
+		id = #{vehicleId,jdbcType=VARCHAR}
+		) v
+		LEFT JOIN zw_m_fuel_type f ON v.fuel_type = f.id
+		LEFT JOIN zw_m_vehicle_type t ON t.id = v.typeId
+	</select>
+	
+	<!-- 根据车辆id查询车牌号 -->
+	<select id="findBrandByVehicleId" parameterType="string" resultType="string">
+	SELECT brand FROM zw_m_vehicle_info WHERE id =#{vehicleId,jdbcType=VARCHAR}
+	</select>
+</mapper>

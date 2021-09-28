@@ -1,0 +1,81 @@
+<form role="form" action="#" method="post" class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+	<div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+	            aria-hidden="true">&times;</span></button>
+	    <h4 class="modal-title" id="myModalLabel1">OBD基本信息</h4>
+	</div>
+	<div class="modal-body">
+	    <div class="form-group">
+	        <label class="col-md-3 control-label">监控对象：</label>
+	        <div class="col-md-3">
+				<input type="hidden" th:value="${result}" name="vehicleId"/>
+				<input type="hidden" th:value="${vehicleInfo}" name="vehicleId"/>
+
+	            <input type="hidden" id="vid" th:value="*{result.vehicleId}"><!--车id-->
+	            <input id="ri_brand" th:value="*{vehicleInfo.brand}" class="form-control" readonly/>
+	        </div>
+	    </div>
+		<div class="form-group"></div>
+		<div class="form-group">
+			<label class="col-md-3 control-label"></label>
+			<div class="col-md-3">
+				<label class="control-label">终端上报参数</label>
+			</div>
+			<label class="col-md-2 control-label"></label>
+			<div class="col-md-3">
+				<label class="control-label">平台设置参数</label>
+			</div>
+		</div>
+		<div class="form-group"></div>
+		<div class="form-group">
+			<label class="col-md-3 control-label">车型分类：</label>
+			<div class="col-md-3">
+				<input id="terminal-vehicleType" class="form-control" readonly/>
+			</div>
+			<label class="col-md-2 control-label">车型分类：</label>
+			<div th:if="*{result.vehicleType} == 0" class="col-md-3">
+				<input name="vehicleType" value="乘用车"  class="form-control" readonly/>
+			</div>
+			<div th:if="*{result.vehicleType} == 1" class="col-md-3">
+				<input name="vehicleType"  value="商用车" class="form-control" readonly/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-md-3 control-label">车型名称/发动机类型：</label>
+			<div class="col-md-3">
+				<input name="" id="srcBaudRate" class="form-control" readonly/>
+			</div>
+			<label class="col-md-2 control-label">车型名称/发动机类型：</label>
+			<div class="col-md-3">
+				<input name="baudRateStr" th:field="*{result.obdVehicleName}" id="prcBaudRate"
+					   class="form-control" readonly/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-md-3 control-label">车型ID：</label>
+			<div class="col-md-3">
+				<input id="terminal-vehicleCode" class="form-control" readonly/>
+			</div>
+			<label class="col-md-2 control-label">车型ID：</label>
+			<div class="col-md-3">
+				<input name="vehicleCode" th:field="*{result.code}" id="vehicleCode" class="form-control" readonly/>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-md-3 control-label">OBD采集间隔(秒)：</label>
+			<div class="col-md-3">
+				<input id="terminal-vehicleTime" class="form-control" readonly/>
+			</div>
+			<label class="col-md-2 control-label">OBD采集间隔(秒)：</label>
+			<div class="col-md-3">
+				<input name="vehicleTime" th:field="*{result.time}" id="vehicleTime" class="form-control" readonly/>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+	    <button type="button" class="btn btn-primary refreshBtn" id="readInformationRefresh">刷新</button>
+	    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	</div>
+</form>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/obdManergerSettingBasic.js"></script>

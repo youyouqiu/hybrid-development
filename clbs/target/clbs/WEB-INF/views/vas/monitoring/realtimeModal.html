@@ -1,0 +1,3041 @@
+<style>
+    .personCompare-content .img-box{
+        float:left;
+        width:31%;
+        height: 230px;
+        line-height: 230px;
+        border: 1px solid #e5e5e5;
+        text-align: center;
+        overflow: hidden;
+    }
+    .personCompare-content .split{
+        float: left;
+        height: 220px;
+        line-height: 220px;
+        padding: 0 10px;
+    }
+    .personCompare-content .content-box{
+        float:left;
+        margin-left: 24px;
+        margin-top:127px;
+    }
+    .personCompare-content .txt1{
+        color: #000;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    .personCompare-content .persent{
+        font-size: 60px;
+        line-height: 55px;
+        color: #000;
+        font-weight: 500;
+    }
+    .personCompare-content .bottom-box .item{
+        margin-top:10px;
+    }
+    .personCompare-content .compare-score{
+        display: none;
+    }
+    .personCompare-loading{
+        position:absolute;
+        left:0;
+        right:0;
+        top:50%;
+        margin-top:-15px;
+        text-align: center;
+        display:none;
+    }
+    .personCompare-loading .loading-state{
+        font-size:26px;
+    }
+</style>
+<!-- 报警处理 -->
+<div class="modal fade" id="warningManage" role="dialog" style="overflow-y:hidden" data-backdrop="static"
+     data-keyboard="false" aria-labelledby="alarmSettingInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">报警处理</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">监控对象：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningCarName"></span>
+                        </div>
+                        <label class="col-md-3 control-label" id="professionLabel">从业人员：</label>
+                        <div class="col-md-3 dataStatistics-value" id="professionValue">
+                            <span id="warningPeo"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">所属分组：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningGroup" style="word-break: break-all"></span>
+                        </div>
+                        <label class="col-md-3 control-label">报警时间：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningTime"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">报警类型：</label>
+                        <div class="col-md-8 dataStatistics-value warningTypeArea">
+                            <span id="warningDescription"></span>
+                        </div>
+                    </div>
+                    <!-- 超速预警 -->
+                    <div class="form-group warningDeal" id="overSpeedGap">
+                        <label class="col-md-3 control-label">超速预警差值(km/h)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="overSpeedGapValue"></span>
+                        </div>
+                    </div>
+                    <!-- 疲劳驾驶预警 -->
+                    <div class="form-group warningDeal" id="tiredDriveGap">
+                        <label class="col-md-3 control-label">疲劳驾驶预警差值(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="tiredDriveGapValue"></span>
+                        </div>
+                    </div>
+                    <!-- 碰撞报警 -->
+                    <div class="form-group warningDeal" id="crashWarning">
+                        <label class="col-md-3 control-label">碰撞时间(ms)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="crashTime"></span>
+                        </div>
+                        <label class="col-md-3 control-label">碰撞加速度(0.1g)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="crashSpeed"></span>
+                        </div>
+                    </div>
+                    <!-- 侧翻预警 -->
+                    <div class="form-group warningDeal" id="turnOnWarning">
+                        <label class="col-md-3 control-label">侧翻角度(度)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="turnOnValue"></span>
+                        </div>
+                    </div>
+                    <!-- 超速报警 -->
+                    <div class="form-group warningDeal" id="overSpeeds">
+                        <label class="col-md-3 control-label">最高速度(km/h)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningSpeed"></span>
+                        </div>
+                        <label class="col-md-3 control-label">超速持续时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningAllTime"></span>
+                        </div>
+                    </div>
+                    <!-- 疲劳驾驶 -->
+                    <div class="form-group warningDeal" id="tiredDrive">
+                        <label class="col-md-3 control-label">连续驾驶时间门限(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="continuousDriveTime"></span>
+                        </div>
+                        <label class="col-md-3 control-label">最小休息时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="breakTime"></span>
+                        </div>
+                    </div>
+                    <!-- 当天累计驾驶超时 -->
+                    <div class="form-group warningDeal" id="addUpDrive">
+                        <label class="col-md-3 control-label">当天累计驾驶时间门限(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="addUpDriveTime"></span>
+                        </div>
+                    </div>
+                    <!-- 超时停车 -->
+                    <div class="form-group warningDeal" id="overTimeStop">
+                        <label class="col-md-3 control-label">最长停车时间(s)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="overTimeStopTime"></span>
+                        </div>
+                    </div>
+                    <!-- 凌晨2-5点行驶报警 -->
+                    <div class="form-group warningDeal" id="earlyRun">
+                        <label class="col-md-3 control-label">凌晨2-5点行驶报警参数：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="earlyRunValue"></span>
+                        </div>
+                    </div>
+                    <!-- 车辆非法位移 -->
+                    <div class="form-group warningDeal" id="displacementCar">
+                        <label class="col-md-3 control-label">车辆非法位移(m)：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="displacementCarDistance"></span>
+                        </div>
+                    </div>
+                    <!-- 车机疑似屏蔽报警 -->
+                    <div id="shieldWarning" class="warningDeal">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">离线时间超过时间报警(s)：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineTime"></span>
+                            </div>
+                            <label class="col-md-3 control-label">起始时间：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineStartTime"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">结束时间：</label>
+                            <div class="col-md-3 dataStatistics-value">
+                                <span id="offLineEndTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <span id="color" style="color: red; display: none; margin-left: 20px;">注：持续性报警结束前暂时不能处理</span>
+                    <input id="warningType" type="hidden" name="warningType"/>
+                    <input type="hidden" id="simcard" name="simcard"/>
+                    <input type="hidden" id="vUuid" name="vUuid"/>
+                    <input type="hidden" id="device" name="device"/>
+                    <input type="hidden" id="sno" name="sno"/>
+                    <input type="hidden" id="startTime">
+                </div>
+            </div>
+            <div class="modal-footer" id="warningHiden" style="text-align:center!important;">
+                <button id="warningManageListening" type="button" class="btn btn-primary btn-alarm-manage">监听</button>
+                <button id="warningManagePhoto" type="button" class="btn btn-primary btn-alarm-manage">拍照</button>
+                <button id="warningManageSend" type="button" class="btn btn-primary btn-alarm-manage">下发短信</button>
+                <button id="warningManageAffirm" type="button" class="btn btn-primary btn-alarm-manage"
+                        style="padding: 9px 0 8px">人工确认报警
+                </button>
+                <button id="warningManageCancel" type="button" class="btn btn-primary btn-alarm-manage">不做处理</button>
+                <button id="warningManageFuture" type="button" class="btn btn-primary btn-alarm-manage">将来处理</button>
+                <button id="warningManageClose" type="button" class="btn btn-default btn-alarm-manage">关闭</button>
+                <input id="earlyAlarmStartTime" type="hidden">
+                <!-- 报警处理-监听 -->
+                <div id="listeningContent">
+                    <form th:action="@{/v/monitoring/handleAlarm}" role="form" id="listeningAlarm" action="#"
+                          method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:20px 0px 0;text-align: left;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarmListen" name="vehicleId" value="">
+                                <input class="hidden" name="orderType" value="41">
+                                <input class="hidden" id="brandListen" name="plateNumber" value="">
+                                <input class="hidden" id="alarmListen" name="alarm" value="">
+                                <input class="hidden" id="startTimeListen" name="startTime" value="">
+                                <input class="hidden" id="simcardListen" name="simcard" value="">
+                                <input class="hidden" id="deviceListen" name="device" value="">
+                                <input class="hidden" id="snoListen" name="sno" value="">
+                                <input class="hidden" id="handleTypeListen" name="handleType" value="">
+                                <input class="hidden" id="descriptionListen" name="description" value="">
+                                <textarea class="hidden" id="remarkListen" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">电话号码：</label>
+                                <div class=" col-md-9">
+                                    <input type="text" placeholder="请输入电话号码" autocomplete="off" class="form-control"
+                                           id="listenPhone"
+                                           name="monitorPhone" maxlength="20"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- 报警处理-拍照 -->
+                <div id="takePicturesContent">
+                    <form th:action="@{/v/monitoring/photo}" role="form" id="takePhotoForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;text-align: left;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="1">
+                                <input class="hidden" id="brandPhoto" name="plateNumber" value="">
+                                <input class="hidden" id="alarmPhoto" name="alarm" value="">
+                                <input class="hidden" id="startTimePhoto" name="startTime" value="">
+                                <input class="hidden" id="simcardPhoto" name="simcard" value="">
+                                <input class="hidden" id="devicePhoto" name="device" value="">
+                                <input class="hidden" id="snoPhoto" name="sno" value="">
+                                <input class="hidden" id="handleTypePhoto" name="handleType" value="">
+                                <input class="hidden" id="description-photo" name="description" value="">
+                                <textarea class="hidden" id="remark-photo" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class=" col-md-3">
+                                    <select name="wayID" class="form-control">
+                                        <option value="1" selected="true">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">间隔时间(秒)：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="0表示按最小间隔拍照" class="form-control" id="time"
+                                           name="time"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">拍照张数：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="默认1,最大10" value="1" class="form-control"
+                                           name="command"/>
+                                </div>
+                                <label class="col-md-3 control-label">保存标志：</label>
+                                <div class=" col-md-3">
+                                    <select name="saveSign" class="form-control">
+                                        <option value="0" selected="true">实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class=" col-md-3">
+                                    <select name="distinguishability" class="form-control">
+                                        <option class="minResolution" value="0">最低分辨率</option>
+                                        <option class="defaultValue" value="1">320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">176*144</option>
+                                        <option value="6">352*288</option>
+                                        <option value="7">704*288</option>
+                                        <option value="8">704*576</option>
+                                        <option class="maxResolution" value="255">最高分辨率</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    图像质量：
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" value="5" name="quality" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="luminance" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">对比度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="contrast" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="saturability" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">色度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="chroma" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <!-- 报警处理-下发短信 -->
+                <div id="sendTextMessages">
+                    <form th:action="@{/v/monitoring/sendTxt}" role="form" id="txtSendForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;text-align: left;">
+                            <div class="form-group newDeviceInfo">
+                                <div class="col-md-9" style="margin-left: 64px;">
+                                    <label class="radio-inline"><input type="radio" name="textType" value="1" checked>
+                                        通知</label>
+                                    <label class="radio-inline"><input type="radio" name="textType" value="2">
+                                        服务</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input class="hidden" id="vidSendTxtForAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="5">
+                                <input class="hidden" id="brandTxt" name="plateNumber" value="">
+                                <input class="hidden" id="alarmTxt" name="alarm" value="">
+                                <input class="hidden" id="startTimeTxt" name="startTime" value="">
+                                <input class="hidden" id="simcardTxt" name="simcard" value="">
+                                <input class="hidden" id="deviceTxt" name="device" value="">
+                                <input class="hidden" id="snoTxt" name="sno" value="">
+                                <input class="hidden" id="handleTypeTxt" name="handleType" value="">
+                                <input class="hidden" id="description-Txt" name="description" value="">
+                                <input class="hidden" id="deviceTypeTxt" name="deviceType">
+                                <textarea class="hidden" id="remark-Txt" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">文本内容：</label>
+                                <div class=" col-md-9">
+                                    <textarea class="form-control" id="smsTxt" name="txt" rows="3"
+                                              maxlength="512"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-9 noPadding">
+                                    <div class="col-md-6 newDeviceInfo">
+                                        <select name="messageTypeOne" class="form-control">
+                                            <option value="1">服务</option>
+                                            <option value="2">紧急</option>
+                                            <option value="3">通知</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 newDeviceInfo">
+                                        <select name="messageTypeTwo" class="form-control">
+                                            <option value="0">中心导航信息</option>
+                                            <option value="1">CAN故障码信息</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 oldDeviceInfo">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="1" type="checkbox">紧急</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="3" checked="checked" type="checkbox"/>终端显示器显示</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="4" checked="checked" type="checkbox"/>终端TTS读播</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 oldDeviceInfo">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="5" checked="checked"
+                                                          type="checkbox"/>广告屏显示</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="alarm-remark" class="clearfix">
+                    <label class="col-md-1 col-sm-3 control-label paddingRight text-right">备注：</label>
+                    <div class="col-md-10 col-sm-8 searchListSelect" style="padding-right: 9px">
+                        <textarea rows="4" class="form-control" id="alarmRemark" maxlength="50"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer listenFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goListeningForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer takePicturesFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goPhotographsForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer sendTextFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goTxtSendForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 区域查车 -->
+<div class="modal fade" id="areaSearchCar" role="dialog" style="overflow-y:hidden" data-backdrop="static"
+     data-keyboard="false" aria-labelledby="alarmSettingInfo" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">区域查询</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    该区域监控对象总数：
+                    <span id="sumRegionalQuery"></span>
+                </div>
+                <div class="row form-horizontal">
+                    <table id="dataTable" class="table table-striped table-bordered table-hover" cellspacing="0"
+                           width="100%">
+                        <thead>
+                        <tr>
+                            <th>监控对象</th>
+                            <th>分组</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="searchCarClose" type="button" class="btn btn-default">关闭</button>
+                <!-- data-dismiss="modal" -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 标注 -->
+<div class="modal fade" id="mark" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">标注</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增标注表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/marker}" id="marker"
+                      role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group" style="display:none;">
+                            <input type="hidden" id="addOrUpdateMarkerFlag" name="addOrUpdateMarkerFlag" value=""/>
+                            <input type="hidden" id="markerId" name="markerId" value=""/>
+                            <label class="col-md-3 control-label">标注经度：</label>
+                            <div class=" col-md-3">
+                                <input id="mark-lng" type="text" value="" class="form-control" readonly="readonly"
+                                       name="longitude"/>
+                            </div>
+                            <label class="col-md-2 control-label">标注纬度：</label>
+                            <div class=" col-md-3">
+                                <input id="mark-lat" type="text" value="" class="form-control" readonly="readonly"
+                                       name="latitude"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 标注名称：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" type="text" placeholder="请输入标注名称" class="form-control" id="markerName"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">标注类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="markerType" name="type">
+                                    <option value="普通标记">普通标记</option>
+                                    <option value="线路点">线路点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">标注类型图标：</label>
+                            <div class=" col-md-8">
+                                <label class="radio-inline">
+                                    <input type="radio" name="markIcon" value="0" checked="checked"
+                                           id="waterDropsRadio">
+                                    <!--<span>小水滴</span>-->
+                                    <i class="marker-drops-water"></i>
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="markIcon" value="1" id="circleRadio">
+                                    <!--<span>其他</span>-->
+                                    <i class="marker-circle"></i>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="4" id="markerDescription"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label lngLat_show">
+                                经纬度
+                                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+                            </label>
+                        </div>
+                        <div class="pointList" style="display: block;">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">经度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="markerLng" name="markerLngName" type="text" placeholder="请输入经度"
+                                           class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">纬度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="markerLat" name="markerLatName" type="text" placeholder="请输入纬度"
+                                           class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-type="zw_m_marker" id="annotatedSave" class="btn btn-primary">保存
+                        </button>
+                        <button type="button" id="markFenceClose" class="btn btn-default btn-off" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--线-->
+<div class="modal fade" id="addLine" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">路线</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/add}" id="addLineForm"
+                      role="form" action="#" method="post">
+                    <table id="table-lng-lat" class="table table-striped table-bordered table-hover table-lng-lat">
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="hidden" id="addOrUpdateLineFlag" name="addOrUpdateLineFlag"/>
+                            <input type="hidden" id="lineId" name="lineId"/>
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 路线名称：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" type="text" placeholder="请输入路线名称" class="form-control" id="lineName1"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">路线类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="lineType1" name="type">
+                                    <option value="国道">国道</option>
+                                    <option value="省道">省道</option>
+                                    <option value="县道">县道</option>
+                                    <option value="高速">高速</option>
+                                    <option value="高架立交">高架立交</option>
+                                    <option value="其他小路">其他小路</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 偏移量(m)：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" placeholder="请输入数字" onkeyup="value=value.replace(/[^0-9]/g,'') "
+                                       class="form-control" id="lineWidth1" name="width"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="lineDescription1"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" id="inflectionPointBox"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="pointSeqs" name="pointSeqs"/>
+                        <input type="hidden" id="longitudes" name="longitudes"/>
+                        <input type="hidden" id="latitudes" name="latitudes"/>
+                        <button type="button" data-type="zw_m_line" id="threadSave" class="btn btn-primary">保存</button>
+                        <button type="button" id="lineEditClose" class="btn btn-default btn-off" data-dismiss="modal">
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 矩形 -->
+<div class="modal fade" id="rectangle-form" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">矩形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/rectangles}"
+                      id="rectangles" role="form" action="#" method="post">
+                    <table id="rectangle-lng-lat1" class="table table-striped table-bordered table-hover table-lng-lat">
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="hidden" id="addOrUpdateRectangleFlag" name="addOrUpdateRectangleFlag"/>
+                            <input type="hidden" id="rectangleId" name="rectangleId"/>
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" type="text" placeholder="请输入区域名称" class="form-control" id="rectangleName"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="rectangleType" name="type">
+                                    <option value="普通区域">普通区域</option>
+                                    <option value="危险区域">危险区域</option>
+                                    <option value="违规区域">违规区域</option>
+                                    <option value="休息区">休息区</option>
+                                    <option value="接驳点">接驳点</option>
+                                    <option value="风控点">风控点</option>
+                                    <option value="途经点">途经点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-md-3 control-label">形状：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="rectangleShape" name="shape">
+                                    <option value="矩形">矩形</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="rectangleDescription"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label lngLat_show">经纬度<span class="fa fa-chevron-up"
+                                                                                       aria-hidden="true"></span></label>
+                        </div>
+                        <div class="pointList">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">左上点经、纬度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="LUPointLngLat" name="lnglatQuery_LU" type="text" placeholder="请输入左上点经、纬度"
+                                           class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">右下点经、纬度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="RDPointLngLat" name="lnglatQuery_RD" type="text" placeholder="请输入右下点经、纬度"
+                                           class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="pointSeqsRectangles" name="pointSeqs"/>
+                        <input type="hidden" id="longitudesRectangles" name="longitudes"/>
+                        <input type="hidden" id="latitudesRectangles" name="latitudes"/>
+                        <button type="button" data-type="zw_m_rectangle" id="rectangleSave" class="btn btn-primary">保存
+                        </button>
+                        <button type="button" id="rectangleEditClose" class="btn btn-default btn-off"
+                                data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 多边形 -->
+<div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">多边形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/polygons}" id="polygons"
+                      role="form" action="#" method="post">
+                    <table id="table-lng-lat1" class="table table-striped table-bordered table-hover table-lng-lat">
+                        <tbody></tbody>
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="hidden" id="addOrUpdatePolygonFlag" name="addOrUpdatePolygonFlag"/>
+                            <input type="hidden" id="polygonId" name="polygonId"/>
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" type="text" placeholder="请输入区域名称" class="form-control" id="polygonName"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="polygonType" name="type">
+                                    <option value="普通区域">普通区域</option>
+                                    <option value="危险区域">危险区域</option>
+                                    <option value="违规区域">违规区域</option>
+                                    <option value="休息区">休息区</option>
+                                    <option value="接驳点">接驳点</option>
+                                    <option value="途经点">途经点</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-md-3 control-label">形状：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="polygonShape" name="shape">
+                                    <option value="多边形">多边形</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="polygonDescription"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label lngLat_show">经纬度<span class="fa fa-chevron-up"
+                                                                                       aria-hidden="true"></span></label>
+                        </div>
+                        <div class="pointList">
+                            <div id="rectangleAllPointShow">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="pointSeqsPolygons" name="pointSeqs"/>
+                        <input type="hidden" id="longitudesPolygons" name="longitudes"/>
+                        <input type="hidden" id="latitudesPolygons" name="latitudes"/>
+                        <button type="button" data-type="zw_m_polygon" id="polygonSave" class="btn btn-primary">保存
+                        </button>
+                        <button type="button" id="polygonFenceClose" class="btn btn-default btn-off"
+                                data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 圆形 -->
+<div class="modal fade" id="circleArea" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">圆形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增圆形区域表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/circles}" id="circles"
+                      role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group" style="display:none;">
+                            <input type="hidden" id="addOrUpdateCircleFlag" name="addOrUpdateCircleFlag"/>
+                            <input type="hidden" id="circleId" name="circleId"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input autocomplete="off" type="text" placeholder="请输入区域名称" class="form-control" id="circleName"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="circleType" name="type">
+                                    <option value="普通区域">普通区域</option>
+                                    <option value="危险区域">危险区域</option>
+                                    <option value="违规区域">违规区域</option>
+                                    <option value="休息区">休息区</option>
+                                    <option value="接驳点">接驳点</option>
+                                    <option value="风控点">风控点</option>
+                                    <option value="途经点">途经点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="circleDescription"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label lngLat_show">经纬度<span class="fa fa-chevron-up"
+                                                                                       aria-hidden="true"></span></label>
+                        </div>
+                        <div class="pointList">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">中心点纬度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="editCircleLat" type="text" name="centerPointLat" value=""
+                                           class="form-control"/>
+                                </div>
+                                <div class="col-md-8 hidden">
+                                    <input autocomplete="off" id="circle-lat" type="text" value="" class="form-control" name="latitude"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">中心点经度：</label>
+                                <div class=" col-md-8">
+                                    <input autocomplete="off" id="editCircleLng" type="text" name="centerPointLng" value="11"
+                                           class="form-control"/>
+                                </div>
+                                <div class=" col-md-8 hidden">
+                                    <input id="circle-lng" type="text" value="11" class="form-control"
+                                           name="longitude"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">半径(米)：</label>
+                                <div class=" col-md-8">
+                                    <input id="editCircleRadius" name="centerRadius" type="text" value=""
+                                           class="form-control"/>
+                                </div>
+                                <div class=" col-md-8 hidden">
+                                    <input id="circle-radius" type="text" value="" class="form-control" name="radius"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-type="zw_m_circle" id="roundSave" class="btn btn-primary">保存</button>
+                <button type="button" id="circleFenceClose" class="btn btn-default btn-off" data-dismiss="modal">取消
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--行政区域-->
+<div class="modal fade" id="administrativeArea" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document" style="width:360px !important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">行政区划</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/addAdministration}"
+                      id="administration" role="form" action="#" method="post">
+                    <table class="table table-striped table-bordered table-hover table-lng-lat">
+                    </table>
+                    <div class="row" data-toggle="distpicker">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label Administrative-label"><label
+                                    class="text-danger">*</label> 省：</label>
+                            <div class=" col-md-8">
+                                <input type="hidden" id="provinceVal" name="province"/>
+                                <select class="form-control" id="province"></select>
+<!--                                <div class="ipt-wrap" style="position: relative;">-->
+<!--                                    <span id="iptIcon" class="iptIcon" style="position: absolute;-->
+<!--                                      top: 0;-->
+<!--                                      left: 119px;-->
+<!--                                      border: 1px solid red;-->
+<!--                                      padding: 9px;">∨</span>-->
+<!--                                    <input-->
+<!--                                        id="ipt"-->
+<!--                                        class="ipt"-->
+<!--                                        type="text"-->
+<!--                                        name="ipt"-->
+<!--                                        style="width: 138px;-->
+<!--                                          height: 38px;-->
+<!--                                          padding-left: 9px;"-->
+<!--                                    />-->
+<!--                                    <ul id="optUl" class="optUl" style="background-color: cornflowerblue;-->
+<!--                                      width: 147px;-->
+<!--                                      border: 1px solid red;-->
+<!--                                      padding: 1px;-->
+<!--                                      list-style-type: none;"></ul>-->
+<!--                                </div>-->
+                                <label id="provinceError"
+                                       style="display: none;color: #fff;background: #b94a48;border: solid thin #fff;padding: 3px 5px;">请选择行政区划省份</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label Administrative-label">市：</label>
+                            <div class=" col-md-8">
+                                <input type="hidden" id="cityVal" name="city"/>
+                                <select class="form-control" id="city">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label Administrative-label">区：</label>
+                            <div class=" col-md-8">
+                                <input type="hidden" id="districtVal" name="district"/>
+                                <select class="form-control" id="district">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label Administrative-label"><label
+                                    class="text-danger">*</label> 名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入行政区划名称" class="form-control" id="administrationName"
+                                       autocomplete="off"
+                                       name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label Administrative-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="administrationDistrict"
+                                          name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="administrativeAreaId" name="administrativeAreaId"/>
+                    <input type="hidden" id="administrativeLngLat" name="administrativeLngLat"/>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-type="zw_m_administration" id="administrativeSave" class="btn btn-primary">
+                    保存
+                </button>
+                <button type="button" id="administrativeClose" class="btn btn-default btn-off" data-dismiss="modal">取消
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 围栏绑定 -->
+<div style="cursor: default;" class="modal fade" id="fenceBind" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document" style="width:80%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">围栏绑定</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row">
+                        <input id="fenceID" name="search" class="form-control" type="hidden"/>
+                        <input id="fenceName" name="search" class="form-control" type="hidden"/>
+                        <input id="fenceInfoId" name="search" class="form-control" type="hidden"/>
+                        <div id="charAll" class="col-md-4">
+                            <h5 class="fwb">监控对象列表</h5>
+                            <div class="col-md-12" style="padding-right:0px;padding-left:0px;">
+                                <input id="searchVehicle" name="search" autocomplete="off" class="form-control"
+                                       style="margin-bottom:10px;" type="text" placeholder="请输入关键字"/>
+                            </div>
+                            <div id="bindVehicleTreeDiv" class="treeArea">
+                                <ul id="treeDemoFence" class="ztree"></ul>
+                            </div>
+                        </div>
+                        <div class="col-md-1 addAreaFance">
+                            <div class="add-button-right" id="addBtn">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            </div>
+                            <div class="add-button-left" id="removeBtn">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-7" id="tableArea">
+                            <h5 class="fwb fenceTc-realtime">绑定详情</h5>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <div class="col-sm-11 col-md-12 control-label"
+                                     style="padding-top:0;padding-bottom:6px;">
+                                    <button type="button" id="setAll" class="btn btn-primary nextBtn">依例全设</button>
+                                    <button th:if="${hasRole}" id="fenceSaveBtn" type="button"
+                                            class="btn btn-primary nextBtn">&nbsp;保存&nbsp;
+                                    </button>
+                                    <button id="fenceCancelBtn" type="button" class="btn btn-default btn-off"
+                                            data-dismiss="modal">取消
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="bindTableByFence" class="bindFence">
+                                <table id="tableList" name="fenceTable"
+                                       class="table table-bordered "
+                                       cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th style="background: none;"><input
+                                                type="checkbox" id="checkAll" class="checkAll"/>
+                                        </th>
+                                        <th>围栏名称</th>
+                                        <th>监控对象</th>
+                                        <th>围栏类型</th>
+                                        <th>下发类型</th>
+                                        <th>报警来源</th>
+                                        <th>开始日期</th>
+                                        <th>结束日期</th>
+                                        <th>开始时间</th>
+                                        <th>结束时间</th>
+                                        <th>驶入报警给平台</th>
+                                        <th>驶出报警给平台</th>
+                                        <th>驶入报警给驾驶员</th>
+                                        <th>驶出报警给驾驶员</th>
+                                        <th>最高速度(km/h)</th>
+                                        <th class="addFenceTh">夜间最高速度(km/h)</th>
+                                        <th class="addFenceTh">夜间限速时间段</th>
+                                        <th>超速持续时间(s)</th>
+                                        <th>行驶时间过长阈值(s)</th>
+                                        <th>行驶时间不足阈值(s)</th>
+                                        <th>允许开门</th>
+                                        <th>进区域开启通信模块</th>
+                                        <th>进区域不采集GNSS详细定位数据</th>
+                                        <th class="hidden">围栏id</th>
+                                        <th class="hidden">车id</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 详情 -->
+<div class="modal fade" id="detailsModel" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">围栏详情</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">名称：</label>
+                            <div class=" col-md-3 textShow">
+                                <span id="detailsFenceName"></span>
+                            </div>
+                            <label class="col-md-3 control-label">类型：</label>
+                            <div class=" col-md-3 textShow">
+                                <span id="detailsFenceType"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">形状：</label>
+                            <div class=" col-md-3 textShow">
+                                <span id="detailsFenceShape"></span>
+                            </div>
+                            <label class="col-md-3 control-label">创建人：</label>
+                            <div class=" col-md-3 textShow">
+                                <span id="detailsFenceCreateName"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">创建时间：</label>
+                            <div class=" col-md-3 textShow">
+                                <span id="detailsFenceCreateTime"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class="col-md-8 textShow">
+                                <span id="detailsFenceDescribe" style="word-break:break-all"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 跟踪 -->
+<div class="modal fade modal-hide-load" id="goTrace" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/parametersTrace}" id="parametersTrace" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="traceParameterTitle"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">
+                                <label class="text-danger">*</label>
+                                回传时间间隔(秒)：
+                            </label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入回传时间间隔" class="form-control" name="interval"
+                                       id="interval" value="5" maxlength="5"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">
+                                <label class="text-danger">*</label>
+                                位置跟踪有效时间(秒)：
+                            </label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入位置跟踪有效时间" class="form-control" name="validity"
+                                       id="validity" value="120" maxlength="10"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="parameters" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 拍照 -->
+<div class="modal fade modal-hide-load" id="goPhotograph" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:50%;">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" role="form" id="takePhoto" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="goPhotographBrand"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <input class="hidden" id="vid1" name="vid" value="">
+                            <input class="hidden" name="orderType" value="1">
+                            <label class="col-md-2 control-label">通道ID：</label>
+                            <div class=" col-md-3">
+                                <select name="wayID" class="form-control">
+                                    <option value="1" selected="true">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">间隔时间(秒)：</label>
+                            <div class=" col-md-3">
+                                <input type="text" placeholder="0表示按最小间隔拍照" class="form-control" value="0" name="time"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class=" col-md-3">
+                                <input type="text" placeholder="默认1,最大10" value="1" class="form-control"
+                                       name="command"/>
+                            </div>
+                            <label class="col-md-3 control-label">保存标志：</label>
+                            <div class=" col-md-3">
+                                <select name="saveSign" class="form-control">
+                                    <option value="0" selected="true">实时上传</option>
+                                    <option value="1">保存</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">分辨率：</label>
+                            <div class=" col-md-3">
+                                <select name="distinguishability" class="form-control">
+                                    <option id="minResolution" value="0">最低分辨率</option>
+                                    <option id="defaultValue" value="1">320*240</option>
+                                    <option value="2">640*480</option>
+                                    <option value="3">800*600</option>
+                                    <option value="4">1024*768</option>
+                                    <option value="5">176*144</option>
+                                    <option value="6">352*288</option>
+                                    <option value="7">704*288</option>
+                                    <option value="8">704*576</option>
+                                    <option id="maxResolution" value="255">最高分辨率</option>
+                                </select>
+                            </div>
+                            <label class="col-md-3 control-label">
+                                <i
+                                        class="fa fa-question-circle fa-lg"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="范围1-10,1代表质量损失最小，10代表压缩比最大">
+                                </i>
+                                图像质量：
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="quality" value="5" name="quality" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">亮度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="luminance" value="125" name="luminance" class="form-control"/>
+                            </div>
+                            <label class="col-md-3 control-label">对比度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="contrast" value="60" name="contrast" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">饱和度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="saturability" value="60" name="saturability"
+                                       class="form-control"/>
+                            </div>
+                            <label class="col-md-3 control-label">色度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="chroma" value="125" name="chroma" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goPhotographs" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
+<!--录像-->
+<div class="modal fade modal-hide-load" id="goVideotape" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:50%;">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" role="form" id="getVideo" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="videotapeBrand"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <input class="hidden" id="vid2" name="vid" value="">
+                            <input class="hidden" name="orderType" value="2">
+                            <label class="col-md-3 control-label">通道ID：</label>
+                            <div class=" col-md-3">
+                                <select name="wayID" class="form-control">
+                                    <option value="1" selected="true">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label">间隔时间(秒)：</label>
+                            <div class=" col-md-3">
+                                <input type="text" placeholder="0表示一直录像" class="form-control" value="3" name="time"
+                                       id="vtime"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">保存标志：</label>
+                            <div class=" col-md-3">
+                                <select name="saveSign" class="form-control">
+                                    <option value="0" selected="true">实时上传</option>
+                                    <option value="1">保存</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label">分辨率：</label>
+                            <div class=" col-md-3">
+                                <select name="distinguishability" class="form-control">
+                                    <option class="minResolution" value="0">最低分辨率</option>
+                                    <option class="defaultValue" value="1">320*240</option>
+                                    <option value="2">640*480</option>
+                                    <option value="3">800*600</option>
+                                    <option value="4">1024*768</option>
+                                    <option value="5">176*144</option>
+                                    <option value="6">352*288</option>
+                                    <option value="7">704*288</option>
+                                    <option value="8">704*576</option>
+                                    <option class="maxResolution" value="255">最高分辨率</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">
+                                <i
+                                        class="fa fa-question-circle fa-lg"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="范围1-10,1代表质量损失最小，10代表压缩比最大">
+                                </i>
+                                图像质量:
+                            </label>
+                            <div class="col-md-3">
+                                <input type="text" id="vquality" value="5" name="quality" class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label">亮度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="vluminance" value="125" name="luminance" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">对比度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="vcontrast" value="60" name="contrast" class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label">饱和度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="vsaturability" value="60" name="saturability"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">色度：</label>
+                            <div class="col-md-3">
+                                <input type="text" id="vchroma" value="125" name="chroma" class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goVideotapes" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+        </div>
+        </form>
+    </div>
+</div>
+</div>
+<!----------超速设置--------->
+<div class="modal fade" id="goOverspeedSetting" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="speedLimit" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="goOverspeedSettingBrand"></h4>
+                    <input class="hidden" id="vid9" name="vid" value="">
+                    <input class="hidden" name="orderType" value="9">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">最高速度(km/h)：</label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入最高速度" value="" class="form-control" name="masSpeed"
+                                       id="masSpeed"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">超速持续时间(秒)：</label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入超速持续时间" value="" class="form-control"
+                                       name="speedTime" id="speedTime"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goOverspeedSettings" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--&lt;!&ndash; 连续回报(定时) &ndash;&gt;
+<div class="modal fade" id="continuousReturnTiming" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="regularReport" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="continuousReturnTimingBrand"></h4>
+                    <input class="hidden" id="vid30" name="vid" value="">
+                    <input class="hidden" name="orderType" value="30">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">驾驶员未登录汇报时间间隔(秒)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="30" class="form-control"
+                                       name="driverLoggingOutUpTimeSpace" id="driverLoggingOutUpTimeSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">休眠时汇报时间间隔(秒)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入休眠时汇报时间间隔" value="120" class="form-control"
+                                       name="dormancyUpTimeSpace" id="dormancyUpTimeSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">紧急报警时汇报时间间隔(秒)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入紧急报警时汇报时间间隔" value="15" class="form-control"
+                                       name="emergencyAlarmUpTimeSpace" id="emergencyAlarmUpTimeSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">缺省时间汇报间隔(秒)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入缺省时汇报时间间隔" value="30" class="form-control"
+                                       name="defaultTimeUpSpace" id="defaultTimeUpSpace"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goRegularReport" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+&lt;!&ndash; 连续回报(定距) &ndash;&gt;
+<div class="modal fade" id="continuousReturnFixedDistance" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" role="form" id="distanceReport" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="continuousReturnFixedDistanceBrand"></h4>
+                    <input class="hidden" id="vid31" name="vid" value="">
+                    <input class="hidden" name="orderType" value="31">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">驾驶员未登录汇报距离间隔(米)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入驾驶员未登录汇报距离间隔" value="200" class="form-control"
+                                       name="driverLoggingOutUpDistanceSpace" id="driverLoggingOutUpDistanceSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">休眠时汇报距离间隔(米)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入休眠时汇报距离间隔" value="20000" class="form-control"
+                                       name="dormancyUpDistanceSpace" id="dormancyUpDistanceSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">紧急报警时汇报距离间隔(米)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入紧急报警时汇报距离间隔" value="100" class="form-control"
+                                       name="emergencyAlarmUpDistanceSpace" id="emergencyAlarmUpDistanceSpace"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">缺省距离汇报间隔(米)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入缺省距离汇报间隔" value="500" class="form-control"
+                                       name="defaultDistanceUpSpace" id="defaultDistanceUpSpace"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goDistanceReport" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>-->
+<!-- 连续回报(定时定距) -->
+<div class="modal fade" id="continuousReturnTimingDistance" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document" style="width:80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="continuousReturnTimingDistanceBrand"></h4>
+                <input class="hidden" id="continuousReturnType" name="orderType" value="32">
+                <style>
+                    #continuousReturnTimingDistance .modal-body {
+                        padding-right: 10%;
+                    }
+                </style>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="col-md-3 control-label">连续回报设置：</label>
+                    <div class="col-md-3">
+                        <select class="form-control" id="continuousReturnValue">
+                            <option value="0" selected>定时</option>
+                            <option value="1">定距</option>
+                            <option value="2">定时定距</option>
+                        </select>
+                    </div>
+                </div>
+
+                <form th:action="@{/v/monitoring/orderMsg}" id="timeInterval2" role="form" action="#" method="post"
+                      class="form-horizontal" hidden>
+                    <input type="hidden" id="continuousReturn1" name="orderType" value="32"/>
+                    <input class="hidden" id="vid32" name="vid">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(秒)：</label>
+                        <div class="col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="30" class="form-control"
+                                   name="driverLoggingOutUpTimeSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="200" class="form-control"
+                                   name="driverLoggingOutUpDistanceSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">休眠时汇报时间间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="120" class="form-control"
+                                   name="dormancyUpTimeSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">休眠时汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="20000" class="form-control"
+                                   name="dormancyUpDistanceSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">紧急报警时汇报时间间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="15" class="form-control"
+                                   name="emergencyAlarmUpTimeSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">紧急报警时汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="100" class="form-control"
+                                   name="emergencyAlarmUpDistanceSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">缺省时间汇报间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="30" class="form-control"
+                                   name="defaultTimeUpSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">缺省距离汇报间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="500" class="form-control"
+                                   name="defaultDistanceUpSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                </form>
+
+                <form th:action="@{/v/monitoring/orderMsg}" id="timeInterval1" role="form" action="#" method="post"
+                      class="form-horizontal" hidden>
+                    <input type="hidden" id="continuousReturn3" name="orderType" value="31"/>
+                    <input class="hidden" id="vid31" name="vid">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">驾驶员未登录汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="200" class="form-control"
+                                   name="driverLoggingOutUpDistanceSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">休眠时汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="20000" class="form-control"
+                                   name="dormancyUpDistanceSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">紧急报警时汇报距离间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="100" class="form-control"
+                                   name="emergencyAlarmUpDistanceSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">缺省距离汇报间隔(米)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="500" class="form-control"
+                                   name="defaultDistanceUpSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                </form>
+
+                <form th:action="@{/v/monitoring/orderMsg}" id="timeInterval0" role="form" action="#" method="post"
+                      class="form-horizontal">
+                    <input type="hidden" id="continuousReturn2" name="orderType" value="30"/>
+                    <input class="hidden" id="vid30" name="vid">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">驾驶员未登录汇报时间间隔(秒)：</label>
+                        <div class="col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="30" class="form-control"
+                                   name="driverLoggingOutUpTimeSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">休眠时汇报时间间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="120" class="form-control"
+                                   name="dormancyUpTimeSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">紧急报警时汇报时间间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="15" class="form-control"
+                                   name="emergencyAlarmUpTimeSpace" maxlength="6"/>
+                        </div>
+                        <label class="col-md-3 control-label">缺省时间汇报间隔(秒)：</label>
+                        <div class=" col-md-3">
+                            <input type="text" placeholder="请输入驾驶员未登录汇报时间间隔" value="30" class="form-control"
+                                   name="defaultTimeUpSpace" maxlength="6"/>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="goTimeInterval" class="btn btn-primary">下发</button>
+                <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 发送原始命令 -->
+<div class="modal fade" id="sendOriginalCommand" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="originalOrder" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="sendOriginalCommandBrand"></h4>
+                    <input class="hidden" id="vid14" name="vid" value="">
+                    <input class="hidden" name="orderType" value="14">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><label class="text-danger">*</label> 原始命令类型：</label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入原始命令类型(16进制，范围为0 ~ FF)" class="form-control"
+                                       name="param"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label"><label class="text-danger">*</label> 原始命令内容：</label>
+                            <div class=" col-md-7">
+                                <input type="text" placeholder="请输入原始命令内容" class="form-control" name="data"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goOriginalOrder" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="recordCollectionCommand" aria-hidden="true" data-backdrop="static"
+     role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="recordCollections" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="recordCollectionCommandBrand"></h4>
+                    <input class="hidden" id="vid10" name="vid" value="">
+                    <input class="hidden" id="orderType" name="orderType" value="10">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">命令字：</label>
+                            <div class=" col-md-7">
+                                <select id="sign" name="sign" class="form-control"
+                                        onchange="treeMonitoring.monitorSignChange(this)">
+                                    <!--<option value="1">行驶记录仪版本</option>
+                                    <option value="2">驾驶证号</option>
+                                    <option value="3">实时时间</option>-->
+                                    <option value="0H" id="recordSignSelected">采集记录仪执行标准版本</option>
+                                    <option value="1H">采集当前驾驶人信息</option>
+                                    <option value="2H">采集记录仪实时时间</option>
+                                    <option value="3H">采集累计行驶里程</option>
+                                    <option value="4H">采集记录仪脉冲系数</option>
+                                    <option value="5H">采集车辆信息</option>
+                                    <option value="6H">采集记录仪状态信号配置信息</option>
+                                    <option value="7H">采集记录仪唯一性编号</option>
+                                    <option value="8H">采集指定的行驶速度记录</option>
+                                    <option value="9H">采集指定的位置信息记录</option>
+                                    <option value="10H">采集指定的事故疑点记录</option>
+                                    <option value="11H">采集指定的超时驾驶记录</option>
+                                    <option value="12H">采集指定的驾驶人身份记录</option>
+                                    <option value="13H">采集指定的外部供电记录</option>
+                                    <option value="14H">采集指定的参数修改记录</option>
+                                    <option value="15H">采集指定的速度状态日志</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group hidden" id="recordTimeIntervalIsHidden">
+                            <label class="col-md-3 control-label">时间：</label>
+                            <div class="col-md-7 searchListSelect">
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="recordTimeInterval" name="timeInterval" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goRecordCollect" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="recordSendCommand" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="recordSends" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="recordSendCommandBrand"></h4>
+                    <input class="hidden" id="recordSend" name="vid" value="">
+                    <input class="hidden" name="orderType" value="17">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">车辆VIN码：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="车辆VIN码" class="form-control" name="vin"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">车牌号：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="车牌号" class="form-control" name="plateNumber"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">号牌分类：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="号牌分类" class="form-control" name="plateType"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goRecordSend" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 文本信息下发 -->
+<div class="modal fade" id="textInfoSend" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/adas/v/monitoring/sendTTS}" role="form" id="txtSend" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="textInfoSendBrand"></h4>
+                    <input class="hidden" id="vid5" name="vehicleId" value="">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">文本内容：</label>
+                            <div class=" col-md-7">
+                                <textarea class="form-control" maxlength="512" name="sendTextContent" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goTxtSend" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 人证对比 -->
+<div class="modal fade" id="personCompare" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/adas/v/monitoring/sendTTS}" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">人证对比</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="personCompare-content" style="position:relative;">
+                        <div id="compareLoad" class="personCompare-loading">
+                            <i class="fa fa-spinner loading-state"></i>
+                        </div>
+                        <div class="clearfix" style="position:relative;">
+                            <div class="img-box">
+                                <img id="personComparePhoto" src="" alt="">
+                            </div>
+                            <div class="split">
+                                <span style="color:#6dcff6;">对比</span>
+                            </div>
+                            <div class="img-box" style="border-color: #6dcff6;">
+                                <img id="personComparePhoto2" src="" alt="">
+                            </div>
+                            <div class="compare-score content-box">
+                                <div class="txt1">相似度</div>
+                                <div>
+                                    <span id="comparePersent" class="persent">78</span>%
+                                </div>
+                                <div id="compareRes" style="margin-top:5px;"><!--同一个人的可能性极低--></div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-box">
+                            <div class="item">
+                                姓名: <span id="compareName"></span>
+                            </div>
+                            <div class="item">
+                                从业资格证号: <span id="compareCard"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="compareReset" type="button" class="btn btn-primary"  data-dismiss="modal">对比</button>
+                    <button id="compareClose" type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 提问下发 -->
+<style>
+    #askQuestionsIssued .error {
+        display: none;
+    }
+</style>
+<div class="modal fade" id="askQuestionsIssued" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" role="form" id="sendQuestion" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="askQuestionsIssuedBrand"></h4>
+                    <input class="hidden" id="vid6" name="vid" value="">
+                    <input class="hidden" name="orderType" value="6">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">提问：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入提问内容" class="form-control" name="question"/>
+                                <label id="question-error" class="error">请输入提问内容</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">答案：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入答案" class="form-control" name="value"/>
+                                <label id="value-error" class="error">请输入答案</label>
+                            </div>
+                        </div>
+                        <div id="answer-add-content">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">答案：</label>
+                                <div class="col-md-5">
+                                    <input type="text" placeholder="请输入答案" class="form-control" name="value"/>
+                                    <label class="error">请输入答案</label>
+                                </div>
+                                <div class="col-md-1">
+                                    <button id="askQuestions-add-btn" type="button" class="btn btn-primary addIcon">
+                                        <span class="glyphicon glyphiconPlus" aria-hidden="true"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:0px auto;">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <div class="col-md-6">
+                                    <div class="checkbox">
+                                        <label><input name="marks" value="0" id="emergency1" type="checkbox"/>紧急</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="checkbox">
+                                        <label><input name="marks" value="4" checked="checked" id="tts1"
+                                                      type="checkbox"/>终端TTS读播</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <div class="col-md-6">
+                                    <div class="checkbox">
+                                        <label><input name="marks" value="5" checked="checked" id="advertisingDisplay1"
+                                                      type="checkbox"/>广告屏显示</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goSendQuestion" class="btn btn-primary">下发</button>
+                    <button type="button" id="closeSendQuestion" class="btn btn-default btn-off" data-dismiss="modal">
+                        关闭
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 电话回拨 -->
+<div class="modal fade" id="reantimeCallBack" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="telBack" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="reantimeCallBackBrand"></h4>
+                    <input class="hidden" id="vid40" name="vid" value="">
+                    <input class="hidden" name="orderType" value="40">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通话方式：</label>
+                            <div class="col-md-7">
+                                <input type="text" value="普通通话" class="form-control" disabled/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">电话号码：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入电话号码" class="form-control" name="regRet"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goTelBack" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 监控对象-监听 -->
+<div class="modal fade" id="monitoringObjectListening" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="listening" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="monitoringObjectListeningBrand"></h4>
+                    <input class="hidden" id="vid41" name="vid" value="">
+                    <input class="hidden" name="orderType" value="41">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通话方式：</label>
+                            <div class="col-md-7">
+                                <input type="text" value="监听" class="form-control" disabled/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">电话号码：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入电话号码" class="form-control" name="regRet"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="gpListening" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 多媒体检索 -->
+<div class="modal fade" id="multimediaSearch" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="multimediaRetrieval" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="multimediaSearchBrand"></h4>
+                    <input class="hidden" id="vid11" name="vid" value="">
+                    <input class="hidden" name="orderType" value="11">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">多媒体类型：</label>
+                            <div class="col-md-7">
+                                <select name="type" class="form-control">
+                                    <option value="0">图像</option>
+                                    <option value="1">音频</option>
+                                    <option value="2">视频</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">通道ID：</label>
+                            <div class="col-md-7">
+                                <select name="wayID" class="form-control">
+                                    <option value="0">所有</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">事件项：</label>
+                            <div class="col-md-7">
+                                <select name="eventCode" class="form-control">
+                                    <option value="0">平台下发指令</option>
+                                    <option value="1">定时动作</option>
+                                    <option value="2">抢劫报警</option>
+                                    <option value="3">碰撞侧翻报警</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">开始时间：</label>
+                            <div class="col-md-7">
+                                <input style="cursor: pointer;  background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="msStartTime" name="startTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">结束时间：</label>
+                            <div class="col-md-7">
+                                <input style="cursor: pointer;  background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="msEndTime" name="endTime" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goMultimediaRetrieval" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 多媒体上传 -->
+<div class="modal fade" id="multimediaUpload" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:60%;">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="multimediaUploads" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="multimediaUploadBrand"></h4>
+                    <input class="hidden" id="vid12" name="vid" value="">
+                    <input class="hidden" name="orderType" value="12">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">多媒体类型：</label>
+                            <div class="col-md-3">
+                                <select name="type" class="form-control">
+                                    <option value="0">图像</option>
+                                    <option value="1">音频</option>
+                                    <option value="2">视频</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label">通道ID：</label>
+                            <div class="col-md-3">
+                                <select name="wayID" class="form-control">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">事件项：</label>
+                            <div class="col-md-3">
+                                <select name="eventCode" class="form-control">
+                                    <option value="0">平台下发指令</option>
+                                    <option value="1">定时动作</option>
+                                    <option value="2">抢劫报警</option>
+                                    <option value="3">碰撞侧翻报警</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">开始时间：</label>
+                            <div class="col-md-3">
+                                <input style="cursor: pointer;  background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="muStartTime" name="startTime" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">结束时间：</label>
+                            <div class="col-md-3">
+                                <input style="cursor: pointer;  background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="muEndTime" name="endTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-7">
+                                <div class="checkbox">
+                                    <label>
+                                        <input name="deleteSign" id="deleteSign" type="checkbox" value="0">
+                                        允许删除
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goMultimediaUploads" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 录音上传 -->
+<div class="modal fade" id="recordingUpload" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="recordUpload" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="recordingUploadBrand"></h4>
+                    <input class="hidden" id="vid13" name="vid" value="">
+                    <input class="hidden" name="orderType" value="13">
+                    <input class="hidden" name="voiceCommand" id="voiceCommand" value="">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">录音时间(秒)：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="0表示一直录音" class="form-control" name="time"
+                                       id="tapingTime"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">保存标志：</label>
+                            <div class="col-md-7">
+                                <select name="saveSign" class="form-control">
+                                    <option value="0">实时上传</option>
+                                    <option value="1">保存</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">采样率(Kbps)：</label>
+                            <div class="col-md-7">
+                                <select name="frequency" class="form-control">
+                                    <option value="0">8</option>
+                                    <option value="1">11</option>
+                                    <option value="2">23</option>
+                                    <option value="3">32</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goRecordUpload" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 数据下行透传 -->
+<div class="modal fade" id="dataGoesThrough" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/parametersTrace}" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="dataGoesThroughBrand"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">透传消息内容：</label>
+                            <div class="col-md-6">
+                                <input type="text" placeholder="请输入透传消息内容" class="form-control" name=""/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 信息服务 -->
+<div class="modal fade" id="informationService" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" role="form" id="infoService" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="informationServiceBrand"></h4>
+                    <input class="hidden" id="vid16" name="vid" value="">
+                    <input class="hidden" name="orderType" value="16">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">信息内容：</label>
+                            <div class=" col-md-6">
+                                <textarea class="form-control" name="value" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goInfoService" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 上报频率设置-->
+<div class="modal fade" id="reportFrequencySet" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoringLong/sendParam}" role="form" id="reportFrequency" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="reportFrequencyBrand"></h4>
+                    <input class="hidden" id="vid17" name="vid" value="">
+                    <input class="hidden" name="orderType" value="17">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">
+                                <i
+                                        class="fa fa-question-circle fa-lg"
+                                        data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="缺省值为24小时，最小设置时间为5分钟">
+                                </i>
+                                上报频率：
+                            </label>
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" id="hours" onchange="if(value&lt;0){value=0}"
+                                       onkeyup="if(value.length&gt;4){value=value.substring(0,4)}"/>
+                            </div>
+                            <div class="col-md-1" style="padding:0px;line-height:34px;">小时</div>
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" id="minute" onchange="if(value&lt;0){value=0}"
+                                       onkeyup="if(value.length&gt;6){value=value.substring(0,6)}"/>
+                                <input type="text" hidden="hidden" id="locationNumber" name="locationNumber"/>
+                            </div>
+                            <div class="col-md-1" style="padding:0px;line-height:34px;">分</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">定位模式：</label>
+                            <div class="col-md-6">
+                                <select name="locationPattern" class="form-control">
+                                    <option value="00">基站定位+卫星定位</option>
+                                    <option value="01">基站定位</option>
+                                    <option value="02">卫星定位</option>
+                                    <option value="03">基站定位+WIFI定位</option>
+                                    <option value="04">基站定位+卫星定位+WIFI定位</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="requiteTimeDiv">
+                            <label class="col-md-4 control-label">上报起始时间：</label>
+                            <div class="col-md-6">
+                                <input style="cursor: pointer;  background-color: #fafafa;" type="text" id="requiteTime"
+                                       name="requiteTime" class="form-control" readonly/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="reportSet" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--定点和校时 -->
+<div class="modal fade" id="fixedPointAndTiming" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoringLong/sendParam}" role="form" id="fixedPointTimingList" action="#"
+                  method="post" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="fixedPointAndTimingBrand"></h4>
+                    <input class="hidden" id="vid18" name="vid" value="">
+                    <input class="hidden" name="orderType" value="18">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div id="baseStation-MainContent">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="goInfofixedPointAndTiming" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 位置跟踪 -->
+<div class="modal fade" id="locationTailAfter" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoringLong/sendParam}" role="form" id="locationTailAfterList" action="#"
+                  method="post" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="locationTailAfterBrand"></h4>
+                    <input class="hidden" id="vid19" name="vid" value="">
+                    <input class="hidden" name="orderType" value="19">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">跟踪时长(秒)：</label>
+                            <div class="col-md-6">
+                                <input type="text" id="longValidity" name="longValidity"
+                                       onKeyUp="value=value.replace(/[^0-9]/g,'')" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">时间间隔(秒)：</label>
+                            <div class=" col-md-6">
+                                <input type="text" id="longInterval" name="longInterval"
+                                       onKeyUp="value=value.replace(/[^0-9]/g,'')" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="positionTrailing" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 透传指令 -->
+<div class="modal fade" id="throughInstruction" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoringLong/sendParam}" id="throughOrder" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="throughInstructionBrand"></h4>
+                    <input class="hidden" id="vid20" name="vid" value="">
+                    <input class="hidden" name="orderType" value="20">
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">指令内容：</label>
+                            <div class=" col-md-6">
+                                <input type="text" placeholder="请输入指令内容" class="form-control" name="longData"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="goThroughOrder">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 围栏关键点 -->
+<div class="modal fade" id="addMonitoringTag" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">添加关键点</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增标注表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/addMonitoringTag}"
+                      id="monitoringTag" role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group hidden">
+                            <input id="lineIDs" name="lineId" value=""/>
+                            <div class="col-md-3">
+                                <input id="marking-lng" name="longitude"/>
+                            </div>
+                            <div class="col-md-3">
+                                <input id="marking-lat" name="latitude"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入名称" class="form-control" id="TagName" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 到达时间：</label>
+                            <div class="col-md-8 searchListSelect">
+                                <input placeholder="请选择到达时间" style="cursor: pointer; background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="arriveTime" name="arriveTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 离开时间：</label>
+                            <div class="col-md-8 searchListSelect">
+                                <input placeholder="请选择离开时间" style="cursor: pointer; background-color: #fafafa;"
+                                       class="form-control layer-date laydate-icon"
+                                       id="leaveTime" name="leaveTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="4" id="description" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="save" class="btn btn-primary">添加</button>
+                        <button type="button" id="monitoringTagClose" class="btn btn-default btn-off"
+                                data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 分段限速 -->
+<div class="modal fade" id="addMonitoringSection" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">分段限速</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增标注表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/addSegment}"
+                      id="monitoringSection" role="form" action="#" method="post">
+                    <div class="row" id="pages">
+                        <div class="col-md-12">
+                            <div class="panel-heading">
+                                <div class="dropdown panel-title fwb">
+                                    <ul class="nav nav-tabs" id="tenples">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="margin-top: 45px">
+                            <div id="pagecontent" class="tab-content">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="saveSection" class="btn btn-primary">提交</button>
+                        <button type="button" id="sectionRateLimitingClose" class="btn btn-default btn-off"
+                                data-dismiss="modal">取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 日志内容 -->
+<div class="modal fade" id="logDetailDiv" role="dialog" aria-hidden="true" data-backdrop="static"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width:31%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">日志内容</h4>
+            </div>
+            <div class="modal-body" id="logContent">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 视频抓拍 -->
+<div class="modal fade" id="videoPhotograph" role="dialog" aria-labelledby="videoPhotograph" aria-hidden="true"
+     data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="videoPhotograph">视频抓拍</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 from-group">
+                        <label class="col-md-3 col-sm-12 control-label">存放路径:</label>
+                        <label class="col-md-8 col-sm-12"><input type="text" id="photoPath" value="C:/clbsVideo"
+                                                                 class="form-control"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnPhoto" class="btn btn-primary">确认</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 断油电 -->
+<div class="modal fade" id="cutOilElec" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="cutOilElecForm" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="cutOilElecBrand"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">当前状态：</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static" id="cutOilElecState"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">速度：</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static" id="cutOilElecSpeed"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">位置：</label>
+                            <div class="col-md-7">
+                                <p class="form-control-static" id="cutOilElecLocation"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">操作：</label>
+                            <div class="col-md-2">
+                                <div class="checkbox" style="padding-left:0px">
+                                    <label><input type="radio" name="cutOilElecOpe" value="1"/>&nbsp;通油电</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="checkbox" style="padding-left:0px">
+                                    <label><input type="radio" name="cutOilElecOpe" value="0"/>&nbsp;断油电</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">下发口令：</label>
+                            <div class="col-md-7">
+                                <input type="password" class="form-control" id="cutOilElecToken"
+                                       name="cutOilElecToken"/>
+                                <label id="cutOilElecError" class="error" for="username" style="display:none"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cutOilElecRefresh" class="btn btn-primary">刷新</button>
+                    <button type="button" id="gpCutOilElec" class="btn btn-primary" disabled style="margin-bottom:2px">
+                        下发
+                    </button>
+                    <button type="button" id="cutoilclose" onclick="treeMonitoring.cutoilclose();"
+                            class="btn btn-default btn-off" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 应答 -->
+<div class="modal fade" id="goTraceResponse" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameterResponse"><span id="msgTitle"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question"></span></label>
+                        <div class=" col-md-7">
+                            <input type="hidden" id="infoId">
+                            <input type="hidden" id="msgDataType">
+                            <input type="hidden" id="objectType">
+                            <input type="hidden" id="objectId">
+                            <input type="text" placeholder="请输入应答" class="form-control" name="interval"
+                                   id="answer"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="parametersResponse" class="btn btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 设置终端车牌号 -->
+<div class="modal fade modal-hide-load" id="setPlateNumber" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="setTerminalPlate" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="terminalPlate"></h4>
+                    <input class="hidden" id="plateId" name="vid">
+                    <input class="hidden" id="oldNumber" name="oldNumber">
+                    <input type="hidden" id="plateOder" name="orderType" value="18"/>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">车牌号：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入车牌号" class="form-control" name="brand"
+                                       id="brand" maxlength="20"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">车牌颜色：</label>
+                            <div class="col-md-7">
+                                <select id="plateColor" class="form-control plateColorSelect" name="plateColor"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">省域ID：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入2位数字" class="form-control" name="provinceId"
+                                       id="provinceId" maxlength="2"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">市县域ID：</label>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="请输入4位数字" class="form-control" name="cityId"
+                                       id="cityId" maxlength="4"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="parametersPlate" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- OBD -->
+<div class="modal fade modal-hide-load" id="OBD" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="setOBD" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title" id="OBDtitle"></h4>
+                    <input class="hidden" id="OBDId" name="vid">
+                    <input class="hidden" id="OBDMultiplicative">
+                    <input class="hidden" id="OBDCommercial">
+                    <input type="hidden" id="OBDOder" name="orderType" value="19"/>
+                    <style>
+                        #sensorDropdown1 td {
+                            text-align: left
+                        }
+
+                        #OBD .modal-body {
+                            overflow: visible !important;
+                        }
+                    </style>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="form-group col-md-11">
+                        <label class="col-md-5 control-label"><label
+                                class="text-danger">*</label> 车型分类：</label>
+                        <div class="col-md-7">
+                            <select class="form-control" id="classification" name="classification">
+                                <option value="0">乘用车</option>
+                                <option value="1" selected>商用车</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-11">
+                        <label class="col-md-5 control-label" id="modelName"><label
+                                class="text-danger">*</label> 车型名称：</label>
+                        <div class="col-md-7">
+                            <input type="hidden" name="modelId" id="modelId"/>
+                            <div class="input-group">
+                                <input type="text" placeholder="请选择类型" class="form-control" id="model" name="model">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-white dropdown-toggle"
+                                            style="height:36px; margin-left: -2px;" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" id="sensorDropdown1"
+                                        role="menu" style="width:100%;">
+                                    </ul>
+                                </div>
+                                <input type="hidden" id="OBDVid" name="vehicleTypeId">
+                                <input type="hidden" id="obdVehicleTypeId" name="obdVehicleTypeId">
+                                <input type="hidden" id="OBDVName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-11">
+                        <label class="col-md-5 control-label">OBD采集间隔（秒）：</label>
+                        <div class=" col-md-7">
+                            <input type="text" placeholder="请输入OBD采集间隔" class="form-control" name="uploadTime"
+                                   value="1"
+                                   id="OBDValue" maxlength="2"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="toSetOBD" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--从业人员详情-->
+<div class="modal fade" id="professionalsDetail" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 700px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">从业人员</h4>
+            </div>
+            <div class="modal-body">
+                <div class="infoScrollBox" id="professionalsInfoScrollBox">
+                    <div class="prevBtnBox">
+                        <i class="fa fa-caret-left"></i>
+                    </div>
+                    <div class="nextBtnBox">
+                        <i class="fa fa-caret-right"></i>
+                    </div>
+
+                    <div class="infoScrollCont" id="professionalsInfoScrollCont">
+                        <div class="col-md-12 singleInfoCont">
+                            <div class="col-md-2 driverPhoto">
+                                <img id="professionalsPhoto"
+                                     src="/clbs/resources/img/peoplems.png"/>
+                            </div>
+                            <div class="col-md-10 infoCont">
+                                <div class="col-md-5">司机姓名：未知</div>
+                                <div class="col-md-7">岗位类型：未知</div>
+                                <div class="col-md-5">手机号：未知</div>
+                                <div class="col-md-7">身份证号：未知</div>
+                                <div class="col-md-12">所属企业：未知</div>
+                                <div class="col-md-12">从业资格证号：未知</div>
+                                <div class="col-md-12">从业资格类别：未知</div>
+                                <div class="col-md-12">发证机关：未知</div>
+                                <div class="col-md-12">有效期至：未知</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-off"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--终端IO状态-->
+<div class="modal fade" id="ioModalTerminal" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">终端I/O状态</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <table class="io-modal-table">
+                        <tbody id="ioModalTerminalContent">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-off"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--传感器IO状态-->
+<div class="modal fade" id="ioModalSensor" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="ioStatusModalTitle">传感器I/O状态</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" role="tablist" id="ioModalTabTitleContainer">
+                    <li role="presentation" class="active" id="sensorIOModalLi1"><a href="#sensorIOModalTab1"
+                                                                                    aria-controls="home" role="tab"
+                                                                                    data-toggle="tab">I/O采集1</a></li>
+                    <li role="presentation" id="sensorIOModalLi2"><a href="#sensorIOModalTab2" aria-controls="profile"
+                                                                     role="tab" data-toggle="tab">I/O采集2</a></li>
+                </ul>
+                <div class="tab-content" id="ioModalTabTitleContent">
+                    <div role="tabpanel" class="tab-pane active" id="sensorIOModalTab1">
+                        <div>
+                            <table class="io-modal-table">
+                                <tbody id="ioModalSensorContent1">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="sensorIOModalTab2">
+                        <div>
+                            <table class="io-modal-table">
+                                <tbody id="ioModalSensorContent2">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-off"
+                        data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--查询围栏数据-->
+<div class="modal fade modal-hide-load" id="fenceModal" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form th:action="@{/v/monitoring/orderMsg}" id="fenceModalForm" role="form" action="#" method="post"
+                  class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                    <h4 class="modal-title">查询围栏数据：<span id="monitorFenceTitle"></span></h4>
+                    <input class="hidden" id="FenceMonitorId" name="vid">
+                    <input type="hidden" id="FenceMonitorOrder" name="orderType" value="50"/>
+                </div>
+                <div class="modal-body clearfix">
+                    <div class="form-group col-md-12">
+                        <label class="col-md-4 control-label"><label
+                                class="text-danger">*</label> 围栏类型：</label>
+                        <div class="col-md-8">
+                            <select class="form-control" id="fenceTypeSelected" name="queryType">
+                                <option value="1">圆形</option>
+                                <option value="2">矩形</option>
+                                <option value="3">多边形</option>
+                                <option value="4">路线</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label class="col-md-4 control-label">查询围栏个数：</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="countId" readonly value="0"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="toSearchFence" class="btn btn-primary">下发</button>
+                    <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-------隐藏框分界线-------->

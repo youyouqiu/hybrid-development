@@ -1,0 +1,105 @@
+<form th:action="@{/m/forward/vehicle/manage/update}" id="addForm" role="form" action="#" method="post"
+    class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">转发车辆下载地址修改</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input th:value="${result.id}" id="id" name='id' type="hidden" />
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 对接码组织：</label>
+                    <div class="has-feedback col-md-7 fastClear">
+                        <input th:value="${result.dockingCodeOrg}" name="dockingCodeOrgName" class="form-control"
+                            id="zTreeCitySel" placeholder="请选择所属企业" style="background-color: #fafafa; cursor: pointer;"
+                            type="text" autocomplete="off" />
+                        <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                            aria-hidden="true"></span>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <input id="selectGroup" th:value="${result.dockingCodeOrgId}" name="dockingCodeOrgId"
+                            type="text" hidden="true" />
+                        <label id="error_label_add" class="error" style="display: none;"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label> 转发平台：</label>
+                    <div class="col-md-7">
+                        <div style="position:relative;">
+                            <div class="input-group">
+                                <input th:value="${result.forwardingPlatform}" name="category" type="text"
+                                    class="form-control" id="category" placeholder="请选择转发平台"
+                                    style="background: #fff !important;">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu"
+                                        style="width:100%!important">
+                                    </ul>
+                                </div>
+                            </div>
+                            <input id="forwardPlatform" th:value="${result.forwardingPlatformId}"
+                                name="forwardingPlatformId" hidden="true">
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-7">
+                        <select name="forwardingPlatformId" th:value="${result.forwardingPlatformId}"
+                            id="vehicleCategory12" placeholder="请选择转发平台" class="form-control">
+                        </select>
+                    </div> -->
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label>webservice地址：</label>
+                    <div class="col-md-7">
+                        <input name="url" th:value="${result.url}" placeholder="请输入webservice地址" maxlength="200"
+                            type="text" id="url" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label>用户名：</label>
+                    <div class="col-md-7">
+                        <input class="form-control" th:value="${result.userName}" placeholder="请输入用户名" name="userName"
+                            id="userName" type="text" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label>密码：</label>
+                    <div class="col-md-7">
+                        <input class="form-control" th:value="${result.password}" placeholder="请输入密码" name="password"
+                            id="password" type="text" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label"><label class="text-danger">*</label>对接码：</label>
+                    <div class="col-md-7">
+                        <input class="form-control" th:value="${result.dockingCode}" placeholder="请输入对接码"
+                            name="dockingCode" id="dockingCode" type="text" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var vehicleTypeNull = [[#{ vehicle.type.null }]];
+    var vehicleTypeExists = [[#{ vehicle.type.exists }]];
+    var publicSize20 = [[#{ public.size20.length }]];
+    var publicSize50 = [[#{ public.size50.length }]];
+
+</script>
+<script type="text/javascript" src="/resources/js/zTree/js/ztreeSearch.js"
+    th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/resources/js/oilSubsidyManage/forwardVehicleManageEdit.js"
+    th:src="@{/resources/js/oilSubsidyManage/forwardVehicleManageEdit.js}"></script>
+<script type="text/javascript" src="/wro/sendAjax.js" th:src="@{/wro/sendAjax.js}"></script>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.TransportTimesDao">
+    <insert id="addTransport" parameterType="com.cb.platform.domain.TransportTimesEntity">
+      insert into zw_m_transport_times(id,vehicle_id,item_name_id,count,transport_type,transport_date,start_site,via_site
+      ,aim_site,professinoal_id,phone,remark,flag,create_data_time,create_data_username) values (#{entity.id},#{entity.vehicleId},#{entity.itemNameId},
+      #{entity.count},#{entity.transportType},#{entity.transportDate},#{entity.startSite},#{entity.viaSite},#{entity.aimSite},#{entity.professinoalId},#{entity.phone},#{entity.remark},#{entity.flag},#{entity.createDataTime},#{entity.createDataUsername})
+    </insert>
+
+    <select id="findById" parameterType="string" resultType="com.cb.platform.domain.TransportTimesEntity">
+        select * from zw_m_transport_times where id = #{id} and flag = 1
+    </select>
+
+    <select id="findByItemName" parameterType="list" resultType="string">
+        select item_name_id from zw_m_transport_times where flag = 1 and item_name_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+           #{item}
+        </foreach>
+    </select>
+    
+    <select id="findByIdList" parameterType="list" resultType="string">
+        select mv.brand from zw_m_transport_times tt,zw_m_vehicle_info mv where tt.flag = 1 and mv.flag = 1 and tt.vehicle_id = mv.id and mv.vehicle_type in (select id from zw_m_vehicle_type zv where zv.flag = 1 and
+        zv.vehicle_category in(select id from zw_m_vehicle_category where flag = 1 and vehicle_category = '危险品运输车'))
+        <if test="list!=null and list.size() > 0">
+            and tt.id in
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="findByVehiclesId" parameterType="list" resultType="com.cb.platform.domain.TransportTimesEntity">
+        select * from zw_m_transport_times where flag = 1
+        <if test="list!=null and list.size() > 0">
+            and vehicle_id in
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <!--根据车牌号查询-->
+    <select id="searchTransport" parameterType="com.cb.platform.domain.TransportTimesQuery" resultType="com.cb.platform.domain.TransportTimesEntity">
+        select tt.id,item.danger_type,mv.brand as vehicle_id,item.name as item_name_id,item.unit,tt.count,tt.transport_type,tt.transport_date,tt.start_site,tt.via_site,tt.aim_site,tt.professinoal_id,
+        tt.phone,tt.remark from (zw_m_transport_times tt inner join zw_m_vehicle_info mv on tt.vehicle_id = mv.id  and mv.flag=1) inner join zw_m_item_name item
+        on tt.item_name_id = item.id and item.flag = 1 where tt.flag = 1 and mv.vehicle_type in (select id from zw_m_vehicle_type zv where zv.flag = 1 and
+        zv.vehicle_category in(select id from zw_m_vehicle_category where flag = 1 and vehicle_category = '危险品运输车'))
+        <if test="query.vehicleNumber!=null and query.vehicleNumber!=''">
+            and mv.brand like CONCAT('%',#{query.vehicleNumber},'%')
+        </if>
+        <if test="list!=null and list.size() > 0">
+            and tt.vehicle_id in
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+         order by tt.create_data_time desc
+    </select>
+    
+    <select id="findDangerTypeList" resultType="string">
+      select value from zw_c_dictionary where type = 'DANGER_TYPE'
+    </select>
+    <!--导出-->
+    <select id="exportTransport" parameterType="string" resultType="com.cb.platform.domain.TransportTimesExportEntity">
+        select mv.brand,item.name,d.value as danger_type,case when item.unit = 1 then 'kg' when item.unit = 2 then 'L' end as unit,tt.count,
+        case when tt.transport_type = 1 then '营运性危险货物运输' when tt.transport_type = 2 then '非营运性危险货物运输' end transport_type,
+        tt.transport_date,tt.start_site,tt.via_site,tt.aim_site,tt.professinoal_id,
+        tt.phone,tt.remark from (zw_m_transport_times tt inner join zw_m_vehicle_info mv on tt.vehicle_id = mv.id  and mv.flag=1) inner join zw_m_item_name item
+        on tt.item_name_id = item.id and item.flag = 1 LEFT JOIN zw_c_dictionary d on item.danger_type = d.code and d.type = 'DANGER_TYPE' where tt.flag = 1
+        and mv.vehicle_type in (select id from zw_m_vehicle_type zv where zv.flag = 1 and vehicle_type = '危险品运输车')
+        <if test="brand!=null and brand!=''">
+            and mv.brand like CONCAT('%',#{brand},'%')
+        </if>
+        <if test="list!=null and list.size() > 0">
+            and tt.vehicle_id in
+            <foreach collection="list" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by tt.create_data_time desc
+    </select>
+
+    <update id="updateTransport" parameterType="com.cb.platform.domain.TransportTimesEntity">
+        update zw_m_transport_times set vehicle_id = #{entity.vehicleId},item_name_id = #{entity.itemNameId},count = #{entity.count},
+         transport_type = #{entity.transportType},transport_date = #{entity.transportDate},start_site = #{entity.startSite},via_site = #{entity.viaSite},
+         aim_site = #{entity.aimSite},professinoal_id = #{entity.professinoalId},phone = #{entity.phone},remark = #{entity.remark},
+         update_data_time = #{entity.updateDataTime},update_data_username = #{entity.updateDataUsername} where id = #{entity.id}
+    </update>
+    <update id="deleteByVehicleId" parameterType="string">
+        delete from zw_m_transport_times where vehicle_id = #{vehicleId}
+    </update>
+    <!--批量删除-->
+    <update id="deleteTransport" parameterType="list">
+        update zw_m_transport_times set flag = 0 where id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </update>
+    <!--根据车辆ID删除记录-->
+    <update id="deleteTransportByVid" parameterType="list">
+        update zw_m_transport_times set flag = 0 where flag = 1 and vehicle_id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--批量添加-->
+    <insert id="insertList" parameterType="list">
+      insert into zw_m_transport_times(id,vehicle_id,item_name_id,count,transport_type,transport_date,start_site,via_site
+      ,aim_site,professinoal_id,phone,remark,flag,create_data_time,create_data_username) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.vehicleId},#{item.itemNameId},#{item.count},#{item.transportType},#{item.transportDate},#{item.startSite},#{item.viaSite},
+            #{item.aimSite},#{item.professinoalId},#{item.phone},#{item.remark},#{item.flag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.OilCalibrationDao">
+	
+	<!-- 分页查询油箱列表 -->
+	<select id="getVehicleList" resultType="com.zw.platform.domain.vas.oilmassmgt.OilVehicleSetting" >
+ 		<!-- 和油量车辆设置一样的条件 -->
+ 		SELECT DISTINCT  c.vehicle_id, v.brand, ov.id FROM
+		(select id,brand from zw_m_vehicle_info where flag = 1 union all
+		select id,people_number as brand from zw_m_people_info where flag = 1 union all
+		select id,thing_number from zw_m_thing_info where flag = 1) v
+		INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+		INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+		INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+		INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+		LEFT JOIN zw_m_oil_box_vehicle ov ON ov.vehicle_id = v.id AND ov.flag = 1
+		LEFT JOIN zw_m_oil_box b ON  b.id = ov.oil_box_id AND b.flag=1
+		LEFT JOIN zw_m_oil_rod_sensor_info os ON os.id = ov.sensor_type AND os.flag = 1
+		LEFT JOIN zw_m_directive d ON d.monitor_object_id = v.id AND d.flag =1 AND d.parameter_type = 4
+		WHERE ov.sensor_type != ''
+		AND au.user_id = #{userId}
+		AND a.org_id IN
+		<foreach item="item" collection="groupList" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+		ORDER BY v.brand
+	</select>
+	
+	<!-- 根据车辆id查询与车辆绑定的油箱的标定数据 -->
+	<select id="getOilCalibrationByVid" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.OilCalibrationForm">
+		select oc.*, ov.oil_box_type oilBoxType from zw_m_oil_calibration oc inner join zw_m_oil_box_vehicle ov on oc.oil_box_vehicle_id = ov.id and ov.flag = 1
+		where oc.oil_box_vehicle_id in (
+			select obv.id from zw_m_oil_box_vehicle obv where obv.flag = 1 and obv.vehicle_id = #{vehicleId})
+		and oc.flag = 1 order by oc.oil_level_height + 0
+	</select>
+	
+	<!-- 根据oilBoxVehicleId删除标定数据 -->
+	<select id="deleteOilCalibrationByOilBoxVehicleId" parameterType="string">
+		update zw_m_oil_calibration set flag = 0 where flag = 1 and oil_box_vehicle_id = #{oilBoxVehicleId}
+	</select>
+	
+	<!-- 保存油量标定数据 -->
+	<insert id="addOilCalibration" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.OilCalibrationForm">
+		INSERT INTO zw_m_oil_calibration (
+        	id, oil_box_vehicle_id, oil_level_height, oil_value, create_data_time, create_data_username
+        )
+        VALUES(
+        	#{id}, #{oilBoxVehicleId}, #{oilLevelHeight}, #{oilValue}, #{createDataTime}, #{createDataUsername}
+        )
+	</insert>
+	
+	<!-- 根据车辆id查询标定状态数据 -->
+	<select id="getCalibrationStatusByVid" parameterType="string" resultType="string">
+		select t.calibration_status from zw_m_oil_box_vehicle t where t.vehicle_id = #{vehicleId} and t.flag = 1
+	</select>
+	
+	<!-- 更新标定状态 -->
+	<update id="updateCalibrationStatusByVid" parameterType="string">
+		update zw_m_oil_box_vehicle
+		set calibration_status = #{calibrationStatus}, update_data_time = #{updateTime}, update_data_username = #{updateUserName}
+		where vehicle_id = #{vehicleId} and flag = 1
+	</update>
+	
+	<!-- 判断车辆是否绑定油箱和传感器 -->
+	<select id="checkIsBondOilBox" parameterType="string" resultType="integer">
+		select count(1) from zw_m_oil_box_vehicle t where t.vehicle_id = #{vehicleId} and t.flag = 1
+	</select>
+	
+	<!-- 保存车辆最后一次标定数据的时间-追溯标定时用 -->
+	<insert id="saveLastCalibration" parameterType="com.zw.platform.domain.vas.oilmassmgt.form.LastOilCalibrationForm">
+		INSERT INTO zw_m_vehicle_last_calibration (
+        	id, vehicle_id, oil_box_type, last_calibration_time, create_data_time, create_data_username
+        )
+        VALUES(
+        	#{id}, #{vehicleId}, #{oilBoxType}, #{lastCalibrationTime}, #{createDataTime}, #{createDataUsername}
+        )
+	</insert>
+	
+	<!-- 根据车辆id删除车辆最后一次标定的时间 -->
+	<delete id="deleteLastCalibration" parameterType="string">
+		delete from zw_m_vehicle_last_calibration where vehicle_id = #{vehicleId}
+	</delete>
+	
+	<!-- 根据车辆id查询车辆最后一次标定的时间 -->
+	<select id="getLastCalibration" parameterType="string" resultType="com.zw.platform.domain.vas.oilmassmgt.form.LastOilCalibrationForm">
+		select * from zw_m_vehicle_last_calibration t where t.vehicle_id = #{vehicleId} and t.flag = 1
+	</select>
+	
+	<!-- 根据车辆id查询标定状态为占用状态的时间 -->
+	<select id="getCalibrationUpdateTimeByVid" parameterType="string" resultType="string">
+		select t.update_data_time from zw_m_oil_box_vehicle t where t.vehicle_id = #{vehicleId} and t.flag = 1 and t.calibration_status = 1
+	</select>
+	
+</mapper>

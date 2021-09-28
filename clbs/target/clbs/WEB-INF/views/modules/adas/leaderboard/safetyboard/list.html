@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>安全看板</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/safetyboard.css"/>
+</head>
+<body>
+<!--<section id="container">-->
+<!--<input type="hidden" id="vehicleIds" th:value="${vehicleIds}">-->
+<!--<div th:replace="fragments/nav">nav</div>-->
+<!--<section class="main-content-wrapper main-content--left">-->
+<!--<div th:replace="fragments/menu_adas">menu</div>-->
+<!--</section>-->
+<!--</section>-->
+<input id="userGroupId" th:value="${session.groupId}" type="text" hidden="true"/>
+<input type="hidden" id="userName" th:value="${session.userName}" />
+<div class="container-box" id="container-box">
+    <!--地图-->
+    <div class="mapContainer" id="mapContainer"></div>
+
+    <!--logo-->
+    <div class="zw-logo">
+        <a href="/clbs/home">
+            <img id="logoImg" />
+        </a>
+    </div>
+
+    <!--时钟-->
+    <div id="timer-container" class="timer-container">
+        <div class="item">0</div>
+        <div class="item" style="margin-right:0;">0</div>
+        <div class="dot">:</div>
+        <div class="item">0</div>
+        <div class="item">0</div>
+    </div>
+
+    <!--left-->
+    <div class="content1">
+        <div class="title">实时报警数(主动安全)</div>
+        <div id="risk-number" class="risk-number f69">
+            <div class="num-box">
+                <span>0</span>
+                <span>0</span>
+            </div>
+        </div>
+        <div class="f26">昨日整天报警数(主动安全)：<span id="yestoday-number">0</span></div>
+        <div id="yestody-ratio" class="f26">
+            <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top" title="" data-original-title="今天0点至此时的主动安全报警数与昨日同时段环比所得"></i>
+            <span class="y-ratio"></span>
+            <span class="y-ratio-icon"></span>
+        </div>
+
+        <!--报警事件-->
+        <div class="safeboard-bg mt50" style="margin-left:-0.2rem;">
+            <div class="title">报警事件</div>
+            <div class="persent-content" id="riskEvents">
+                <!--<div class="flip-box">
+                    <div class="front">
+                        <div class="persent-tit">事故未发生</div>
+                    </div>
+                    <div class="backend">
+                        <div class="persent-tit">事故未发生2</div>
+                    </div>
+                </div>
+                <div class="flip-box">
+                    <div class="front">
+                        <div class="persent-item clearfix">
+                            <div class="persent-box">
+                                <span class="persent" style="width:100%"></span>
+                            </div>
+                            <span class="persent-num">8024</span>
+                        </div>
+                    </div>
+                    <div class="backend">
+                        <div class="persent-item clearfix">
+                            <div class="persent-box">
+                                <span class="persent" style="width:80%"></span>
+                            </div>
+                            <span class="persent-num">80</span>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <!--right-->
+    <div class="content2">
+        <div class="safeboard-bg" style="margin-right:-0.2rem;">
+            <!--风险占比-->
+            <div class="title">风险占比</div>
+            <div id="getRiskProportion" class="risk-ratio clearfix">
+                <!--<li class="item clearfix">
+                    <div class="box">
+                        <p>
+                            <span class="num">12.3</span>
+                            <span class="per"> %</span>
+                        </p>
+                        <p class="txt">疑似疲劳</p>
+                    </div>
+                    <div class="box">
+                        <p>
+                            <span class="num">12.3</span>
+                            <span class="per"> %</span>
+                        </p>
+                        <p class="txt">疑似疲劳</p>
+                    </div>
+                </li>-->
+            </div>
+            <!--风险处置情况-->
+            <div class="title mt50">风险处置情况</div>
+            <div id="getRisksDealInfo" class="persent-content">
+                <!--<div class="persent-tit">事故未发生</div>
+                <div class="persent-item clearfix">
+                    <div class="persent-box">
+                        <span class="persent" style="width:100%"></span>
+                    </div>
+                    <span class="persent-num">8024</span>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <!--bottom-->
+    <div class="bottom-box">
+        <ul class="status-list clearfix">
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker1.png) center no-repeat;background-size: 100% 100%;"></i>心跳</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker3.png) center no-repeat;background-size: 100% 100%;"></i>行驶</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker6.png) center no-repeat;background-size: 100% 100%;"></i>停止</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker4.png) center no-repeat;background-size: 100% 100%;"></i>超速</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker2.png) center no-repeat;background-size: 100% 100%;"></i>报警</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker5.png) center no-repeat;background-size: 100% 100%;"></i>离线</li>
+            <li class="item"><i class="ico" style="background: url(/clbs/resources/img/marker7.png) center no-repeat;background-size: 100% 100%;"></i>未定位</li>
+        </ul>
+    </div>
+</div>
+</body>
+<script src="resources/js/layui/layer/layer.js" th:src="@{/resources/js/layui/layer/layer.js}"></script>
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&amp;key=6b953aec395d345fd37e1b5434d587a9&amp;plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor,AMap.MarkerClusterer"></script>
+<script src="/clbs/resources/js/mapObject.js"></script>
+<script src="/clbs/resources/js/safetyboard.js"></script>
+<script src="/clbs/resources/js/jquery.validate.min.js"></script>
+<script src="/clbs/resources/js/tg_util.js"></script>
+<script src="/clbs/resources/js/personalized.js"></script>
+</html>

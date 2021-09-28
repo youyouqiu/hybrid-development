@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.RectangleDao">
+    <select id="getRectangleByID" parameterType="string" resultType="com.zw.platform.domain.functionconfig.Rectangle">
+        SELECT
+         *
+        FROM
+        zw_m_rectangle
+        WHERE flag=1 and
+        id = #{id}
+    </select>
+    <!-- 新增矩形 -->
+    <insert id="rectangles" parameterType="com.zw.platform.domain.functionconfig.form.RectangleForm">
+        INSERT INTO zw_m_rectangle (
+        id, name, description, type, left_longitude, left_latitude, right_longitude, right_latitude, group_id, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{name}, #{description}, #{type}, #{leftLongitude}, #{leftLatitude}, #{rightLongitude}, #{rightLatitude}, #{groupId},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    <!-- 更新矩形区域 -->
+    <update id="updateRectangle" parameterType="com.zw.platform.domain.functionconfig.form.RectangleForm">
+        UPDATE zw_m_rectangle
+        SET
+         	name = #{name}, 
+         	description = #{description}, 
+         	type = #{type}, 
+         	left_longitude = #{leftLongitude}, 
+         	left_latitude = #{leftLatitude}, 
+         	right_longitude = #{rightLongitude}, 
+         	right_latitude = #{rightLatitude},
+         	update_data_time = #{updateDataTime},
+         	update_data_username = #{updateDataUsername}
+    	WHERE id = #{rectangleId}
+    </update>
+    <!-- 新增电子围栏总表 -->
+    <insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.FenceInfoForm">
+        INSERT INTO zw_m_fence_info (
+        id, type, shape, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{type}, #{shape}, #{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    
+    <!-- 根据id list 查询矩形 -->
+    <select id="getRectangleByIds" resultType="com.zw.platform.domain.functionconfig.Rectangle">
+        SELECT
+         *
+        FROM
+        zw_m_rectangle
+        WHERE flag=1 
+        AND id IN 
+        <foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+        
+    </select>
+</mapper>

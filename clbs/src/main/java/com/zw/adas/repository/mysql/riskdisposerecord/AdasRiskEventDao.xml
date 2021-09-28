@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskdisposerecord.AdasRiskEventDao">
+    <!-- 新增 -->
+    <insert id="add"
+            parameterType="com.zw.adas.domain.riskManagement.form.AdasRiskEventForm">
+		INSERT INTO zw_m_risk_event (
+		id, risk_Type,
+		risk_event,description, function_id,
+		create_data_time,create_data_username,flag)
+		VALUES(
+		#{id},#{riskType},
+		#{riskEvent},#{description},
+		#{functionId},#{createDataTime},#{createDataUsername},#{flag})
+	</insert>
+    <!-- 批量新增 -->
+    <insert id="addByBatch"
+            parameterType="com.zw.adas.domain.riskManagement.form.AdasRiskEventImportForm">
+        INSERT INTO zw_m_risk_event (
+        id, risk_Type,
+        risk_event, description,
+        function_id,
+        create_data_time,create_data_username,flag)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},#{item.riskType}, #{item.riskEvent},
+            #{item.description}, #{item.functionId},
+            #{item.createDataTime},
+            #{item.createDataUsername},
+            #{item.flag})
+        </foreach>
+    </insert>
+    <!-- 跟新风向任务 -->
+    <update id="update"
+            parameterType="com.zw.adas.domain.riskManagement.form.AdasRiskEventForm">
+		Update zw_m_risk_event set
+		risk_Type=#{riskType},risk_event=#{riskEvent},
+		description=#{description},function_id=#{functionId},update_data_time=#{updateDataTime},update_data_username
+		= #{updateDataUsername} where id=#{id}
+	</update>
+    <!-- 查询 -->
+    <select id="find"
+            parameterType="com.zw.adas.domain.riskManagement.query.AdasRiskEventQuery"
+            resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+        SELECT * FROM zw_m_risk_event
+        WHERE flag=1
+
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND risk_event LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY risk_type,create_data_time DESC
+    </select>
+
+    <!-- 查询 -->
+    <select id="findAll" resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+		SELECT * FROM zw_m_risk_event
+		<if test="flag != null and flag !=''">
+            <where>
+                flag =#{flag}
+            </where>
+        </if>
+		ORDER BY risk_type,create_data_time desc
+	</select>
+
+    <select id="get" parameterType="string"
+            resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+		SELECT * FROM zw_m_risk_event WHERE id = #{id} and flag = 1
+	</select>
+
+    <!-- 根据查询 -->
+    <select id="findByRiskEvent" parameterType="string"
+            resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+        SELECT A.* FROM zw_m_risk_event A
+        WHERE flag = 1
+        <if test="riskEvent != null and riskEvent != ''">
+            AND risk_event = #{riskEvent}
+        </if>
+    </select>
+    <!-- 根据id查询风险事件信息 -->
+    <select id="findById" parameterType="string"
+            resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+		SELECT A.* FROM zw_m_risk_event A
+		WHERE flag = 1
+		AND A.id =
+		#{id}
+	</select>
+
+    <!-- <select id="findByTypeAndEvent" parameterType="string" resultType="com.zw.platform.domain.riskManagement.RiskEvent">
+        SELECT * FROM zw_m_risk_event WHERE flag = 1 and risk_type = #{riskType}
+        and risk_event = #{riskEvent} </select> -->
+    <delete id="delete" parameterType="string">
+		UPDATE zw_m_risk_event set
+		flag=0 WHERE id = #{id}
+	</delete>
+    <select id="isExist" parameterType="string"
+            resultType="com.zw.adas.domain.riskManagement.AdasRiskEvent">
+        SELECT * FROM zw_m_risk_event WHERE flag = 1 and
+        risk_type = #{0} and
+        risk_event = #{1}
+        <!-- and id <![CDATA[ <> ]]> #{id} -->
+    </select>
+    <select id="isRepeate"
+            parameterType="com.zw.adas.domain.riskManagement.form.AdasRiskEventForm"
+            resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM zw_m_risk_event WHERE flag = 1 AND id
+		!= #{id} AND
+		risk_type = #{riskType} and risk_event = #{riskEvent}
+	</select>
+
+    <select id="getDocRiskEventMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,CONCAT(risk_event,'(',SUBSTR(risk_type,1,2),')')as riskType from zw_m_risk_event
+	</select>
+
+    <select id="getRiskEventMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,risk_event as riskEvent ,risk_type as riskType from zw_m_risk_event
+	</select>
+
+    <select id="getRiskTypeMap" resultType="hashmap">
+		SELECT CONCAT(function_id,"") as functionId,risk_type as riskType from zw_m_risk_event
+	</select>
+
+    <select id="findAllEvent" resultType="java.util.Map">
+        SELECT risk_type riskType,function_id eventId FROM zw_m_risk_event where flag =1 and risk_type_num in (1,2,3,4,6)
+    </select>
+
+    <select id="getRiskEvent" parameterType="string" resultType="string">
+        SELECT risk_event from zw_m_risk_event where function_id = #{functionId}
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+<wsdl:definitions
+        targetNamespace="http://zw.com/namespace/service"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns:tns="http://zw.com/namespace/service"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        name="HistoryVideoService">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://zw.com/namespace/service">
+            <!-- xsd part start -->
+            <xsd:element name="pushHistoryVideo" type="tns:pushHistoryVideo" />
+            <xsd:element name="historyVideoResponse" type="tns:historyVideoResponse" />
+            <xsd:complexType name="pushHistoryVideo">
+                <xsd:sequence>
+                    <xsd:element name="id" type="xsd:string" />
+                    <xsd:element name="pwd" type="xsd:string" />
+                    <xsd:element name="carno" type="xsd:string" />
+                    <xsd:element name="camera" type="xsd:integer" />
+                    <xsd:element name="color" type="xsd:string" />
+                    <xsd:element name="devicenum" type="xsd:string" />
+                    <xsd:element name="risknum" type="xsd:string" />
+                    <xsd:element name="visitid" type="xsd:string" />
+                    <xsd:element name="starttime" type="xsd:long" />
+                    <xsd:element name="endtime" type="xsd:long" />
+                    <xsd:element name="filepath" type="xsd:string" />
+                    <xsd:element name="type" type="xsd:integer" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="historyVideoResponse">
+                <xsd:sequence>
+                    <xsd:element name="historyVideo" type="tns:historyVideo" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="historyVideo">
+                <xsd:sequence>
+                    <xsd:element name="resp_code" type="xsd:integer" />
+                    <xsd:element name="resp_msg" type="xsd:string" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <!-- xsd part end -->
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="pushHistoryVideo">
+        <wsdl:part element="tns:pushHistoryVideo" name="parameters" />
+    </wsdl:message>
+    <wsdl:message name="historyVideoResponse">
+        <wsdl:part element="tns:historyVideoResponse" name="parameters" />
+    </wsdl:message>
+    <wsdl:portType name="IHistoryVideoService">
+        <wsdl:operation name="pushHistoryVideo">
+            <wsdl:input message="tns:pushHistoryVideo" />
+            <wsdl:output message="tns:historyVideoResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="historyVideoServiceSOAP" type="tns:IHistoryVideoService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="pushHistoryVideo">
+            <wsdl:input><soap:body use="literal" /></wsdl:input>
+            <wsdl:output><soap:body use="literal" /></wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HistoryVideoService">
+        <wsdl:port binding="tns:historyVideoServiceSOAP" name="historyVideoServicePort">
+            <soap:address location="http://192.168.24.34:8080/clbs/webservice/VideoDataService.wsdl" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.IntercomPersonnelDao">
+    <sql id="Example_Where_Clause">
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="condition.name != null">
+                and name = #{condition.name}
+            </if>
+            <if test="condition.birthday != null">
+                and birthday = #{condition.birthday}
+            </if>
+            <if test="condition.gender != null">
+                and gender = #{condition.gender}
+            </if>
+            <if test="condition.identity != null">
+                and identity = #{condition.identity}
+            </if>
+            <if test="condition.phone != null">
+                and phone = #{condition.phone}
+            </if>
+            <if test="condition.address != null">
+                and address = #{condition.address}
+            </if>
+            <if test="condition.email != null">
+                and email = #{condition.email}
+            </if>
+            <if test="condition.flag != null">
+                and flag = #{condition.flag}
+            </if>
+            <if test="condition.createDataTime != null">
+                and create_data_time = #{condition.createDataTime}
+            </if>
+            <if test="condition.createDataUsername != null">
+                and create_data_username = #{condition.createDataUsername}
+            </if>
+            <if test="condition.updateDataTime != null">
+                and update_data_time = #{condition.updateDataTime}
+            </if>
+            <if test="condition.updateDataUsername != null">
+                and update_data_username = #{condition.updateDataUsername}
+            </if>
+        </trim>
+    </sql>
+    <sql id="Base_Column_List">
+        id, name, birthday, gender, identity, phone, address, email, flag, create_data_time,
+        create_data_username, update_data_time, update_data_username
+    </sql>
+    <!-- 查询  -->
+    <select id="find" parameterType="com.zw.talkback.domain.basicinfo.query.PersonnelQuery"
+            resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT * FROM zw_m_people_info
+        WHERE flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and (name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            or phone LIKE CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+    <!-- 查询所有监控对象人（游离的+权限内分组下的人）  -->
+    <select id="findPeosonnelByGroup" parameterType="com.zw.talkback.domain.basicinfo.query.PersonnelQuery"
+            resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT t.*, device.device_number AS deviceNumber, sim.simcard_number AS simcardNumber, t.org_id AS groupId,
+        GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assign, ji.job_name as jobName,skp.skillIds, skp.skillNames,
+        blood.bloodTypeId,blood.bloodTypeName,driver.driverTypeIds,driver.driverTypeNames,qualification.qualificationId,
+        qualification.qualificationName,nation.nationId,nation.nationName
+        FROM
+        zw_m_people_info t
+        inner join zw_m_job_info ji on ji.id = t.job_id and ji.flag = 1
+        LEFT JOIN zw_m_config con ON t.id = con.vehicle_id AND con.flag = 1 AND con.monitor_type = '1'
+        LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+        LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle mav ON t.id = mav.vehicle_id AND mav.flag = 1
+        LEFT JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+        left join
+        (select bi.people_id as pId, group_concat(sk.id) as skillIds, group_concat(sk.name) as skillNames
+        from zw_m_skill sk
+        inner join zw_m_people_basic_info bi on sk.id = bi.basic_id and bi.flag = 1
+        where sk.flag = 1
+        and bi.type = 1
+        group by bi.people_id
+        ) skp on skp.pId = t.id
+
+        left join
+        (select bi.people_id as pId, group_concat(d.id) as driverTypeIds, group_concat(d.value) as driverTypeNames
+        from zw_c_dictionary d
+        inner join zw_m_people_basic_info bi on d.id = bi.basic_id and bi.flag = 1
+        where
+        bi.type = 2
+        group by bi.people_id
+        ) driver on driver.pId = t.id
+
+        left join
+        (select p.id as pId, d.id as bloodTypeId, d.value as bloodTypeName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.blood_type_id = d.id and p.flag = 1
+        ) blood on blood.pid = t.id
+
+        left join
+        (select p.id as pId, d.id as nationId, d.value as nationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.nation_id = d.id and p.flag = 1
+        ) nation on nation.pid = t.id
+
+        left join
+        (select p.id as pId, d.id as qualificationId, d.value as qualificationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.qualification_id = d.id and p.flag = 1
+        ) qualification on qualification.pid = t.id
+        WHERE t.flag = 1
+        AND t.id IN
+        (SELECT p.id FROM zw_m_people_info p
+        INNER JOIN zw_m_assignment_vehicle av ON p.id = av.vehicle_id AND av.flag = 1 AND av.monitor_type = '1'
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        WHERE p.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.groupId != null and param.groupId !=''">
+                AND a.org_id = #{param.groupId}
+            </if>
+        </if>
+        UNION
+        SELECT p1.id FROM zw_m_people_info p1
+        AND NOT EXISTS
+        (SELECT av1.id FROM zw_m_assignment_vehicle av1 WHERE p1.id = av1.vehicle_id AND av1.flag = 1)
+        AND p1.org_od IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.groupId != null and param.groupId !=''">
+                AND p1.org_od = #{param.groupId}
+            </if>
+        </if>
+        )
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+                and ( t.name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                OR t.people_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+        GROUP BY t.id,
+        device.id,
+        sim.id,cpg.id
+        ORDER BY t.create_data_time DESC
+    </select>
+
+    <!-- 查询所有监控对象人（所选分组下的人）  -->
+    <select id="findPeosonnelByAssign" parameterType="com.zw.talkback.domain.basicinfo.query.PersonnelQuery"
+            resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT t.*, device.device_number AS deviceNumber, sim.simcard_number AS simcardNumber, t.org_id AS groupId,
+        GROUP_CONCAT(DISTINCT ma.name SEPARATOR ',') AS assign
+        FROM
+        zw_m_people_info t
+        INNER JOIN zw_m_config con ON t.id = con.vehicle_id AND con.flag = 1 AND con.monitor_type = '1'
+        INNER JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        INNER JOIN zw_m_assignment_vehicle mav ON t.id = mav.vehicle_id AND mav.flag = 1 AND mav.monitor_type = '1'
+        INNER JOIN zw_m_assignment_user au ON mav.assignment_id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = mav.assignment_id AND a.flag = 1
+        WHERE t.flag = 1
+        AND au.user_id = #{userId}
+        <if test="param != null">
+            <if test="param.assignId != null and param.assignId !=''">
+                AND a.id = #{param.assignId}
+            </if>
+        </if>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+                and ( t.name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                OR t.people_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+        GROUP BY t.id,
+        device.id,
+        sim.id,cpg.id
+        ORDER BY t.create_data_time DESC
+    </select>
+
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.talkback.domain.basicinfo.form.PersonnelForm">
+        INSERT INTO zw_m_people_info (
+        id, people_number, name, gender, identity, phone, email,remark,create_data_time,create_data_username,
+        is_incumbency, job_id, qualification_id, blood_type_id, nation_id
+        )
+        VALUES(
+         #{id}, #{peopleNumber}, #{name}, #{gender}, #{identity}, #{phone},
+         #{email},#{remark},#{createDataTime},#{createDataUsername}, #{isIncumbency}, #{jobId},
+         #{qualificationId}, #{bloodTypeId}, #{nationId}
+        )
+    </insert>
+
+    <!-- 根据id删除一个 Peopel -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_people_info set flag=0 WHERE id = #{id}
+    </delete>
+
+    <!-- 根据ids删除多个 Peopel -->
+    <delete id="deleteMuch" parameterType="string">
+        UPDATE zw_m_people_info set flag=0 WHERE id IN
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 修改 PER -->
+    <update id="update" parameterType="com.zw.talkback.domain.basicinfo.form.PersonnelForm">
+        UPDATE zw_m_people_info SET
+        <if test="peopleNumber != null and peopleNumber != ''">
+            people_number=#{peopleNumber},
+        </if>
+        name = #{name}, birthday = #{birthday}, identity = #{identity},
+        gender=#{gender},
+        phone = #{phone}, address = #{address}, email = #{email},remark=#{remark},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        job_id = #{jobId},
+        is_incumbency = #{isIncumbency},
+        blood_type_id = #{bloodTypeId},
+        nation_id = #{nationId},
+        qualification_id = #{qualificationId}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 通过id得到一个 User-->
+    <select id="get" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT p.*,p.org_id groupId,c.id bindId, ji.job_name jobName, skp.skillIds, skp.skillNames,
+        blood.bloodTypeId,blood.bloodTypeName,driver.driverTypeIds,driver.driverTypeNames,qualification.qualificationId,
+        qualification.qualificationName,nation.nationId,nation.nationName
+        FROM zw_m_people_info p
+        inner join zw_m_job_info ji on ji.id = p.job_id and ji.flag = 1
+		LEFT JOIN zw_m_config c ON c.vehicle_id = p.id AND c.flag = 1
+		 left join
+         (select bi.people_id as pId, group_concat(sk.id) as skillIds, group_concat(sk.name) as skillNames
+        from zw_m_skill sk
+        inner join zw_m_people_basic_info bi on sk.id = bi.basic_id and bi.flag = 1
+        where sk.flag = 1
+				and bi.type = 1
+        group by bi.people_id
+        ) skp on skp.pId = p.id
+
+		left join
+        (select bi.people_id as pId, group_concat(d.id) as driverTypeIds, group_concat(d.value) as driverTypeNames
+        from zw_c_dictionary d
+        inner join zw_m_people_basic_info bi on d.id = bi.basic_id and bi.flag = 1
+        where
+		bi.type = 2
+        group by bi.people_id
+        ) driver on driver.pId = p.id
+
+        left join
+        (select p.id as pId, d.id as bloodTypeId, d.value as bloodTypeName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.blood_type_id = d.id and p.flag = 1
+        ) blood on blood.pid = p.id
+
+        left join
+        (select p.id as pId, d.id as nationId, d.value as nationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.nation_id = d.id and p.flag = 1
+        ) nation on nation.pid = p.id
+
+        left join
+        (select p.id as pId, d.id as qualificationId, d.value as qualificationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.qualification_id = d.id and p.flag = 1
+        ) qualification on qualification.pid = p.id
+		WHERE 
+		p.flag = 1
+		AND p.id = #{id}
+    </select>
+
+    <!-- 通过id得到一个 User-->
+    <select id="getPeople" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT p.*,p.org_id groupId,c.id bindId FROM zw_m_people_info p
+        LEFT JOIN zw_m_config c ON c.vehicle_id = p.id AND c.flag = 1
+        WHERE
+        p.flag = 1
+        AND p.id IN
+        <foreach item="item" collection="peopleList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据身份证编号查询人员信息 -->
+    <select id="findByIdentity" parameterType="string"
+            resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT personnel.* FROM zw_m_people_info personnel
+        WHERE flag = 1
+        <if test="identity != null and identity != ''">
+            AND identity = #{identity}
+        </if>
+    </select>
+
+    <!-- 根据人员编号查询人员信息 -->
+    <select id="findByPeopleNumber" parameterType="string"
+            resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT personnel.* FROM zw_m_people_info personnel
+        WHERE flag = 1
+        <if test="peopleNumber != null and peopleNumber != ''">
+            AND BINARY people_number=#{peopleNumber}
+        </if>
+    </select>
+
+    <!-- 批量新增 -->
+    <insert id="addByBatch" parameterType="com.zw.talkback.domain.basicinfo.form.PersonnelForm">
+        INSERT INTO zw_m_people_info (
+        id, name, birthday, gender, identity, phone, address,
+        email,create_data_time,create_data_username,people_number,remark, job_id,
+        is_incumbency
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.name}, #{item.birthday}, #{item.gender}, #{item.identity}, #{item.phone},
+            #{item.address},
+            #{item.email},#{item.createDataTime},#{item.createDataUsername},#{item.peopleNumber},#{item.remark},
+            #{item.jobId}, #{item.isIncumbency})
+        </foreach>
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="upDateByBatch" parameterType="com.zw.talkback.domain.basicinfo.form.PersonnelForm">
+        update zw_m_people_info
+        set is_incumbency = 2
+        where id in
+        <foreach collection="list" item="item" index="index"
+                 separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </insert>
+    <!-- 去重 -->
+    <select id="findByPersonnel" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and identity = #{identity}
+    </select>
+    <select id="isExist" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and identity = #{identity} and id <![CDATA[ <> ]]> #{id}
+    </select>
+
+    <!-- 编号不能重复 -->
+    <select id="findByNumber" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        <!-- SELECT * FROM zw_m_people_info WHERE flag = 1 and people_number = #{peopleNumber} -->
+        select pi.*,pi.org_id groupId from zw_m_people_info pi where pi.flag = 1
+        and BINARY pi.people_number = #{peopleNumber}
+    </select>
+
+    <!-- 出去当前用户，编号是否重复 -->
+    <select id="findByNumberId" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT * FROM zw_m_people_info WHERE flag = 1 and BINARY people_number = #{number} and id <![CDATA[ <> ]]> #{id}
+    </select>
+
+    <select id="findNumberByPid" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+		SELECT sim.simcard_number,device.device_number,device.device_type from zw_m_people_info  p
+		LEFT JOIN zw_m_config con  ON p.id = con.vehicle_id AND con.flag =1
+		LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+		LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+		where p.id=#{id} AND p.flag=1
+	</select>
+
+    <select id="findPeopleById" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT  * from  zw_m_people_info where flag=1 and id =#{id}
+    </select>
+
+    <select id="findAllPeopleNumber" resultType="string">
+        SELECT people_number from  zw_m_people_info where flag=1
+    </select>
+
+    <update id="deleteLeaveJob" parameterType="string">
+        update zw_m_leave_job_assignment
+        set
+        flag = 0
+        where
+        flag = 1
+        and people_id in
+        <foreach collection="list" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateWorkStaeToOnLine" parameterType="string">
+        update zw_m_people_info
+        set
+        is_incumbency = 2
+        where
+        id = #{id}
+        and flag = 1
+    </update>
+
+    <select id="findIntercomPersonnelWithOutAuth" resultType="map">
+        SELECT
+        t.id,t.people_number AS peopleNumber,t.name,t .birthday, t.gender, t.identity,t.phone,t.address,t.email,t.flag, t.create_data_time AS 	createDataTime,DATE_FORMAT( t.create_data_time, '%Y-%m-%d') AS createDataTimeStr, t.update_data_time AS updateDataTime,
+        DATE_FORMAT(t.update_data_time,'%Y-%m-%d') AS updateDataTimeStr,device.device_number AS deviceNumber,sim.simcard_number AS simcardNumber,
+        t.org_id AS groupName,t.org_id AS groupId, GROUP_CONCAT(ma.name SEPARATOR ',') AS assign,
+        GROUP_CONCAT(DISTINCT 	ma.org_id SEPARATOR ',') AS assignGroup, GROUP_CONCAT(ma.id SEPARATOR ',') AS assignId,
+        t.remark AS remark,
+        t.is_incumbency AS isIncumbency,ji.id AS jobId,ji.job_name AS jobName,driver.driverTypeIds,driver.driverTypeNames,
+        skp.skillIds,skp.skillNames,blood.bloodTypeId,blood.bloodTypeName,nation.nationId,nation.nationName,qualification.qualificationId,
+        qualification.qualificationName
+        FROM zw_m_people_info t
+        LEFT JOIN zw_m_config con ON con.vehicle_id=t.id AND con.flag =1 AND con.monitor_type = 1
+        LEFT JOIN zw_m_device_info device ON device.id = con.device_id AND device.flag = 1
+        LEFT JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        LEFT JOIN zw_m_assignment_vehicle mav ON mav.vehicle_id= t.id AND mav.flag=1
+        LEFT JOIN zw_m_assignment ma ON ma.id = mav.assignment_id AND ma.flag = 1
+        left join
+         (select bi.people_id as pId, group_concat(sk.id) as skillIds, group_concat(sk.name) as skillNames
+        from zw_m_skill sk
+        inner join zw_m_people_basic_info bi on sk.id = bi.basic_id and bi.flag = 1
+        where sk.flag = 1
+				and bi.type = 1
+        group by bi.people_id
+        ) skp on skp.pId = t.id
+
+		left join
+        (select bi.people_id as pId, group_concat(d.id) as driverTypeIds, group_concat(d.value) as driverTypeNames
+        from zw_c_dictionary d
+        inner join zw_m_people_basic_info bi on d.id = bi.basic_id and bi.flag = 1
+        where
+		bi.type = 2
+        group by bi.people_id
+        ) driver on driver.pId = t.id
+
+        left join
+        (select p.id as pId, d.id as bloodTypeId, d.value as bloodTypeName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.blood_type_id = d.id and p.flag = 1
+        ) blood on blood.pid = t.id
+
+        left join
+        (select p.id as pId, d.id as nationId, d.value as nationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.nation_id = d.id and p.flag = 1
+        ) nation on nation.pid = t.id
+
+        left join
+        (select p.id as pId, d.id as qualificationId, d.value as qualificationName
+        from zw_c_dictionary d
+        inner join zw_m_people_info p on p.qualification_id = d.id and p.flag = 1
+        ) qualification on qualification.pid = t.id
+
+        INNER JOIN zw_m_job_info ji ON ji.id = t.job_id AND ji.flag = 1
+        WHERE t.flag = 1
+        AND t.id IN (
+        SELECT id FROM zw_m_people_info WHERE id IN (
+        SELECT av.vehicle_id FROM zw_m_assignment_vehicle av
+            INNER JOIN zw_m_assignment_user au ON au.assignment_id=av.assignment_id AND au.flag = 1
+            WHERE av.flag =1
+            ) OR id IN (
+            SELECT p1.id FROM zw_m_people_info p1
+            WHERE p1.flag = 1
+            AND NOT EXISTS (SELECT 1 FROM zw_m_assignment_vehicle av1 WHERE av1.vehicle_id=p1.people_id AND av1.flag = 1)
+            )
+          )
+        GROUP BY t.create_data_time DESC,t.id DESC
+    </select>
+    <select id="getLeaveJobPersonnelList" resultType="com.zw.talkback.domain.basicinfo.LeaveJobPersonnel">
+        SELECT zmlja.people_id AS peopleId, zmlja.assignment_id AS assignmentId,
+        zmpi.people_number AS peopleNumber,zma.name AS assignmentName
+        FROM zw_m_leave_job_assignment zmlja
+        INNER JOIN zw_m_people_info zmpi ON zmpi.id = zmlja.people_id AND zmpi.flag = 1
+        INNER JOIN zw_m_assignment zma ON zma.id = zmlja.assignment_id AND zma.flag = 1
+        WHERE zmlja.flag = 1
+        AND zmlja.assignment_id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="countLeaveJobPeopleNum" resultType="java.lang.Integer">
+        SELECT count(zmlja.people_id) FROM zw_m_leave_job_assignment zmlja
+        INNER JOIN zw_m_people_info zmpi ON zmpi.id = zmlja.people_id AND zmpi.flag = 1
+        WHERE zmlja.flag = 1
+        AND zmlja.assignment_id = #{assignmentId}
+    </select>
+
+    <update id="updateWorkStae">
+        update zw_m_people_info
+        set
+        is_incumbency = #{state}
+        where id = #{id}
+        and flag = 1
+    </update>
+
+    <insert id="saveLeaveJob" parameterType="com.zw.talkback.domain.basicinfo.LeaveJobPersonnel">
+        insert into zw_m_leave_job_assignment (id, assignment_id,
+        people_id,flag,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},
+            #{item.assignmentId},
+            #{item.peopleId},
+            #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="findJobByPeopleId" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.Personnel">
+        SELECT j.job_name,j.job_icon_name
+        from zw_m_people_info p
+        inner join zw_m_job_info j on j.id = p.job_id and j.flag = 1
+        where p.flag=1 and p.id =#{id}
+    </select>
+
+    <select id="findPeopleDesignateIds" parameterType="string" resultType="string">
+        SELECT id
+        from zw_m_people_designate_info
+        where flag=1 and people_id =#{id}
+    </select>
+
+
+    <select id="findPeopleScheduledIds" parameterType="string" resultType="string">
+        SELECT id
+        from zw_m_people_scheduled_info
+        where flag=1 and people_id =#{id}
+    </select>
+    <select id="getAllPeopleIds" resultType="java.lang.String">
+        select id from zw_m_people_info where flag=1
+    </select>
+    <select id="getPeopleIdListByJobId" resultType="java.lang.String">
+        SELECT DISTINCT id FROM zw_m_people_info WHERE flag = 1 AND job_id = #{jobId}
+    </select>
+
+    <select id="getPeopleIdByGroupId" resultType="java.lang.String">
+        SELECT DISTINCT zmav.vehicle_id FROM zw_m_assignment_vehicle zmav
+        INNER JOIN zw_m_people_info zmpi ON zmav.vehicle_id = zmpi.id AND zmpi.flag = 1
+        INNER JOIN zw_m_assignment zma ON zmav.assignment_id = zma.id AND zma.flag = 1
+        WHERE zmav.flag = 1 AND zma.org_id in
+        <foreach collection="list" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findIntercomInfoByPeopleId" resultType="com.zw.talkback.domain.intercom.form.IntercomObjectForm">
+        select i.*,s.simcard_number
+        from zw_m_intercom_info i
+        inner join zw_m_config c on c.intercom_info_id = i.id and c.flag = 1
+        inner join zw_m_sim_card_info s on s.id = i.simcard_id and s.flag = 1
+        where i.flag = 1 and i.user_id is not null
+        and c.vehicle_id = #{id}
+    </select>
+
+
+    <select id="findKnobNum" resultType="integer">
+        select om.knob_num from zw_m_original_model om
+        inner join zw_m_intercom_info i on i.original_model_id = om.index and i.flag = 1
+        inner join zw_m_config c on c.intercom_info_id = i.id and c.flag = 1
+        where om.flag = 1
+        and c.vehicle_id = #{id}
+    </select>
+
+    <select id="getVehicleKnobNumbers" resultType="integer">
+        select av.knob_no from zw_m_assignment_vehicle av
+        where av.flag = 1
+        and av.vehicle_id = #{id}
+    </select>
+
+    <update id="deletePeopleScheduled" parameterType="String">
+        update zw_m_monitor_scheduled_info
+        set
+        flag = 0
+        where
+        monitor_id in
+        <foreach collection="list" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateLeaveJobScheduled" parameterType="String">
+        update zw_m_people_scheduled_info
+        set
+        flag = 2
+        where
+        flag = 1
+        and
+        people_id in
+        <foreach collection="list" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="deletePeopleDesignate" parameterType="String">
+        update zw_m_people_designate_info
+        set
+        flag = 0
+        where people_id = #{id}
+        and flag = 1
+    </update>
+
+    <update id="deleteLeaveJobScheduled" parameterType="String">
+        update zw_m_people_scheduled_info
+        set
+        flag = 0
+        where people_id = #{id}
+        and flag = 2
+    </update>
+
+    <update id="deletePeopleDesignateByIds" parameterType="String">
+        update zw_m_monitor_designate_info
+        set
+        flag = 0
+        where
+        flag = 1
+        and
+        monitor_id in
+        <foreach collection="list" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findInterlocutorByCondition" resultType="com.zw.talkback.domain.basicinfo.InterlocutorInfo">
+        SELECT DISTINCT zmpi.id monitorId,zmpi.people_number monitorName,zmii.user_id interlocutorId,
+        zmpi.create_data_time createDataTime,zmc.monitor_type as monitorType
+        FROM (
+        SELECT car.id id, car.brand people_number,create_data_time, '' as qualification_id,'' as blood_type_id,'' as
+        gender, '' as identity FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number people_number,create_data_time,qualification_id,blood_type_id,
+        gender,identity FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number people_number,create_data_time, '' as qualification_id,'' as blood_type_id,'' as
+        gender,'' as identity FROM zw_m_thing_info th WHERE th.flag = 1
+        ) zmpi
+        INNER JOIN zw_m_assignment_vehicle zmav ON zmpi.id = zmav.vehicle_id AND zmav.flag = 1
+        INNER JOIN zw_m_assignment zma ON zmav.assignment_id = zma.id AND zma.flag != 0
+        INNER JOIN zw_m_config zmc ON zmpi.id = zmc.vehicle_id AND zmc.flag = 1
+        INNER JOIN zw_m_intercom_info zmii ON zmc.intercom_info_id = zmii.id AND zmii.flag = 1
+        LEFT JOIN zw_m_intercom_model zmim ON zmim.original_model_id = zmii.original_model_id AND zmim.flag = 1
+        LEFT JOIN zw_m_people_basic_info zmpbiskill ON zmpi.id = zmpbiskill.people_id AND (zmpbiskill.flag = 1 AND
+        zmpbiskill.type = 1)
+        LEFT JOIN zw_m_skill zms ON zmpbiskill.basic_id = zms.id AND zms.flag = 1
+        LEFT JOIN zw_m_people_basic_info zmpbidriver ON zmpi.id = zmpbidriver.people_id AND (zmpbidriver.flag = 1 AND
+        zmpbidriver.type = 2)
+        LEFT JOIN zw_c_dictionary zcddriver ON zmpbidriver.basic_id = zcddriver.id
+        WHERE zmii.user_id IS NOT NULL
+        <if test="monitorIdList != null and monitorIdList.size() > 0">
+            and zmpi.id in
+            <foreach collection="monitorIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIdList != null and assignmentIdList.size() > 0">
+            and zma.id in
+            <foreach collection="assignmentIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="skillIdList != null and skillIdList.size() > 0">
+            and zms.id in
+            <foreach collection="skillIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="intercomModelIdList != null and intercomModelIdList.size() > 0">
+            and zmim.id in
+            <foreach collection="intercomModelIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="driverLicenseCategoryIdList != null and driverLicenseCategoryIdList.size() > 0">
+            and zcddriver.id in
+            <foreach collection="driverLicenseCategoryIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="qualificationIdList != null and qualificationIdList.size() > 0">
+            and zmpi.qualification_id in
+            <foreach collection="qualificationIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="bloodTypeIdList != null and bloodTypeIdList.size() > 0">
+            and zmpi.blood_type_id in
+            <foreach collection="bloodTypeIdList" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="ageRangeList != null and ageRangeList.size() > 0">
+            and (DATE_FORMAT(NOW(), '%Y') - substring(identity,7,4)) &lt;= #{ageRangeList[1]}
+            and (DATE_FORMAT(NOW(), '%Y') - substring(identity,7,4)) &gt;= #{ageRangeList[0]}
+        </if>
+        <if test="gender != null and gender != ''">
+            and zmpi.gender = #{gender}
+        </if>
+    </select>
+
+    <select id="getInterlocutorInfoByInterlocutorIdList"
+            resultType="com.zw.talkback.domain.basicinfo.InterlocutorInfo">
+        SELECT DISTINCT zmpi.id monitorId,zmpi.people_number monitorName,zmii.user_id interlocutorId,
+        zmom.knob_num knobNum,GROUP_CONCAT(DISTINCT zmav.knob_no) knobNos,zmii.number userNumber,
+        zmpi.create_data_time createDataTime,zmc.monitor_type as monitorType
+        FROM (
+        SELECT car.id id, car.brand people_number,create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number people_number,create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number people_number,create_data_time FROM zw_m_thing_info th WHERE th.flag = 1
+        ) zmpi
+        INNER JOIN zw_m_assignment_vehicle zmav ON zmpi.id = zmav.vehicle_id AND zmav.flag = 1
+        INNER JOIN zw_m_assignment zma ON zmav.assignment_id = zma.id AND zma.flag != 0
+        INNER JOIN zw_m_config zmc ON zmpi.id = zmc.vehicle_id AND zmc.flag = 1
+        INNER JOIN zw_m_intercom_info zmii ON zmc.intercom_info_id = zmii.id AND zmii.flag = 1
+        LEFT JOIN zw_m_original_model zmom ON zmom.index = zmii.original_model_id AND zmom.flag = 1
+        WHERE zmii.user_id IS NOT NULL
+        AND zmii.user_id IN
+        <foreach collection="interlocutorIdList" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+        GROUP BY zmpi.id
+    </select>
+    <select id="getInterlocutorInfoByInterlocutorId"
+            resultType="com.zw.talkback.domain.basicinfo.InterlocutorInfo">
+        SELECT  zmpi.id monitorId, zmpi.people_number monitorName, zmii.user_id interlocutorId,
+       zmii.number userNumber, zmpi.create_data_time createDataTime,zmc.monitor_type as monitorType
+       FROM (
+        SELECT car.id id, car.brand people_number,create_data_time  FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number people_number,create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number people_number,create_data_time FROM zw_m_thing_info th WHERE th.flag = 1
+        ) zmpi
+       INNER JOIN zw_m_config zmc ON zmpi.id = zmc.vehicle_id AND zmc.flag = 1
+       INNER JOIN zw_m_intercom_info zmii ON zmc.intercom_info_id = zmii.id AND zmii.flag = 1
+       WHERE  zmii.user_id = #{interlocutorId}
+    </select>
+
+    <select id="findAssignmentUseKnobNo" resultType="com.zw.talkback.domain.intercom.info.IntercomObjectInfo">
+        SELECT ass.id as assignmentId,GROUP_CONCAT(asv.knob_no) AS knobNos,om.knob_num,p.id AS monitorId
+        FROM zw_m_assignment ass
+        INNER JOIN zw_m_assignment_vehicle asv ON asv.assignment_id = ass.id AND asv.flag = 1
+        INNER JOIN zw_m_people_info p ON p.id = asv.vehicle_id AND p.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_intercom_info ini ON ini.id = c.intercom_info_id AND ini.flag = 1
+        INNER JOIN zw_m_original_model om ON om.`index` = ini.original_model_id AND om.flag = 1
+        WHERE ass.flag =1
+        AND ini.id = #{intercomInfoId}
+    </select>
+
+    <update id="updatePeopleincumbency" parameterType="String">
+        update zw_m_people_info
+        set
+        is_incumbency = 1
+        where flag = 1
+        and id in
+        <foreach collection="peopleIds" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+
+    </update>
+
+    <!-- 根据车辆id获取信息配置表id -->
+    <select id="getConfigIdByVehicleId" parameterType="string" resultType="java.lang.String">
+		select id from zw_m_config t where t.vehicle_id = #{vehicleId} and t.flag = 1
+	</select>
+
+
+    <!-- 根据车辆ids获取信息配置表id -->
+    <select id="getConfigIdByVehicleIds" parameterType="string" resultType="java.lang.String">
+        select id from zw_m_config t where
+        t.vehicle_id in
+        <foreach item="item" collection="ids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and t.flag = 1
+    </select>
+
+    <update id="updateIncumbency" parameterType="string">
+        update zw_m_people_info
+        set is_incumbency = 1
+        where id in
+        <foreach collection="ids" close=")" open="(" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

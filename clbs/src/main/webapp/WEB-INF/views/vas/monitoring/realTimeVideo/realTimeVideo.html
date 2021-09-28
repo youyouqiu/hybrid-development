@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>实时视频</title>
+	<div th:replace="fragments/header">header</div>
+	<link rel="stylesheet"
+		  href="/clbs/resources/css/electronicFence.css"
+		  th:src="@{/clbs/resources/css/electronicFence.css}" />
+	<!--map-->
+	<link rel="stylesheet"
+		  href="https://cache.amap.com/lbs/static/main1119.css" />
+	<link rel="stylesheet"
+		  href="resources/css/electronicFence-map.css"
+		  th:href="@{/resources/css/electronicFence-map.css}" />
+	<link rel="stylesheet"
+		  href="resources/css/realTimeMonitoring.css"
+		  th:href="@{/resources/css/realTimeMonitoring.css}" />
+</head>
+<body style="overflow:hidden;">
+<section id="container">
+	<div th:replace="fragments/nav">nav</div>
+	<div th:replace="fragments/menu">menu</div>
+	<!--main content start-->
+	<section class="main-content-wrapper">
+		<section id="main-content" class="mainContenTop"><input th:value="${jumpId}" id="jumpId" type="hidden"  />
+			<div class="row">
+				<div class="col-md-12" style="padding-left:1px;padding-right:0px !important;">
+
+					<div id="content-left" class="col-md-3" style="padding-right: 0px; padding-left: 0px;">
+						<div class="panel panel-default" id="panDefLeft">
+							<div class="panel-body fixed-table-body panTabPadd">
+								<div class="form-horizontal">
+									<div class="form-group allGroup">
+										<div style="cursor:pointer" onclick="chooseAll()" class="col-md-3 col-sm-5 col-xs-5 text-right btnPadding">
+											<span>全部</span><span id="tall">(...)</span>
+										</div>
+										<div style="cursor:pointer" id="online" onclick="tline()" class="col-md-3 col-sm-5 col-xs-5 text-right btnPaddingOnLine">
+											<span>在线</span><span  id="tline">(...)</span>
+										</div>
+										<div style="cursor:pointer" onclick="chooseMiss()" class="col-md-3 col-sm-5 col-xs-5 text-right btnPadding">
+											<span>离线</span><span id="tmiss">(...)</span>
+										</div>
+										<div class="col-md-3 col-sm-5 col-xs-5 btnPadding">
+											<i id="goHidden" class="fa fa-chevron-left" style="position: absolute;top: 5px;right: 20px;"></i>
+										</div>
+									</div>
+								</div>
+								<div class="form-group allGroup">
+									<div class="col-md-7 col-sm-12 col-xs-12 btnPadding">
+										<div class="input-group">
+											<input id="search_condition"  type="text" class="form-control" placeholder="车牌号" />
+											<!-- <span class="input-group-btn">
+										        <button id="treeSearch" onclick="search_ztree('treeDemo','search_condition','vehicle')" class="btn searchArea" type="button">
+										        	<span class="glyphicon glyphicon-search"></span>
+										        </button>
+										    </span> -->
+										</div>
+										</div>
+										<div class="col-md-3 col-sm-6 col-xs-6 updataBtn">
+											 <button id="refresh" onclick="refreshTree()" class="btn btn-default" type="button" name="refresh" title="刷新">
+					                               <span class="glyphicon glyphicon-refresh"></span>
+					                          </button>
+										</div>
+										<div class="col-md-2 col-sm-6 col-xs-6 btnPadding">
+											<div class="columns btn-group pull-right">
+					                            <div class="keep-open btn-group" title="定制显示列">
+					                                <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					                                    <span class="glyphicon glyphicon-align-justify"></span> <span class="caret"></span>
+					                                </button>
+					                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+														<div class="checkbox">
+														  <label>
+														    <input onclick="showMisses()" id="showMiss" type="checkbox" value="">
+														              显示离线
+														  </label>
+														</div>
+														<!-- <div class="checkbox">
+															<label>
+																<input onclick="showNerverOnline()" id="neverOnline" type="checkbox" value="">
+																显示未上线
+															</label>
+														</div> -->
+														<div class="checkbox">
+														  <label>
+														    <input onclick="showlineAndRun()" id="showRun" type="checkbox" value="">
+														              显示行驶
+														  </label>
+														</div>
+														<div class="checkbox">
+														  <label>
+														    <input onclick="showlineAndStop()" id="showStop" type="checkbox" value="">
+														              显示停止
+														  </label>
+														</div>
+														<div class="checkbox">
+														  <label>
+														    <input onclick="showlineAndAlarm()" id="showAlarm" type="checkbox" value="">
+														              显示报警
+														  </label>
+														</div>
+														<div class="checkbox">
+															<label>
+																<input onclick="showMissW()" id="missW" type="checkbox" value="">
+																显示未定位
+															</label>
+														</div>
+														<div class="checkbox">
+															<label>
+																<input onclick="showOverSpeed()" id="overSpeed" type="checkbox" value="">
+																显示超速
+															</label>
+														</div>
+					                                </ul>
+					                            </div>
+					                        </div>
+										</div>
+									</div>
+									<div class="col-md-12 groupzTree" id="thetree">
+										<ul id="treeDemo" class="ztree"></ul>
+									</div>
+									<div class="col-md-12 stateArea" id="IdentificationInfo" style="padding:0;">
+										<div class="col-md-12 form-group">
+											<div class="col-md-4 col-sm-4 col-xs-4 stateIcon text-center">
+												<span class="offlineIconArea" style="cursor:pointer" onclick="chooseMiss()" id="chooseMiss" type="button">
+													<span  class="btnImage iconArea offlineIcon_ico_docu"></span>离&nbsp;&nbsp;&nbsp;线
+												</span>
+											</div>
+											<div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+												<span class="onlineNotPositioningArea" style="cursor:pointer" onclick="chooseNot()" id="chooseNot" type="button">
+													<span class="btnImage iconArea onlineNotPositioning_ico_docu"></span>未定位
+												</span>
+											</div>
+											<div class="col-md-4 col-sm-4 col-xs-4 stateIcon text-center">
+												<span type="button" id="chooseAlam" onclick="chooseAlam()" style="cursor:pointer" class="warningArea">
+													<span class="btnImage iconArea warning_ico_docu"></span>报&nbsp;&nbsp;&nbsp;警
+												</span>
+											</div>
+										</div>
+										<div class="col-md-12 form-group">
+											<div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+												<span class="onlineDrivingArea" style="cursor:pointer" onclick="chooseRun()" id="chooseRun" type="button">
+													<span class="btnImage iconArea onlineDriving_ico_docu"></span>行&nbsp;&nbsp;&nbsp;驶
+												</span>
+											</div>
+											<div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+												<span type="button" id="chooseStop" onclick="chooseStop()" style="cursor:pointer" class="onlineParkingArea">
+													<span class="btnImage iconArea onlineParking_ico_docu"></span>停&nbsp;&nbsp;&nbsp;止
+												</span>
+											</div>
+											<div class="col-md-4 col-sm-4 col-xs-4 btnPadding text-center">
+												<span type="button" onclick="chooseOverSeep()" id="chooseOverSeep" style="cursor:pointer" class="speedLimitWarningArea">
+													<span class="btnImage iconArea speedLimitWarning_ico_docu"></span>超&nbsp;&nbsp;&nbsp;速
+												</span>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="content-right" class="col-md-9 content-right">
+							<div class="panel panel-default contPanelMargin">
+								<div class="panel-body fixed-table-body form-horizontal btnPaddingTop">
+									<div class="form-group	mapDataPadd">
+										<div class="col-md-12 mapPaddCon">
+											<div id="MapContainer"></div>
+											<div id="realTimeBtn" class="realtimebtn-group">
+				                                <input type="button" class="mapBtn map-active" value="地图" onclick="setMap();">
+				                                <input type="button" class="mapBtn" value="卫星" onclick="satellite();">
+				                                <input type="button" class="mapRC" id="realTimeRC" value="实时路况">
+				                            </div>
+											<div id="goShow">
+												<i id="goHidden" class="fa fa-chevron-right"></i>
+											</div>
+											<!-- 2标记勿删 -->
+										<div id="dragDIV"></div>
+										<ul id="myTab" class="nav nav-tabs">
+											<li id="realTimeStatus" class="active"><a href="#realTimeState" data-toggle="tab">状态信息</a></li>
+											<!-- 3标记勿删 -->
+											<li id="realTtimeAlarm"><a href="#realTimeCall" data-toggle="tab">报警记录</a></li>
+											<li id="operationLog"><a href="#operationLog" data-toggle="tab">操作日志</a></li>
+											<div style="float:right;margin:9px 20px 0px 0px;">
+												<li style="display:inline-block;cursor:pointer;"><i id="scalingBtn" class="fa  fa-chevron-down"></i></li>
+											</div>
+										</ul>
+										<div id="myTabContent" class="tab-content" style="overflow-x:auto;">
+											<div class="tab-pane fade in active" id="realTimeState">
+												<table id="realTimeStateTable"
+													   class="table table-striped table-bordered table-hover"
+													   cellspacing="0" width="100%">
+													<thead>
+													<tr>
+														<th>序号</th>
+														<th>名称</th>
+														<th>时间</th>
+														<th>所属分组</th>
+														<th>对象类型</th>
+														<th>ACC状态</th>
+														<th>运行状态</th>
+														<th>行驶速度</th>
+														<th>方向</th>
+														<th>当日里程</th>
+														<th>总里程</th>
+														<th>当日油耗</th>
+														<th>总油耗</th>
+														<th>当前位置</th>
+													</tr>
+													</thead>
+													<tbody>
+													</tbody>
+												</table>
+											</div>
+											<!-- 1 标记勿删-->
+											<div class="tab-pane fade" id="realTimeCall">
+												<table id="alarmTable"
+													   class="table table-striped table-bordered table-hover"
+													   cellspacing="0" width="100%">
+													<thead>
+													<tr>
+														<th>序号</th>
+														<th>名称</th>
+														<th>所属分组</th>
+														<th>对象类型</th>
+														<th>报警类型</th>
+														<th>从业人员</th>
+														<th>报警时间</th>
+														<th>报警位置</th>
+														<th>处理状态</th>
+													</tr>
+													</thead>
+													<tbody>
+													</tbody>
+												</table>
+											</div>
+											<div class="tab-pane fade" id="operationLog">
+												<table id=""
+													   class="table table-striped table-bordered table-hover"
+													   cellspacing="0" width="100%">
+													<thead>
+													<tr>
+														<th>序号</th>
+														<th>用户名</th>
+														<th>操作时间</th>
+														<th>操作对象</th>
+														<th>对象类型</th>
+														<th>操作名称</th>
+														<th>操作类型</th>
+													</tr>
+													</thead>
+													<tbody>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+	<!--main content end-->
+</section>
+<div th:replace="fragments/footer_realTime">footer</div>
+</body>
+<!--/***** 当前页js end *****/-->
+<script src="resources/js/zTree/js/ztreeSearch.js"
+		th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js"
+		th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js"
+		th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+</html>

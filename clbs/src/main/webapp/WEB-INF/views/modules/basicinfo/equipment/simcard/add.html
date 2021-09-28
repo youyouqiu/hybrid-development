@@ -1,0 +1,199 @@
+<form th:action="@{/m/basicinfo/equipment/simcard/add}" id="addForm"
+      role="form" action="#" method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;</button>
+        <h4 class="modal-title">新增终端手机号信息</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 终端手机号：</label>
+                    <div class="col-md-4">
+                        <input name="simcardNumber" placeholder="请输入终端手机号" type="text" id="simcardNumber"
+                               class="form-control "/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input name="groupName" class="form-control" id="zTreeCitySel"
+                               placeholder="请选择所属企业" style="background-color: #fafafa; cursor: pointer;" type="text" autocomplete="off"/>
+                        <span class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true" id="zTreeCitySelSpan"></span>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <input id="groupId" name="groupId" type="text" hidden="true"/>
+                        <label id="error_label_add" class="error" style="display: none;"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">启停状态：</label>
+                    <div class="col-md-4">
+                        <label class="radio-inline"> 
+                        	<input type="radio" name="isStart" id="isRadio" value="1" checked> 启用
+                        </label> 
+                        <label class="radio-inline"> 
+                        	<input type="radio" name="isStart" id="noRadio" value="0"> 停用
+                    	</label>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger"></label> ICCID：</label>
+                    <div class="col-md-4">
+                        <input name="iccid" placeholder="请输入ICCID号" type="text" id="iccid"
+                               class="form-control" maxlength="20"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger"></label> IMEI：</label>
+                    <div class="col-md-4">
+                        <input name="imei" placeholder="请输入IMEI号" type="text" id="imei"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger"></label> IMSI：</label>
+                    <div class="col-md-4">
+                        <input name="imsi" placeholder="请输入IMSI号" type="text" id="imsi"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">运营商：</label>
+                    <div class="col-md-4">
+                        <select name="operator" placeholder="请选择运营商" class="form-control">
+                            <option selected="selected" value="中国移动">中国移动</option>
+                            <option value="中国联通">中国联通</option>
+                            <option value="中国电信">中国电信</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">发放地市：</label>
+                    <div class="col-md-4">
+                        <input name="placementCity" maxlength="20" placeholder="请输入发放地市" type="text"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">套餐流量(M)：</label>
+                    <div class="col-md-4">
+                        <input name="simFlow" placeholder="请输入套餐流量" type="text"
+                               class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                    </div>
+                    <label class="col-md-2 control-label">当日流量(M)：</label>
+                    <div class="col-md-4">
+                        <input name="dayRealValue" placeholder="当日流量" type="text"
+                               class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">当月流量(M)：</label>
+                    <div class="col-md-4">
+                        <input name="monthRealValue" placeholder="当月流量" type="text"
+                               class="form-control" readonly />
+                    </div>
+                    <label class="col-md-2 control-label">流量最后更新时间：</label>
+                    <div class="col-md-4">
+                        <input name="monthTrafficDeadline" placeholder="流量最后更新时间" type="text"
+                               class="form-control"  readonly />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">修正系数：</label>
+                    <div class="col-md-4">
+                        <input name="correctionCoefficient" value="100" placeholder="请输入修正系数" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">预警系数：</label>
+                    <div class="col-md-4">
+                        <input id="forewarningCoefficient" value="90" name="forewarningCoefficient" placeholder="请输入预警系数" type="text"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">月预警流量(M)：</label>
+                    <div class="col-md-4">
+                        <input name="alertsFlow" placeholder="月预警流量 = 月流量阈值(M) * 预警系数" type="text"
+                               id="alertsFlow" class="form-control" readonly />
+                    </div>
+                    <label class="col-md-2 control-label">流量月结日：</label>
+                    <div class="col-md-4">
+                        <input name="monthlyStatement" readonly  placeholder="默认为每月1号" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">小时流量阈值(M)：</label>
+                    <div class="col-md-4">
+                        <input name="hourThresholdValue" placeholder="请输入小时流量阈值" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">日流量阈值(M)：</label>
+                    <div class="col-md-4">
+                        <input name="dayThresholdValue" placeholder="请输入日流量阈值" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">月流量阈值(M)：</label>
+                    <div class="col-md-4">
+                        <input id="monthThresholdValue" name="monthThresholdValue"  placeholder="月流量阈值" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">激活日期：</label>
+                    <div class="col-md-4 has-feedback">
+                        <input id="openCardTime" name="openCardTime" placeholder="请输入激活日期" autocomplete="off"
+                               class="form-control layer-date laydate-icon">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">到期时间：</label>
+                    <div class="col-md-4">
+                        <input id="endTime" name="endTime" placeholder="请输入到期时间" autocomplete="off"
+                               class="form-control layer-date laydate-icon"/>
+                    </div>
+                    <label class="col-md-2 control-label">真实SIM卡号：</label>
+                    <div class="col-md-4">
+                        <input name="realId" type="text" maxlength="20" class="form-control" placeholder="请输入真实SIM卡号">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input name="remark" type="text" class="form-control" placeholder="请输入备注">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmit">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <input  type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+	var simNumberNull = [[#{sim.newnumber.error}]];
+	var simNumberError = [[#{sim.newnumber.error}]];
+	var simRealNumberError = [[#{sim.newnumber.error}]];
+	var simNumberExists = [[#{sim.number.exists}]];
+    var simMax200Length = [[#{sim.max200.length}]];
+    var simHourTrafficLength = [[#{sim.hourTraffic.length}]];
+    var simDayTrafficLength = [[#{sim.dayTraffic.length}]];
+    var simMonthTrafficLength = [[#{sim.monthTraffic.length}]];
+    var simCompareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+    var publicSize6=[[#{public.size6.length}]];
+    var publicSize20=[[#{public.size20.length}]];
+    var publicSize50=[[#{public.size50.length}]];
+    var phoneError = [[#{phone.error}]];
+    var publicNull = [[#{public.null}]];
+    var publicNumberFloat = [[#{public.number.float}]];
+    var publicNumberInt = [[#{public.number.int}]];
+</script>
+<script src="/wro/simCardAdd.js" th:src="@{/wro/simCardAdd.js}"></script>

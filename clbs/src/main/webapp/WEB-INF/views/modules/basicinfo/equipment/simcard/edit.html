@@ -1,0 +1,213 @@
+<form th:action="@{/m/basicinfo/equipment/simcard/edit.gsp}"
+	  th:object="${result}" id="editForm" role="form" action="#"
+	  method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">&times;
+		</button>
+		<h4 class="modal-title">修改终端手机号信息</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<input th:field="*{id}" type="text" hidden="true"/>
+				<input th:value="*{bindId}" id="bindId" type="hidden"/>
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label
+							class="text-danger">*</label> 终端手机号：</label>
+					<div class="col-md-4">
+						<input id="simcardNumber" th:field="*{simcardNumber}" type="text" name="simcardNumber"
+							   placeholder="请输入终端手机号" class="form-control"/>
+						<input th:value="*{simcardNumber}" id="scn" type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label"><label
+							class="text-danger">*</label> 所属企业：</label>
+					<div class="has-feedback col-md-4 fastClear">
+						<input th:field="*{groupName}" name="groupName"
+							   style="background-color: #fafafa; cursor: pointer;"
+							   class="form-control" id="zTreeCitySel" placeholder="请选择所属企业"
+							   type="text" value="" autocomplete="off"/>
+						<span class="fa fa-chevron-down form-control-feedback"
+							  aria-hidden="true" id="zTreeCitySelSpan"></span>
+						<input class="form-control hidden" name="groupId" id="groupId" th:field="*{groupId}"/>
+						<div class="ztreeModelBox" id="zTreeContent">
+							<ul id="ztreeDemo" class="ztree"></ul>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">启停状态：</label>
+					<div class="col-md-4">
+						<label class="radio-inline"> <input type="radio"
+															th:field="*{isStart}" name="isStart" id="isRadio" value="1"
+															checked> 启用
+						</label> <label class="radio-inline"> <input type="radio"
+																	 th:field="*{isStart}" name="isStart" id="noRadio"
+																	 value="0">
+						停用
+					</label>
+					</div>
+					<label class="col-md-2 control-label"><label
+							class="text-danger"></label> ICCID：</label>
+					<div class="col-md-4">
+						<input th:field="*{iccid}" placeholder="请输入ICCID号" type="text" id="iccid"
+							   class="form-control" maxlength="20"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label
+							class="text-danger"></label> IMEI：</label>
+					<div class="col-md-4">
+						<input th:field="*{imei}" placeholder="请输入IMEI号" type="text" id="imei"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label"><label
+							class="text-danger"></label> IMSI：</label>
+					<div class="col-md-4">
+						<input th:field="*{imsi}" placeholder="请输入IMSI号" type="text" id="imsi"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">运营商：</label>
+					<div class="col-md-4">
+						<select th:field="*{operator}" name="operator" placeholder="请选择运营商" class="form-control">
+							<option value="中国移动">中国移动</option>
+							<option value="中国联通">中国联通</option>
+							<option value="中国电信">中国电信</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label">发放地市：</label>
+					<div class="col-md-4">
+						<input name="placementCity" th:field="*{placementCity}" maxlength="20" placeholder="请输入发放地市" type="text"
+							   class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">套餐流量(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{simFlow}" name="simFlow" placeholder="请输入套餐流量"
+							   type="text" class="form-control" onkeyup="value=value.replace(/[^\d]/g,'')"/>
+					</div>
+					<label class="col-md-2 control-label">当日流量(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{dayRealValue}" placeholder="请输入当日流量" type="text"
+							   class="form-control" readonly/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">当月流量(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{monthRealValue}" placeholder="请输入当月流量" type="text"
+							   class="form-control" readonly/>
+					</div>
+					<label class="col-md-2 control-label">流量最后更新日：</label>
+					<div class="col-md-4">
+						<input th:field="*{monthTrafficDeadline}" placeholder="流量最后更新日" type="text"
+							   class="form-control" readonly/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">修正系数：</label>
+					<div class="col-md-4">
+						<input th:field="*{correctionCoefficient}" placeholder="请输入修正系数" type="text"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">预警系数：</label>
+					<div class="col-md-4">
+						<input id="forewarningCoefficient" th:field="*{forewarningCoefficient}" placeholder="请输入预警系数"
+							   type="text"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">月预警流量(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{alertsFlow}" name="alertsFlow" placeholder="月预警流量 = 月流量阈值(M) * 预警系数"
+							   type="text" class="form-control" readonly/>
+					</div>
+					<label class="col-md-2 control-label">流量月结日：</label>
+					<div class="col-md-4">
+						<input th:field="*{monthlyStatement}" readonly placeholder="默认为每月1号" type="text"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">小时流量阈值(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{hourThresholdValue}" placeholder="请输入小时流量阈值" type="text"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">日流量阈值(M)：</label>
+					<div class="col-md-4">
+						<input th:field="*{dayThresholdValue}" placeholder="请输入日流量阈值" type="text"
+							   class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">月流量阈值(M)：</label>
+					<div class="col-md-4">
+						<input type="text" id="monthThresholdValue" th:field="*{monthThresholdValue}"
+							   placeholder="请输入月流量阈值"
+							   class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label">激活日期：</label>
+					<div class="col-md-4 has-feedback">
+						<input id="openCardTimeEdit" th:field="*{openCardTime}" name="openCardTime" autocomplete="off"
+							   placeholder="请输入激活日期" class="form-control layer-date laydate-icon">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">到期时间：</label>
+					<div class="col-md-4">
+						<input id="endTimeEdit" th:field="*{endTime}" name="endTime" placeholder="请输入到期时间" autocomplete="off"
+							   class="form-control layer-date laydate-icon"/>
+					</div>
+					<label class="col-md-2 control-label">真实SIM卡号：</label>
+					<div class="col-md-4">
+						<input th:field="*{realId}" name="realId" type="text" maxlength="20" class="form-control" placeholder="请输入真实SIM卡号">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">备注：</label>
+					<div class="col-md-4">
+						<input th:field="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<div id="bindMsg" hidden="true" style="text-align:left;color:red;">
+			<p> 注 ： 该终端手机号已和监控对象绑定，终端手机号不允许修改，如需修改请先解除绑定！</p>
+		</div>
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var simNumberNull = [[#{sim.newnumber.error}]];
+    var simNumberError = [[#{sim.newnumber.error}]];
+    var simRealNumberError = [[#{sim.newnumber.error}]];
+    var simNumberExists = [[#{sim.number.exists}]];
+    var simMax200Length = [[#{sim.max200.length}]];
+    var simHourTrafficLength = [[#{sim.hourTraffic.length}]];
+    var simDayTrafficLength = [[#{sim.dayTraffic.length}]];
+    var simMonthTrafficLength = [[#{sim.monthTraffic.length}]];
+    var simCompareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+    var publicSize6 = [[#{public.size6.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var phoneError = [[#{phone.error}]];
+    var publicNull = [[#{public.null}]];
+    var publicNumberFloat = [[#{public.number.float}]];
+    var publicNumberInt = [[#{public.number.int}]];
+
+
+</script>
+<script src="/wro/simCardEdit.js" th:src="@{/wro/simCardEdit.js}"></script>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.AlarmSearchDao">
+    <!-- 根据类型查询具体报警信息 -->
+    <select id="getAlarmType" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select * from zw_m_alarm_type where flag = 1
+        <if test="type!= null and type!= ''">
+            and type= #{type}
+        </if>
+    </select>
+    <!-- 根据报警标志位查询具体报警信息 -->
+    <select id="getAlarmName" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select * from zw_m_alarm_type where flag = 1
+        <if test="pos!= null and pos!= ''">
+            and pos= #{pos}
+        </if>
+    </select>
+
+    <!-- 根据车辆id查询报警信息 -->
+    <select id="findSpeedParameter" parameterType="string" resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+		SELECT ap.param_code,aps.* from zw_m_alarm_parameter_setting aps
+		LEFT JOIN zw_m_alarm_parameter ap on aps.alarm_parameter_id = ap.id and ap.flag = 1
+		LEFT JOIN zw_m_alarm_type aType on ap.alarm_type_id  = aType.id and aType.flag = 1
+		where aType.name = '超速报警' and aps.vehicle_id = #{vehicleId} and aps.flag = 1 and aType.type = 'driverAlarm'
+	</select>
+
+    <!-- 根据报警类型名字查询报警参数信息 -->
+    <select id="findAlarmParametByName" resultType="com.zw.platform.domain.vas.alram.AlarmParameter">
+        SELECT ap.* from zw_m_alarm_parameter ap
+		LEFT JOIN zw_m_alarm_type aType on ap.alarm_type_id = aType.id and aType.flag = 1
+		where aType.name = #{alarmName} and ap.flag = 1 and aType.type = 'driverAlarm'
+    </select>
+
+    <select id="findAlarmParameterByNameAndType" resultType="com.zw.platform.domain.vas.alram.AlarmParameter">
+        SELECT zmap.*
+        from zw_m_alarm_parameter zmap
+                 LEFT JOIN zw_m_alarm_type zmat on zmap.alarm_type_id = zmat.id and zmat.flag = 1
+        where zmat.name = #{alarmName}
+          and zmap.flag = 1
+          and zmat.type = #{type}
+    </select>
+
+    <!-- 根据车辆id查询报警信息 -->
+    <select id="getAlarmConfig" parameterType="string" resultType="com.zw.platform.domain.vas.alram.query.AlarmConfig">
+		SELECT
+	    ps.vehicle_id,
+	    ps.alarm_push,
+        GROUP_CONCAT(distinct mat.pos) pos
+        FROM
+	    zw_m_alarm_parameter_setting ps
+        LEFT JOIN zw_m_alarm_parameter ap ON ap.id = ps.alarm_parameter_id
+        AND ap.flag = 1
+        LEFT JOIN zw_m_alarm_type mat ON mat.id = ap.alarm_type_id
+        AND mat.flag = 1
+        WHERE
+	    ps.vehicle_id = #{vehicleId}
+	    and
+	    ps.alarm_push !=0
+        AND ps.flag = 1
+        GROUP BY ps.alarm_push
+	</select>
+
+    <select id="getAlarm808" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+       select * from zw_m_alarm_type where type in ('alert','faultAlarm','vehicleAlarm','driverAlarm')
+    </select>
+
+    <select id="getAlarmTypeById" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select * from zw_m_alarm_type where flag = 1 and id = #{alarmTypeId}
+    </select>
+
+
+    <select id="findAllAlarmType" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select `name`,pos from zw_m_alarm_type where flag = 1
+    </select>
+    <select id="getAlarmTypeByProtocolType" parameterType="integer"
+            resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select * from zw_m_alarm_type alt where alt.flag = 1
+        AND alt.protocol_type IN
+        <foreach item="item" collection="protocolTypes" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getAdasEventMap" resultType="java.util.Map">
+        SELECT risk_event as riskEvent,function_id as functionId  from zw_m_risk_event
+    </select>
+
+    <select id="getRoadSpeed"
+            resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select * from zw_m_alarm_type alt where alt.flag = 1 AND alt.pos = 164
+    </select>
+
+    <select id="findPosEventCommonNameMap" resultType="java.util.Map">
+    SELECT
+        pos,
+        risk.event_common_name name
+    FROM
+        zw_m_alarm_type type
+    LEFT JOIN zw_m_risk_event risk ON type.pos = risk.808_pos
+    WHERE
+        type.flag = 1
+    AND type = 'adasAlarm'
+    AND event_common_name IS NOT NULL
+    </select>
+
+    <select id="getDispatchAlarmType" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        select zmat.*
+        from zw_m_alarm_type zmat
+        where zmat.flag = 1
+          and (zmat.pos = 0 or zmat.pos = 152 or zmat.pos = 153 or zmat.pos = 154 or zmat.pos = 155 or zmat.pos = 156)
+    </select>
+
+    <select id="getAllAlarmTypes" resultType="string">
+        select distinct pos from zw_m_alarm_type where flag =1
+    </select>
+</mapper>

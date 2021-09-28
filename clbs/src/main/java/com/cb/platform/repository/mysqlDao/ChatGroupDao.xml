@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.ChatGroupDao">
+    <!-- 新增聊天分组信息 -->
+    <insert id = "insertChatGroup" parameterType="com.cb.platform.domain.ChatGroupDo">
+        insert into zw_m_chat_group(group_id,group_name,group_remark,flag,create_data_time,create_data_username)
+        value (#{groupId},#{groupName},#{groupRemark},1,#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <select id="findByParam" parameterType="com.cb.platform.domain.query.ChatGroupQuery" resultType="com.cb.platform.domain.ChatGroupDo">
+        SELECT cg.*  FROM zw_m_chat_group cg
+        <where>
+            <if test="groupName!=null and groupName!=''"> AND cg.group_name LIKE BINARY CONCAT('%',#{groupName},'%') </if>
+            <if test="createDataUsername!=null and createDataUsername!=''"> AND cg.create_data_username = #{createDataUsername} </if>
+            and cg.flag=1
+        </where>
+        ORDER BY  cg.create_data_time DESC
+    </select>
+
+    <select id="findByName" parameterType="com.cb.platform.domain.query.ChatGroupQuery" resultType="com.cb.platform.domain.ChatGroupDo">
+        SELECT cg.*  FROM zw_m_chat_group cg
+        where cg.group_name = BINARY #{groupName} and cg.flag=1
+        ORDER BY  cg.create_data_time DESC
+    </select>
+
+
+    <!-- 修改聊天分组信息 -->
+    <update id = "updateChatGroup" parameterType="com.cb.platform.domain.ChatGroupDo">
+        update zw_m_chat_group set group_name = #{groupName},
+        group_remark = #{groupRemark},update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername} where group_id = #{groupId} and flag =1
+    </update>
+
+
+    <!-- 修改聊天分组信息 -->
+    <update id = "removeChatGroup" parameterType="string">
+        update zw_m_chat_group set flag = 0 where group_id = #{groupId} and flag =1
+    </update>
+
+    <!-- 根据分组编号获取分组信息 -->
+    <select id = "getChatGroupById" parameterType="string" resultType="com.cb.platform.domain.ChatGroupDo">
+        select * from zw_m_chat_group where group_id = #{groupId} and flag =1
+    </select>
+
+</mapper>

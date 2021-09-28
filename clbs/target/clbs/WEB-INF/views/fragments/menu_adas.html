@@ -1,0 +1,39 @@
+<!--sidebar start-->
+<aside class="sidebar sidebar-toggle">
+	<div id="leftside-navigation" class="nano">
+		<ul class="nano-content">
+			<li class="sub-menu active">
+				<a th:href="@{/home}" class=""> 
+					<i class="fa fa-home"></i><span>首页</span>
+				</a>
+			</li>
+
+			<li class="sub-menu" th:each="menu : ${session.menus}" >
+				<a href="javascript:void(0);" th:id="${menu.id}">
+					<i th:class="${menu.iconCls}" ></i><span th:text="${menu.resourceName}"></span>
+					<i class="arrow fa fa-angle-right pull-right"></i>
+				</a>
+				<ul class="second-menu-ul">
+					<li class="second-menu" th:each="menu1 : ${menu.childMenus}" >
+						<a  th:href="@{${menu1.permValue} }" th:id="${menu1.id}">
+							<i class="fa fa-location-arrow"></i><span th:text="${menu1.resourceName}"></span> 
+							<i th:class="${menu1.iconCls}"></i> 
+						</a>
+						<ul>
+							<li th:each="menu2 : ${menu1.childMenus}">
+								<a th:href="@{${menu2.permValue} }" th:id="${menu2.id}">
+									<i class="fa  fa-pencil"></i><span th:text="${menu2.resourceName}"></span>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<div class="clearfix"></div>
+</aside>
+<!--sidebar end-->
+<!--权限控制 -->
+<input th:value="${hasRole}" id="permission" type="hidden"  />
+<input th:value="${session.isAdmin}" id="isAdmin" type="hidden"  />

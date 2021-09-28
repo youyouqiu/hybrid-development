@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoSettingDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoSetting" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="all_channel" property="allChannel" jdbcType="INTEGER" />
+    <result column="logic_channel" property="logicChannel" jdbcType="INTEGER" />
+    <result column="real_code_schema" property="realCodeSchema" jdbcType="INTEGER" />
+    <result column="real_resolution_ratio" property="realResolutionRatio" jdbcType="INTEGER" />
+    <result column="real_keyframe_every" property="realKeyframeEvery" jdbcType="INTEGER" />
+    <result column="real_frame_rate" property="realFrameRate" jdbcType="INTEGER" />
+    <result column="real_code_rate" property="realCodeRate" jdbcType="INTEGER" />
+    <result column="save_code_schema" property="saveCodeSchema" jdbcType="INTEGER" />
+    <result column="save_resolution_ratio" property="saveResolutionRatio" jdbcType="INTEGER" />
+    <result column="save_keyframe_every" property="saveKeyframeEvery" jdbcType="INTEGER" />
+    <result column="save_frame_rate" property="saveFrameRate" jdbcType="INTEGER" />
+    <result column="save_code_rate" property="saveCodeRate" jdbcType="INTEGER" />
+    <result column="osd" property="osd" jdbcType="INTEGER" />
+    <result column="audio_settings" property="audioSettings" jdbcType="INTEGER" />
+    <result column="flag" property="flag" jdbcType="SMALLINT" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, vehicle_id, all_channel, logic_channel, real_code_schema, real_resolution_ratio, 
+    real_keyframe_every, real_frame_rate, real_code_rate, save_code_schema, save_resolution_ratio, 
+    save_keyframe_every, save_frame_rate, save_code_rate, osd, audio_settings, flag, 
+    create_data_time, create_data_username, update_data_time, update_data_username
+  </sql>
+  <!-- 根据车辆id查询4个表的主键，和是否有数据，以及是否下发过 -->
+  <select id="getIdsAndIsSettingByVehicleId" resultType="map" parameterType="string">
+	SELECT DISTINCT vs.vehicle_id videoSettingVid,vc.vehicle_id videoChannelVid, vss.vehicle_id videoSleepVid, rs.vehicle_id videoRecordingVid
+	FROM zw_m_video_setting vs
+	LEFT JOIN (
+			SELECT id,flag FROM zw_m_vehicle_info
+			UNION
+			SELECT id,flag FROM zw_m_people_info
+			UNION
+			SELECT id,flag FROM zw_m_thing_info
+	) object ON vs.vehicle_id = object.id AND object.flag = 1
+    LEFT JOIN zw_m_video_setting vp ON vp.vehicle_id = object.id AND vp.flag=1
+	LEFT JOIN zw_m_video_channel_setting vc ON vc.vehicle_id = object.id AND vc.flag = 1
+	LEFT JOIN zw_m_video_sleep_setting vss ON vss.vehicle_id = object.id AND vss.flag = 1
+	LEFT JOIN zw_m_recording_setting rs ON rs.vehicle_id = object.id AND rs.flag = 1
+	WHERE object.id = #{vehicleId}
+  </select>
+
+  <!--由于前端通过以下zw_m_video_channel_setting,zw_m_video_sleep_setting,zw_m_recording_setting-->
+  <select id="findIdsAndIsSettingByVehicleIds" resultType="com.zw.platform.domain.realTimeVideo.VideoSetting"
+          parameterType="list">
+    SELECT DISTINCT vs.vehicle_id videoSettingVid,vc.vehicle_id videoChannelVid, vss.vehicle_id videoSleepVid, rs.vehicle_id videoRecordingVid
+    FROM zw_m_video_setting vs
+    LEFT JOIN zw_m_video_channel_setting vc ON vc.vehicle_id = vs.vehicle_id AND vc.flag = 1
+    LEFT JOIN zw_m_video_sleep_setting vss ON vss.vehicle_id = vs.vehicle_id AND vss.flag = 1
+    LEFT JOIN zw_m_recording_setting rs ON rs.vehicle_id = vs.vehicle_id AND rs.flag = 1
+    WHERE vs.flag = 1
+    <if test="vehicleIds != null and vehicleIds.size > 0">
+      AND vs.vehicle_id IN
+      <foreach collection="vehicleIds" item="vehicleId" open="(" separator="," close=")">
+        #{vehicleId}
+      </foreach>
+    </if>
+  </select>
+  
+  <!-- 查询4个表里设置过音视频参数的车辆id和车牌号 A -->
+  <select id="getVehicleIdAndBrand" resultType="map">
+    SELECT c.id id,c.brand brand FROM zw_m_vehicle_info c WHERE c.flag = 1
+    UNION ALL
+    SELECT p.id id,p.people_number brand FROM zw_m_people_info p WHERE p.flag = 1
+    UNION ALL
+    SELECT w.id id,w.thing_number brand FROM zw_m_thing_info w WHERE w.flag = 1
+  </select>
+
+  <!-- 查询4个表里设置过音视频参数的车辆id和车牌号 B -->
+  <select id="getVehicleIdBySettingVideo" resultType="java.lang.String">
+    SELECT vehicle_id FROM zw_m_video_setting where flag = 1
+  </select>
+  
+  <!-- 根据车辆id查询音视频参数设置 -->
+  <select id="getVideoParamByVehicleId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_m_video_setting
+    where vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据车辆id和通道号查询音视频参数设置 -->
+  <select id="getVideoParamByVehicleIdAndLogicChannel" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_m_video_setting
+    where vehicle_id=#{vehicleId,jdbcType=VARCHAR} and logic_channel = #{logicChannel,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 保存视频参数 -->
+  <insert id="saveVideoParam" parameterType="com.zw.platform.domain.realTimeVideo.VideoSetting" >
+    insert into zw_m_video_setting (id, vehicle_id, all_channel, 
+      logic_channel, real_code_schema, real_resolution_ratio, 
+      real_keyframe_every, real_frame_rate, real_code_rate, 
+      save_code_schema, save_resolution_ratio, save_keyframe_every, 
+      save_frame_rate, save_code_rate, osd, 
+      audio_settings, flag, create_data_time, 
+      create_data_username, update_data_time, update_data_username
+      )
+    values (#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR}, #{allChannel,jdbcType=INTEGER}, 
+      #{logicChannel,jdbcType=INTEGER}, #{realCodeSchema,jdbcType=INTEGER}, #{realResolutionRatio,jdbcType=INTEGER}, 
+      #{realKeyframeEvery,jdbcType=INTEGER}, #{realFrameRate,jdbcType=INTEGER}, #{realCodeRate,jdbcType=INTEGER}, 
+      #{saveCodeSchema,jdbcType=INTEGER}, #{saveResolutionRatio,jdbcType=INTEGER}, #{saveKeyframeEvery,jdbcType=INTEGER}, 
+      #{saveFrameRate,jdbcType=INTEGER}, #{saveCodeRate,jdbcType=INTEGER}, #{osd,jdbcType=INTEGER}, 
+      #{audioSettings,jdbcType=INTEGER}, #{flag,jdbcType=SMALLINT}, #{createDataTime,jdbcType=TIMESTAMP}, 
+      #{createDataUsername,jdbcType=VARCHAR}, #{updateDataTime,jdbcType=TIMESTAMP}, #{updateDataUsername,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <!-- 修改视频参数 -->
+  <update id="updateVideoParam" parameterType="com.zw.platform.domain.realTimeVideo.VideoSetting" >
+    update zw_m_video_setting
+    <set >
+      <if test="vehicleId != null" >
+        vehicle_id = #{vehicleId,jdbcType=VARCHAR},
+      </if>
+      <if test="allChannel != null" >
+        all_channel = #{allChannel,jdbcType=INTEGER},
+      </if>
+      <if test="logicChannel != null" >
+        logic_channel = #{logicChannel,jdbcType=INTEGER},
+      </if>
+      <if test="realCodeSchema != null" >
+        real_code_schema = #{realCodeSchema,jdbcType=INTEGER},
+      </if>
+      <if test="realResolutionRatio != null" >
+        real_resolution_ratio = #{realResolutionRatio,jdbcType=INTEGER},
+      </if>
+      <if test="realKeyframeEvery != null" >
+        real_keyframe_every = #{realKeyframeEvery,jdbcType=INTEGER},
+      </if>
+      <if test="realFrameRate != null" >
+        real_frame_rate = #{realFrameRate,jdbcType=INTEGER},
+      </if>
+      <if test="realCodeRate != null" >
+        real_code_rate = #{realCodeRate,jdbcType=INTEGER},
+      </if>
+      <if test="saveCodeSchema != null" >
+        save_code_schema = #{saveCodeSchema,jdbcType=INTEGER},
+      </if>
+      <if test="saveResolutionRatio != null" >
+        save_resolution_ratio = #{saveResolutionRatio,jdbcType=INTEGER},
+      </if>
+      <if test="saveKeyframeEvery != null" >
+        save_keyframe_every = #{saveKeyframeEvery,jdbcType=INTEGER},
+      </if>
+      <if test="saveFrameRate != null" >
+        save_frame_rate = #{saveFrameRate,jdbcType=INTEGER},
+      </if>
+      <if test="saveCodeRate != null" >
+        save_code_rate = #{saveCodeRate,jdbcType=INTEGER},
+      </if>
+      <if test="osd != null" >
+        osd = #{osd,jdbcType=INTEGER},
+      </if>
+      <if test="audioSettings != null" >
+        audio_settings = #{audioSettings,jdbcType=INTEGER},
+      </if>
+      <if test="flag != null" >
+        flag = #{flag,jdbcType=SMALLINT},
+      </if>
+      <if test="createDataTime != null" >
+        create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createDataUsername != null" >
+        create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDataTime != null" >
+        update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDataUsername != null" >
+        update_data_username = #{updateDataUsername,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 根据车辆id删除 -->
+  <delete id="delete">
+    delete from zw_m_video_setting
+    where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteVideoParam">
+    delete from zw_m_video_setting
+    where vehicle_id = #{vehicleId}
+    and logic_channel = #{logicChannel}
+  </delete>
+
+  <select id="getPhysicsChannel" resultType="java.lang.String">
+    select physics_channel from zw_m_video_channel_setting
+      where  vehicle_id = #{vehicleId}
+     and logic_channel = #{logicChannel}
+  </select>
+
+  <delete id="deleteBatch">
+    delete from zw_m_video_setting
+    where vehicle_id in
+    <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+      #{monitorId}
+    </foreach>
+  </delete>
+
+
+  <!-- 获取音频参数 -->
+  <select id="getVideoParam" parameterType="String"
+          resultType="com.zw.platform.domain.realTimeVideo.AudioParam">
+		select c.vehicle_id,c.device_id,d.audio_code,d.video_code,d.audio_channel,d.audio_sampling,d.audio_sampling_bit,d.audio_fps_len
+		from zw_m_device_info d
+		inner join zw_m_config c on d.id = c.device_id and c.flag=1
+		where d.flag = 1
+		and c.vehicle_id = #{vehicleId}
+	</select>
+
+
+  <select id="findAudioFormatByDeviceId" resultType="integer" parameterType="string">
+    SELECT tt.audio_format as audioFormat
+    FROM zw_m_device_info di
+    inner join zw_m_terminal_type tt on tt.id = di.terminal_type_id
+    where tt.flag = 1
+    and di.flag = 1
+    <if test="id != null and id != ''">
+      and di.id = #{id}
+    </if>
+  </select>
+</mapper>

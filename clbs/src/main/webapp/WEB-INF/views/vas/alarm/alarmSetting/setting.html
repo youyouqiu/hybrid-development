@@ -1,0 +1,1329 @@
+<form th:action="@{/a/alarmSetting/setting.gsp}" id="settingForm" role="form" action="#" method="post"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">报警参数设置</h4>
+        <style>
+            .typeName {
+                padding-left: 36px;
+            }
+
+
+            .emptyMsg {
+                margin: 20px 0 0 15px;
+                color: red;
+            }
+            #settingForm .widget-todo{
+                position: relative;
+            }
+            #settingForm .widget-todo >.infoTitle {
+                position: absolute;
+                left: -28px;
+                top: 3px;
+            }
+            #settingForm .widget-todo >.tooltip{
+                left: -38px!important;
+            }
+            #settingForm .tooltip-inner{
+                text-align: justify;
+            }
+            #settingForm .widget-todo >.tooltip.top .tooltip-arrow{
+                left: 8%!important;
+                margin-left: -2px!important;
+            }
+        </style>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="referVehicleList" th:value="${referVehicleList}" type="hidden"/>
+                <input id="driverareaAlarmList" th:value="${driverareaAlarmList}" type="hidden"/>
+                <input id="driverlineAlarmList" th:value="${driverlineAlarmList}" type="hidden"/>
+                <input id="drivertimeAlarmList" th:value="${drivertimeAlarmList}" type="hidden"/>
+                <input id="tempAlarmList" th:value="${tempAlarmList}" type="hidden"/>
+                <input id="humAlarmList" th:value="${humAlarmList}" type="hidden"/>
+                <input id="oilAlarmList" th:value="${oilAlarmList}" type="hidden"/>
+                <input id="ioAlarmList" th:value="${ioAlarmList}" type="hidden"/>
+                <input id="areaAlarmList" th:value="${areaAlarmList}" type="hidden"/>
+                <input id="lineAlarmList" th:value="${lineAlarmList}" type="hidden"/>
+                <input id="pointAlarmList" th:value="${pointAlarmList}" type="hidden"/>
+                <input id="veerAlarmList" th:value="${veerAlarmList}" type="hidden"/>
+                <input id="levelAlarmList" th:value="${levelAlarmList}" type="hidden"/>
+                <input id="workHourAlarmList" th:value="${workHourAlarmList}" type="hidden"/>
+                <input id="loadAlarmList" th:value="${loadAlarmList}" type="hidden"/>
+                <input id="tirePressureAlarmList" th:value="${tirePressureAlarmList}" type="hidden"/>
+                <input id="devicePowerAlarmList" th:value="${devicePowerAlarmList}" type="hidden"/>
+                <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+                <div class="form-group">
+                    <input id="curBox" type="hidden"/>
+                    <label class="col-md-2 control-label"> <label
+                            class="text-danger">*</label> 监控对象：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;min-height:36px;" th:value="${vehicle.brand}" name="brand"
+                               placeholder="请输入监控对象" class="form-control" readonly/>
+                        <input th:field="${vehicle.id}" id="vehicleId" name="vehicleId" type="text" hidden="false"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 参考对象：</label>
+                    <div class="col-md-4">
+                        <div class="input-group" style="margin-right:15px;">
+                            <input name="brands" type="text" class="form-control" id="brands" style="min-height:36px;">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-white dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu" style="max-width:300px">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-heading">
+                    <div class="dropdown panel-title fwb">
+                        <ul class="nav nav-tabs">
+                            <li class="active" id="TabFenceBox"><a href="#home1" data-toggle="tab">预警</a></li>
+                            <li id="TabCarBox"><a href="#profile1" data-toggle="tab">驾驶员引起报警</a></li>
+                            <li id="TabCarBox1"><a href="#profile2" data-toggle="tab">车辆报警</a></li>
+                            <li id="TabCarBox2"><a href="#profile3" data-toggle="tab">故障报警</a></li>
+                            <li id="TabCarBox3q"><a href="#profile4q" data-toggle="tab">F3高精度报警</a></li>
+                            <li id="TabCarBox3"><a href="#profile4" data-toggle="tab">F3传感器报警</a></li>
+                            <li id="IOAlarmTab"><a href="#IOAlarmBox" data-toggle="tab">I/O报警</a></li>
+                            <li id="TabCarBox4"><a href="#profile5" data-toggle="tab">平台报警</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding-top: 0px !important; ">
+                    <div class="tab-content">
+                        <div class="tab-pane" id="IOAlarmBox">
+                            <div class="panel-heading" style="padding-top: 0px !important; ">
+                                <div class="dropdown panel-title fwb">
+                                    <ul class="nav nav-tabs">
+                                        <li class="active" id="IOAlarm1"><a href="#IOAlarmProfile1" data-toggle="tab">终端I/O</a>
+                                        </li>
+                                        <li id="IOAlarm2"><a href="#IOAlarmProfile2" data-toggle="tab">I/O采集1</a></li>
+                                        <li id="IOAlarm3"><a href="#IOAlarmProfile3" data-toggle="tab">I/O采集2</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tab-content" style="margin-left: 15px">
+                                <div class="tab-pane active" id="IOAlarmProfile1">
+                                    <ul class="widget-todo">
+                                        <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                           data-placement="top"
+                                           data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                        <div id="textinfo">
+                                            <span class="shielding"
+                                                  style="cursor: pointer;margin-left:-7px;">屏蔽</span><span
+                                                class="noneset">无</span><span class="partset"
+                                                                              style="margin-left:2px;">局部</span><span
+                                                class="wholeset" style="margin-left:4px;"> 全局 </span><span class=""
+                                                                                                           style="margin-left:180px;"> 状态 </span>
+                                        </div>
+                                        <div id="textline">
+                                            <span>|</span><span style="margin-left:-2px;">|</span><span
+                                                style="margin-left:3px;">|</span><span
+                                                style="margin-left:4px;">|</span><span
+                                                style="margin-left:180px;">|</span></div>
+                                        <div class="emptyMsg" th:if="${deviceIos.isEmpty()}">
+                                            <p> 注 ： 请先在【应用管理】的【I/O监测设置】中设置I/O即可查看</p>
+                                        </div>
+                                        <li class="clearfix" th:each="io:${deviceIos}">
+                                            <div class="form-group">
+                                                <div class="col-md-2">
+                                                    <div th:if="${io.paramCode == 'param1'}">
+                                                        <div class="leftselectbutton">
+                                                            <input name="selectinfo" class="selectvalue" hidden="true"
+                                                                   th:value="${io.alarmPush}" th:id="${io.id}"/>
+                                                            <span class="selectbutton"
+                                                                  style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                            <span class="button0"></span>
+                                                            <span class="button1"></span>
+                                                            <span class="button2"></span>
+                                                            <span class="button3"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 alarmSet">
+                                                    <div class="checkbox-outline" th:if="${io.paramCode == 'param1'}">
+                                                        <label class="typeName" readonly style="text-decoration: none;"
+                                                               th:text="${io.name}" th:id="${io.pos}"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 alarmLeftPadding">
+                                                    <select class="form-control" name="parameterValSel"
+                                                            onchange="alarmSettings.getIOAlarmStateTxt(this)">
+                                                        <option value> - 状态 -</option>
+                                                        <!--1号位固定传高电平的值   parameterValue 1：高电平 2：低电平-->
+                                                        <option th:value="${io.highSignalType}" th:text="${io.stateOne}"
+                                                                th:selected="${''+io.highSignalType == io.parameterValue}"></option>
+                                                        <option th:value="${io.highSignalType==1?2:1}"
+                                                                th:text="${io.stateTwo}"
+                                                                th:selected="${(io.highSignalType ==1?'2':'1') == io.parameterValue}"></option>
+                                                    </select>
+                                                    <input type="hidden" name="alarmTypeId"
+                                                           th:value="${io.alarmTypeId}">
+                                                </div>
+                                                <div class="col-md-3 alarmLeftPadding">
+                                                    <input class="form-control" type="text" readonly/>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane" id="IOAlarmProfile2">
+                                    <ul class="widget-todo">
+                                        <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                           data-placement="top"
+                                           data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                        <div id="textinfo">
+                                            <span class="shielding" style="cursor: pointer;margin-left:-7px;">屏蔽</span>
+                                            <span class="noneset">无</span><span class="partset"
+                                                                                style="margin-left:2px;">局部</span><span
+                                                class="wholeset" style="margin-left:4px;"> 全局 </span><span class=""
+                                                                                                           style="margin-left:180px;"> 状态 </span>
+                                        </div>
+                                        <div id="textline">
+                                            <span>|</span>
+                                            <span style="margin-left:-2px;">|</span>
+                                            <span
+                                                    style="margin-left:3px;">|</span><span
+                                                style="margin-left:4px;">|</span><span
+                                                style="margin-left:180px;">|</span></div>
+                                        <div class="emptyMsg" th:if="${collectionOneIos.isEmpty()}">
+                                            <p> 注 ： 请先在【应用管理】的【I/O监测设置】中设置I/O即可查看</p>
+                                        </div>
+                                        <li class="clearfix" th:each="io:${collectionOneIos}">
+                                            <div class="form-group">
+                                                <div class="col-md-2">
+                                                    <div th:if="${io.paramCode == 'param1'}">
+                                                        <div class="leftselectbutton">
+                                                            <input name="selectinfo" class="selectvalue" hidden="true"
+                                                                   th:value="${io.alarmPush}" th:id="${io.id}"/>
+                                                            <span class="selectbutton"
+                                                                  style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                            <span class="button0"></span>
+                                                            <span class="button1"></span>
+                                                            <span class="button2"></span>
+                                                            <span class="button3"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 alarmSet">
+                                                    <div class="checkbox-outline" th:if="${io.paramCode == 'param1'}">
+                                                        <label class="typeName" readonly style="text-decoration: none;"
+                                                               th:text="${io.name}" th:id="${io.pos}"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 alarmLeftPadding">
+                                                    <select class="form-control" name="parameterValSel"
+                                                            onchange="alarmSettings.getIOAlarmStateTxt(this)">
+                                                        <option value selected> - 状态 -</option>
+                                                        <option th:value="${io.highSignalType}" th:text="${io.stateOne}"
+                                                                th:selected="${''+io.highSignalType == io.parameterValue}"></option>
+                                                        <option th:value="${io.highSignalType==1?2:1}"
+                                                                th:text="${io.stateTwo}"
+                                                                th:selected="${(io.highSignalType ==1?'2':'1') == io.parameterValue}"></option>
+                                                        <input type="hidden" name="alarmTypeId"
+                                                               th:value="${io.alarmTypeId}">
+                                                </div>
+                                                <div class="col-md-3 alarmLeftPadding">
+                                                    <input class="form-control" type="text" readonly/>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane" id="IOAlarmProfile3">
+                                    <ul class="widget-todo">
+                                        <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                           data-placement="top"
+                                           data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                        <div id="textinfo">
+                                            <span class="shielding" style="cursor: pointer;margin-left:-7px;">屏蔽</span>
+                                            <span class="noneset">无</span><span class="partset"
+                                                                                style="margin-left:2px;">局部</span><span
+                                                class="wholeset" style="margin-left:4px;"> 全局 </span><span class=""
+                                                                                                           style="margin-left:180px;"> 状态 </span>
+                                        </div>
+                                        <div id="textline">
+                                            <span>|</span>
+                                            <span style="margin-left:-2px;">|</span>
+                                            <span
+                                                    style="margin-left:3px;">|</span><span
+                                                style="margin-left:4px;">|</span><span
+                                                style="margin-left:180px;">|</span></div>
+                                        <div class="emptyMsg" th:if="${collectionTwoIos.isEmpty()}">
+                                            <p> 注 ： 请先在【应用管理】的【I/O监测设置】中设置I/O即可查看</p>
+                                        </div>
+                                        <li class="clearfix" th:each="io:${collectionTwoIos}">
+                                            <div class="form-group">
+                                                <div class="col-md-2">
+                                                    <div th:if="${io.paramCode == 'param1'}">
+                                                        <div class="leftselectbutton">
+                                                            <input name="selectinfo" class="selectvalue" hidden="true"
+                                                                   th:value="${io.alarmPush}" th:id="${io.id}"/>
+                                                            <span class="selectbutton"
+                                                                  style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                            <span class="button0"></span>
+                                                            <span class="button1"></span>
+                                                            <span class="button2"></span>
+                                                            <span class="button3"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1 alarmSet">
+                                                    <div class="checkbox-outline" th:if="${io.paramCode == 'param1'}">
+                                                        <label class="typeName" readonly style="text-decoration: none;"
+                                                               th:text="${io.name}" th:id="${io.pos}"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 alarmLeftPadding">
+                                                    <select class="form-control" name="parameterValSel"
+                                                            onchange="alarmSettings.getIOAlarmStateTxt(this)">
+                                                        <option value selected> - 状态 -</option>
+                                                        <option th:value="${io.highSignalType}" th:text="${io.stateOne}"
+                                                                th:selected="${''+io.highSignalType == io.parameterValue}"></option>
+                                                        <option th:value="${io.highSignalType==1?2:1}"
+                                                                th:text="${io.stateTwo}"
+                                                                th:selected="${(io.highSignalType ==1?'2':'1') == io.parameterValue}"></option>
+                                                    </select>
+                                                    <!--  <input type="hidden" name="alarmTypeId" th:value="${io.alarmTypeId}"> -->
+                                                </div>
+                                                <div class="col-md-3 alarmLeftPadding">
+                                                    <input class="form-control" type="text" readonly/>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane active isDevice" id="home1">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo"><span class="shielding"
+                                                             style="cursor: pointer;margin-left:-7px;">屏蔽</span><span
+                                            class="noneset">无</span><span class="partset"
+                                                                          style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline"><span style="margin-left:-7px;">|</span><span
+                                            style="margin-left:-2px;">|</span><span
+                                            style="margin-left:3px;">|</span><span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <li class="clearfix" th:each="alarmType:${alertList}">
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2" hidden="true">
+                                                        <input type="text" name="selectinfo" class="selectvalue"
+                                                               hidden="true" th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <div class="checkbox-outline" th:if="${alarmType.sendFlag == '1'}">
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.id == '5b9b208c-bc26-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input id="parameterValue"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue"
+                                                                   placeholder="请输入参数值" class="form-control"
+                                                                   type="text"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.id == '5b9b195c-bc26-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue"
+                                                                   placeholder="请输入参数值" class="form-control"
+                                                                   type="text"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.id != '5b9b208c-bc26-11e6-a4a6-cec0c932ce01' && alarmType.id != '5b9b195c-bc26-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                                        </div>
+                                                    </div>
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane isDevice" id="profile1">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo"><span class="shielding"
+                                                             style="cursor: pointer;margin-left:-7px;">屏蔽</span><span
+                                            class="noneset">无</span><span class="partset"
+                                                                          style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline"><span style="margin-left:-7px;">|</span><span
+                                            style="margin-left:-2px;">|</span><span
+                                            style="margin-left:3px;">|</span><span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <input type="text" th:value="${driverAlarmList}" hidden>
+                                    <li class="clearfix" th:each="alarmType:${driverAlarmList}">
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2">
+                                                        <input type="text" name="selectinfo" class="selectvalue"
+                                                               hidden="true" th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2" hidden="true">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <div class="checkbox-outline" th:if="${alarmType.sendFlag == '1'}">
+                                                    <!--违规行驶报警-->
+                                                    <div class="col-md-4 alarmLeftPadding" th:if="${alarmType.alarmTypeId == '01351ee2-bb84-11e6-a4a6-cec0c932ce02'}">
+                                                        <input style="cursor: pointer;  background-color: #fafafa;" th:value="${alarmType.parameterValue}"
+                                                               class="runDateTime form-control layer-date laydate-icon"
+                                                               id="parameterValue" name="parameterValue" readonly>
+                                                    </div>
+                                                    <div class="col-md-4 alarmLeftPadding" th:if="${alarmType.alarmTypeId != '01351ee2-bb84-11e6-a4a6-cec0c932ce02'}">
+                                                        <input type="text" id="parameterValue"
+                                                               th:value="${alarmType.parameterValue}"
+                                                               name="parameterValue"
+                                                               placeholder="请输入参数值" class="form-control"
+                                                               onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                                    </div>
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane isDevice" id="profile2">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo"><span class="shielding"
+                                                             style="cursor: pointer;margin-left:-7px;">屏蔽</span><span
+                                            class="noneset">无</span><span class="partset"
+                                                                          style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline"><span style="margin-left:-7px;">|</span><span
+                                            style="margin-left:-2px;">|</span><span
+                                            style="margin-left:3px;">|</span><span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <li class="clearfix" th:each="alarmType:${vehicleAlarmList}">
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2" hidden="true">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <div class="checkbox-outline" th:if="${alarmType.sendFlag == '1'}">
+                                                    <div class="col-md-4 alarmLeftPadding">
+                                                        <input type="text" id="parameterValue"
+                                                               th:value="${alarmType.parameterValue}"
+                                                               name="parameterValue"
+                                                               placeholder="请输入参数值" class="form-control"
+                                                               onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                                    </div>
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane isDevice" id="profile3">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo"><span class="shielding"
+                                                             style="cursor: pointer;margin-left:-7px;">屏蔽</span><span
+                                            class="noneset">无</span><span class="partset"
+                                                                          style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline"><span style="margin-left:-7px;">|</span><span
+                                            style="margin-left:-2px;">|</span><span
+                                            style="margin-left:3px;">|</span><span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <li class="clearfix" th:each="alarmType:${faultAlarmList}">
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2" hidden="true">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7 alarmLeftPadding">
+                                                <div class="checkbox-outline" th:if="${alarmType.sendFlag == '1'}">
+                                                    <div class="col-md-4 alarmLeftPadding">
+                                                        <input type="text" id="parameterValue"
+                                                               th:value="${alarmType.parameterValue}"
+                                                               name="parameterValue"
+                                                               placeholder="请输入参数值" class="form-control"
+                                                               onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                                    </div>
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                       <!--高精度-->
+                        <div class="tab-pane" id="profile4q">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="alarmTextInof">
+                                        <span class="noneset">无</span>
+                                        <span class="partset" style="margin-left:2px;">局部</span>
+                                        <span class="wholeset" style="margin-left:4px;"> 全局 </span>
+                                    </div>
+                                    <div id="textline">
+                                        <span style="margin-left:-2px;">|</span>
+                                        <span style="margin-left:3px;">|</span>
+                                        <span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <li class="clearfix"  th:each="alarmType:${highPrecisionAlarmList}">
+                                        <div class="form-group">
+                                            <div class="col-md-1" style="margin-right: 40px;">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="F3leftselectbutton leftselectbutton2">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton leftselectbutton2" hidden="true">
+                                                        <input type="text" name="selectinfo" class="selectvalue"
+                                                               hidden="true" th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0 button0flag"></span>
+                                                        <span class="button1 button1flag"></span>
+                                                        <span class="button2 button2flag"></span>
+                                                        <span class="button3 button3flag"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet" style="margin-right: 20px;">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <div class="checkbox-outline" th:if="${alarmType.sendFlag == '1'}">
+                                                    <!--电量报警-->
+                                                    <div class="checkbox-outline" th:if="${alarmType.id == '60cc2fcf-42b6-45d1-83ab-26ae33b42dbe'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" id="alarmElectric" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"/>
+                                                            <label for="alarmElectric" class="error" style="display: none;">请输入0-100范围的正整数</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--急加速报警-->
+                                                    <div class="checkbox-outline" th:if="${alarmType.id == 'c6e3e5ee-ce76-40e2-a368-33a5b298c02c'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" id="alarmAccelerate" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"/>
+                                                            <label for="alarmAccelerate" class="error" style="display: none;">请输入0-2.5范围的数字且保留一位小数</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--急减速报警-->
+                                                    <div class="checkbox-outline" th:if="${alarmType.id == '48c2f1ae-6e85-40b2-a2f9-c50ea9c21b90'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" id="alarmSpeed" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"/>
+                                                            <label for="alarmSpeed" class="error" style="display: none;">请输入0-2.5范围的数字且保留一位小数</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--急转弯报警-->
+                                                    <div class="checkbox-outline" th:if="${alarmType.id == 'dbc0fa3a-c0ba-4963-9979-cc6f9d7d6a4f'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input id="alarmWheel" type="text" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"/>
+                                                            <label for="alarmWheel" class="error" style="display: none;">请输入0-100范围的正整数</label>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <!--碰撞报警-->
+                                                    <div class="checkbox-outline" th:if="${alarmType.id == 'a21f3b28-98c0-44e3-817e-1502fed96ad7'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input autocomplete="off" id="alarmCollision" type="text" name="parameterValue" th:value="${alarmType.parameterValue}"
+                                                                   placeholder="请输入参数值" class="form-control"/>
+                                                            <label for="alarmWheel" class="error" style="display: none;">请输入0-5范围的数字且保留一位小数</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="tab-pane" id="profile4">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo">
+                                        <span class="shielding" style="cursor: pointer;margin-left:-7px;">屏蔽</span>
+                                        <span class="noneset">无</span><span class="partset"
+                                                                            style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline">
+                                        <span>|</span>
+                                        <span>|</span>
+                                        <span>|</span>
+                                        <span>|</span>
+                                    </div>
+                                    <li class="clearfix" th:each="alarmType:${sensorAlarmList}">
+                                        <!-- 超速报警 、胎压报警、载重报警-->
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0"></span>
+                                                        <span class="button1"></span>
+                                                        <span class="button2"></span>
+                                                        <span class="button3"></span>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton" hidden="true">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0"></span>
+                                                        <span class="button1"></span>
+                                                        <span class="button2"></span>
+                                                        <span class="button3"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.sendFlag == '1' || alarmType.pos == '67'}">
+                                                    <div class="col-md-4 alarmLeftPadding">
+                                                        <input type="text" id="parameterValue"
+                                                               th:value="${alarmType.parameterValue}"
+                                                               name="parameterValue"
+                                                               placeholder="请输入参数值" class="form-control"
+                                                               onkeyup="value=value.replace(/[^\d]/g,'')"/ >
+                                                    </div>
+                                                    <label class="col-md-6 alarmLeftPadding" readonly
+                                                           style="text-decoration: none;padding-top:7px;"
+                                                           th:text="${alarmType.description}"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="profile5">
+                            <div class="col-md-12">
+                                <ul class="widget-todo">
+                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip"
+                                       data-placement="top"
+                                       data-original-title="“屏蔽”指对应报警类型不推送，不存储；“无”指对应报警类型不推送，会存储；“局部”指对应报警类型仅推送实时监控和实时视频页面，会存储；“全局”指对应报警类型全局推送，会存储。"></i>
+                                    <div id="textinfo">
+                                        <span class="shielding" style="cursor: pointer;margin-left:-7px;">屏蔽</span>
+                                        <span class="noneset">无</span><span class="partset"
+                                                                            style="margin-left:2px;">局部</span><span
+                                            class="wholeset" style="margin-left:4px;"> 全局 </span></div>
+                                    <div id="textline">
+                                        <span>|</span>
+                                        <span style="margin-left:-2px;">|</span>
+                                        <span style="margin-left:3px;">|</span>
+                                        <span style="margin-left:4px;">|</span>
+                                    </div>
+                                    <input type="text" th:value="${platAlarmList}" hidden>
+                                    <li class="clearfix" th:each="alarmType:${platAlarmList}">
+                                        <div class="form-group">
+                                            <div class="col-md-2">
+                                                <div th:if="${alarmType.paramCode == 'param1'}">
+                                                    <div class="leftselectbutton">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0"></span>
+                                                        <span class="button1"></span>
+                                                        <span class="button2"></span>
+                                                        <span class="button3"></span>
+                                                    </div>
+                                                    <input th:if="${alarmType.pos == '76' || alarmType.pos == '77'|| alarmType.pos == '150' || alarmType.pos == '209'}"
+                                                           type="hidden" th:value="${alarmType.paramCode}"
+                                                           name="paramCodeValue">
+                                                </div>
+                                                <div th:if="${alarmType.paramCode != 'param1'}">
+                                                    <div class="leftselectbutton" hidden="true">
+                                                        <input name="selectinfo" class="selectvalue" hidden="true"
+                                                               th:value="${alarmType.alarmPush}"
+                                                               th:id="${alarmType.id}"/>
+                                                        <span class="selectbutton"
+                                                              style="width:20px;height:20px;position:absolute;left:9px;top:7px;"></span>
+                                                        <span class="button0"></span>
+                                                        <span class="button1"></span>
+                                                        <span class="button2"></span>
+                                                        <span class="button3"></span>
+                                                    </div>
+                                                    <input th:if="${alarmType.pos == '76' || alarmType.pos == '77' || alarmType.pos == '150' || alarmType.pos == '209'}"
+                                                           type="hidden" th:value="${alarmType.paramCode}"
+                                                           name="paramCodeValue">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 alarmSet">
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode == 'param1'}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:text="${alarmType.name}" th:id="${alarmType.pos}"></label>
+                                                </div>
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.paramCode != 'param1' && (alarmType.pos == '76' || alarmType.pos == '77' || alarmType.pos == '150' || alarmType.pos == '209')}">
+                                                    <label class="typeName" readonly style="text-decoration: none;"
+                                                           th:id="${alarmType.pos}"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8 alarmLeftPadding">
+                                                <!-- 疑似人为屏蔽 -->
+                                                <div class="checkbox-outline"
+                                                     th:if="${alarmType.alarmTypeId == '0334e0bc-bb84-11e6-a4a6-cec0c932ce02'}">
+                                                    <div class="col-md-4 alarmLeftPadding">
+                                                        <input placeholder="请输入参数值"
+                                                               th:min="${alarmType.id == 'bccd2eaa-667f-11e9-9cb1-000c297cf511' ? 1 : 5}"
+                                                               th:max="${alarmType.id == 'bccd2eaa-667f-11e9-9cb1-000c297cf509' ? 20 : 60}"
+                                                               onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                               type="text" th:id="${alarmType.id}"
+                                                               th:value="${alarmType.parameterValue}"
+                                                               name="parameterValue" class="form-control"/>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <label class="alarmLeftPadding" readonly
+                                                               style="text-decoration: none;padding-top:7px;"
+                                                               th:text="${alarmType.description}"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="checkbox-outline" th:if="${alarmType.alarmTypeId == '013527pa-bb84-11e6-a4a6-cec0c932ce05' || alarmType.id == '5b9b55ca-bc26-11e6-a4a6-cec0c932ce01'
+														|| alarmType.alarmTypeId == '01351320-bb84-11e6-a4a6-cec0c932ce01' || alarmType.alarmTypeId == '9f291a24-2832-11e8-b467-0ed5f89f718b'
+														|| alarmType.alarmTypeId == '532b0e70-51c7-11e8-9c2d-fa7ae01bbebc' || alarmType.alarmTypeId == '013527pa-bb84-11e6-a4a6-cec0c932ce04'
+														|| alarmType.alarmTypeId == '2134deb4-bb84-11e6-a4a6-cec0c932ce01'|| alarmType.alarmTypeId == '0334e0bc-bb84-11e6-a4a6-cec0c932ce01'}">
+                                                    <!-- 车机疑似屏蔽报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.id == '5b9b55ca-bc26-11e6-a4a6-cec0c932ce01' && alarmType.paramCode == 'param1'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" id="parameterValue"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue"
+                                                                   placeholder="请输入参数值" class="form-control"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"/>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="col-md-12 alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 路线偏离报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '013527pa-bb84-11e6-a4a6-cec0c932ce04'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <select id="parameterValue"
+                                                                    class="lineDeviateSelect form-control">
+                                                                <option value="0"
+                                                                        th:selected="${alarmType.parameterValue == '0'}">
+                                                                    通用标准
+                                                                </option>
+                                                                <!--<option value = "1" th:selected="${alarmType.parameterValue == '1'}">山西标准</option>-->
+                                                                <option value="2"
+                                                                        th:selected="${alarmType.parameterValue == '2'}">
+                                                                    四川标准
+                                                                </option>
+                                                            </select>
+                                                            <input type="hidden" id="lineDeviateSelect"
+                                                                   name="parameterValue"/>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 异动报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '01351320-bb84-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <!-- <input type = "text" id = "parameterValue" th:value="${alarmType.parameterValue}" name = "parameterValue" class="form-control"/>  -->
+                                                            <select th:if="${alarmType.paramCode == 'param1'}"
+                                                                    id="parameterValue"
+                                                                    class="exceptionMoveSelect form-control">
+                                                                <option value="0"
+                                                                        th:selected="${alarmType.parameterValue == '0'}">
+                                                                    通用标准
+                                                                </option>
+                                                                <option value="1"
+                                                                        th:selected="${alarmType.parameterValue == '1'}">
+                                                                    山西标准
+                                                                </option>
+                                                                <option value="2"
+                                                                        th:selected="${alarmType.parameterValue == '2'}">
+                                                                    四川标准
+                                                                </option>
+                                                            </select>
+                                                            <input th:if="${alarmType.paramCode == 'param1'}"
+                                                                   type="hidden" id="exceptionMoveSelect"
+                                                                   name="parameterValue"/>
+                                                            <input th:if="${alarmType.paramCode == 'param2'}"
+                                                                   style="cursor: pointer;  background-color: #fafafa;"
+                                                                   class="dateTime2 form-control layer-date laydate-icon"
+                                                                   id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if="${alarmType.paramCode == 'param2'}"
+                                                                   th:value="${alarmType.parameterValue}" type="hidden"
+                                                                   id="dateTimeValue2"/>
+                                                            <input th:if="${alarmType.paramCode == 'param3'}"
+                                                                   style="cursor: pointer;  background-color: #fafafa;"
+                                                                   class="dateTime3 form-control layer-date laydate-icon"
+                                                                   id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if="${alarmType.paramCode == 'param3'}"
+                                                                   th:value="${alarmType.parameterValue}" type="hidden"
+                                                                   id="dateTimeValue3"/>
+                                                            <!-- 勿删 -->
+                                                            <!-- <input th:if = "${alarmType.paramCode == 'param4'}" style="cursor: pointer;  background-color: #fafafa;" class="dateTime4 form-control layer-date laydate-icon" id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if = "${alarmType.paramCode == 'param4'}" th:value="${alarmType.parameterValue}" type="hidden" id = "dateTimeValue4"/>
+                                                            <input th:if = "${alarmType.paramCode == 'param5'}" style="cursor: pointer;  background-color: #fafafa;" class="dateTime5 form-control layer-date laydate-icon" id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if = "${alarmType.paramCode == 'param5'}" th:value="${alarmType.parameterValue}" type="hidden" id = "dateTimeValue5"/> -->
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="col-md-6 alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 超速预警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '9f291a24-2832-11e8-b467-0ed5f89f718b'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input placeholder="请输入参数值" min="0" max="100"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                                   type="text" th:id="${alarmType.id}"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue" class="form-control"/>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 超速报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '013527pa-bb84-11e6-a4a6-cec0c932ce05'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input placeholder="请输入参数值"
+                                                                   th:if="${alarmType.paramCode != 'param1' && alarmType.paramCode != 'param3' && alarmType.paramCode != 'param4' && alarmType.paramCode != 'param5' && alarmType.paramCode != 'param11'}"
+                                                                   min="0" max="160"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                                   type="text" th:id="${alarmType.id}"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue" class="form-control"/>
+                                                            <input placeholder="请输入参数值"
+                                                                   th:if="${alarmType.paramCode == 'param3'}" min="1"
+                                                                   max="100" onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                                   type="text" th:id="${alarmType.id}"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue" class="form-control"/>
+                                                            <select th:if="${alarmType.paramCode == 'param1'}"
+                                                                    th:id="${alarmType.id}" name="parameterValue"
+                                                                    class="overSpeedSelect form-control">
+                                                                <option value="0"
+                                                                        th:selected="${alarmType.parameterValue == '0'}">
+                                                                    通用标准
+                                                                </option>
+                                                                <option value="1"
+                                                                        th:selected="${alarmType.parameterValue == '1'}">
+                                                                    山西标准
+                                                                </option>
+                                                                <option value="2"
+                                                                        th:selected="${alarmType.parameterValue == '2'}">
+                                                                    四川标准
+                                                                </option>
+                                                            </select>
+                                                            <input th:if="${alarmType.paramCode == 'param1'}"
+                                                                   type="hidden" id="overSpeedSelect"
+                                                                   name="parameterValue"/>
+                                                            <input th:if="${alarmType.paramCode == 'param4'}"
+                                                                   style="cursor: pointer;  background-color: #fafafa;"
+                                                                   class="dateTime14 form-control layer-date laydate-icon"
+                                                                   id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if="${alarmType.paramCode == 'param4'}"
+                                                                   th:value="${alarmType.parameterValue}" type="hidden"
+                                                                   id="dateTimeValue14"/>
+                                                            <input th:if="${alarmType.paramCode == 'param5'}"
+                                                                   style="cursor: pointer;  background-color: #fafafa;"
+                                                                   class="dateTime15 form-control layer-date laydate-icon"
+                                                                   id="parameterValue" name="parameterValue" readonly>
+                                                            <input th:if="${alarmType.paramCode == 'param5'}"
+                                                                   th:value="${alarmType.parameterValue}" type="hidden"
+                                                                   id="dateTimeValue15"/>
+                                                            <input th:if="${alarmType.paramCode == 'param11'}"
+                                                                   type="hidden" id="isRoadNetSpeedLimit"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue"/>
+                                                        </div>
+                                                        <div th:if="${alarmType.paramCode != 'param11'}"
+                                                             class="col-md-5">
+                                                            <i th:if="${alarmType.paramCode == 'param3'}"
+                                                               style="margin-left:-1px;"
+                                                               class="fa fa-question-circle fa-lg" data-toggle="tooltip"
+                                                               data-placement="top"
+                                                               data-original-title="夜间速度达到日间限速*设置百分比时触发报警"/>
+                                                            <label th:if="${alarmType.paramCode != 'param1'}"
+                                                                   class="alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                            <div th:if="${alarmType.paramCode == 'param1'}"
+                                                                 class="checkbox" style="width:150px;">
+                                                                <label class="control-label alarmLeftPadding">
+                                                                    <input type="checkbox" id="roadNetSpeedLimit"
+                                                                           value="0">
+                                                                    <i class="fa fa-question-circle fa-lg infoTitle" data-toggle="tooltip" data-placement="top" data-original-title="勾选后调用第三方道路限速地图接口获取道路级别的路网限速值，平台根据道路级别可设置平台限速值，报警时以两者中限速值小的为准"></i>
+                                                                    路网限速
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div th:if="${alarmType.paramCode == 'param3'}"
+                                                             class="col-md-3 control-label text-right">
+                                                            <span id="overSpeedHide"
+                                                                  style="cursor: pointer;"><font>显示更多</font><span
+                                                                    class="fa fa-chevron-down"
+                                                                    aria-hidden="true"></span></span>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 长时间下线报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '532b0e70-51c7-11e8-9c2d-fa7ae01bbebc' && alarmType.paramCode == 'param1'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input type="text" id="parameterValue"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue"
+                                                                   placeholder="请输入参数值" class="form-control"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')" min="10"
+                                                                   max="1440"/>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="col-md-12 alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- ACC信号异常报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '2134deb4-bb84-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input placeholder="请输入参数值" min="0" max="100"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                                   type="text" th:id="${alarmType.id}"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue" class="form-control"/>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                    <!-- 位置信息异常报警 -->
+                                                    <div class="checkbox-outline"
+                                                         th:if="${alarmType.alarmTypeId == '0334e0bc-bb84-11e6-a4a6-cec0c932ce01'}">
+                                                        <div class="col-md-4 alarmLeftPadding">
+                                                            <input placeholder="请输入参数值" min="0" max="100"
+                                                                   onkeyup="value=value.replace(/[^\d]/g,'')"
+                                                                   type="text" th:id="${alarmType.id}"
+                                                                   th:value="${alarmType.parameterValue}"
+                                                                   name="parameterValue" class="form-control"/>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <label class="alarmLeftPadding" readonly
+                                                                   style="text-decoration: none;padding-top:7px;"
+                                                                   th:text="${alarmType.description}"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <input id="checkedParams" name="checkedParams" type="hidden"/>
+                        <input id="deviceType" name="deviceType" th:value="${vehicle.deviceType}" type="hidden"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" type="button" id="defaultParam">
+            <strong>默认值</strong>
+        </button>
+        <button class="btn btn-primary readFlag" type="button" id="readParam">
+            <strong>读取</strong>
+        </button>
+        <button class="btn btn-primary" type="button" onclick="alarmSettings.doSubmit()">
+            <strong>提 交</strong>
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var systemError = [[#{system.error}]];
+</script>
+<script src="/wro/alarmSetting.js" th:src="@{/wro/alarmSetting.js}"></script>
+<style>
+    /*.clearfix{
+    min-height:49px;
+    }*/
+    .selectbutton {
+        display: inline-block;
+        height: 20px;
+        width: 20px;
+        background-color: #6ED1F9;
+        border-radius: 50%;
+        z-index: 999;
+        box-shadow: 1px 1px 1px #C6C6C6;
+    }
+
+    .button0, .button1 {
+        position: absolute;
+        top: 7px;
+        width: 20px;
+        height: 20px;
+        left: 9px;
+        cursor: pointer;
+    }
+
+    .button1 {
+        left: 55px;
+    }
+
+    .button2 {
+        position: absolute;
+        top: 7px;
+        width: 20px;
+        height: 20px;
+        left: 103px;
+        cursor: pointer;
+    }
+
+    .button3 {
+        position: absolute;
+        top: 7px;
+        width: 20px;
+        height: 20px;
+        left: 152px;
+        cursor: pointer;
+    }
+
+    .button0flag {
+        left: 9px;
+    }
+
+    .button1flag {
+        left: 55px;
+    }
+
+    .button2flag {
+        left: 103px;
+    }
+
+    .button3flag {
+        left: 152px;
+    }
+
+    #textinfo {
+        margin-left: -8px;
+        font-size: 0;
+    }
+
+    #textinfo span {
+        display: inline-block;
+        width: 46px;
+        height: 20px;
+        font-size: 14px;
+        text-align: center;
+    }
+    #alarmTextInof {
+        margin-left: -17px;
+        font-size: 0;
+    }
+    #alarmTextInof span {
+        display: inline-block;
+        width: 46px;
+        height: 20px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #textline {
+        font-size: 0;
+        line-height: 20px;
+    }
+
+    #textline span {
+        display: inline-block;
+        width: 47px;
+        height: 10px;
+        font-size: 14px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    #textline span:nth-child(1) {
+        margin-left: -15px !important;
+    }
+
+    #textline span:nth-child(2) {
+        margin-left: -2px !important;
+    }
+
+    #textline span:nth-child(3) {
+        margin-left: 1px !important;
+    }
+
+    #textline span:nth-child(4) {
+        margin-left: 1px !important;
+    }
+
+    .leftselectbutton {
+        position: relative;
+        width: 180px;
+        height: 30px;
+        left: -12px;
+        background-image: url(../../resources/img/ssdf1.png);
+        background-repeat: no-repeat;
+        background-position: 2px 4px;
+    }
+    .F3leftselectbutton {
+        position: relative;
+        width: 180px;
+        height: 30px;
+        left: -12px;
+        background-image: url(../../resources/img/F3ssdf1.png);
+        background-repeat: no-repeat;
+        background-position: 2px 4px;
+    }
+
+    .leftselectbutton2 {
+        position: relative;
+        left: -12px;
+    }
+
+    #settingForm .form-control {
+        min-height: 36px;
+    }
+
+    @media screen and (max-width: 1280px) {
+        .modal-body {
+            max-height: 390px;
+        }
+    }
+
+    .tab-content > .tab-pane.active {
+        display: block;
+    }
+
+    #settingForm > input[type=checkbox] {
+        position: relative;
+        top: 1px;
+        left: -5px;
+    }
+
+    .ignore {
+        position: relative;
+        top: 1px;
+    }
+</style>

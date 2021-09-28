@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.sharding.LogSearchDao">
+
+    <!-- 查询log -->
+    <select id="findLog"
+        parameterType="com.zw.platform.domain.reportManagement.query.LogSearchQuery"
+        resultType="com.zw.platform.domain.reportManagement.LogSearch">
+        SELECT * FROM zw_log l
+        WHERE l.org_id IN
+        <foreach item="item" collection="groupIds" separator=","
+            open="(" close=")">
+            #{item}
+        </foreach>
+        AND l.event_date BETWEEN #{startTime} AND #{endTime}
+        <if test="username != null and username !=''">
+            AND l.username LIKE
+            CONCAT('%',#{username},'%')
+        </if>
+        <if test="message != null and message != ''">
+            AND (l.message LIKE CONCAT('%',#{message},'%')
+                OR l.monitoring_operation LIKE CONCAT('%',#{message},'%')
+            )
+        </if>
+        <if test="module != null and module != ''">
+            AND l.module=#{module} 
+        </if>
+        <if test="logSource != null and logSource != ''">
+            AND l.log_source=#{logSource}
+        </if>
+        ORDER BY l.event_date DESC
+    </select>
+    
+    <select id="findVideoLogCount"
+        parameterType="com.zw.platform.domain.reportManagement.query.LogSearchQuery"
+        resultType="com.zw.platform.domain.reportManagement.VideoLog">
+        SELECT username, COUNT(1) userCount FROM zw_log
+        WHERE
+        event_date BETWEEN #{startTime} AND #{endTime}
+        AND org_id IN
+        <foreach item="item" collection="groupIds" separator=","
+            open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="usernames != null and usernames.size() > 0">
+            AND username IN
+            <foreach collection="usernames" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="username != null and username !=''">
+            AND username LIKE
+            CONCAT('%',#{username},'%')
+        </if>
+        <if test="message != null and message != ''">
+            AND (message LIKE CONCAT('%',#{message},'%')
+                OR monitoring_operation LIKE CONCAT('%',#{message},'%')
+            )
+        </if>
+        <if test="module != null and module != ''">
+            AND module=#{module}
+        </if>
+        GROUP BY username
+    </select>
+
+    <select id="findVideoLogDetail" resultType="com.zw.platform.domain.reportManagement.VideoLog">
+        SELECT * FROM zw_log
+        WHERE
+        org_id IN
+        <foreach item="item" collection="groupIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND event_date BETWEEN #{startTime} AND #{endTime}
+        <if test="username != null and username !=''">
+            AND username LIKE
+            CONCAT('%',#{username},'%')
+        </if>
+        <if test="message != null and message != ''">
+            AND (message LIKE CONCAT('%',#{message},'%')
+            OR monitoring_operation LIKE CONCAT('%',#{message},'%')
+            )
+        </if>
+        <if test="module != null and module != ''">
+            AND module=#{module}
+        </if>
+        ORDER BY event_date DESC
+    </select>
+    
+    <insert id="addLog" parameterType="com.zw.platform.domain.reportManagement.form.LogSearchForm" >
+        insert into zw_log (id, event_date, ip_address, username, org_id, message, log_source, module,
+                            monitoring_operation, brand, plate_color)
+        values (#{id}, #{eventDate}, #{ipAddress}, #{username}, #{groupId}, #{message}, #{logSource}, #{module},
+                #{monitoringOperation}, #{brand}, #{plateColor})
+      </insert>
+
+    <select id="findLogByModule" resultType="com.zw.platform.domain.reportManagement.LogSearch">
+        SELECT message,event_date,username,ip_address,brand,plate_color,log_source,monitoring_operation
+        from zw_log
+        where module=#{module} and event_date BETWEEN #{startTime} AND #{endTime}
+        ORDER BY event_date DESC
+    </select>
+
+    <select id="getByTime" resultType="com.zw.platform.domain.reportManagement.LogSearch">
+        select message,event_date,username,ip_address,brand,plate_color,log_source,monitoring_operation,org_id
+        from zw_log where log_source = 3
+        and event_date between #{startTime} and #{endTime}
+        and org_id in
+        <foreach collection="orgIds" item="item" open="(" close=")" separator=",">
+         #{item}
+         </foreach>
+         order by event_date desc limit 1000
+    </select>
+
+    <select id="listTopRecordsByTime" resultType="com.zw.platform.domain.reportManagement.LogSearch">
+        SELECT id, event_date, ip_address, username, group_id orgId, message, log_source, module,
+               monitoring_operation, brand, plate_color
+        FROM zw_c_log
+        WHERE event_date BETWEEN #{beginTime} AND #{endTime}
+        <if test="id != null">
+            AND (event_date > #{beginTime} OR id > #{id})
+        </if>
+        ORDER BY event_date, id
+        LIMIT #{batchSize}
+    </select>
+
+    <select id="checkIfExists" resultType="boolean">
+        SELECT 1 FROM zw_log WHERE event_date = #{eventDate} AND id = #{id} LIMIT 1
+    </select>
+
+    <insert id="batchInsert">
+        insert into zw_log (id, event_date, ip_address, username, org_id, message, log_source, module,
+                            monitoring_operation, brand, plate_color)
+        values
+        <foreach collection="collection" item="data" separator=",">
+            (#{data.id}, #{data.eventDate}, #{data.ipAddress}, #{data.username}, #{data.orgId}, #{data.message},
+            #{data.logSource}, #{data.module}, #{data.monitoringOperation}, #{data.brand}, #{data.plateColor})
+        </foreach>
+    </insert>
+</mapper>

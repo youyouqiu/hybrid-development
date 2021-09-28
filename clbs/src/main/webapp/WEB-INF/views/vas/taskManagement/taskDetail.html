@@ -1,0 +1,100 @@
+<style>
+    .schedule-list{border:1px solid #eee;padding:0 20px;margin-bottom:20px;/*max-height:260px;overflow: hidden;overflow-y: auto;*/}
+    .zw-title{background:#eee;padding:5px;height:38px;margin-top:20px;}
+    .zw-title .control-label{padding-top:0;height:28px;line-height:28px;}
+    .inputStyleHide{padding:0;}
+</style>
+<form th:object="${taskInfo}"
+      id="detailForm"
+      role="form"
+      class="form-horizontal"
+      xmlns:th="http://www.w3.org/1999/xhtml">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">任务详情</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="hidden" id="*{id}"><!--任务id-->
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 任务名称：</label>
+                    <div class="col-md-10">
+                        <input th:value="*{taskName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注： </label>
+                    <div class="col-md-10">
+                        <div th:text="*{remark}" style="padding-top: 8px"></div>
+                    </div>
+                </div>
+
+                <ul id="schedule-list" class="schedule-list">
+                    <li class="item" th:each="taskItems:*{taskItems}">
+                        <div class="zw-title clearfix">
+                            <label class="control-label pull-left"><label
+                                    class="text-danger">*</label> 任务项 </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 控制类型： </label>
+                            <div class="col-md-10">
+                                <label class="radio-inline"><input disabled class="controlType" type="radio"  th:name="${taskItems.startTime}" value="1" checked>
+                                    <span th:class="${taskItems.controlType==1 ? '' : 'hide'}">围栏</span>
+                                    <span th:class="${taskItems.controlType==2 ? '' : 'hide'}">RFID</span>
+                                    <span th:class="${taskItems.controlType==3 ? '' : 'hide'}">NFC</span>
+                                    <span th:class="${taskItems.controlType==4 ? '' : 'hide'}">二维码</span>
+                                </label>
+                                <!--<label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="2" th:checked="${taskItems.controlType == 2}" disabled>RFID</label>-->
+                                <!--<label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="3" th:checked="${taskItems.controlType == 3}" disabled>NFC</label>-->
+                                <!--<label class="radio-inline"><input class="controlType" type="radio" name="controlType0" value="4" th:checked="${taskItems.controlType == 4}" disabled>二维码</label>-->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 围栏： </label>
+                            <div class="col-md-10 has-feedback">
+                                <input th:value="${taskItems.fenceName}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 开始时间： </label>
+                            <div class="col-md-4">
+                                <input  th:value="${taskItems.startTime}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 结束时间： </label>
+                            <div class="col-md-4">
+                                <input  th:value="${taskItems.endTime}" readonly="readonly" type="text" class="form-control inputStyleHide" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 关联报警： </label>
+                            <div class="col-md-10">
+                                <label class="checkbox-inline"><input class="relationAlarm" value="1" type="checkbox" disabled th:checked="${taskItems.relationAlarm.indexOf('1') != -1}"/> 任务未到岗</label>
+                                <label class="checkbox-inline"><input class="relationAlarm" value="2" type="checkbox" disabled th:checked="${taskItems.relationAlarm.indexOf('2') != -1}"/> 任务离岗</label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+    	<span>
+	        <button type="button" class="btn btn-default" data-dismiss="modal">
+	            <strong>关 闭</strong>
+	        </button>
+    	</span>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/taskDetails.js"></script>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoSleepSettingDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoSleepSetting" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="wakeup_hand_sign" property="wakeupHandSign" jdbcType="INTEGER" />
+    <result column="wakeup_condition_sign" property="wakeupConditionSign" jdbcType="INTEGER" />
+    <result column="wakeup_condition" property="wakeupCondition" jdbcType="INTEGER" />
+    <result column="wakeup_time_sign" property="wakeupTimeSign" jdbcType="INTEGER" />
+    <result column="wakeup_time" property="wakeupTime" jdbcType="INTEGER" />
+    <result column="wakeup_time_flag" property="wakeupTimeFlag" jdbcType="INTEGER" />
+    <result column="wakeup_time1" property="wakeupTime1" jdbcType="VARCHAR" />
+    <result column="wakeup_close1" property="wakeupClose1" jdbcType="VARCHAR" />
+    <result column="wakeup_time2" property="wakeupTime2" jdbcType="VARCHAR" />
+    <result column="wakeup_close2" property="wakeupClose2" jdbcType="VARCHAR" />
+    <result column="wakeup_time3" property="wakeupTime3" jdbcType="VARCHAR" />
+    <result column="wakeup_close3" property="wakeupClose3" jdbcType="VARCHAR" />
+    <result column="wakeup_time4" property="wakeupTime4" jdbcType="VARCHAR" />
+    <result column="wakeup_close4" property="wakeupClose4" jdbcType="VARCHAR" />
+    <result column="flag" property="flag" jdbcType="SMALLINT" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, vehicle_id, wakeup_hand_sign, wakeup_condition_sign, wakeup_condition, wakeup_time_sign, 
+    wakeup_time, wakeup_time_flag, wakeup_time1, wakeup_close1, wakeup_time2, wakeup_close2, 
+    wakeup_time3, wakeup_close3, wakeup_time4, wakeup_close4, flag, create_data_time, 
+    create_data_username, update_data_time, update_data_username
+  </sql>
+  <!-- 根据车辆id查询视频休眠参数 -->
+  <select id="getVideoSleepByVehicleId" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_m_video_sleep_setting
+    where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+  </select>
+  <!--添加视频休眠参数  -->
+  <insert id="saveVideoSleep" parameterType="com.zw.platform.domain.realTimeVideo.VideoSleepSetting" >
+    insert into zw_m_video_sleep_setting (id, vehicle_id, wakeup_hand_sign, 
+      wakeup_condition_sign, wakeup_condition, wakeup_time_sign, 
+      wakeup_time, wakeup_time_flag, wakeup_time1, 
+      wakeup_close1, wakeup_time2, wakeup_close2, 
+      wakeup_time3, wakeup_close3, wakeup_time4, 
+      wakeup_close4, flag, create_data_time, 
+      create_data_username
+      )
+    values (#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR}, #{wakeupHandSign,jdbcType=INTEGER}, 
+      #{wakeupConditionSign,jdbcType=INTEGER}, #{wakeupCondition,jdbcType=INTEGER}, #{wakeupTimeSign,jdbcType=INTEGER}, 
+      #{wakeupTime,jdbcType=INTEGER}, #{wakeupTimeFlag,jdbcType=INTEGER}, #{wakeupTime1,jdbcType=VARCHAR}, 
+      #{wakeupClose1,jdbcType=VARCHAR}, #{wakeupTime2,jdbcType=VARCHAR}, #{wakeupClose2,jdbcType=VARCHAR}, 
+      #{wakeupTime3,jdbcType=VARCHAR}, #{wakeupClose3,jdbcType=VARCHAR}, #{wakeupTime4,jdbcType=VARCHAR}, 
+      #{wakeupClose4,jdbcType=VARCHAR}, #{flag,jdbcType=SMALLINT}, #{createDataTime,jdbcType=TIMESTAMP}, 
+      #{createDataUsername,jdbcType=VARCHAR}
+      )
+  </insert>  
+  <!--修改视频休眠参数  -->
+  <update id="updateVideoSleep" parameterType="com.zw.platform.domain.realTimeVideo.VideoSleepSetting" >
+    update zw_m_video_sleep_setting
+    <set>
+        wakeup_hand_sign = #{wakeupHandSign,jdbcType=INTEGER},
+
+        wakeup_condition_sign = #{wakeupConditionSign,jdbcType=INTEGER},
+
+        wakeup_condition = #{wakeupCondition,jdbcType=INTEGER},
+
+        wakeup_time_sign = #{wakeupTimeSign,jdbcType=INTEGER},
+
+        wakeup_time = #{wakeupTime,jdbcType=INTEGER},
+
+        wakeup_time_flag = #{wakeupTimeFlag,jdbcType=INTEGER},
+
+        wakeup_time1 = #{wakeupTime1,jdbcType=VARCHAR},
+
+        wakeup_close1 = #{wakeupClose1,jdbcType=VARCHAR},
+
+        wakeup_time2 = #{wakeupTime2,jdbcType=VARCHAR},
+
+        wakeup_close2 = #{wakeupClose2,jdbcType=VARCHAR},
+
+        wakeup_time3 = #{wakeupTime3,jdbcType=VARCHAR},
+
+        wakeup_close3 = #{wakeupClose3,jdbcType=VARCHAR},
+
+        wakeup_time4 = #{wakeupTime4,jdbcType=VARCHAR},
+        
+        wakeup_close4 = #{wakeupClose4,jdbcType=VARCHAR},
+        
+        update_data_time = #{updateDataTime,jdbcType=TIMESTAMP}, 
+        
+        update_data_username = #{updateDataUsername,jdbcType=VARCHAR}
+        
+    </set>
+    where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+  </update>
+  
+  <delete id="delete">
+    delete from zw_m_video_sleep_setting where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+  </delete>
+
+    <delete id="deleteBatch">
+    delete from zw_m_video_sleep_setting where vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+  </delete>
+</mapper>

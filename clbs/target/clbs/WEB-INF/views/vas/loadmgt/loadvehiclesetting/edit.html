@@ -1,0 +1,442 @@
+<div  class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" id="closeModal" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">载重管理设置修改</h4>
+        <style>
+            label.control-label{
+                padding-left: 0;
+                padding-right: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="vehicleList" th:value="${vehicleList}" type="hidden"/>
+                <input id="id" th:value="${vehicleLoadSetting.id}" type="hidden"/>
+                <input id="twoId" th:value="${vehicleLoadSetting.twoId}" type="hidden"/>
+                <input id="type" th:value="${type}" type="hidden"/>
+                <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken" id="avoidRepeatSubmitToken">
+                <!-- curBox用于区分标定详情页面显示哪个油箱的数据 -->
+                <input id="curBox" type="hidden"/>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> <label
+                            class="text-danger">*</label> 监控对象：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer" th:value="${vehicleInfo.brand}" name="vehicleBrand"
+                               placeholder="请输入监控对象" class="form-control" readonly id="vehicleBrand"/>
+                        <input th:value="${vehicleInfo.id}" id="vehicleId" name="vehicleId" type="hidden"/>
+                        <input th:value="${monitorType}"  name="monitorType" id="monitorType" type="hidden"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 参考对象：</label>
+                    <div class="col-md-4">
+                        <div class="input-group" style="margin-right:15px;">
+                            <input name="brands" type="text" class="form-control" id="brands">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-white dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel-heading">
+                    <div class="dropdown panel-title fwb">
+                        <ul class="nav nav-tabs">
+                            <li class="active" id="egine1Title"><a href="#egine1" data-toggle="tab">1#载重</a></li>
+                            <li id="egine2Title"><a href="#egine2" data-toggle="tab">2#载重</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content">
+                        <!-- 载重1 -->
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                传感器基本参数
+                            </label>
+                        </div>
+
+                        <div class="tab-pane active" id="egine1">
+                            <form id="bindForm">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 传感器型号：
+                                </label>
+                                <div class="col-md-4">
+                                    <input type="hidden" name="formSensorId1" id="formSensorId1" th:value="${vehicleLoadSetting.sensorId}"/>
+                                    <div class="input-group">
+                                        <input type="text" placeholder="请选择传感器型号" class="form-control" id="sensorId">
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn btn-white dropdown-toggle"
+                                                    style="height:36px" data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right" id="sensorDropdown1"
+                                                role="menu" style="width:100%;">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label class="col-md-4"></label>
+                                <div class="col-md-2 control-label text-right">
+                                    <span id="tankBasisInfo"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                                </div>
+                            </div>
+                            <div  id="tankBasisInfo-content" hidden>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> 波特率：
+                                </label>
+                                <div class="col-md-4">
+                                    <input readonly="readonly" name="baudRate" id="baudRate" class="form-control"/>
+                                </div>
+                                <label class="col-md-2 control-label"> 滤波系数：
+                                </label>
+                                <div class="col-md-4">
+                                    <input readonly="readonly" name="filterFactor" id="filterFactor" class="form-control"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> 补偿使能：
+                                </label>
+                                <div class="col-md-4">
+                                    <input readonly="readonly" name="compensate" id="compensate" class="form-control"/>
+                                </div>
+                                <label class="col-md-2 control-label"> 奇偶校验：
+                                </label>
+                                <div class="col-md-4">
+                                    <input readonly="readonly" name="oddEvenCheck" id="oddEvenCheck" class="form-control"/>
+                                </div>
+                            </div>
+                            </div>
+                            <hr/>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">
+                                    个性参数
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 载重测量方法：
+                                </label>
+                                <div class="col-md-4">
+                                    <select id = "loadMeterWay" name="loadMeterWay" placeholder="请选择载重测量方法"
+                                        class="form-control" style="background-color: #fafafa" th:field="*{vehicleLoadSetting.personLoadParam.loadMeterWay}">
+                                        <option selected="selected" value="0">单计重</option>
+                                        <option value="1">双计重</option>
+                                        <option value="2">四计重</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 传感器重量单位：
+                                </label>
+                                <div class="col-md-4">
+                                    <select id = "loadMeterUnit" name="loadMeterUnit" placeholder="请选择传感器重量单位"
+                                        class="form-control" style="background-color: #fafafa" th:field="*{vehicleLoadSetting.personLoadParam.loadMeterUnit}">
+                                        <option value="0">0.1kg</option>
+                                        <option value="1">1kg</option>
+                                        <option value="2">10kg</option>
+                                        <option value="3" selected="selected">100kg</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 空载阈值(kg)：
+                                </label>
+                                <div class="col-md-4">
+                                    <input id="noLoadValue" name="noLoadValue"  type="text" class="form-control" placeholder="请输入空载阈值"
+                                                            th:value="${vehicleLoadSetting.personLoadParam.noLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                </div>
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 空载阈值偏差(%)：
+                                </label>
+                                <div class="col-md-4">
+                                    <input id="noLoadThreshold" name="noLoadThreshold"  type="text" class="form-control" value="10" placeholder="请输入空载阈值偏差"
+                                                th:value="${vehicleLoadSetting.personLoadParam.noLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")' />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 轻载阈值(kg)：
+                                </label>
+                                 <div class="col-md-4">
+                                    <input id="lightLoadValue" name="lightLoadValue"  type="text" class="form-control" placeholder="请输入轻载阈值"
+                                                 th:value="${vehicleLoadSetting.personLoadParam.lightLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                </div>
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 轻载阈值偏差(%)：
+                                </label>
+                                <div class="col-md-4">
+                                    <input id="lightLoadThreshold" name="lightLoadThreshold"  type="text" class="form-control" value="10" placeholder="请输入轻载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.personLoadParam.lightLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 满载阈值(kg)：
+                                </label>
+                                 <div class="col-md-4">
+                                    <input id="fullLoadValue" name="fullLoadValue"  type="text" class="form-control" placeholder="请输入满载阈值"
+                                                     th:value="${vehicleLoadSetting.personLoadParam.fullLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                </div>
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 满载阈值偏差(%)：
+                                </label>
+                                <div class="col-md-4">
+                                    <input id="fullLoadThreshold" name="fullLoadThreshold"  type="text" class="form-control" value="10" placeholder="请输入满载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.personLoadParam.fullLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-2 control-label"> <label
+                                        class="text-danger">*</label> 超载阈值(kg)：
+                                </label>
+                                 <div class="col-md-4">
+                                    <input id="overLoadValue" name="overLoadValue"  type="text" class="form-control" placeholder="请输入超载阈值"
+                                                 th:value="${vehicleLoadSetting.personLoadParam.overLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                </div>
+                                <label class="col-md-2 control-label"><label
+                                        class="text-danger">*</label> 超载阈值偏差(%)：
+                                </label>
+                                <div class="col-md-4">
+                                    <input id="overLoadThreshold" name="overLoadThreshold"  type="text" class="form-control" value="10" placeholder="请输入超载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.personLoadParam.overLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span style="float: left;">
+                                    <a class="btn btn-primary" type="button" onclick="editObj.setValue('1')" th:href="@{/v/loadmgt/loadvehiclesetting/import}" data-toggle="modal" data-target="#commonSmWin">
+                                        <strong>导入标定数据</strong>
+                                    </a>
+                                    <a class="btn btn-primary" id="calculateBtn" type="button" th:href="@{/v/loadmgt/loadvehiclesetting/download}">
+                                        <strong>标定模板下载</strong>
+                                    </a>
+                                    <a class="btn btn-primary" type="button" id="calibrationERRO" onclick="editObj.setValue('1')" th:href="@{/v/loadmgt/loadvehiclesetting/CalibrationSettingPage}" data-toggle="modal" data-target="#commonLgWin" >
+                                        <strong>标定设置</strong>
+                                        <input name="listValue" id="listValue" type="hidden" th:value="${vehicleLoadSetting.adParamJson}"/>
+                                    </a>
+                                </span>
+                            </div>
+                            </form>
+                        </div>
+
+                        <!-- 载重2 -->
+                        <div class="tab-pane" id="egine2">
+                            <form id="bindForm2">
+                            <div class="form-group">
+                                  <label class="col-md-2 control-label"> <label
+                                          class="text-danger">*</label> 传感器型号：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input type="hidden" name="formSensorId2" id="formSensorId2" th:value="${vehicleLoadSetting.twoSensorId}"/>
+                                      <div class="input-group">
+                                          <input type="text" placeholder="请选择传感器型号" class="form-control" id="sensorId2">
+                                          <div class="input-group-btn">
+                                              <button type="button" class="btn btn-white dropdown-toggle"
+                                                      style="height:36px" data-toggle="dropdown">
+                                                  <span class="caret"></span>
+                                              </button>
+                                              <ul class="dropdown-menu dropdown-menu-right" id="sensorDropdown2"
+                                                  role="menu" style="width:100%;">
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <label class="col-md-4"></label>
+                                  <div class="col-md-2 control-label text-right">
+                                      <span id="tankBasisInfo2"><font>显示更多</font><span class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                                  </div>
+                              </div>
+                            <div id="tankBasisInfo2-content" hidden>
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"> 波特率：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input readonly="readonly" name="baudRate2" id="baudRate2" class="form-control"/>
+                                  </div>
+                                  <label class="col-md-2 control-label"> 滤波系数：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input readonly="readonly" name="filterFactor2" id="filterFactor2" class="form-control"/>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"> 补偿使能：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input readonly="readonly" name="compensate2" id="compensate2" class="form-control"/>
+                                  </div>
+                                  <label class="col-md-2 control-label"> 奇偶校验：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input readonly="readonly" name="oddEvenCheck2" id="oddEvenCheck2" class="form-control"/>
+                                  </div>
+                              </div>
+                            </div>
+                              <hr/>
+                              <div class="form-group">
+                                  <label class="col-sm-2 control-label">
+                                      个性参数
+                                  </label>
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 载重测量方法：
+                                  </label>
+                                  <input type="hidden" id="loadDefalt2" th:value="${vehicleLoadSetting.twoPersonLoadParam}">
+                                  <div class="col-md-4">
+                                      <select id = "loadMeterWay2" name="loadMeterWay2" placeholder="请选择载重测量方法"
+                                          class="form-control" style="background-color: #fafafa" th:field="*{vehicleLoadSetting.twoPersonLoadParam.loadMeterWay}">
+                                          <option selected="selected" value="0">单计重</option>
+                                          <option value="1">双计重</option>
+                                          <option value="2">四计重</option>
+                                      </select>
+                                  </div>
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 传感器重量单位：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <select id = "loadMeterUnit2" name="loadMeterUnit2" placeholder="请选择传感器重量单位"
+                                          class="form-control" style="background-color: #fafafa" th:field="*{vehicleLoadSetting.twoPersonLoadParam.loadMeterUnit}">
+                                          <option value="3" selected="selected">100kg</option>
+                                          <option value="0">0.1kg</option>
+                                          <option value="1">1kg</option>
+                                          <option value="2">10kg</option>
+                                      </select>
+                                  </div>
+                              </div>
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 空载阈值(kg)：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input id="noLoadValue2" name="noLoadValue2"  type="text" class="form-control" placeholder="请输入空载阈值"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.noLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                  </div>
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 空载阈值偏差(%)：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input id="noLoadThreshold2" name="noLoadThreshold2" type="text"  class="form-control" value="10" placeholder="请输入空载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.noLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"> <label
+                                          class="text-danger">*</label> 轻载阈值(kg)：
+                                  </label>
+                                   <div class="col-md-4">
+                                      <input id="lightLoadValue2" name="lightLoadValue2"  type="text" class="form-control" placeholder="请输入轻载阈值"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.lightLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                  </div>
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 轻载阈值偏差(%)：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input id="lightLoadThreshold2" name="lightLoadThreshold2"  type="text" class="form-control" value="10" placeholder="请输入轻载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.lightLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"> <label
+                                          class="text-danger">*</label> 满载阈值(kg)：
+                                  </label>
+                                   <div class="col-md-4">
+                                      <input id="fullLoadValue2" name="fullLoadValue2"  type="text" class="form-control" placeholder="请输入满载阈值"
+                                                    th:value="${vehicleLoadSetting.twoPersonLoadParam.fullLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                  </div>
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 满载阈值偏差(%)：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input id="fullLoadThreshold2" name="fullLoadThreshold2"  type="text" class="form-control" value="10" placeholder="请输入满载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.fullLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                  <label class="col-md-2 control-label"> <label
+                                          class="text-danger">*</label> 超载阈值(kg)：
+                                  </label>
+                                   <div class="col-md-4">
+                                      <input id="overLoadValue2" name="overLoadValue2"  type="text" class="form-control" placeholder="请输入超载阈值"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.overLoadValue}" onkeyup='value=value.replace(/[^0-9.]/g,"")' />
+                                  </div>
+                                  <label class="col-md-2 control-label"><label
+                                          class="text-danger">*</label> 超载阈值偏差(%)：
+                                  </label>
+                                  <div class="col-md-4">
+                                      <input id="overLoadThreshold2" name="overLoadThreshold2"  type="text" class="form-control" value="10" placeholder="请输入超载阈值偏差"
+                                                 th:value="${vehicleLoadSetting.twoPersonLoadParam.overLoadThreshold}" onkeyup='value=value.replace(/[^0-9]/g,"")'/>
+                                  </div>
+                              </div>
+
+                              <div class="form-group">
+                                <span style="float: left;">
+                                    <a class="btn btn-primary" type="button" onclick="editObj.setValue('2')" th:href="@{/v/loadmgt/loadvehiclesetting/import}" data-toggle="modal" data-target="#commonSmWin">
+                                        <strong>导入标定数据</strong>
+                                    </a>
+                                    <a class="btn btn-primary" id="calculateBtn2" type="button" th:href="@{/v/loadmgt/loadvehiclesetting/download}">
+                                        <strong>标定模板下载</strong>
+                                    </a>
+                                    <a class="btn btn-primary" type="button" id="calibrationERRO2" onclick="editObj.setValue('2')" th:href="@{/v/loadmgt/loadvehiclesetting/CalibrationSettingPage}" data-toggle="modal" data-target="#commonLgWin" >
+                                        <strong>标定设置</strong>
+                                        <input name="listValue2" id="listValue2" type="hidden" th:value="${vehicleLoadSetting.twoAdParamJson}"/>
+                                    </a>
+                                </span>
+                           </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer" style="margin:0px;">
+        <button class="btn btn-primary" type="button" id="doSubmit">
+            <strong>提 交</strong>
+        </button>
+        <button type="button" class="btn btn-default" id="closeWindow" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <label id="error_label_add" class='error' style='display: none;'></label>
+</div>
+<script th:inline="javascript">
+    var sendCommandComplete = [[#{send.command.complete}]];
+    var selectItem = [[#{select.item}]];
+    var systemError = [[#{system.error}]];
+    var publicNull = [[#{public.null}]];
+    var publicNumberInt = [[#{public.number.int}]];
+    var vehicleInsuranceDiscount = [[#{loadManagement.sholdrange}]];
+    var loadManagementDecimalOne = [[#{loadManagement.decimalOne}]];
+    var loadManagementNoloadvalueNull = [[#{loadManagement.noloadvalue.null}]];
+    var loadManagementLightloadvalueNull = [[#{loadManagement.lightloadvalue.null}]];
+    var loadManagementFullloadvalueNull = [[#{loadManagement.fullloadvalue.null}]];
+    var loadManagementOverloadvalueNull = [[#{loadManagement.overloadvalue.null}]];
+    var loadManagementNoloadthresholdNull = [[#{loadManagement.noloadthreshold.null}]];
+    var loadManagementLightloadthresholdNull = [[#{loadManagement.lightloadthreshold.null}]];
+    var loadManagementFullloadthresholdNull = [[#{loadManagement.fullloadthreshold.null}]];
+    var loadManagementOverloadthresholdNull = [[#{loadManagement.overloadthreshold.null}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/loadManagementSettingEdit.js"></script>

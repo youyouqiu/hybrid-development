@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.RiskCampaignDao">
+
+    <!-- 查询 -->
+    <select id="find"
+            parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.query.RiskCampaignQuery">
+        SELECT
+        vi.brand brand,vi.plate_color plateColor,rc.vehicle_id vehicleId,rv.visit_time
+        visitTime,risk_number,warning_time,rl.risk_level,rc.risk_level riskLevelNum,group_concat(distinct re.risk_type)
+        risk_type, CASE rc.STATUS
+        WHEN 1 THEN
+        '待处理'
+        WHEN 2 THEN
+        '处理中'
+        WHEN 3 THEN
+        '跟踪'
+        WHEN 4 THEN
+        '待回访'
+        WHEN 5 THEN
+        '回访中'
+        end as status
+        FROM
+        zw_m_risk_campaign rc
+        LEFT JOIN zw_m_vehicle_info vi on vi.id=rc.vehicle_id and vi.flag =1
+        LEFT JOIN zw_m_risk_level rl ON rl.risk_value = rc.risk_level
+        LEFT JOIN zw_m_risk_alarm ra on ra.risk_id = rc.id and ra.flag=1
+        LEFT JOIN zw_m_risk_event re on re.function_id = ra.event_id and re.flag=1
+        LEFT JOIN zw_m_risk_visit rv on rv.risk_id = rc.id and rv.flag=1
+        INNER JOIN zw_m_assignment_vehicle av ON vi.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        WHERE rc.flag =1
+        and rc.status !=6
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY risk_number
+        ORDER BY
+        FIELD(rc.STATUS,1,4,2,5,3),
+        rc.risk_level desc,
+        rc.risk_number desc
+    </select>
+
+
+    <select id="getAllRiskList" resultType="com.zw.platform.domain.riskManagement.query.RiskCampaignQuery">
+        SELECT
+        rc.id, rc.vehicle_id vehicleId
+        FROM
+        zw_m_risk_campaign rc
+        WHERE rc.flag =1
+        <choose>
+            <when test="status == 0">
+                AND rc.status !=6
+            </when>
+            <otherwise>
+                AND rc.status = #{status}
+            </otherwise>
+        </choose>
+        ORDER BY
+        <if test="status == 0">
+            FIELD(rc.STATUS,1,4,2,5,3),
+        </if>
+        rc.risk_level DESC,
+        rc.risk_number DESC
+    </select>
+
+
+    <select id="getRiskList" resultType="com.zw.platform.domain.riskManagement.query.RiskCampaignQuery">
+        SELECT
+        vi.brand brand, vi.plate_color plateColor, rc.vehicle_id vehicleId, rv.visit_time visitTime,
+        risk_number, warning_time, rl.risk_level, rc.risk_level riskLevelNum, rc.risk_type,
+        CASE rc.STATUS
+        WHEN 1 THEN
+        '待处理'
+        WHEN 2 THEN
+        '处理中'
+        WHEN 3 THEN
+        '跟踪'
+        WHEN 4 THEN
+        '待回访'
+        WHEN 5 THEN
+        '回访中'
+        END AS status
+        FROM
+        zw_m_risk_campaign rc
+        LEFT JOIN zw_m_vehicle_info vi on vi.id=rc.vehicle_id and vi.flag =1
+        LEFT JOIN zw_m_risk_level rl ON rl.risk_value = rc.risk_level
+        LEFT JOIN (
+        SELECT a.risk_id, a.visit_time
+        FROM zw_m_risk_visit a
+        INNER JOIN (
+        SELECT risk_id, MAX(visit_order) visit_order
+        FROM zw_m_risk_visit
+        GROUP BY risk_id
+        ) b ON a.risk_id = b.risk_id AND a.visit_order = b.visit_order
+        WHERE a.flag = 1) rv ON rv.risk_id = rc.id
+        <if test="list != null and list.size() > 0">
+            WHERE rc.id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY
+        FIELD(rc.STATUS,1,4,2,5,3),
+        rc.risk_level DESC,
+        rc.risk_number DESC
+    </select>
+
+    <!-- 根据风险编号查询风险数据 -->
+    <select id="getRiskByNum"
+            parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.query.RiskCampaignQuery">
+        SELECT
+            rc.id,
+            rc.risk_number,
+            rc.warning_time,
+            rl.risk_level,
+            rc.status,
+            rc.address,
+            rc.speed,
+            vi.brand,
+            vi.plate_color,
+            rc.vehicle_id,
+            di.device_number,
+            vt.vehicle_type,
+            vi.group_id groupName,
+            a.telephone groupPhone,
+            rc.risk_type,
+            c.id        configId
+        FROM
+            zw_m_risk_campaign rc
+            LEFT JOIN zw_m_vehicle_info vi ON vi.id = rc.vehicle_id
+            LEFT JOIN zw_m_vehicle_type vt ON vt.id = vi.vehicle_type
+            LEFT JOIN zw_m_risk_level rl ON rl.risk_value = rc.risk_level
+            LEFT JOIN zw_m_assignment a ON a.id IN (
+            SELECT assignment_id
+            FROM zw_m_assignment_vehicle
+            WHERE vehicle_id = rc.vehicle_id AND flag = 1)
+            LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+            LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        WHERE
+            rc.risk_number = #{num}
+            AND rc.flag = 1
+        GROUP BY rc.risk_number
+
+    </select>
+
+    <select id="getMediaList"
+            resultType="com.zw.platform.domain.multimedia.Media">
+
+        SELECT
+        type,
+        media_name,
+        media_url,
+        media_url_new
+        FROM
+        zw_m_media m
+        WHERE
+        m.flag = 1
+        AND m.vehicle_id = #{vid} AND m.type= 0
+        AND m.media_id IN
+        <foreach collection="mediaIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="getMediaListbyEventId"
+            parameterType="string"
+            resultType="com.zw.platform.domain.multimedia.Media">
+        SELECT
+            DISTINCT
+            type,
+            media_name,
+            media_url,
+            media_url_new
+        FROM
+            zw_m_media
+        WHERE
+            flag = 1
+            AND
+            risk_event_id = #{riskEventId}
+            AND type = 2
+    </select>
+    <select id="getProfessionalsInfo" resultType="com.zw.platform.domain.basicinfo.ProfessionalsInfo">
+        SELECT
+            pi.`name`                  name,
+            pi.phone                   phone,
+            pi.emergency_contact       emergencyContact,
+            pi.emergency_contact_phone emergencyContactPhone,
+            pi.photograph              photograph,
+            pi.id
+        FROM
+            zw_m_professionals_info pi
+            LEFT JOIN zw_m_config_professionals cp ON cp.professionals_id = pi.id AND cp.flag = 1
+            LEFT JOIN zw_m_config c ON c.id = cp.config_id AND c.flag = 1
+        WHERE
+            c.id = #{cid} AND pi.flag = 1
+    </select>
+
+
+    <!-- 根据风险编号查询事件数据 -->
+    <select id="getRiskEventByNum"
+            parameterType="string"
+            resultType="com.zw.platform.domain.riskManagement.query.RiskEventQuery">
+        SELECT
+            ra.id,
+            ra.event_number,
+            ra.event_time,
+            re.risk_event,
+            re.risk_type
+        FROM
+            zw_m_risk_alarm ra
+            LEFT JOIN zw_m_risk_campaign rc ON rc.id = ra.risk_id
+                                               AND rc.flag = 1
+            LEFT JOIN zw_m_risk_event re ON re.function_id = ra.event_id
+                                            AND re.flag = 1
+        WHERE
+            rc.risk_number = #{num}
+            AND ra.flag = 1
+        ORDER BY
+            ra.event_number
+    </select>
+
+    <!-- 根据风险编号查询事件数据 -->
+    <update id="updateRiskType">
+        UPDATE zw_m_risk_campaign rc
+        SET rc.`status` = #{type}
+        WHERE rc.risk_number = #{num} AND rc.flag = 1
+    </update>
+
+    <update id="updateRisk" parameterType="com.zw.platform.domain.riskManagement.form.RiskCampaignForm">
+        update zw_m_risk_campaign
+        <set>
+            <if test="vehicleId != null">
+                vehicle_id = #{vehicleId},
+            </if>
+            <if test="riskNumber != null">
+                risk_number = #{riskNumber},
+            </if>
+            <if test="riskLevel != null">
+                risk_level = #{riskLevel},
+            </if>
+            <if test="riskType != null">
+                risk_type = #{riskType},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="speed != null">
+                speed = #{speed},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="dealId != null">
+                deal_id = #{dealId},
+            </if>
+            <if test="driverId != null">
+                driver_id = #{driverId},
+            </if>
+            <if test="job != null">
+                job = #{job},
+            </if>
+            <if test="warningTime != null">
+                warning_time = #{warningTime},
+            </if>
+            <if test="fileTime != null">
+                file_time = #{fileTime},
+            </if>
+            <if test="dealTime != null">
+                deal_time = #{dealTime},
+            </if>
+            <if test="riskResult != null">
+                risk_result = #{riskResult},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="createDataTime != null">
+                create_data_time = #{createDataTime},
+            </if>
+            <if test="createDataUsername != null">
+                create_data_username = #{createDataUsername},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+        </set>
+        where id = #{id} and flag=1
+    </update>
+
+    <insert id="dealRisk" parameterType="com.zw.platform.domain.riskManagement.form.RiskVisitForm">
+        INSERT INTO zw_m_risk_visit (id, risk_id, warning_accuracy, warn_after_status, intervention_personnel,
+                                     intervention_after_status, warning_level, content, reason, isvisit,
+                                     visit_time, flag, create_data_time, create_data_username, update_data_time,
+                                     update_data_username, visit_order, driver_id)
+        VALUES (#{vistId}, #{riskId}, #{warningAccuracy}, #{warnAfterStatus}, #{interventionPersonnel},
+                           #{interventionAfterStatus}, #{warningLevel}, #{content}, #{reason}, #{isvisit},
+                           #{visitTime}, #{flag}, #{createDataTime}, #{createDataUsername}, #{updateDataTime},
+                #{updateDataUsername}, #{visitOrder}, #{driverId})
+    </insert>
+
+    <update id="updateDealRisk" parameterType="com.zw.platform.domain.riskManagement.form.RiskVisitForm">
+        UPDATE zw_m_risk_visit
+        SET
+            warning_accuracy          = #{record.warningAccuracy},
+            warn_after_status         = #{record.warnAfterStatus},
+            intervention_personnel    = #{record.interventionPersonnel},
+            intervention_after_status = #{record.interventionAfterStatus},
+            warning_level             = #{record.warningLevel},
+            content                   = #{record.content},
+            reason                    = #{record.reason},
+            isvisit                   = #{record.isvisit},
+            visit_time                = #{record.visitTime},
+            visit_order               = #{record.visitOrder},
+            flag                      = #{record.flag},
+            create_data_time          = #{record.createDataTime},
+            create_data_username      = #{record.createDataUsername},
+            update_data_time          = #{record.updateDataTime},
+            update_data_username      = #{record.updateDataUsername}
+        WHERE risk_id = #{record.riskId} AND flag = 1
+    </update>
+
+    <select id="cheakDealRisk" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM zw_m_risk_visit
+        WHERE risk_id = #{num} AND flag = 1
+    </select>
+
+    <select id="getDealRisk" resultType="com.zw.platform.domain.riskManagement.form.RiskVisitForm">
+        SELECT *
+        FROM zw_m_risk_visit
+        WHERE risk_id = #{num} AND flag = 1
+    </select>
+
+    <select id="getMedas" resultType="com.zw.platform.domain.multimedia.form.MediaForm">
+        SELECT *
+        FROM zw_m_media
+        WHERE visit_id = #{vid} AND flag = 1
+    </select>
+
+    <select id="findAlarmIdByTimeAndCode" resultType="java.util.Map">
+        SELECT
+            alarm.id,
+            alarm.media_id AS mediaId,cam.id as riskId
+        FROM zw_m_risk_alarm alarm, zw_m_risk_campaign cam
+        WHERE
+            alarm.flag = 1 AND cam.flag = 1 AND cam.id = alarm.risk_id AND cam.vehicle_id = #{vehicleId}
+            AND alarm.event_id = #{eventCode} AND alarm.event_time = #{time}
+    </select>
+
+    <select id="queryMediaIdById" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT media_id
+        FROM zw_m_risk_alarm
+        WHERE id = #{id} AND flag = 1
+    </select>
+
+    <select id="getRiskEventIds" resultType="java.lang.String">
+        SELECT r.id
+        FROM zw_m_risk_alarm r, zw_m_risk_campaign c
+        WHERE c.vehicle_id = #{vehicleId} AND r.risk_id = c.id
+              AND r.media_id LIKE CONCAT('%', #{mediaId}, '%')
+        ORDER BY r.create_data_time DESC
+    </select>
+
+    <select id="queryRiskEventIds" resultType="string" parameterType="string">
+        SELECT al.id
+        FROM zw_m_risk_campaign ca INNER JOIN zw_m_risk_alarm al ON al.risk_id = ca.id
+        WHERE ca.id = #{riskId} AND al.flag = 1 AND ca.flag = 1
+    </select>
+
+    <select id="getRiskEventTypes" resultType="com.zw.platform.domain.riskManagement.query.RiskEventQuery">
+        SELECT risk_event, risk_type, function_id FROM zw_m_risk_event
+    </select>
+
+
+    <select id="getRiskLevels" resultType="java.lang.String">
+        select risk_level from zw_m_risk_level order by CAST(risk_value AS UNSIGNED)
+    </select>
+</mapper>

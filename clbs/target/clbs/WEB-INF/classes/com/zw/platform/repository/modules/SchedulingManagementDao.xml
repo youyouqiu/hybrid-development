@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.SchedulingManagementDao">
+    <insert id="addScheduling" parameterType="com.zw.platform.domain.scheduledmanagement.SchedulingFrom">
+        INSERT INTO zw_m_scheduled_info (id, scheduled_name, start_date, end_date, date_duplicate_type, remark,
+                                         group_id, flag, create_data_time, create_data_username)
+        VALUES (#{id}, #{scheduledName}, #{startDate}, #{endDate}, #{dateDuplicateType},
+                #{remark}, #{groupId}, #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <insert id="addMonitorScheduling"
+            parameterType="com.zw.platform.domain.scheduledmanagement.SchedulingRelationMonitorForm">
+        INSERT INTO zw_m_monitor_scheduled_info
+        (id, scheduled_info_id, monitor_id, start_date, end_date, date_duplicate_type, flag)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.scheduledInfoId}, #{item.monitorId}, #{item.startDate}, #{item.endDate},
+            #{item.dateDuplicateType}, #{item.flag})
+        </foreach>
+    </insert>
+
+    <insert id="addSchedulingItem" parameterType="com.zw.platform.domain.scheduledmanagement.SchedulingItemForm">
+        INSERT INTO zw_m_scheduled_item_info
+        (id, scheduled_info_id, control_type, fence_info_id, start_time, end_time, relation_alarm, residence_time, flag)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.scheduledInfoId}, #{item.controlType}, #{item.fenceInfoId}, #{item.startTime},
+            #{item.endTime}, #{item.relationAlarm}, #{item.residenceTime}, #{item.flag})
+        </foreach>
+    </insert>
+
+    <update id="deleteScheduling">
+        update zw_m_scheduled_info
+        set flag = 0
+        where id = #{scheduledInfoId}
+    </update>
+
+    <delete id="deleteMonitorScheduling">
+        delete
+        from zw_m_monitor_scheduled_info
+        where scheduled_info_id = #{scheduledInfoId}
+    </delete>
+
+    <delete id="deleteSchedulingItem">
+        delete
+        from zw_m_scheduled_item_info
+        where scheduled_info_id = #{scheduledInfoId}
+    </delete>
+
+    <update id="updateScheduling" parameterType="com.zw.platform.domain.scheduledmanagement.SchedulingFrom">
+        update
+            zw_m_scheduled_info
+        set scheduled_name       = #{scheduledName},
+            start_date           = #{startDate},
+            end_date             = #{endDate},
+            date_duplicate_type  = #{dateDuplicateType},
+            remark               = #{remark},
+            update_data_time     = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        where flag = 1
+          and id = #{id}
+    </update>
+    <update id="updateSchedulingEndDateToNowDate">
+        update zw_m_scheduled_info
+        set end_date                 = #{nowDate},
+            update_data_time         = #{updateDataTime},
+            update_data_username     = #{updateDataUsername},
+            is_mandatory_termination = 1
+        where id = #{scheduledInfoId}
+    </update>
+    <update id="updateSchedulingRelationMonitorEndDateToNowDate">
+        update zw_m_monitor_scheduled_info
+        set end_date = #{nowDate}
+        where scheduled_info_id = #{scheduledInfoId}
+    </update>
+
+    <delete id="deleteSchedulingRelationMonitor">
+        update zw_m_monitor_scheduled_info
+        set flag = 0
+        where scheduled_info_id = #{scheduledInfoId}
+        and monitor_id in
+        <foreach item="item" collection="monitorIdList" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="getSchedulingList" resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+        select zmsi.id, zmsi.scheduled_name, zmsi.start_date, zmsi.end_date,
+        DATE_FORMAT(zmsi.start_date, '%Y-%m-%d') as startDateStr,
+        DATE_FORMAT(zmsi.end_date, '%Y-%m-%d') as endDateStr,
+        zmsi.date_duplicate_type as dateDuplicateType, zmsi.remark, zmsi.group_id, zmsi.create_data_time,
+        zmsi.create_data_username, zmsi.is_mandatory_termination
+        from zw_m_scheduled_info zmsi
+        where zmsi.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND BINARY zmsi.scheduled_name LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        and zmsi.group_id in
+        <foreach item="item" collection="organizationIdSet" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by zmsi.create_data_time desc
+    </select>
+
+    <select id="getSchedulingInfoById" resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+        select zmsi.id,
+               zmsi.scheduled_name                      as scheduledName,
+               zmsi.start_date                          as startDate,
+               zmsi.end_date                            as endDate,
+               DATE_FORMAT(zmsi.start_date, '%Y-%m-%d') as startDateStr,
+               DATE_FORMAT(zmsi.end_date, '%Y-%m-%d')   as endDateStr,
+               zmsi.date_duplicate_type                 as dateDuplicateType,
+               zmsi.remark,
+               zmsi.group_id                            as groupId,
+               zmsi.create_data_time                    as createDataDime,
+               zmsi.create_data_username                as createDataUsername
+        from zw_m_scheduled_info zmsi
+        where zmsi.flag = 1
+          and zmsi.id = #{scheduledInfoId}
+    </select>
+
+    <select id="getSchedulingInfoByName"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+        select zmsi.id,
+               zmsi.scheduled_name                      as scheduledName,
+               zmsi.start_date                          as startDate,
+               zmsi.end_date                            as endDate,
+               DATE_FORMAT(zmsi.start_date, '%Y-%m-%d') as startDateStr,
+               DATE_FORMAT(zmsi.end_date, '%Y-%m-%d')   as endDateStr,
+               zmsi.date_duplicate_type                 as dateDuplicateType,
+               zmsi.remark,
+               zmsi.group_id                            as groupId,
+               zmsi.create_data_time                    as createDataDime,
+               zmsi.create_data_username                as createDataUsername
+        from zw_m_scheduled_info zmsi
+        where zmsi.flag = 1
+          and zmsi.scheduled_name = #{scheduledName}
+    </select>
+
+    <select id="getSchedulingRelationMonitorInfoListById"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingRelationMonitorInfo">
+        select zmmsi.*, moniotrInfo.id, moniotrInfo.monitorName
+        from zw_m_monitor_scheduled_info zmmsi
+                 left join (
+            SELECT zmvi.id, zmvi.brand AS monitorName
+            FROM zw_m_vehicle_info zmvi
+            where zmvi.flag = 1
+            UNION ALL
+            SELECT zmpi.id, zmpi.people_number AS monitorName
+            FROM zw_m_people_info zmpi
+            where zmpi.flag = 1
+            UNION ALL
+            SELECT zmti.id, zmti.thing_number AS monitorName
+            FROM zw_m_thing_info zmti
+            where zmti.flag = 1
+        ) moniotrInfo on moniotrInfo.id = zmmsi.monitor_id
+        where zmmsi.flag = 1
+          and zmmsi.scheduled_info_id = #{scheduledInfoId}
+    </select>
+
+    <select id="getSchedulingRelationMonitorInfoListByIdList"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingRelationMonitorInfo">
+        select zmmsi.*, zmsi.scheduled_name, moniotrInfo.id as monitorId, moniotrInfo.monitorName
+        from zw_m_monitor_scheduled_info zmmsi
+        left join (
+        SELECT zmvi.id, zmvi.brand AS monitorName
+        FROM zw_m_vehicle_info zmvi
+        where zmvi.flag = 1
+        UNION ALL
+        SELECT zmpi.id, zmpi.people_number AS monitorName
+        FROM zw_m_people_info zmpi
+        where zmpi.flag = 1
+        UNION ALL
+        SELECT zmti.id, zmti.thing_number AS monitorName
+        FROM zw_m_thing_info zmti
+        where zmti.flag = 1
+        ) moniotrInfo on moniotrInfo.id = zmmsi.monitor_id
+        left join zw_m_scheduled_info zmsi on zmmsi.scheduled_info_id = zmsi.id and zmsi.flag = 1
+        where zmmsi.flag = 1
+        and zmmsi.scheduled_info_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getSchedulingItemInfoListById"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingItemInfo">
+        SELECT zmsii.*, fence.name as fenceName, zmfi.shape as fenceInfoId
+        from zw_m_scheduled_item_info zmsii
+                 left join zw_m_fence_info zmfi on zmsii.fence_info_id = zmfi.shape and zmfi.flag = 1
+                 left join (
+            select zmp.id, zmp.name, zmp.group_id
+            from zw_m_polygon zmp
+            where zmp.flag = 1
+            UNION ALL
+            select zmc.id, zmc.name, zmc.group_id
+            from zw_m_circle zmc
+            where zmc.flag = 1
+            UNION ALL
+            select zml.id, zml.name, zml.group_id
+            from zw_m_line zml
+            where zml.flag = 1
+            UNION ALL
+            select zmm.id, zmm.name, zmm.group_id
+            from zw_m_marker zmm
+            where zmm.flag = 1
+        ) fence on zmfi.shape = fence.id
+        where zmsii.flag = 1
+          and scheduled_info_id = #{scheduledInfoId}
+    </select>
+
+    <select id="getSchedulingItemInfoListByIdList"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingItemInfo">
+        SELECT zmsii.*, zmfi.shape as fenceInfoId
+        from zw_m_scheduled_item_info zmsii
+        left join zw_m_fence_info zmfi on zmsii.fence_info_id = zmfi.shape and zmfi.flag = 1
+        where zmsii.flag = 1
+        and scheduled_info_id in
+        <foreach item="item" collection="list" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getConflictsSchedulingInfoList"
+            resultType="com.zw.platform.domain.scheduledmanagement.SchedulingInfo">
+        select zmsi.*
+        from zw_m_scheduled_info zmsi where flag = 1
+        <if test="scheduledInfoId != null and scheduledInfoId != ''">
+            and id != #{scheduledInfoId}
+        </if>
+        and (
+        (#{startDate} &gt;= zmsi.start_date and #{startDate} &lt;= zmsi.end_date) or
+        (#{endDate} &gt;= zmsi.start_date and #{endDate} &lt;= zmsi.end_date) or
+        (#{startDate} &lt;= zmsi.start_date and #{endDate} &gt;= zmsi.end_date)
+        )
+        and zmsi.end_date &gt; #{nowDate}
+    </select>
+
+    <select id="getNeedCalculateOfflineReportScheduledId" resultType="java.lang.String">
+        SELECT DISTINCT id
+        FROM zw_m_scheduled_info
+        WHERE start_date &lt;= #{nowDate}
+          AND end_date &gt;= #{nowDate}
+          AND flag = 1
+          AND (
+                FIND_IN_SET(#{weekDay}, date_duplicate_type) OR FIND_IN_SET('8', date_duplicate_type)
+            )
+    </select>
+
+    <update id="deleteMonitorScheduByMonitorIds">
+        update zw_m_monitor_scheduled_info set flag=0 where 1=0
+        <if test="monitorIdList!=null and monitorIdList.size!=0">
+            or monitor_id in
+            <foreach item="item" collection="monitorIdList" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </update>
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.CallNumberDao">
+
+    <select id="getAllAvailablePersonCallNumber" resultType="string">
+      SELECT call_number from zw_m_call_number where person_call =1
+	</select>
+
+    <select id="getAllAvailableGroupCallNumber" resultType="string">
+        SELECT call_number from zw_m_call_number where group_call =1
+    </select>
+    <update id="updatePersonCallNumber">
+      update zw_m_call_number set person_call=#{status} where call_number=#{number}
+    </update>
+    <update id="updateGroupCallNumber">
+     update zw_m_call_number set group_call=#{status} where call_number=#{number}
+    </update>
+    <update id="updatePersonCallNumberBatch">
+        update zw_m_call_number set person_call=#{status} where call_number in
+        <foreach collection="personNumbers" item="personNumber" open="(" separator="," close=")">
+            #{personNumber}
+        </foreach>
+    </update>
+    <insert id="addCallNumbers">
+        insert into zw_m_call_number(call_number,person_call,group_call) values
+        <foreach collection="callNumbers" item="callNumber" separator=",">
+                (#{callNumber},1,1)
+        </foreach>
+    </insert>
+
+    <select id="checkCallNumber" resultType="long">
+        SELECT count(call_number)  from zw_m_call_number
+    </select>
+
+
+</mapper>

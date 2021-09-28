@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.NewLifecycleDao">
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.LifecycleDO">
+        INSERT INTO zw_m_service_lifecycle (
+        id,billing_date,expire_date,flag, create_data_time,create_data_username
+        )
+        VALUES
+        (#{id}, #{billingDate}, #{expireDate}, #{flag}, now(), #{createDataUsername})
+    </insert>
+
+    <delete id="delete" parameterType="string">
+        DELETE FROM zw_m_service_lifecycle WHERE id = #{id}
+    </delete>
+
+    <select id="findLifecycleExpireRemindList" resultType="java.lang.String">
+        select c.vehicle_id
+        FROM zw_m_config c
+                 INNER JOIN zw_m_service_lifecycle sl ON sl.id = c.service_lifecycle_id AND sl.flag = 1
+        WHERE c.flag = 1
+          AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') > #{currentDateStr}
+          AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') &lt;= #{expireRemindDate}
+    </select>
+
+    <select id="findLifecycleAlreadyExpireRemindList" resultType="java.lang.String">
+        select c.vehicle_id
+        FROM zw_m_config c
+                 INNER JOIN zw_m_service_lifecycle sl ON sl.id = c.service_lifecycle_id AND sl.flag = 1
+        WHERE c.flag = 1
+          AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') &lt;= #{currentDateStr}
+    </select>
+
+    <select id="findLifecycleExpireBy"
+            resultType="com.zw.platform.domain.statistic.info.LifecycleExpireStatisticInfo">
+        select monitory.id AS monitorId,monitory.monitorNumber,c.monitor_type,sl.expire_date,
+        DATEDIFF(sl.expire_date,#{queryDateStr}) expireDays
+        from zw_m_config c
+        INNER JOIN zw_m_service_lifecycle sl ON sl.id = c.service_lifecycle_id AND sl.flag = 1
+        INNER JOIN (
+        SELECT vi.id,vi.brand AS monitorNumber FROM zw_m_vehicle_info vi
+        WHERE vi.flag = 1
+        UNION ALL
+        SELECT pi.id,pi.people_number AS monitorNumber FROM zw_m_people_info pi
+        WHERE pi.flag = 1
+        UNION ALL
+        SELECT ti.id,ti.thing_number AS monitorNumber FROM zw_m_thing_info ti WHERE ti.flag = 1
+        ) monitory ON monitory.id = c.vehicle_id
+        WHERE c.flag = 1
+        <if test="monitoryIds != null and monitoryIds.size > 0">
+            AND monitory.id IN
+            <foreach collection="monitoryIds" item="vehicleId" open="(" separator="," close=")">
+                #{vehicleId}
+            </foreach>
+        </if>
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND monitory.monitorNumber LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        <if test="lifecycleStatus == 1">
+            <!--全部：0、未到期：1（<服务到期时间>日期减去查询条件里的<时间>日期大于【平台信息配置】中设置的“到期提前提醒日期”）-->
+            AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') > #{expireRemindDate}
+        </if>
+        <if test="lifecycleStatus == 2">
+            <!--即将到期:2（<服务到期时间>日期减去查询条件里的<时间>日期小于等于【平台信息配置】中设置的"到期提前提醒日期”且大于0）-->
+            AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') > #{queryDateStr} AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') &lt;= #{expireRemindDate}
+        </if>
+        <if test="lifecycleStatus == 3">
+            <!--已到期：3（<服务到期时间>日期减去查询条件里的<时间>日期小于0）-->
+            AND DATE_FORMAT(sl.expire_date, '%Y-%m-%d') &lt;= #{queryDateStr}
+        </if>
+        ORDER BY sl.expire_date
+    </select>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.LifecycleDO">
+        UPDATE zw_m_service_lifecycle SET
+        billing_date = #{billingDate}, expire_date = #{expireDate},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteBatch" parameterType="string">
+        DELETE FROM zw_m_service_lifecycle WHERE id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="addByBatch" parameterType="com.zw.platform.basic.domain.LifecycleDO">
+        INSERT INTO zw_m_service_lifecycle (
+        id,billing_date,expire_date,flag, create_data_time,create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.billingDate}, #{item.expireDate}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+</mapper>

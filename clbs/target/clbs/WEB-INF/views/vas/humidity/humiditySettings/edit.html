@@ -1,0 +1,427 @@
+<form th:action="@{/v/sensorSettings/add}"
+ id="bindForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">修改湿度传感器</h4>
+		<style>
+			label.control-label{
+				padding-left: 0;
+				padding-right: 0;
+			}
+		</style>
+	</div>
+      <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+      	<div class="row">
+			<div class="col-md-12">
+				<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+				<input id = "transduserManage"  th:value="${TransduserManage}" type="hidden"/> 
+				<input id = "outId"  th:value="${id}" type="hidden"/>
+				<input id = "curBox" type="hidden" />
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input th:value="${vehicle}" id="vehicle"  type="hidden"/>
+						<input style="cursor: pointer"  id = "vehicleBrand"  class="form-control" readonly />
+						<input  id="vehicleId"  type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label"> 参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important;">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+                <div class="col-md-12">
+                       <div class="panel-heading">
+                           <div class="dropdown panel-title fwb">
+                               <ul class="nav nav-tabs" id="activeShow">
+                                   <li class="active" ><a href="#home1" data-toggle="tab">湿度传感器1</a></li>
+                                   <li class="" id="show2"><a href="#home2"  data-toggle="tab">湿度传感器2</a></li>
+                                   <li class="" style="display:none" id="show3"><a href="#home3" data-toggle="tab">湿度传感器3</a></li>
+                                   <li class="" style="display:none" id="show4"><a href="#home4" data-toggle="tab">湿度传感器4</a></li>
+                                	<li class="" >
+                                	 <button  type="button" class="btn btn-primary addIcon" id="addButton">
+                           				<span class="glyphicon glyphiconPlus" aria-hidden="true"> </span>
+                          			 </button>
+                                	</li>
+                               </ul>
+                           </div>
+                       </div>
+                       <div class="panel-body">
+                           <div class="tab-content" id="humidityContent">
+                           		<!-- 湿度传感器1 -->
+							   <div class="form-group">
+								   <label class="col-sm-2 control-label">
+									   传感器基本参数
+								   </label>
+							   </div>
+                               <div class="tab-pane active" id="home1">
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+										<input name="sensorId" type="hidden" class="form-control" id="sensorId">
+									</label>
+									<div class="col-md-4">
+										<div class="input-group">
+											
+											<input name="sensorNumber" type="text" class="form-control" id="sensorNumber">
+											<label id="errorMsg" class="error" style='display: none;'>请选择已有的传感器型号</label>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+													data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important;">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 补偿使能：</label>
+									<div class="col-md-4">
+				                       <select disabled name="compensate" id = "compensate" placeholder="" class="form-control">                        	
+				                        	<option value="1" selected>使能</option>
+				                        	<option value="2">禁用</option>                        	
+				                       	</select> 
+				                    </div>   
+									<label class="col-md-2 control-label"> 滤波系数：</label>
+									<div class="col-md-4">
+				                        <select disabled name="filterFactor" id = "filterFactor" placeholder="" class="form-control">      
+				                        	<option value="1">实时</option>                  	
+				                        	<option value="2" >平滑</option>                        	
+				                        	<option value="3">平稳</option>                        	
+				                       	</select>
+				                    </div>
+								</div>
+								   <input type="hidden" id = "remark" name = "remark"  />
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									
+									<label class="col-md-2 control-label"> 自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "autoTime" name="autoTime" placeholder="请选择自动上传时间" 
+											class="form-control">
+											<option selected="selected" value="1">被动</option>
+											<option value="2">10</option>
+											<option value="3">20</option>
+											<option value="4">30</option>
+						                </select>
+									</div>
+									<label class="col-md-2 control-label"> 超出阈值时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "overValve" name = "overValve" value="35" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入超出阈值时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+										<div class="col-md-4">
+										<input type="text" id = "correctionFactorK" name = "correctionFactorK" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorB" name = "correctionFactorB" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 湿度报警上阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmUp" name = "alarmUp" value="40" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警上阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label"> 湿度报警下阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmDown" name = "alarmDown" value="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警下阈值" class="form-control" />
+									</div>
+								</div>
+							</div>
+							<!-- 湿度传感器2 -->
+                               <div class="tab-pane " id="home2">
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+										<input   type="hidden" class="form-control" id="sensorId2">
+									</label>
+									<div class="col-md-4">
+										<div class="input-group">
+											
+											<input   type="text" class="form-control" id="sensorNumber2">
+											<label id="errorMsg2" class="error" style='display: none;'>请选择已有的传感器型号</label>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+													data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important;">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 补偿使能：</label>
+									<div class="col-md-4">
+				                       <select disabled   id = "compensate2" placeholder="" class="form-control">                        	
+				                        	<option value="1" selected>使能</option>
+				                        	<option value="2">禁用</option>                        	
+				                       	</select> 
+				                    </div>   
+									<label class="col-md-2 control-label"> 滤波系数：</label>
+									<div class="col-md-4">
+				                        <select disabled  id = "filterFactor2" placeholder="" class="form-control">      
+				                        	<option value="1">实时</option>                  	
+				                        	<option value="2" >平滑</option>                        	
+				                        	<option value="3">平稳</option>                        	
+				                       	</select>
+				                    </div>
+								</div>
+								   <input type="hidden" id = "remark2"   />
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "autoTime2" placeholder="请选择自动上传时间" 
+											class="form-control">
+											<option selected="selected" value="1">被动</option>
+											<option value="2">10</option>
+											<option value="3">20</option>
+											<option value="4">30</option>
+						                </select>
+									</div>
+									<label class="col-md-2 control-label"> 超出阈值时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "overValve2"  value="35" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入超出阈值时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorK2" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorB2"  value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 湿度报警上阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmUp2"  value="40" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警上阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label"> 湿度报警下阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmDown2"  value="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警下阈值" class="form-control" />
+									</div>
+								</div>
+							</div>
+							<!-- 湿度传感器3 -->
+                               <div class="tab-pane " id="home3">
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+										<input  type="hidden" class="form-control" id="sensorId3">
+									</label>
+									<div class="col-md-4">
+										<div class="input-group">
+										
+											<input  type="text" class="form-control" id="sensorNumber3">
+											<label id="errorMsg3" class="error" style='display: none;'>请选择已有的传感器型号</label>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+													data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important;">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 补偿使能：</label>
+									<div class="col-md-4">
+				                       <select disabled  id = "compensate3" placeholder="" class="form-control">                        	
+				                        	<option value="1" selected>使能</option>
+				                        	<option value="2">禁用</option>                        	
+				                       	</select> 
+				                    </div>   
+									<label class="col-md-2 control-label"> 滤波系数：</label>
+									<div class="col-md-4">
+				                        <select disabled  id = "filterFactor3" placeholder="" class="form-control">      
+				                        	<option value="1">实时</option>                  	
+				                        	<option value="2" >平滑</option>                        	
+				                        	<option value="3">平稳</option>                        	
+				                       	</select>
+				                    </div>
+								</div>
+								   <input type="hidden" id = "remark3"   />
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "autoTime3" placeholder="请选择自动上传时间" 
+											class="form-control">
+											<option selected="selected" value="1">被动</option>
+											<option value="2">10</option>
+											<option value="3">20</option>
+											<option value="4">30</option>
+						                </select>
+									</div>
+									<label class="col-md-2 control-label"> 超出阈值时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "overValve3"  value="35" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入超出阈值时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorK3"  value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorB3"  value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 湿度报警上阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmUp3"  value="40" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警上阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label"> 湿度报警下阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmDown3"  value="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警下阈值" class="form-control" />
+									</div>
+								</div>
+							</div>
+							<!-- 湿度传感器4 -->
+                             <div class="tab-pane " id="home4">
+								<div class="form-group">
+									<label class="col-md-2 control-label"> <label
+										class="text-danger">*</label> 传感器型号：
+										<input  type="hidden" class="form-control" id="sensorId4">
+									</label>
+									<div class="col-md-4">
+										<div class="input-group">
+											
+											<input  type="text" class="form-control" id="sensorNumber4">
+											<label id="errorMsg4" class="error" style='display: none;'>请选择已有的传感器型号</label>
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-white dropdown-toggle"
+													data-toggle="dropdown">
+													<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu dropdown-menu-right" role="menu">
+												</ul>
+											</div>
+										</div>
+									</div>
+									<label class="col-md-4"></label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 补偿使能：</label>
+									<div class="col-md-4">
+				                       <select disabled id = "compensate4" placeholder="" class="form-control">                        	
+				                        	<option value="1" selected>使能</option>
+				                        	<option value="2">禁用</option>                        	
+				                       	</select> 
+				                    </div>   
+									<label class="col-md-2 control-label"> 滤波系数：</label>
+									<div class="col-md-4">
+				                        <select disabled  id = "filterFactor4" placeholder="" class="form-control">      
+				                        	<option value="1">实时</option>                  	
+				                        	<option value="2" >平滑</option>                        	
+				                        	<option value="3">平稳</option>                        	
+				                       	</select>
+				                    </div>
+								</div>
+								 <input type="hidden" id = "remark4"   />
+								<hr/>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">
+									个性参数
+									</label>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 自动上传时间(s)：</label>
+									<div class="col-md-4">
+										<select id = "autoTime4"  placeholder="请选择自动上传时间" 
+											class="form-control">
+											<option selected="selected" value="1">被动</option>
+											<option value="2">10</option>
+											<option value="3">20</option>
+											<option value="4">30</option>
+						                </select>
+									</div>
+									<label class="col-md-2 control-label"> 超出阈值时间阈值(s)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "overValve4"  value="35" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入超出阈值时间阈值" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">输出修正系数K：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorK4"  value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label">输出修正系数B：</label>
+									<div class="col-md-4">
+										<input type="text" id = "correctionFactorB4"  value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label"> 湿度报警上阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmUp4"  value="40" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警上阈值" class="form-control" />
+									</div>
+									<label class="col-md-2 control-label"> 湿度报警下阈值(%)：</label>
+									<div class="col-md-4">
+										<input type="text" id = "alarmDown4" value="8" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入湿度报警下阈值" class="form-control" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+      </div>
+      <div class="modal-footer" style="margin:0px;">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/wro/humiditySettingsEdit.js" th:src="@{/wro/humiditySettingsEdit.js}"></script>

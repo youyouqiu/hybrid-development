@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>油量标定</title>
+    <div th:replace="fragments/header">header</div>
+	<style>
+		label.control-label{
+			padding-left: 0;
+			padding-right: 0;
+		}
+	</style>
+</head>
+<body>
+    <section class="leftMenuBg">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+        	<div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">应用管理</li>
+                            <li class="active">油量管理</li>
+                            <li class="active">油量标定</li>
+                        </ul>
+                        <h1 class="h1">油量标定</h1>
+                    </div>
+                </div>
+	            <div class="row eightIsZero">
+	                <div class="col-md-12">
+	                	<input id="vehicleList" th:value="${vehicleList}" type="hidden" />
+	                	<input id="curBox" value="1" type="hidden" />
+	                	<input id="editOrRebuild" value="1" type="hidden" />
+	                	<input id="curClickedBtn" type="hidden" />
+	                	<input id="vehicleId" type="hidden" />
+	                	<!-- 每次点名请求时，把请求的msgSN存放在这里，用于对比设备返回的消息中msgSNAck的值是否相等，以此区分是否为一次对话 -->
+	                	<input id="msgSN" type="hidden" />
+	                	<!-- 存放临时值的隐藏input -->
+	                	<!-- 修正标定-监控对象 -->
+	                	<input id="corCalibration_brands" type="hidden" />
+	                	<!-- 修正标定-车辆id -->
+	                	<input id="corCalibration_vehicleId" type="hidden" />
+	                	<!-- 修正标定-setParameterId -->
+	                	<input id="corCalibration_settingParamId" type="hidden" />
+	                	<!-- 修正标定-calibrationParamId -->
+	                	<input id="corCalibration_calibrationParamId" type="hidden" />
+	                	<!-- 修正标定-transmissionParamId -->
+	                	<input id="corCalibration_transmissionParamId" type="hidden" />
+	                	<!-- 修正标定-主油箱-油量车辆设置id -->
+	                	<input id="corCalibration_tank1_oilBoxVehicleId" type="hidden" />
+	                	<!-- 修正标定-主油箱-加油前点我-液位高度 -->
+	                	<input id="corCalibration_tank1_oilLevelHeight_before" type="hidden" />
+	                	<!-- 修正标定-主油箱-加油前点我-油量值 -->
+	                	<input id="corCalibration_tank1_oilValue_before" type="hidden" />
+	                	<!-- 修正标定-主油箱-加油后点我-液位高度 -->
+	                	<input id="corCalibration_tank1_oilLevelHeight_after" type="hidden" />
+	                	<!-- 修正标定-主油箱-加油后点我-油量值 -->
+	                	<input id="corCalibration_tank1_oilValue_after" type="hidden" />
+	                	<!-- 修正标定-主油箱-实际加油量 -->
+	                	<input id="corCalibration_tank1_actualAddOil" type="hidden" />
+	                	<!-- 修正标定-主油箱-实际加油量提示语信息 -->
+	                	<input id="corCalibration_tank1_noteMsg" type="hidden" />
+	                	<!-- 修正标定-主油箱-标定数据-液位高度 -->
+	                	<input id="corCalibration_tank1_oilLevelHeights" type="hidden" />
+	                	<!-- 修正标定-主油箱-标定数据-油量值 -->
+	                	<input id="corCalibration_tank1_oilValues" type="hidden" />
+	                	<!-- 修正标定-主油箱-标定数据-基准油量值 -->
+	                	<input id="corCalibration_tank1_base_oilValues" type="hidden" />
+
+	                	<!-- 修正标定-副油箱-油量车辆设置id -->
+	                	<input id="corCalibration_tank2_oilBoxVehicleId" type="hidden" />
+	                	<!-- 修正标定-副油箱-加油前点我-液位高度 -->
+	                	<input id="corCalibration_tank2_oilLevelHeight_before" type="hidden" />
+	                	<!-- 修正标定-副油箱-加油前点我-油量值 -->
+	                	<input id="corCalibration_tank2_oilValue_before" type="hidden" />
+	                	<!-- 修正标定-副油箱-加油后点我-液位高度 -->
+	                	<input id="corCalibration_tank2_oilLevelHeight_after" type="hidden" />
+	                	<!-- 修正标定-副油箱-加油后点我-油量值 -->
+	                	<input id="corCalibration_tank2_oilValue_after" type="hidden" />
+	                	<!-- 修正标定-副油箱-实际加油量 -->
+	                	<input id="corCalibration_tank2_actualAddOil" type="hidden" />
+	                	<!-- 修正标定-副油箱-实际加油量提示语信息 -->
+	                	<input id="corCalibration_tank2_noteMsg" type="hidden" />
+	                	<!-- 修正标定-副油箱-标定数据-液位高度 -->
+	                	<input id="corCalibration_tank2_oilLevelHeights" type="hidden" />
+	                	<!-- 修正标定-副油箱-标定数据-油量值 -->
+	                	<input id="corCalibration_tank2_oilValues" type="hidden" />
+	                	<!-- 修正标定-副油箱-标定数据-基准油量值 -->
+	                	<input id="corCalibration_tank2_base_oilValues" type="hidden" />
+
+	                	<!-- 重新标定-监控对象 -->
+	                	<input id="ReCalibration_brands" type="hidden" />
+	                	<!-- 重新标定-车辆id -->
+	                	<input id="ReCalibration_vehicleId" type="hidden" />
+	                	<!-- 重新标定-标定数据总条数 -->
+	                	<input id="ReCalibration_num" type="hidden" />
+	                	<!-- 重新标定-setParameterId -->
+	                	<input id="ReCalibration_settingParamId" type="hidden" />
+	                	<!-- 重新标定-calibrationParamId -->
+	                	<input id="ReCalibration_calibrationParamId" type="hidden" />
+	                	<!-- 重新标定-transmissionParamId -->
+	                	<input id="ReCalibration_transmissionParamId" type="hidden" />
+	                	<!-- 重新标定-主油箱-油量车辆设置id -->
+	                	<input id="ReCalibration_tank1_oilBoxVehicleId" type="hidden" />
+	                	<!-- 重新标定-主油箱-加油前点我-液位高度 -->
+	                	<input id="ReCalibration_tank1_oilLevelHeight_before" type="hidden" />
+	                	<!-- 重新标定-主油箱-加油前点我-油量值 -->
+	                	<input id="ReCalibration_tank1_oilValue_before" type="hidden" />
+	                	<!-- 重新标定-主油箱-加油前点我-ad值 -->
+	                	<input id="ReCalibration_tank1_oilADHeight" type="hidden" />
+	                	<!-- 重新标定-主油箱-实际加油量 -->
+	                	<input id="ReCalibration_tank1_actualAddOil" type="hidden" />
+	                	<!-- 重新标定-主油箱-标定数据-液位高度 -->
+	                	<input id="ReCalibration_tank1_oilLevelHeights" type="hidden" />
+	                	<!-- 重新标定-主油箱-标定数据-油量值 -->
+	                	<input id="ReCalibration_tank1_oilValues" type="hidden" />
+	                	<!-- 重新标定-主油箱-序号 -->
+	                	<input id="ReCalibration_tank1_seqNo" type="hidden" />
+
+	                	<!-- 重新标定-副油箱-油量车辆设置id -->
+	                	<input id="ReCalibration_tank2_oilBoxVehicleId" type="hidden" />
+	                	<!-- 重新标定-副油箱-加油前点我-液位高度 -->
+	                	<input id="ReCalibration_tank2_oilLevelHeight_before" type="hidden" />
+	                	<!-- 重新标定-副油箱-加油前点我-油量值 -->
+	                	<input id="ReCalibration_tank2_oilValue_before" type="hidden" />
+	                	<!-- 重新标定-副油箱-加油前点我-ad值 -->
+	                	<input id="ReCalibration_tank2_oilADHeight" type="hidden" />
+	                	<!-- 重新标定-副油箱-实际加油量 -->
+	                	<input id="ReCalibration_tank2_actualAddOil" type="hidden" />
+	                	<!-- 重新标定-副油箱-标定数据-液位高度 -->
+	                	<input id="ReCalibration_tank2_oilLevelHeights" type="hidden" />
+	                	<!-- 重新标定-副油箱-标定数据-油量值 -->
+	                	<input id="ReCalibration_tank2_oilValues" type="hidden" />
+	                	<!-- 重新标定-副油箱-序号 -->
+	                	<input id="ReCalibration_tank2_seqNo" type="hidden" />
+
+	                	<!-- 追溯标定--主油箱-加油前点我-液位高度 -->
+	                	<input id="ascendCalibration_tank1_oilLevelHeight_before" type="hidden" />
+	                	<!-- 追溯标定-主油箱-加油前点我-油量值 -->
+	                	<input id="ascendCalibration_tank1_oilValue_before" type="hidden" />
+	                	<!-- 追溯标定-主油箱-加油后点我-液位高度 -->
+	                	<input id="ascendCalibration_tank1_oilLevelHeight_after" type="hidden" />
+	                	<!-- 追溯标定-主油箱-加油后点我-油量值 -->
+	                	<input id="ascendCalibration_tank1_oilValue_after" type="hidden" />
+	                	<!-- 追溯标定-主油箱-实际加油量 -->
+	                	<input id="ascendCalibration_tank1_actualAddOil" type="hidden" />
+	                	<!-- 追溯标定-主油箱-文本框提示语 -->
+	                	<input id="ascendCalibration_tank1_noteMsg" type="hidden" />
+
+	                	<!-- 追溯标定--副油箱-加油前点我-液位高度 -->
+	                	<input id="ascendCalibration_tank2_oilLevelHeight_before" type="hidden" />
+	                	<!-- 追溯标定-副油箱-加油前点我-油量值 -->
+	                	<input id="ascendCalibration_tank2_oilValue_before" type="hidden" />
+	                	<!-- 追溯标定-副油箱-加油后点我-液位高度 -->
+	                	<input id="ascendCalibration_tank2_oilLevelHeight_after" type="hidden" />
+	                	<!-- 追溯标定-副油箱-加油后点我-油量值 -->
+	                	<input id="ascendCalibration_tank2_oilValue_after" type="hidden" />
+	                	<!-- 追溯标定-副油箱-实际加油量 -->
+	                	<input id="ascendCalibration_tank2_actualAddOil" type="hidden" />
+	                	<!-- 追溯标定-副油箱-文本框提示语 -->
+	                	<input id="ascendCalibration_tank2_noteMsg" type="hidden" />
+
+	                    <div class="panel panel-default">
+	                        <div class="panel-heading">
+	                            <div class="dropdown panel-title fwb">
+	                                <ul class="nav nav-tabs">
+	                                    <li class="active" id="amendmentCalibration"><a style="cursor: pointer;">实时修正</a></li>
+	                                    <li id="againCalibration"><a style="cursor: pointer;">重新标定</a></li>
+	                                    <li id="ascendDemarcate"><a style="cursor: pointer;">追溯修正</a></li>
+	                                </ul>
+	                            </div>
+	                            <div class="actions pull-right">
+	                                <i class="fa fa-chevron-down"></i>
+	                            </div>
+	                        </div>
+	                        <div class="panel-body">
+	                            <div class="tab-content">
+	                            	<!-- 修正标定 -->
+	                                <div class="tab-pane active" id="amendment">
+	                                    <section class="fuelux">
+	                                        <form action="#" method="" id="submitForm">
+	                                        	<div class="col-md-12">
+													<div class="col-md-6 col-sm-12 form-group text-right actual-oil-left">
+	                                                     <label class="col-md-3 col-sm-12 control-label oilcalibration-label"><label class="text-danger">*</label> 监控对象：</label>
+	                                                     <div class="col-md-4 col-sm-12">
+	                                                        <div style="position:relative;">
+	                                                           <div class="input-group">
+	                                                         		<input name="brands" type="text" maxlength="10" class="form-control" id="brands" autocomplete="off"></input>
+	                                                           		<div class="input-group-btn">
+		                                                               	<button type="button" class="btn btn-white dropdown-toggle">
+		                                                                   	<span class="caret"></span>
+		                                                               	</button>
+		                                                               	<ul id="ulHide" class="dropdown-menu dropdown-menu-right oilcalibrationNumberPlate" role="menu" style="width:100%;padding-top: 0px; max-height: 375px; max-width: 800px; overflow: auto;  transition: 0.3s;">
+	                                                               		</ul>
+	                                                           		</div>
+	                                                     		</div>
+	                                                        </div>
+	                                                     </div>
+		                                                 <div class="col-md-4 col-sm-12 tankAmendmentRadio">
+	                                                		<label class="col-md-6 col-sm-6 tankAmendmentLab" id="tankRadio1"><input type="radio" name="tank" value=""> 主油箱</label>
+	                                                		<label class="col-md-6 col-sm-6 tankAmendmentLab" id="tankRadio2"><input type="radio" name="tank" value=""> 副油箱</label>
+		                                                 </div>
+	                                                 </div>
+	                                        	</div>
+	                                        	<div class="col-md-12">
+	                                                 <div class="col-md-6 col-sm-12 form-group">
+	                                                 	<div class="col-md-3 col-sm-12 text-right actual-oil-left">
+	                                                 		<div th:if="${hasRole}">
+	                                                 		<button type="button" id="submitBefore" class="btn btn-primary" data-dismiss="modal">加油前点我</button>
+	                                                 		</div>
+	                                                 	</div>
+	                                                 	<div class="col-md-4 col-sm-12">
+	                                                 		<input type="text" class="form-control" id="oilLevelHeight_before" placeholder="加油前液位高度(mm)" readonly="readonly"></input>
+	                                                 	</div>
+	                                                 	<div class="col-md-5 col-sm-12">
+	                                                 		<input type="text" class="form-control" id="oilValue_before" placeholder="加油前油量值(L)" readonly="readonly"></input>
+	                                                 	</div>
+	                                                </div>
+	                                                <div class="col-md-6 col-sm-12 form-group">
+	                                                 	<div class="col-md-3 col-sm-12 text-right actual-oil-left">
+	                                                 		<div th:if="${hasRole}">
+	                                                 		<button type="button" id="submitAfter" class="btn btn-primary" data-dismiss="modal">加油后点我</button>
+	                                                 		</div>
+	                                                 	</div>
+	                                                 	<div class="col-md-4 col-sm-12">
+	                                                 		<input type="text" class="form-control" id="oilLevelHeight_after" placeholder="加油后液位高度(mm)" readonly="readonly"></input>
+	                                                 	</div>
+	                                                 	<div class="col-md-5 col-sm-12">
+                                                 			<input type="text" class="form-control" id="oilValue_after" placeholder="加油后油量值(L)" readonly="readonly"></input>
+                                                 		</div>
+	                                                </div>
+	                                        	</div>
+                                                <div class="col-md-12">
+	                                                <div class="col-md-6 col-sm-12 form-group">
+	                                                     <div class="col-md-3 col-sm-12 text-right actual-oil-left">
+		                                                     <label class="control-label oilcalibration-label"><label class="text-danger">*</label> 实际加油量:</label>
+	                                                     </div>
+	                                                     <div class="col-md-9 col-sm-12">
+                                                         	<input name="actualAddOil" type="text" maxlength="6" onkeyup="value=value.replace(/[^0-9.]/g,'')" class="form-control" id="actualAddOil" placeholder="请输入实际加油量(L)"></input>
+	                                                     </div>
+	                                                 </div>
+	                                                 <div class="col-md-6 col-sm-12 form-group">
+	                                                     <div class="col-md-3 col-sm-12 text-right actual-oil-left">
+		                                                     <label class="control-label oilcalibration-label">下发状态:</label>
+	                                                     </div>
+	                                                     <div class="col-md-4 col-sm-12">
+                                                         	<input  type="text"  readonly="readonly" class="form-control sendStatus4Amendment" ></input>
+	                                                     </div>
+	                                                     <div class="col-md-5 col-sm-12 text-right">
+	                                                     	<div class="col-md-12 col-sm-12 olicalbrationBtn">
+	                                                     		<div th:if="${hasRole}">
+	                                                 			<button type="button" id="submitBtn" class="btn btn-primary">修正下发</button>
+	                                                 			<button type="button" id="corCancleBtn" class="btn btn-default">取消修正</button>
+		                                                 		<input type="reset" class="hidden"  id="corResetBtn" />
+	                                                     		</div>
+	                                                     	</div>
+	                                                     </div>
+	                                                 </div>
+                                                 </div>
+	                                        </form>
+	                                    </section>
+	                                </div>
+	                                <!-- 重新标定 -->
+	                                <div class="tab-pane" id="again">
+	                                    <section class="fuelux">
+	                                        <form action="#" method="">
+	                                        	<div class="col-md-12 col-sm-12">
+		                                            <div class="col-md-6 col-sm-12 form-group text-right actual-oil-left">
+	                                                     <label class="col-md-3 col-sm-12 control-label oilcalibration-label"><label class="text-danger">*</label> 监控对象：</label>
+	                                                     <div class="col-md-4 col-sm-12">
+	                                                        <div style="position:relative;">
+	                                                           <div class="input-group">
+	                                                         		<input name="brands2" type="text" maxlength="10" class="form-control" id="brands2" autocomplete="off"></input>
+	                                                           		<div class="input-group-btn">
+		                                                               	<button type="button" class="btn btn-white dropdown-toggle">
+		                                                                   	<span class="caret"></span>
+		                                                               	</button>
+		                                                               	<ul id="ulHide2" class="dropdown-menu dropdown-menu-right oilcalibrationNumberPlate" role="menu" style="width:100%;padding-top: 0px; max-height: 375px; max-width: 800px; overflow: auto;  transition: 0.3s;">
+	                                                               		</ul>
+	                                                           		</div>
+	                                                     		</div>
+	                                                        </div>
+	                                                     </div>
+		                                                 <div class="col-md-4 col-sm-12 form-group tankAmendmentRadio text-left">
+	                                                		<label class="col-md-6 col-sm-6 tankAmendmentLab" id="tankRadio3"><input type="radio" name="tank" value=""> 主油箱</label>
+	                                                		<label class="col-md-6 col-sm-6 tankAmendmentLab" id="tankRadio4"><input type="radio" name="tank" value=""> 副油箱</label>
+		                                                 </div>
+	                                                 </div>
+	                                                 <div class="col-md-6 col-sm-12 form-group">
+	                                                 	<div class="col-md-4 col-sm-12 text-right actual-oil-left">
+	                                                 		<div th:if="${hasRole}">
+	                                                 		<button type="button" id="submitBefore2" class="btn btn-primary" data-dismiss="modal">刷新最新值</button>
+	                                                 		</div>
+	                                                 	</div>
+	                                                 	<div class="col-md-4 col-sm-12">
+	                                                 		<input type="text" class="form-control" id="oilLevelHeight2_before" placeholder="当前液位高度(mm)" readonly="readonly"></input>
+	                                                 	</div>
+	                                                 	<div class="col-md-4 col-sm-12">
+	                                                 		<input type="hidden" class="form-control" id="oilValue2_before" placeholder="当前油量值(L)" readonly="readonly"></input>
+	                                                 		<input type="text" class="form-control" id="oilADHeight" placeholder="当前AD值" readonly="readonly" />
+	                                                 	</div>
+	                                                 </div>
+                                                 </div>
+                                                 <div class="col-md-12">
+	                                                 <div class="col-md-6 col-sm-12 form-group">
+	                                                     <div class="col-md-3 col-sm-12 text-right actual-oil-left">
+		                                                     <label class="control-label oilcalibration-label"><label class="text-danger">*</label> 实际加油量：</label>
+	                                                     </div>
+	                                                     <div class="col-md-4 col-sm-12">
+	                                                        	<input name="actualAddOil2" type="text" class="form-control" id="actualAddOil2" maxlength="6" onkeyup="value=value.replace(/[^0-9.]/g,'')" placeholder="请输入实际加油量(L)"></input>
+	                                                     </div>
+	                                                     <div class="col-md-5 col-sm-12">
+	                                                     	<div class="col-md-12 col-sm-12 olicalbrationBtn">
+	                                                     		<div th:if="${hasRole}">
+	                                                 			<button type="button" id="submitBtn2" class="btn btn-primary">提&nbsp;&nbsp;交</button>
+	                                                 			<button type="button" id="cancleSaveBtn" class="btn btn-default">撤&nbsp;&nbsp;消</button>
+	                                                     		</div>
+	                                                     	</div>
+	                                                     </div>
+	                                                 </div>
+	                                                 <div class="col-md-6 col-sm-12 form-group">
+	                                                 	<div class="col-md-4 col-sm-12 text-right actual-oil-left">
+		                                                     <label class="control-label oilcalibration-label">下发状态:</label>
+	                                                     </div>
+	                                                     <div class="col-md-4 col-sm-12">
+                                                         	<input  type="text"  readonly="readonly" class="form-control sendStatus4Amendment" ></input>
+	                                                     </div>
+	                                                 </div>
+                                                 </div>
+	                                        </form>
+	                                    </section>
+	                                </div>
+	                            	<!-- 追溯修正 -->
+	                            	<div class="tab-pane" id="ascend">
+	                                    <section class="fuelux">
+	                                        <form id="oilist" action="#" method="" class="form-horizontal">
+	                                        	<div class="col-md-12">
+	                                        		<div class="form-group">
+	                                                     <label class="col-md-1 control-label oilcalibration-label"><label class="text-danger">*</label> 监控对象：</label>
+	                                                     <div class="col-md-3">
+	                                                        <div style="position:relative;">
+	                                                           <div class="input-group">
+	                                                         		<input name="brands3" type="text" class="form-control" id="brands3" autocomplete="off"></input>
+	                                                           		<div class="input-group-btn">
+		                                                               	<button type="button" class="btn btn-white dropdown-toggle">
+		                                                                   	<span class="caret"></span>
+		                                                               	</button>
+		                                                               	<ul id="ulHide3" class="dropdown-menu dropdown-menu-right oilcalibrationNumberPlate" role="menu" style="width:100%;padding-top: 0px; max-height: 375px; max-width: 800px; overflow: auto;  transition: 0.3s;">
+	                                                               		</ul>
+	                                                           		</div>
+	                                                     		</div>
+	                                                        </div>
+	                                                     </div>
+		                                                <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+														<div class="col-md-4 col-sm-8 searchListSelect">
+															<input style="cursor: pointer; background-color: #fafafa;"
+																class="form-control layer-date laydate-icon"
+																id="timeInterval" name="timeInterval" readonly />
+														</div>
+	                                                     <div class="col-md-4" hidden>
+	                                                     	<input type="text" id="origionalTime_tank1" value="" />
+	                                                     	<input type="text" id="origioanlTime_tank2" value="" />
+	                                                     	主油箱最后一次标定时间：<input type="text" id="tank1LastTime" value="" /><br/>
+	                                                     	副油箱最后一次标定时间：<input type="text" id="tank2LastTime" value="" />
+	                                                     </div>
+	                                                     <div class="col-md-12">
+	                                                     	<div class="col-md-6 oilcalibration-label">
+	                                                     		<label class="col-md-2 col-sm-6" id="tankRadio5" style="padding-left: 0"><input checked="checked" type="radio" name="tank" value=""> 主油箱</label>
+	                                                			<label class="col-md-2 col-sm-6" id="tankRadio6" style="padding-left: 0"><input type="radio" name="tank" value=""> 副油箱</label>
+	                                                     	</div>
+	                                                     	<div class="col-md-6  control-label">
+	                                                     		<button id="todayClick" type="button" class="btn btn-primary">今天</button>
+						                                        <button id="yesterdayClick" type="button"
+						                                                class="btn btn-primary">前一天
+						                                        </button>
+						                                        <button id="inquireClick" type="button"
+						                                                class="btn btn-primary">查询
+						                                        </button>
+	                                                     	</div>
+					                                    </div>
+					                                  </div>
+                                                 </div>
+	                                        </form>
+	                                    </section>
+	                                </div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="row eightIsZero" id="echartsArea" style="display:none;">
+	                <div class="col-md-12">
+	                    <div class="panel panel-default" id="graphArea">
+	                        <div class="panel-heading">
+	                            <h3 class="panel-title fwb">图形展示</h3>
+	                            <div class="actions pull-right">
+	                                <i class="fa fa-chevron-up" id="showClick"></i>
+	                            </div>
+	                        </div>
+	                        <div class="panel-body" id="graphShow" style="display:none;">
+	                            <div id="sjcontainer" style="height: 600px;width:100%; margin: 0 auto"></div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	            <!-- 加油数据 -->
+	            <div class="row eightIsZero" id="demarcateData" style="display:none;">
+	                <div class="col-md-12">
+	                    <div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">加油数据</h3>
+								<div class="actions pull-right">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+	                        <div class="panel-body">
+	                        	<form id="" action="#" method="" class="form-horizontal">
+	                        		<div class="form-group">
+		                        		<div class="col-md-12">
+		                        			<div class="col-md-6">
+			                        			<label class="col-md-2 control-label">加油前：</label>
+			                        			<div class="col-md-5">
+			                        				<input id="oil_before_height" name="oil_value" readonly="readonly" class="form-control" placeholder="加油前液位高度（mm）" />
+			                        			</div>
+			                        			<div class="col-md-5">
+			                        				<input id="oil_before_value" name="oil_value" readonly="readonly" class="form-control" placeholder="加油前油量值（L）" />
+			                        			</div>
+			                        		</div>
+			                        		<div class="col-md-6">
+			                        			<label class="col-md-2 control-label">加油后：</label>
+			                        			<div class="col-md-5">
+			                        				<input id="oil_after_height" name="oil_value" readonly="readonly" class="form-control" placeholder="加油后液位高度（mm）" />
+			                        			</div>
+			                        			<div class="col-md-5">
+			                        				<input id="oil_after_value" name="oil_value" readonly="readonly" class="form-control" placeholder="加油后油量值（L）" />
+			                        			</div>
+			                        		</div>
+		                        		</div>
+		                        	</div>
+		                        	<div class="form-group">
+		                        		<div class="col-md-12">
+			                        		<div class="col-md-6 oilcalibration-label">
+			                        			<label class="col-md-2 control-label">实际加油量：</label>
+			                        			<div class="col-md-5">
+			                        				<input type="text" name="oil_value" id="actualAddOil3" maxlength="6" onkeyup="value=value.replace(/[^0-9.]/g,'')" class="form-control" placeholder="请输入实际加油量(L)" />
+			                        			</div>
+			                        		</div>
+			                        		<div class="col-md-6 ">
+
+				                        		<label class="col-md-2 control-label">下发状态:</label>
+                                                 <div class="col-md-4">
+                                                   	<input  type="text"  readonly="readonly" class="form-control sendStatus4Amendment" ></input>
+                                                </div>
+
+	                                      		<div class="col-md-6 col-sm-12 text-right">
+                                                   	<div class="col-md-12 col-sm-12 olicalbrationBtn">
+                                                   		<div th:if="${hasRole}">
+                                               				<button id="submit_btn" type="button" class="btn btn-primary">修正下发</button>
+                                     						<button id="cancle_btn" type="button" class="btn btn-default">取消修正</button>
+                                     						<button id="ascendResetBtn" type="reset" class="hidden" />
+                                                   		</div>
+                                                   	</div>
+                                                </div>
+			                        		</div>
+			                        	</div>
+		                        	</div>
+                                </form>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	            <!-- 油箱标定数据 -->
+	            <div class="row">
+	                <div class="col-md-12">
+	                    <div class="panel panel-default">
+							<div class="panel-heading" id="stretch">
+								<h3 class="panel-title fwb">标定数据</h3>
+								<div class="actions pull-right">
+									<i class="fa chevron-down" id="stretch-chevron"></i>
+								</div>
+							</div>
+	                        <div class="panel-body dataarea" id="stretch-body">
+	                            <div class="dropdown panel-title fwb">
+	                                <ul class="nav nav-tabs">
+	                                    <li class="active" id="tankOneCutover"><a href="#tankOne" data-toggle="tab">主油箱</a></li>
+	                                    <li id="tankTwoCutover"><a href="#tankTwo" data-toggle="tab">副油箱</a></li>
+	                                    <div class="pull-right" id="compareDataDiv">
+	                               			<button th:if="${hasRole}"
+
+	                               			type="button" id="compareDataBtn"
+	                               			class="btn btn-primary"
+
+	                               			>数据对比</button>
+	                               			<button th:if="${hasRole}"
+
+	                               			type="button" id="refreshDataBtn3"
+	                               			class="btn btn-primary hidden"
+
+	                               			>读取标定数据</button>
+	                               		</div>
+		                                <div id="reCalBtnDiv" style="display: none;margin-right:5px" class="pull-right">
+		                                	<div th:if="${hasRole}">
+	                                 		<button type="button" id="saveOilCalibrationBtn" class="btn btn-primary">保存下发</button>
+	                               			</div>
+
+	                               		</div>
+	                                </ul>
+	                            </div>
+	                        	<div class="panel-body tankPanelBody">
+
+			                        	<!-- 主油箱 -->
+			                            <div class="tab-pane active" id="tankOne">
+			                            	<div style="overflow-x:hidden">
+			                            		<div class="row">
+			                            		<div class="col-md-12" id="tankWraper1">
+			                            			<p style="text-align:center;font-weight:bold;" id="tankTitle1">传感器上报参数</p>
+			                            			<table id="fuelTankCalibration" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+						                                <thead>
+							                                <tr id="trOne">
+							                                    <th class="text-center">序号</th>
+							                                    <th class="text-center">液位高度(mm)</th>
+							                                    <th class="text-center">油量值(L)</th>
+							                                </tr>
+						                                </thead>
+						                                <tbody  id="dataList">
+						                                </tbody>
+						                            </table>
+			                            		</div>
+			                            		<div class="col-md-6 hidden" id="tankWraper3">
+			                            			<p style="text-align:center;font-weight:bold;">平台修正参数</p>
+			                            			<table class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+						                                <thead>
+							                                <tr id="trOne">
+							                                    <th class="text-center">序号</th>
+							                                    <th class="text-center">液位高度(mm)</th>
+							                                    <th class="text-center">油量值(L)</th>
+							                                </tr>
+						                                </thead>
+						                                <tbody  id="dataList3">
+						                                </tbody>
+						                            </table>
+			                            		</div>
+			                            	</div>
+			                            	</div>
+			                            </div>
+			                        	<!-- 副油箱 -->
+			                            <div class="tab-pane active" style="display: none;" id="tankTwo">
+			                            	<div style="overflow-x:hidden">
+			                            		<div class="row">
+			                            			<div class="col-md-12"  id="tankWraper2">
+			                            				<p style="text-align:center;font-weight:bold;" id="tankTitle2">传感器上报参数</p>
+			                            				<table id="fuelTankCalibration2" class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+							                                <thead>
+								                                <tr id="trTwo">
+								                                    <th class="text-center">序号</th>
+								                                    <th class="text-center">液位高度(mm)</th>
+								                                    <th class="text-center">油量值(L)</th>
+								                                </tr>
+							                                </thead>
+							                                <tbody  id="dataList2">
+							                                </tbody>
+							                            </table>
+			                            			</div>
+			                            			<div class="col-md-6 hidden"  id="tankWraper4">
+			                            				<p style="text-align:center;font-weight:bold;">平台修正参数</p>
+			                            				<table class="table table-striped table-bordered table-hover noCheckTable" cellspacing="0" width="100%">
+							                                <thead>
+								                                <tr id="trTwo">
+								                                    <th class="text-center">序号</th>
+								                                    <th class="text-center">液位高度(mm)</th>
+								                                    <th class="text-center">油量值(L)</th>
+								                                </tr>
+							                                </thead>
+							                                <tbody  id="dataList4">
+							                                </tbody>
+							                            </table>
+			                            			</div>
+			                            		</div>
+			                            	</div>
+
+			                            </div>
+	                                   	<div class="form-group text-right">
+	                                   		<input type="hidden" id="settingParamId" />
+	                                   		<input type="hidden" id="calibrationParamId" />
+	                                   		<input type="hidden" id="transmissionParamId" />
+	                                   		<input type="hidden" id="oilBoxVehicleId1" />
+	                                   		<input type="hidden" id="oilBoxVehicleId2" />
+	                                   		<div id="reCalBtnDiv" style="display: none">
+	                                   		</div>
+	                                   	</div>
+	                        	</div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<!-- 读取配置文件的提示语信息 -->
+<script th:inline="javascript">
+	var addRowMsg = [[#{oil.calibration.addRow}]];
+	var reCalMsg = [[#{oil.calibration.reCal}]];
+	var isBoundMsg = [[#{oil.calibration.isBound}]];
+	var isOnlineMsg = [[#{oil.calibration.isOnline}]]
+	var tank1GetDataFailMsg = [[#{oil.calibration.tank1.getDataFail}]];
+	var tank2GetDataFailMsg = [[#{oil.calibration.tank2.getDataFail}]]
+	var getDataFailMsg = [[#{oil.calibration.getDataFail}]];
+	var loadingMsg = [[#{oil.calibration.loading}]];
+	var brandNullMsg = [[#{oil.calibration.brand.null}]];
+	var getBeforeDataMsg = [[#{oil.calibration.getBeforeData}]];
+	var getBothDataMsg = [[#{oil.calibration.getBothData}]];
+	var reCalRefreshMsg = [[#{oil.calibration.reCal.refresh}]];
+	var actualAddOilNullMsg = [[#{oil.calibration.actualAddOil.null}]];
+	var actualAddOilIsRightNumMsg = [[#{oil.calibration.actualAddOil.isRightNum}]];
+	var actualAddOilIsAboveZeroMsg = [[#{oil.calibration.actualAddOil.isAboveZero}]];
+	var saveConfirmMsg = [[#{oil.calibration.actualAddOil.saveConfirm}]];
+	var cancleConfirmMsg = [[#{oil.calibration.actualAddOil.cancleConfirm}]];
+	var systemErrorMsg = [[#{system.error}]];
+	var systemLoadingTimeout = [[#{system.loading.timout}]];
+	var oilCalibrationAscendNodata = [[#{oil.calibration.ascend.noData}]];
+	var queryStarttimeNull = [[#{oil.calibration.ascend.startTime.null}]];
+	var queryEndtimeNull = [[#{oil.calibration.ascend.endTime.null}]];
+	var queryEndCompStart = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+	var queryPeriod = [[#{oil.calibration.ascend.query.peroid}]];
+	var ascendBeforeDataNull = [[#{oil.calibration.ascend.before.null}]];
+	var ascendAfterDataNull = [[#{oil.calibration.ascend.after.null}]];
+	var ascendOilNull = [[#{oil.calibration.ascend.oil.null}]];
+	var ascendTimeComp = [[#{oil.calibration.ascend.timeCompare}]];
+	var ascendOilComp = [[#{oil.calibration.ascend.oilCompare}]];
+	var calibrationSuccess = [[#{oil.calibration.result.success}]];
+	var calibrationFail = [[#{oil.calibration.result.fail}]];
+	var vehicleBrandNull = [[#{vehicle.brand.null}]];
+	var vehicleBrandError = [[#{vehicle.brand.error}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/echarts.js" th:src="@{/resources/js/echarts.js}"></script>
+<script src="/wro/oil-calibration.js" th:src="@{/wro/oil-calibration.js}"></script>

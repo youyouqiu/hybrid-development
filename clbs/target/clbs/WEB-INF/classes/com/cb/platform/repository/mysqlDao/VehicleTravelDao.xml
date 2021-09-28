@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.VehicleTravelDao">
+    <!-- 新增 -->
+    <insert id="addVehicleTravel" parameterType="com.cb.platform.domain.VehicleTravelForm">
+        INSERT INTO zw_m_vehicle_travel (
+        id,vehicle_id,travel_id, start_time,end_time,address,travel_content,remark, create_data_time,
+        create_data_username
+        )
+        VALUES(
+        #{id}, #{vehicleId}, #{travelId},
+        #{startTime},#{endTime},#{address},#{travelContent},#{remark},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+
+    <insert id="addVehicleTravelByBatch" parameterType="com.cb.platform.domain.VehicleTravelForm">
+        INSERT INTO zw_m_vehicle_travel (
+        id,vehicle_id,travel_id, start_time,end_time,address,travel_content,remark, create_data_time,
+        create_data_username
+        )
+        VALUES
+        <foreach collection="vehicleTravelForms" item="item" index="index" separator=",">
+            (
+            #{item.id}, #{item.vehicleId}, #{item.travelId},#{item.startTime},#{item.endTime},#{item.address},
+            #{item.travelContent},#{item.remark},#{item.createDataTime},#{item.createDataUsername}
+            )
+        </foreach>
+
+    </insert>
+
+    <update id="deleteVehicleTravelById" parameterType="string">
+        UPDATE zw_m_vehicle_travel set flag = 0 where id = #{id} and flag =1
+    </update>
+
+    <update id="deleteVehicleTravelByIds" parameterType="string">
+        UPDATE zw_m_vehicle_travel set flag = 0 where 1=0
+        <if test="ids != null and ids !=''">
+            OR ( id in
+            <foreach collection="ids.split(',')" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and flag =1)
+        </if>
+
+    </update>
+
+    <select id="findVehicleTravelById" parameterType="string" resultType="com.cb.platform.domain.VehicleTravelForm">
+        SELECT * from zw_m_vehicle_travel where id = #{id} and  flag =1
+    </select>
+    <update id="updateVehicleTravel" parameterType="com.cb.platform.domain.VehicleTravelForm">
+        update zw_m_vehicle_travel
+        <set>
+            vehicle_id = #{vehicleId},
+             travel_id = #{travelId},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            address = #{address},
+            travel_content = #{travelContent},
+            remark = #{remark},
+            update_data_time = #{updateDataTime},
+            update_data_username = #{updateDataUsername}
+        </set>
+        WHERE id = #{id} and flag =1
+    </update>
+
+    <select id="searchVehicleTravels" resultType="com.cb.platform.domain.VehicleTravelForm">
+        select DISTINCT  * from zw_m_vehicle_travel where 1=0
+        <if test="query.vehicleIdList != null and query.vehicleIdList.size>0">
+            OR( vehicle_id IN
+            <foreach collection="query.vehicleIdList" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and flag =1
+            )
+        </if>
+        <if test="query.travelId != null and query.travelId != ''">
+            or(travel_id LIKE BINARY
+            CONCAT('%',#{query.travelId},'%')and flag =1)
+        </if>
+
+        order by create_data_time desc
+
+    </select>
+
+    <select id="isRepeateTravelId" resultType="string">
+        select travel_id from zw_m_vehicle_travel where flag =1
+        <if test="id != null">
+            and id != #{id}
+        </if>
+        and travel_id =#{travelId}
+    </select>
+
+    <select id="findLogTravelIdsByIds" resultType="string">
+        SELECT group_concat( DISTINCT travel_id separator ',') from zw_m_vehicle_travel where 1=0
+        <if test="ids != null and ids.size>0">
+            OR id in
+            <foreach collection="ids" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="deleteVehicleTravelByVehicleIds" parameterType="string">
+        UPDATE zw_m_vehicle_travel set flag = 0 where 1=0
+        <if test="vehicleIds != null ">
+            OR ( vehicle_id in
+            <foreach collection="vehicleIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and flag =1)
+        </if>
+
+
+    </select>
+
+
+    <select id="findLogTravelIdsByVehicleIds" resultType="string">
+        SELECT group_concat( DISTINCT travel_id separator ',') from zw_m_vehicle_travel where 1=0
+        <if test="vehicleIds != null and vehicleIds.size>0">
+            OR vehicle_id in
+            <foreach collection="vehicleIds" item="item"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

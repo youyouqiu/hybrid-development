@@ -1,0 +1,200 @@
+<style>
+    #modal-body{max-height: 898px;overflow: hidden;overflow-y: auto;}
+    .schedule-list{border:1px solid #eee;padding:0 20px;margin-bottom:20px;}
+    .zw-title{background:#eee;padding:5px;height:38px;margin-top:20px;}
+    .zw-title .btn{padding:4px 8px;margin-bottom:0;}
+    .zw-title .btn-danger{margin-right:10px;}
+    .zw-title .control-label{padding-top:0;height:28px;line-height:28px;}
+    .stayMinute{width:40px;height:20px;line-height:20px;text-align: center;padding:6px 0;}
+    .del-hide .del-btn,.add-hide .add-btn{display:none;}
+    .person-mark{height:36px;line-height:36px;}
+    .residenceTime,#monitorIds{width:0;position:absolute;height:0;padding:0;z-index: -1;overflow: hidden;}
+</style>
+<form th:object="${result}" id="editForm"
+      role="form"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改排班</h4>
+    </div>
+
+    <div id="modal-body" class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="hidden" th:value="${itemInfo}"/>
+                <input id="groupId" type="hidden" th:value="${schedulingInfo.groupId}"><!--所属企业id-->
+                <input id="scheduleId" type="hidden" th:value="${schedulingInfo.id}"><!--排班id-->
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班名称： </label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.scheduledName}" name="name" maxlength="20" type="text"
+                               class="form-control readonly" id="scheduledName" placeholder="请输入排班名称"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班开始日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.startDateStr}" id="startDate" readonly="readonly" name="startDateStr" placeholder="请选择排班开始日期" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 排班结束日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="${schedulingInfo.endDateStr}" id="endDate" readonly="readonly" name="endDateStr" placeholder="请选择排班结束日期" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 日期重复类型： </label>
+                    <div class="col-md-4">
+                        <select name="dateDuplicateType" id="repeatType" class="form-control readonly">
+                            <option value="0" th:selected="${schedulingInfo.dateDuplicateType.indexOf('8') != -1}">每天</option>
+                            <option value="1" th:selected="${schedulingInfo.dateDuplicateType.indexOf('8') == -1}">周期</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="weeks" class="form-group" th:style="${schedulingInfo.dateDuplicateType.indexOf('8') != -1 ? 'display:none;' : ''}">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline" for="week1"><input class="readonly" id="week1" name="week" type="checkbox" value="1" th:checked="${schedulingInfo.dateDuplicateType=='8' || schedulingInfo.dateDuplicateType.indexOf('1') != -1}"/> 周一</label>
+                        <label class="checkbox-inline" for="week2"><input class="readonly" id="week2" name="week" type="checkbox" value="2" th:checked="${schedulingInfo.dateDuplicateType=='8' || schedulingInfo.dateDuplicateType.indexOf('2') != -1}"/> 周二</label>
+                        <label class="checkbox-inline" for="week3"><input class="readonly" id="week3" name="week" type="checkbox" value="3" th:checked="${schedulingInfo.dateDuplicateType=='8' || schedulingInfo.dateDuplicateType.indexOf('3') != -1}"/> 周三</label>
+                        <label class="checkbox-inline" for="week4"><input class="readonly" id="week4" name="week" type="checkbox" value="4" th:checked="${schedulingInfo.dateDuplicateType=='8' || schedulingInfo.dateDuplicateType.indexOf('4') != -1}"/> 周四</label>
+                        <label class="checkbox-inline" for="week5"><input class="readonly" id="week5" name="week" type="checkbox" value="5" th:checked="${schedulingInfo.dateDuplicateType=='8' || schedulingInfo.dateDuplicateType.indexOf('5') != -1}"/> 周五</label>
+                        <label class="checkbox-inline" for="week6"><input class="readonly" id="week6" name="week" type="checkbox" value="6" th:checked="${schedulingInfo.dateDuplicateType.indexOf('6') != -1}"/> 周六</label>
+                        <label class="checkbox-inline" for="week7"><input class="readonly" id="week7" name="week" type="checkbox" value="7" th:checked="${schedulingInfo.dateDuplicateType.indexOf('7') != -1}"/> 周日</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 选择对象： </label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input class="form-control" id="groupSelect"
+                               placeholder="请选择" style="background-color: #fafafa; cursor: pointer;" type="text" autocomplete="off"/>
+                        <span class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true" id="groupSelectSpan"></span>
+                        <div class="menuContent" id="menuContent">
+                            <ul id="treeTypeDemo" class="ztree" th:data-value="${monitorIdList}"></ul>
+                        </div>
+                        <input name="monitorIds" type="text" value="0" id="monitorIds"><!--隐藏域-->
+                    </div>
+                    <div class="person-mark col-md-2">当前选择：<span id="selectNum">0</span>个</div>
+                </div>
+
+                <ul id="schedule-list" class="schedule-list">
+                    <li class="item" th:each="itemInfo:${schedulingItemList}">
+                        <input class="itemId" type="hidden" th:value="${itemInfo.id}">
+                        <div class="zw-title clearfix">
+                            <label class="control-label pull-left"><label
+                                    class="text-danger">*</label> 排班项 </label>
+                            <button type="button"
+                                    class="btn btn-primary pull-right add-btn">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger pull-right del-btn">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 控制类型： </label>
+                            <div class="col-md-10">
+                                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="1" checked>围栏</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="2" disabled>RFID</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="3" disabled>NFC</label>
+                                <label class="radio-inline"><input class="controlType" type="radio" th:name="${'controlType' + itemInfoStat.index}" value="4" disabled>二维码</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 围栏： </label>
+                            <div class="col-md-4 has-feedback">
+                                <!--组织树复选框-->
+                                <input style="cursor: pointer; background-color: #fafafa;"
+                                       placeholder="请选择排班围栏" class="form-control fenceGroupSelect readonly"
+                                       th:id="${'groupSelect' + itemInfoStat.index}"
+                                       name="fenceInfoId"
+                                       th:data-id="${itemInfo.fenceInfoId}"/>
+                                <span class="fa fa-chevron-down form-control-feedback"
+                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                      th:id="${'groupSelectSpan' + itemInfoStat.index}"></span>
+                                <div th:id="${'menuContent' + itemInfoStat.index}" class="menuContent">
+                                    <ul th:id="${'treeTypeDemo' + itemInfoStat.index}" th:data-value="${itemInfo.fenceInfoId}" class="ztree"></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 开始时间： </label>
+                            <div class="col-md-4">
+                                <input th:value="${itemInfo.startTime}" th:id="${'startTime' + itemInfoStat.index}" readonly="readonly" name="startDate" placeholder="请选择排班开始时间" type="text"
+                                       class="form-control layer-date laydate-icon startTime" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                            </div>
+                            <label class="col-md-2 control-label"><label
+                                    class="text-danger">*</label> 结束时间： </label>
+                            <div class="col-md-4">
+                                <input th:value="${itemInfo.endTime}" th:id="${'endTime' + itemInfoStat.index}" readonly="readonly" name="endDate" placeholder="请选择排班结束时间" type="text"
+                                       class="form-control layer-date laydate-icon endTime" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 关联报警： </label>
+                            <div class="col-md-10">
+                                <label class="checkbox-inline"><input class="relationAlarm readonly" th:name="${'relationAlarm' + itemInfoStat.index}" value="1" type="checkbox" th:checked="${itemInfo.relationAlarm.indexOf('1')!=-1}"/> 上班未到岗</label>
+                                <label class="checkbox-inline"><input class="relationAlarm readonly" th:name="${'relationAlarm' + itemInfoStat.index}" value="2" type="checkbox" th:checked="${itemInfo.relationAlarm.indexOf('2')!=-1}" checked/> 上班离岗</label>
+                                <label class="checkbox-inline">
+                                    <input id="longTime" class="relationAlarm readonly" th:name="${'relationAlarm' + itemInfoStat.index}" th:checked="${itemInfo.relationAlarm.indexOf('3')!=-1}" value="3" type="checkbox" /> 超时长停留
+                                    <input class="form-control stayMinute readonly" type="text" th:value="${itemInfo.residenceTime}">
+                                    分钟
+                                    <input th:id="${'residenceTime' + itemInfoStat.index}" class="form-control residenceTime" name="residenceTime" type="text" th:value="${itemInfo.relationAlarm.indexOf('3')!=-1 ? itemInfo.residenceTime : 30}">
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注： </label>
+                    <div class="col-md-10">
+                        <input th:value="${schedulingInfo.remark}" name="remark" maxlength="100" type="text"
+                               class="form-control readonly" id="remarks" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var nameNull = [[#{scheduleManage.name.null}]];
+    var peopleIdsNull = [[#{scheduleManage.peopleIds.null}]];
+    var startDateStrNull = [[#{scheduleManage.startDateStr.null}]];
+    var endDateStrNull = [[#{scheduleManage.endDateStr.null}]];
+    var fenceInfoIdNull = [[#{scheduleManage.fenceInfoId.null}]];
+    var startDateNull = [[#{scheduleManage.startDate.null}]];
+    var endDateNull = [[#{scheduleManage.endDate.null}]];
+    var residenceTimeNull = [[#{scheduleManage.residenceTime.null}]];
+    var nameExists = [[#{scheduleManage.name.exists}]];
+    var nameError = [[#{scheduleManage.name.error}]];
+    var endDateError = [[#{scheduleManage.endDate.error}]];
+    var residenceTimeRangeError = [[#{scheduleManage.residenceTime.rangeError}]];
+    var residenceTimeDigitsError = [[#{scheduleManage.residenceTime.digitsError}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/schedulingCenter/schedulingManagement/scheduleEdit.js"></script>

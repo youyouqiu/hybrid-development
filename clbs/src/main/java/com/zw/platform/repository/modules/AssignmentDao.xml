@@ -1,0 +1,1584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.AssignmentDao">
+
+    <!-- 查询分组 -->
+    <select id="findAssignment"
+            parameterType="com.zw.platform.domain.basicinfo.query.AssignmentQuery"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.*,a.org_id groupId FROM zw_m_assignment a
+        WHERE a.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND a.name LIKE
+            CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        <if test="groupList != null">
+            AND a.org_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="groupId != null and groupId != ''">
+            AND a.org_id = #{groupId}
+        </if>
+        ORDER BY create_data_time DESC,a.name
+    </select>
+
+    <!--根据车牌号/任务编号/物品编号查询人、车、物信息-->
+    <select id="findGroupNameByBrand" parameterType="list" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        select * from
+        (SELECT a.*,ag.group_id,v.brand as vehicle_id FROM zw_m_assignment a,zw_m_assignment_vehicle
+        av,zw_m_vehicle_info v,zw_m_assignment_group ag where a.flag = 1 and av.flag = 1 and v.flag = 1 and
+        av.monitor_type = 0
+        and a.id = ag.assignment_id and a.id = av.assignment_id and v.id = av.vehicle_id and v.brand in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT a.*,ag.group_id,v.thing_number as vehicle_id FROM zw_m_assignment a,zw_m_assignment_vehicle
+        av,zw_m_thing_info v,zw_m_assignment_group ag where a.flag = 1 and av.flag = 1 and v.flag = 1 and
+        av.monitor_type = 2
+        and a.id = ag.assignment_id and a.id = av.assignment_id and v.id = av.vehicle_id and v.thing_number in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT a.*,ag.group_id,v.people_number as vehicle_id FROM zw_m_assignment a,zw_m_assignment_vehicle
+        av,zw_m_people_info v,zw_m_assignment_group ag where a.flag = 1 and av.flag = 1 and v.flag = 1 and
+        av.monitor_type = 1
+        and a.id = ag.assignment_id and a.id = av.assignment_id and v.id = av.vehicle_id and v.people_number in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ) t
+    </select>
+    <!-- 查询分组 -->
+    <select id="listAssignment" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.*, ag.group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1 AND au.user_id = #{userId}
+        WHERE a.flag = 1
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+            AND a.name LIKE BINARY
+            CONCAT('%',#{query.simpleQueryParam},'%')
+        </if>
+        <if test="query.groupList != null">
+            AND ag.group_id in
+            <foreach item="item" collection="query.groupList" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.groupId != null and query.groupId != ''">
+            AND ag.group_id = #{query.groupId}
+        </if>
+        ORDER BY create_data_time DESC,a.name
+    </select>
+
+    <!-- 批量查询分组 -->
+    <select id="findAssignmentByBatch"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.*, ag.group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="assignList != null">
+            AND a.id in
+            <foreach item="item" collection="assignList" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY create_data_time DESC, a.name
+    </select>
+
+    <!-- 查询分组 -->
+    <select id="getGroups" resultType="java.lang.String">
+        SELECT DISTINCT GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        AND au.user_id = #{userId}
+        <if test="vehicleId != null and vehicleId != ''">
+            AND av.vehicle_id = #{vehicleId}
+        </if>
+    </select>
+    <!-- 查询类型 -->
+    <select id="getType" resultType="java.lang.String">
+		SELECT t.vehicle_type FROM zw_m_vehicle_info v , zw_m_vehicle_type t
+		WHERE v.id = #{vehicleId} AND v.vehicle_type = t.id
+	</select>
+
+    <!-- 查询用户分组权限 -->
+    <select id="findUserAssignment"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.id, a.name, a.org_id groupId FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        <if test="orgIds != null">
+            AND a.org_id in
+            <foreach item="item" collection="orgIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+
+    <!-- 查询用户分组权限 -->
+    <select id="findUserAssignmentByVehicleId"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.id, a.name FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        and av.vehicle_id in
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <!-- 查询用户分组权限(1120优化) -->
+    <select id="findUserAssignmentFilterName"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.id, a.name, ag.group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON au.assignment_id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        <if test="groupList != null">
+            AND ag.group_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="name != null and name != ''">
+            AND  a.name like CONCAT('%',#{name},'%')
+        </if>
+
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <!-- 查询用户分组统计 -->
+    <select id="findAssignmentNum" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.id, (
+            <!-- 此处为针对数据量做的优化，a是小数据集，av是大数据集，因此group by不如子查询快，实测提升600+% -->
+            SELECT count(1) FROM zw_m_assignment_vehicle av
+            INNER JOIN zw_m_config c ON av.vehicle_id = c.vehicle_id AND c.flag = 1
+            <if test="deviceTypeSet != null and deviceTypeSet.size() >0">
+                INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+            </if>
+            WHERE av.`assignment_id` = a.`id` AND av.`flag` = 1
+            <if test="monitorType != null and monitorType != ''">
+                AND c.monitor_type = #{monitorType}
+            </if>
+            <if test="deviceTypeSet != null and deviceTypeSet.size() >0">
+                AND d.device_type IN
+                <foreach collection="deviceTypeSet" item="deviceType" open="(" separator="," close=")" >
+                    #{deviceType}
+                </foreach>
+            </if>
+            ) mNum
+        FROM zw_m_assignment a
+        WHERE a.`flag` = 1
+        <if test="assignList != null and assignList.size() > 0">
+            AND a.id IN
+            <foreach item="item" collection="assignList" separator="," open="(" close=")">
+                #{item.id}
+            </foreach>
+        </if>
+    </select>
+    <insert id="addAssignment" parameterType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+	    insert into zw_m_assignment (id, name, type,contacts,telephone, description, flag, create_data_time, create_data_username)
+	    values (#{id}, #{name}, #{type}, #{contacts},#{telephone},#{description}, #{flag}, #{createDataTime}, #{createDataUsername})
+  	</insert>
+
+    <insert id="addGroupAssignment" parameterType="com.zw.platform.domain.basicinfo.form.AssignmentGroupForm">
+	    insert into zw_m_assignment_group (id, assignment_id, group_id, flag, create_data_time, create_data_username)
+	    values (#{id}, #{assignmentId}, #{groupId}, #{flag}, #{createDataTime}, #{createDataUsername})
+  	</insert>
+
+    <!-- 批量新增用户与分组的关联表 -->
+    <insert id="addAssignmentUserByBatch"
+            parameterType="com.zw.platform.domain.basicinfo.form.AssignmentUserForm">
+        insert into zw_m_assignment_user (id, user_id, assignment_id,
+        flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.userId},
+            #{item.assignmentId},
+            #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="findAllUserAssignment"
+            resultType="com.zw.platform.domain.basicinfo.AssignmentData">
+        SELECT DISTINCT a.id, a.name, ag.group_id,au.user_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON au.assignment_id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="userIdList != null">
+            AND au.user_id in
+            <foreach item="userId" collection="userIdList" separator=","
+                     open="(" close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="groupList != null">
+            AND ag.group_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <!-- 根据id查询分组 -->
+    <select id="findAssignmentById"
+            parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.*,ag.group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="id != null and id != ''">
+            AND a.id = #{id}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据id查询分组加计数 -->
+    <select id="findAssignmentByIdNum"
+            parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.id, a.name, ag.group_id, COUNT(av.vehicle_id) mNum FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.`assignment_id` = a.`id` AND av.`flag` = 1
+        WHERE a.flag = 1
+        <if test="id != null and id != ''">
+            AND a.id = #{id}
+        </if>
+    </select>
+
+    <!-- 修改分组 -->
+    <update id="updateAssignment" parameterType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+    	update zw_m_assignment
+		    set name = #{name},
+		      type = #{type},
+		      contacts = #{contacts},
+		      telephone = #{telephone},
+		      description = #{description},
+		      flag = #{flag},
+		      update_data_time = #{updateDataTime},
+		      update_data_username = #{updateDataUsername}
+	    where id = #{id}
+  </update>
+
+    <!-- 根据分组id查询车辆 -->
+    <select id="findVehicleByAssignmentId"
+            parameterType="String"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT v.* FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time createDataTime,car.flag FROM
+        zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType,peo.create_data_time createDataTime,peo.flag FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        ) v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentId != null and assignmentId != ''">
+            AND av.assignment_id = #{assignmentId}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据分组id查询监控对象 -->
+    <select id="findMonitorByAssignmentId"
+            parameterType="String"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id, t.brand, c.monitor_type, av.assignment_id FROM zw_m_assignment_vehicle av
+        INNER JOIN (
+        <!-- 这里因为av表至多命中100条数据，所以可以大大减少人车物查询条数，loosescan策略 -->
+        SELECT car.id id, car.brand brand, car.create_data_time createDataTime FROM zw_m_vehicle_info car
+        WHERE car.flag=1 AND car.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND av.assignment_id = #{assignmentId})
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,peo.create_data_time createDataTime FROM zw_m_people_info peo
+        WHERE peo.flag=1 AND peo.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND av.assignment_id = #{assignmentId})
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,th.create_data_time createDataTime FROM zw_m_thing_info th
+        WHERE th.flag=1 AND th.id IN (SELECT av.vehicle_id FROM zw_m_assignment_vehicle av WHERE av.flag = 1 AND av.assignment_id = #{assignmentId})
+        ) t ON t.id = av.vehicle_id
+        INNER JOIN zw_m_config c ON av.vehicle_id = c.vehicle_id and c.flag = 1
+        WHERE av.flag = 1
+        <if test="assignmentId != null and assignmentId != ''">
+            AND av.assignment_id = #{assignmentId}
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+    <!-- 根据分组id查询监控对象 -->
+    <select id="findMonitorByAssignmentIdList"
+            parameterType="List"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id, t.brand,di.device_type AS deviceType,si.simcard_number AS simcardNumber,
+        t.monitorType, av.assignment_id AS assignmentId,t.aliases FROM zw_m_assignment_vehicle av
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType, car.aliases aliases FROM zw_m_vehicle_info
+        car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType, peo.name aliases FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType, th.name aliases FROM
+        zw_m_thing_info th WHERE th.flag=1
+        ) t
+        ON t.id = av.vehicle_id
+        INNER JOIN zw_m_config con ON con.vehicle_id=av.vehicle_id AND con.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id=con.device_id AND di.flag=1
+        INNER JOIN zw_m_sim_card_info si ON si.id =con.sim_card_id AND si.flag=1
+        WHERE av.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id IN
+            <foreach item="item" collection="assignmentIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query != null and query != '' ">
+            AND t.brand LIKE CONCAT('%',#{query},'%')
+        </if>
+        <if test="deviceTypes != null">
+            AND di.device_type IN
+            <foreach item="item" collection="deviceTypes" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY av.create_data_time desc
+    </select>
+
+    <!-- 根据分组id查询监控对象 -->
+    <select id="countMonitorByAssignmentIdList" resultType="int">
+
+        SELECT count(1) FROM zw_m_assignment_vehicle av
+        INNER JOIN zw_m_config con ON con.vehicle_id=av.vehicle_id AND con.flag = 1
+        WHERE av.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id IN
+            <foreach item="item" collection="assignmentIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 根据分组ids查询车辆（已在config中绑定） -->
+    <select id="findVehicleByAssignmentIds"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.*,'0' monitorType, av.assignment_id,d.device_number,tt.support_photo_flag as isVideo FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="deviceType != null and deviceType != ''">
+            AND d.device_type = #{deviceType}
+        </if>
+        <if test="webType != null and webType != '' and webType == 3">
+            AND d.manufacturer_id IS NOT NULL AND d.manufacturer_id <![CDATA[<>]]> ""
+            AND d.device_modelNumber IS NOT NULL AND d.device_modelNumber <![CDATA[<>]]> ""
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <!-- 根据分组ids查询车辆 id（已在config中绑定） -->
+    <select id="findVehicleIdsByAssignmentIds"
+            parameterType="list"
+            resultType="string">
+        SELECT distinct v.id FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <select id="listVehiclesByAssignmentsIds" parameterType="list" resultType="java.lang.String">
+        SELECT vehicle_id FROM zw_m_assignment_vehicle WHERE flag = 1 AND monitor_type = 0
+        <if test="assignIds != null and assignIds.size() > 0">
+            AND assignment_id IN
+            <foreach collection="assignIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="listMonitorIdByAssignmentsIds" resultType="com.zw.platform.domain.infoconfig.dto.AssignmentVehicleDto">
+        SELECT vehicle_id, assignment_id FROM zw_m_assignment_vehicle WHERE flag = 1
+        <if test="assignIds != null and assignIds.size() > 0">
+            AND assignment_id IN
+            <foreach collection="assignIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 根据分组ids查询监控对象（已在config中绑定） -->
+    <select id="findMonitorByAssignmentIds"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id,t.brand,t.monitorType,t.createDataTime,t.flag,av.assignment_id, ass.name
+        groupName,m.professionalsName,t.aliases,
+        de.device_number deviceNumber,tt.support_photo_flag AS isVideo,de.device_type deviceType,de.id deviceId,sim.simcard_number
+        simcardNumber
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType, car.aliases aliases, car.create_data_time
+        createDataTime,car.flag,car.plate_color,car.vehicle_color FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType, peo.name aliases, peo.create_data_time createDataTime,
+        peo.flag,0,0 FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType, th.name aliases, th.create_data_time createDataTime,th.flag,0,0 FROM
+        zw_m_thing_info th WHERE th.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag=1
+        INNER JOIN zw_m_config con ON con.vehicle_id=av.vehicle_id AND con.flag = 1
+        LEFT JOIN (
+        SELECT cpro.config_id,
+        GROUP_CONCAT(DISTINCT p.name SEPARATOR ',') AS professionalsName
+        FROM zw_m_config_professionals cpro
+        INNER JOIN zw_m_professionals_info p ON p.id = cpro.professionals_id AND p.flag = 1
+        WHERE cpro.flag = 1
+        GROUP BY cpro.config_id
+        ) m ON m.config_id = con.id
+        INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = av.assignment_id AND ass.flag = 1
+        WHERE t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deviceTypes != null">
+            AND de.device_type in
+            <foreach item="item" collection="deviceTypes" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+    <!-- 根据分组ids查询监控对象（已在config中绑定） -->
+    <select id="findMonitorIdsByAssignmentIds"
+            parameterType="list"
+            resultType="string">
+        SELECT t.id
+        FROM
+        (
+        SELECT car.id id, car.flag FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.flag FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT thi.id id, thi.flag FROM zw_m_thing_info thi WHERE thi.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag=1
+        WHERE t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+    </select>
+
+
+    <!-- 根据分组ids模糊查询监控对象（已在config中绑定） -->
+    <select id="findMonitorByAssignmentIdsFuzzy"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id,t.brand,t.monitorType,t.createDataTime,t.flag,av.assignment_id, ass.name
+        groupName,m.professionalsName,t.aliases,
+        de.device_number deviceNumber,tt.support_photo_flag AS isVideo,de.device_type deviceType,de.id deviceId,sim.simcard_number
+        simcardNumber
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType, car.aliases aliases,  car.create_data_time
+        createDataTime,car.flag,car.plate_color,car.vehicle_color FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType, peo.name aliases, peo.create_data_time createDataTime,
+        peo.flag,0,0 FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.name aliases, th.create_data_time createDataTime,
+        th.flag,0,0 FROM zw_m_thing_info th WHERE th.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag=1
+        INNER JOIN zw_m_config con ON con.vehicle_id=av.vehicle_id AND con.flag = 1
+        LEFT JOIN (
+        SELECT cpro.config_id,
+        GROUP_CONCAT(DISTINCT p.name SEPARATOR ',') AS professionalsName
+        FROM zw_m_config_professionals cpro
+        INNER JOIN zw_m_professionals_info p ON p.id = cpro.professionals_id AND p.flag = 1
+        WHERE cpro.flag = 1
+        GROUP BY cpro.config_id
+        ) m ON m.config_id = con.id
+        INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = av.assignment_id AND ass.flag = 1
+        WHERE t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="queryType == 'name' and queryParam != null and queryParam != ''">
+            AND t.brand LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        <if test="queryType == 'monitorId' and queryParam != null and queryParam != ''">
+            AND t.id = #{queryParam}
+        </if>
+        <if test="queryType == 'deviceNumber' and queryParam != null and queryParam != ''">
+            AND de.device_number LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        <if test="queryType == 'simcardNumber' and queryParam != null and queryParam != ''">
+            AND sim.simcard_number LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        <if test="queryType == 'assignName' and queryParam != null and queryParam != ''">
+            AND ass.name LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        <if test="queryType == 'professional' and queryParam != null and queryParam != ''">
+            AND m.professionalsName LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        <if test="deviceTypes != null">
+            AND de.device_type in
+            <foreach item="item" collection="deviceTypes" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+    <!-- 根据分组ids查询车辆 id（已在config中绑定） -->
+    <select id="findVehicleByAssignmentIdsFuzzy"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.*,'0' monitorType, av.assignment_id,d.device_number,tt.support_photo_flag AS isVideo FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="deviceTypes != null and deviceTypes.size() > 0">
+            AND d.device_type IN
+            <foreach collection="deviceTypes" item="deviceType" open="(" separator="," close=")">
+                #{deviceType}
+            </foreach>
+        </if>
+        <if test="queryParam != null and queryParam != ''">
+            AND v.brand LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <!-- 根据分组ids,设备类型查询监控对象（已在config中绑定） -->
+    <select id="findMonitorByAssignmentIdsAndType"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id,t.brand,t.monitorType,t.createDataTime,t.flag,av.assignment_id, ass.name
+        groupName,m.professionalsName,
+        de.device_number deviceNumber,tt.support_photo_flag isVideo,de.device_type deviceType,de.id deviceId,sim.simcard_number
+        simcardNumber
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time
+        createDataTime,car.flag,car.plate_color,car.vehicle_color FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType,peo.create_data_time createDataTime,peo.flag,0,0 FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time createDataTime,th.flag,0,0 FROM
+        zw_m_thing_info th WHERE th.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag=1
+        INNER JOIN zw_m_config con ON con.vehicle_id=av.vehicle_id AND con.flag = 1
+        LEFT JOIN (
+        SELECT cpro.config_id,
+        GROUP_CONCAT(DISTINCT p.name SEPARATOR ',') AS professionalsName
+        FROM zw_m_config_professionals cpro
+        INNER JOIN zw_m_professionals_info p ON p.id = cpro.professionals_id AND p.flag = 1
+        WHERE cpro.flag = 1
+        GROUP BY cpro.config_id
+        ) m ON m.config_id = con.id
+        INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+        INNER JOIN zw_m_terminal_type tt on tt.id = de.terminal_type_id AND tt.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = av.assignment_id AND ass.flag = 1
+        WHERE t.flag = 1
+        <if test="deviceType == '-1'">
+            AND de.device_type BETWEEN '0' AND '1'
+        </if>
+        <if test="deviceType != '-1'">
+            AND de.device_type = #{deviceType}
+        </if>
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+    <!-- 根据分组ids,设备类型查询车辆（已在config中绑定） -->
+    <select id="findVehicleByAssignIdAndType"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.id, v.brand, '0' monitorType, av.assignment_id, d.device_type
+        FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1 AND d.device_type = #{deviceType}
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <select id="countVehicleByAssignIdAndType" resultType="int">
+        SELECT count(0) FROM (
+        SELECT distinct v.id, av.assignment_id, d.device_type
+        FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1 AND d.device_type = #{deviceType}
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ) table_count
+    </select>
+
+    <select id="vehicleTruckTree"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.*,av.assignment_id FROM zw_m_vehicle_info v
+        left join zw_m_vehicle_type vt on v.vehicle_type = vt.id
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        WHERE v.flag = 1 AND vt.vehicle_category = '4'
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 删除分组 -->
+    <update id="deleteAssignment" parameterType="String">
+    	update zw_m_assignment
+		    set flag = 0
+	    where id = #{id}
+	    and flag = 1
+    </update>
+
+    <!-- 删除分组与企业关联 -->
+    <update id="deleteAssignmentGroupByAssId" parameterType="String">
+    	update zw_m_assignment_group
+		    set flag = 0
+	    where assignment_id = #{assignmentId}
+	    and flag = 1
+    </update>
+
+    <!-- 删除分组与企业关联 -->
+    <update id="deleteAssignmentUserByAssId" parameterType="String">
+    	update zw_m_assignment_user
+		    set flag = 0
+	    where assignment_id = #{assignmentId}
+	    and flag = 1
+    </update>
+
+    <!-- 删除分组（批量） -->
+    <update id="deleteAssignmentByBatch" parameterType="list">
+        update zw_m_assignment
+        set flag = 0
+        where flag = 1
+        and id in
+        <foreach item="item" collection="list" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 删除分组与企业关联（批量） -->
+    <update id="deleteAssignmentGroupByAssIdByBatch" parameterType="list">
+        update zw_m_assignment_group
+        set flag = 0
+        where flag = 1
+        and assignment_id in
+        <foreach item="item" collection="list" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 删除分组与企业关联（批量） -->
+    <update id="deleteAssignmentUserByAssIdByBatch" parameterType="list">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and assignment_id in
+        <foreach item="item" collection="list" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据车辆id删除车辆分组信息 -->
+    <update id="deleteAssignmentVehicle" parameterType="string">
+    	update zw_m_assignment_vehicle set flag = 0 where vehicle_id = #{vehicleId}
+    </update>
+
+    <!-- 新增车辆分组信息 -->
+    <insert id="addAssignmentVehicle" parameterType="com.zw.platform.domain.infoconfig.form.AssignmentVehicleForm">
+    	insert into zw_m_assignment_vehicle (id, assignment_id, vehicle_id, flag, create_data_time, create_data_username,monitor_type)
+	    values (#{id}, #{assignmentId}, #{vehicleId}, #{flag}, #{createDataTime}, #{createDataUsername}, #{monitorType})
+    </insert>
+
+    <!-- 新增车辆分组信息 -->
+    <insert id="addAssignVehicleList">
+        insert into zw_m_assignment_vehicle (id, assignment_id, vehicle_id, flag, create_data_time,
+        create_data_username,monitor_type)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.assignmentId}, #{item.vehicleId}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername}, #{item.monitorType})
+        </foreach>
+    </insert>
+
+    <select id="findAssignmentByVehicleId"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.*,ag.group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON au.assignment_id = ag.assignment_id AND ag.flag = 1
+        <if test="userId != null and userId !=''">
+            AND au.user_id = #{userId}
+        </if>
+        <if test="groupList != null">
+            AND ag.group_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vehicleId != null and vehicleId != ''">
+            AND av.vehicle_id = #{vehicleId}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据车辆id删除车辆分组信息 -->
+    <update id="deleteAssignmentVehicleByVidAid">
+        update zw_m_assignment_vehicle set flag = 0 where flag = 1 and assignment_id = #{assignmentId}
+        and vehicle_id in
+        <foreach item="item" collection="vehicleList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 查询同一组织下是否有相同名称的分组 -->
+    <select id="findByNameForOneOrg"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+		SELECT a.* FROM zw_m_assignment a
+		INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+		WHERE a.flag = 1
+		AND a.name = BINARY #{name}
+		AND ag.group_id = #{groupId}
+	</select>
+
+    <select id="findOneOrgAssiForNameRep"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+		SELECT a.* FROM zw_m_assignment a
+		INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+		WHERE a.flag = 1
+		AND a.name = #{name}
+		AND ag.group_id = #{groupId}
+		AND a.id <![CDATA[ <> ]]> #{id}
+	</select>
+
+    <!-- 根据组织id查询组织下所有分组 -->
+    <select id="findAssignmentByGroupId"
+            parameterType="String"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.*FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="groupId != null and groupId != ''">
+            AND ag.group_id = #{groupId}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 根据组织id列表查询组织列表下所有分组 -->
+    <select id="findAssignmentByGroupIdList" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.id, a.name, ag.group_id
+        FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="groupIdList != null and groupIdList.size() > 0">
+            AND ag.group_id IN
+            <foreach collection="groupIdList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 根据组织id查询组织下所有分组 ,排除当前分组-->
+    <select id="findAssignByGroupIdExpectVehicle"
+            parameterType="String"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.*FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        <if test="groupId != null and groupId != ''">
+            AND ag.group_id = #{groupId}
+        </if>
+        AND a.id != #{assignmentId}
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 批量新增分组 -->
+    <insert id="addAssignmentByBatch" parameterType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+        insert into zw_m_assignment (id, name, type,contacts,telephone, description, flag, create_data_time,
+        create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.name}, #{item.type},
+            #{item.contacts}, #{item.telephone}, #{item.description},
+            #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 批量新增分组与组织的关联表 -->
+    <insert id="addGroupAssignmentByBatch" parameterType="com.zw.platform.domain.basicinfo.form.AssignmentGroupForm">
+        insert into zw_m_assignment_group (id, assignment_id, group_id, flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.assignmentId}, #{item.groupId},
+            #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 删除分组与车辆关联 -->
+    <update id="deleteVehiclePer" parameterType="com.zw.platform.domain.infoconfig.form.AssignmentVehicleForm">
+    	update zw_m_assignment_vehicle
+		    set flag = 0
+	    where 
+	    assignment_id = #{assignmentId}
+	    and vehicle_id = #{vehicleId}
+	    and flag = 1
+    </update>
+
+    <!-- 批量新增分组与车辆的关联表 -->
+    <insert id="addVehiclePer" parameterType="com.zw.platform.domain.infoconfig.form.AssignmentVehicleForm">
+        insert into zw_m_assignment_vehicle (id, assignment_id, vehicle_id, monitor_type, flag, create_data_time,
+        create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.assignmentId}, #{item.vehicleId}, #{item.monitorType},
+            #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="findAssignsGroupId" parameterType="string" resultType="string">
+  	    select 
+  	       ag.group_id 
+  	    from zw_m_assignment_group ag 
+  	    left join zw_m_assignment a on ag.assignment_id = a.id 
+  	    where ag.assignment_id = #{id}
+  	</select>
+
+    <!-- 根据分组ids查询监控对象    车    （已在config中绑定） -->
+    <select id="vehicleFindByAssignmentId"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT t.id,t.brand, '0' monitorType,
+        t.create_data_time,t.flag,av.assignment_id,m.deviceNumber,m.isVideo, m.groupName,
+        m.simcardNumber,m.professionalsName
+        FROM
+        zw_m_vehicle_info t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN (
+            SELECT assv.vehicle_id,GROUP_CONCAT(DISTINCT ass.name SEPARATOR ',') groupName,GROUP_CONCAT(DISTINCT p.name
+            SEPARATOR ',') AS professionalsName,
+            de.device_number deviceNumber,tt.support_photo_flag AS isVideo,de.device_type deviceType,sim.simcard_number simcardNumber
+            FROM zw_m_assignment_vehicle assv
+            INNER JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+            INNER JOIN zw_m_config con ON assv.vehicle_id = con.vehicle_id AND con.flag = 1
+            INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+            inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+            INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+            LEFT JOIN zw_m_config_professionals cpro ON cpro.config_id = con.id AND cpro.flag = 1
+            LEFT JOIN zw_m_professionals_info p ON p.id = cpro.professionals_id AND p.flag = 1
+            WHERE assv.flag = 1
+            <if test="assignmentIds != null">
+                AND assv.assignment_id in
+                <foreach item="item" collection="assignmentIds" separator=","
+                         open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="assignmentIds == null">
+                AND 1=0
+            </if>
+            GROUP BY assv.vehicle_id
+            ) m
+        ON t.id = m.vehicle_id
+        where t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="deviceTypeSet != null and deviceTypeSet.size > 0">
+            AND m.deviceType IN
+            <foreach collection="deviceTypeSet" item="deviceType" open="(" separator="," close=")">
+                #{deviceType}
+            </foreach>
+        </if>
+        ORDER BY t.create_data_time DESC
+    </select>
+
+    <!-- 根据分组ids查询监控对象   根据监控对象类型和终端类型查询车辆数量 -->
+    <select id="getMonitorCount"
+            parameterType="list"
+            resultType="String">
+        SELECT DISTINCT assv.vehicle_id FROM zw_m_assignment_vehicle assv
+        INNER JOIN zw_m_config con ON assv.vehicle_id = con.vehicle_id AND con.flag = 1
+        INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+        WHERE assv.flag = 1
+        <if test="assignmentIds != null">
+            AND assv.assignment_id IN
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="deviceType != null and deviceType != ''">
+            AND de.device_type = #{deviceType}
+        </if>
+        <if test="monitorType != null and monitorType != ''">
+            AND con.monitor_type = #{monitorType}
+        </if>
+    </select>
+
+    <!-- 根据分组ids查询监控对象    人    （已在config中绑定） -->
+    <select id="peopleFindByAssignmentId"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT t.id,t.brand,t.monitorType, t.createDataTime,t.flag,av.assignment_id,m.deviceNumber,m.isVideo,
+        m.groupName,
+        m.simcardNumber,m.professionalsName
+        FROM
+        (
+        SELECT peo.id id, peo.people_number brand,'1' monitorType,peo.create_data_time createDataTime,peo.flag FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN (
+        SELECT assv.vehicle_id,GROUP_CONCAT(DISTINCT ass.name SEPARATOR ',') groupName,GROUP_CONCAT(DISTINCT p.name
+        SEPARATOR ',') AS professionalsName,
+        de.device_number deviceNumber,tt.support_photo_flag AS isVideo,sim.simcard_number simcardNumber
+        FROM zw_m_assignment_vehicle assv
+        INNER JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+        INNER JOIN zw_m_config con ON assv.vehicle_id = con.vehicle_id AND con.flag = 1
+        INNER JOIN zw_m_device_info de ON de.id = con.device_id AND de.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info sim ON sim.id = con.sim_card_id AND sim.flag = 1
+        LEFT JOIN zw_m_config_professionals cpro ON cpro.config_id = con.id AND cpro.flag = 1
+        LEFT JOIN zw_m_professionals_info p ON p.id = cpro.professionals_id AND p.flag = 1
+        WHERE assv.flag = 1
+        <if test="assignmentIds != null">
+            AND assv.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        GROUP BY assv.vehicle_id
+        ) m
+        ON t.id = m.vehicle_id
+        where t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+    <!-- 根据传感器类型查询绑定该类型传感器的监控对象 -->
+    <select id="findTempSensoreVehicleByAssignmentId"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT DISTINCT
+        v.*, av.assignment_id,
+        d.device_number,
+        tt.support_photo_flag as isVideo
+        FROM
+        zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id
+        AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id
+        AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id
+        AND d.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id
+        AND s.flag = 1
+        INNER JOIN zw_m_sensor_vehicle sv ON sv.vehicle_id = v.id
+        AND sv.flag = 1
+        INNER JOIN zw_m_sensor_info si ON si.id = sv.sensor_id
+        AND si.flag = 1
+        AND si.sensor_type = #{sensorType}
+        WHERE
+        v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+    <select id="findAssignsGroupIds" parameterType="list"
+            resultType="java.lang.String">
+        select ag.group_id
+        from zw_m_assignment_group ag
+        where ag.assignment_id in
+        <foreach item="item" collection="assignmentIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findAssignNames" parameterType="list"
+            resultType="java.lang.String">
+        select a.name
+        from zw_m_assignment a
+        where a.id in
+        <foreach item="item" collection="assignmentIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getAssignsByMonitorId" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        select a.name,av.*
+        from zw_m_assignment_vehicle av
+        inner join zw_m_assignment a on a.id = av.assignment_id and a.flag = 1
+        where
+        av.flag = 1
+        and
+        av.vehicle_id in
+        <foreach item="item" collection="vehicleIds" separator=","
+                                    open="(" close=")">
+             #{item}
+        </foreach>
+    </select>
+
+    <select id="getAllAssignmentByGroupIds" resultType="java.lang.String">
+        SELECT DISTINCT ag.assignment_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_assignment_group ag ON au.assignment_id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        <if test="groupList != null">
+            AND ag.group_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <select id="getTransportAssignmentByGroupId"
+            resultType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+        SELECT * FROM (
+            SELECT COUNT(DISTINCT av.vehicle_id) assignmentNumber,a.*,substring(a.name,7) AS orderNum FROM zw_m_assignment a
+                INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+                LEFT JOIN zw_m_assignment_vehicle av ON a.id = av.assignment_id AND av.flag = 1
+                WHERE a.flag = 1
+                AND ag.group_id = #{groupId}
+                AND a.name LIKE '货运平台分组%'
+                GROUP BY a.id
+        ) ass WHERE ass.assignmentNumber &lt; 100
+        ORDER BY ass.orderNum
+    </select>
+
+    <select id="findTransportAssignmentByGroupId"
+            resultType="Integer">
+        SELECT substring(a.name,7) AS orderNum FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        AND ag.group_id = #{groupId}
+        AND a.name LIKE '货运平台分组%'
+    </select>
+
+    <select id="getGroupHasAssignmentNumber" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+        SELECT COUNT(*) AS assignmentNumber,ag.group_id FROM zw_m_assignment_group ag
+        WHERE ag.flag = 1
+        AND ag.group_id = #{groupId}
+    </select>
+
+    <select id="getGroupAssignmentNumbers"
+            resultType="com.zw.platform.domain.basicinfo.form.AssignmentForm">
+        SELECT COUNT(*) AS assignmentNumber,ag.group_id FROM zw_m_assignment_group ag
+        WHERE ag.flag = 1
+        and ag.group_id in
+        <foreach collection="list" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+        group by  ag.group_id
+    </select>
+
+    <select id="getGroupNotLikeFreightSize" resultType="int">
+        SELECT COUNT(*) AS orderNum FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        WHERE a.flag = 1
+        AND ag.group_id = #{groupId}
+        AND a.name NOT LIKE '货运平台分组%'
+    </select>
+
+    <select id="getAssignPhoneByIds" parameterType="string" resultType="string">
+        select GROUP_CONCAT(DISTINCT telephone) from zw_m_assignment where id in
+        <foreach item="item" collection="assignIds.split(',')" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+
+    </select>
+
+    <resultMap id="t809ForwardResultMap" type="com.zw.platform.domain.basicinfo.Assignment">
+        <result column="id" property="id"/>
+        <collection property="monitorIds" ofType="java.lang.String">
+            <result column="vehicle_id"/>
+        </collection>
+    </resultMap>
+    
+    <select id="find809ForwardAssignmentNum" parameterType="java.util.List" resultMap="t809ForwardResultMap">
+        SELECT a.id, av.vehicle_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id FROM zw_m_thing_info th WHERE th.flag=1
+        ) t ON av.vehicle_id = t.id
+        INNER JOIN zw_m_config c ON t.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        WHERE a.`flag` = 1
+        AND a.id IN
+        <foreach item="item" collection="assigns" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+        AND c.monitor_type = 0
+    </select>
+
+    <select id="get809ForwardCount" parameterType="java.util.List" resultType="String">
+        SELECT av.vehicle_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_group ag ON a.id = ag.assignment_id AND ag.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id FROM zw_m_thing_info th WHERE th.flag=1
+        ) t ON av.vehicle_id = t.id
+        INNER JOIN zw_m_config c ON t.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        WHERE a.`flag` = 1
+        AND a.id IN
+        <foreach item="item" collection="assigns" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.monitor_type = 0
+        AND d.manufacturer_id IS NOT NULL AND d.manufacturer_id <![CDATA[<>]]> ""
+        AND d.device_modelNumber IS NOT NULL AND d.device_modelNumber <![CDATA[<>]]> ""
+    </select>
+
+    <select id="getAssignmentNameByUserId" resultType="string">
+        SELECT DISTINCT a.name FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1 AND au.user_id = #{userId}
+    </select>
+
+    <select id="findMonitorIdsByAssignIdsAndGroupIds" parameterType="list" resultType="string">
+        SELECT av.vehicle_id
+        FROM zw_m_assignment_vehicle av
+        INNER JOIN (
+        SELECT vg.id id
+        FROM zw_m_vehicle_info vg
+        WHERE vg.flag=1 AND vg.org_id IN
+        <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT pg.id id FROM zw_m_people_info pg
+        WHERE pg.flag = 1 AND pg.org_id IN
+        <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        UNION ALL
+        SELECT thi.id id FROM zw_m_thing_info thi WHERE thi.flag=1 AND thi.group_id IN
+        <foreach item="item" collection="groupIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ) t ON t.id = av.vehicle_id
+        WHERE av.flag=1 AND av.assignment_id IN
+        <foreach item="item" collection="assignmentIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getGroupVehicleCount" resultType="java.lang.Integer">
+        SELECT COUNT(DISTINCT av.vehicle_id) AS vehicleCount
+        FROM
+            zw_m_assignment_group ag
+        LEFT JOIN zw_m_assignment_vehicle av ON ag.assignment_id = av.assignment_id AND av.flag = 1
+        WHERE ag.flag = 1
+        AND av.monitor_type = '0'
+        AND av.vehicle_id IS NOT NULL
+        AND ag.group_id IN
+        <foreach item="item" collection="groupIdList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND av.assignment_id IN
+        <foreach item="item" collection="assignmentIdList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        AND vg.group_id = #{groupId}
+    </select>
+    <select id="getAssignmentIdByUserId" resultType="java.lang.String">
+        SELECT
+            DISTINCT a.id
+        FROM
+            zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE
+            a.flag = 1
+        AND au.user_id = #{userId}
+    </select>
+    <select id="findAssignUserIdsByGroupIds" resultType="java.lang.String">
+        SELECT DISTINCT assu.user_id
+        FROM zw_m_assignment_user assu
+        LEFT JOIN zw_m_assignment ass ON assu.assignment_id = ass.id AND ass.flag = 1
+        LEFT JOIN zw_m_assignment_group assg ON ass.id = assg.assignment_id AND assg.flag = 1
+        WHERE assu.flag = 1
+        AND assg.group_id IN
+        <foreach item="item" collection="list" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findUserAssignmentFuzzy"
+            resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT DISTINCT a.id, a.name, a.org_id group_id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        <if test="groupList != null">
+            AND a.org_id in
+            <foreach item="item" collection="groupList" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND a.name like CONCAT('%',#{query},'%')
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <select id="findVehicleByAssignmentFuzzy"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.id,v.brand,'0' monitorType, av.assignment_id FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="queryParam != null and queryParam != ''">
+            AND v.brand LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <!-- 根据分组ids模糊查询监控对象（已在config中绑定） -->
+    <select id="findMonitorByAssignmentFuzzy"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT t.id,t.brand,t.monitorType,t.createDataTime,t.flag,av.assignment_id
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time
+        createDataTime,car.flag,car.plate_color,car.vehicle_color FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType,peo.create_data_time createDataTime,peo.flag,0,0 FROM
+        zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time createDataTime,th.flag,0,0 FROM
+        zw_m_thing_info th WHERE th.flag=1
+        ) t
+        INNER JOIN zw_m_assignment_vehicle av ON t.id = av.vehicle_id AND av.flag=1
+        WHERE t.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="queryParam != null and queryParam != ''">
+            AND t.brand LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        ORDER BY t.createDataTime DESC
+    </select>
+
+
+    <!-- 根据分组ids模糊查询监控对象（已在config中绑定） -->
+    <select id="findVehicleByTradeFuzzy"
+            parameterType="list"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.id,v.brand,'0' monitorType, av.assignment_id FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="queryParam != null and queryParam != ''">
+            AND v.trade_name LIKE CONCAT('%',#{queryParam},'%')
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+
+    <select id="findVehicleByAssignmentIdsAndDeviceTypes"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct v.*,'0' monitorType, av.assignment_id,d.device_number,tt.support_photo_flag as isVideo FROM zw_m_vehicle_info v
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_config c ON v.id = c.vehicle_id AND c.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        inner join zw_m_terminal_type tt on tt.id = d.terminal_type_id and tt.flag = 1
+        INNER JOIN zw_m_sim_card_info s ON s.id = c.sim_card_id AND s.flag = 1
+        WHERE v.flag = 1
+        <if test="assignmentIds != null">
+            AND av.assignment_id in
+            <foreach item="item" collection="assignmentIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="assignmentIds == null">
+            AND 1=0
+        </if>
+        <if test="deviceTypes != null and deviceTypes.size() > 0">
+            AND d.device_type IN
+            <foreach collection="deviceTypes" item="deviceType" open="(" separator="," close=")">
+                #{deviceType}
+            </foreach>
+        </if>
+        ORDER BY v.create_data_time desc
+    </select>
+    <select id="findAssignsByMonitorIdList" resultType="com.zw.platform.domain.infoconfig.form.AssignmentVehicleForm">
+        select a.name assignmentName,av.assignment_id as assignmentId,av.vehicle_id as vehicleId
+        from zw_m_assignment_vehicle av
+        inner join zw_m_assignment a on a.id = av.assignment_id and a.flag = 1
+        where
+        av.flag = 1
+        and
+        av.vehicle_id in
+        <foreach item="monitorId" collection="monitorIdList" separator=","
+                 open="(" close=")">
+            #{monitorId}
+        </foreach>
+    </select>
+    <select id ='findAssignNamesByIds' resultType="String">
+        select name from zw_m_assignment where flag = 1
+        <if test="list != null and list.size() > 0">
+            and id in
+            <foreach collection="list" close=")" open="(" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 查询用户分组统计 -->
+    <select id="findAllAssignmentNum" resultType="com.zw.platform.domain.basicinfo.Assignment">
+        SELECT a.id, COUNT(av.vehicle_id) mNum FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.`assignment_id` = a.`id` AND av.`flag` = 1
+        INNER JOIN zw_m_config c ON av.vehicle_id = c.vehicle_id AND c.flag = 1
+        <if test="deviceTypeSet != null and deviceTypeSet.size() >0">
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id AND d.flag = 1
+        </if>
+        WHERE a.`flag` = 1
+        <if test="assignList != null and assignList.size() > 0">
+            AND a.id IN
+            <foreach item="item" collection="assignList" separator="," open="(" close=")">
+                #{item.id}
+            </foreach>
+        </if>
+        <if test="deviceTypeSet != null and deviceTypeSet.size() >0">
+            AND d.device_type IN
+            <foreach collection="deviceTypeSet" item="deviceType" open="(" separator="," close=")" >
+                #{deviceType}
+            </foreach>
+        </if>
+        GROUP BY a.id
+        ORDER BY a.create_data_time DESC, a.name
+    </select>
+
+    <select id="findVehicleAndAssignNameInfos" resultType="com.zw.platform.domain.basicinfo.driverDiscernManage.VehicleAssignmentInfo">
+        SELECT av.vehicle_id, GROUP_CONCAT(DISTINCT a.name SEPARATOR ',') AS assignmentName
+        FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        WHERE a.flag = 1
+        AND av.vehicle_id IN
+        <foreach item="monitorId" collection="monitorIdList" separator=","
+                 open="(" close=")">
+            #{monitorId}
+        </foreach>
+        GROUP BY av.vehicle_id
+    </select>
+
+    <select id="findAssignmentIdByFuzzyAssignmentName" resultType="java.lang.String">
+        select id
+        from zw_m_assignment
+        where flag = 1
+          and name like CONCAT('%', #{fuzzyAssignmentName}, '%')
+    </select>
+
+</mapper>

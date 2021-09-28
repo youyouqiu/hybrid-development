@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <title>终端管理</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">设备管理</li>
+                            <li class="active">终端管理</li>
+                        </ul>
+                        <h1 class="h1 ">终端管理</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="leftTreeBox">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="orgPannel">
+                                    <h3 class="panel-title fwb">组织架构</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="orgPannel-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" style="padding: 0px;" id="orgPannel-body">
+                                    <div class="form-group" style="margin-top: 15px;">
+                                        <div class="col-md-12">
+                                            <input autocomplete="off" id="search_condition" name="search"
+                                                class="form-control" style="margin-bottom: 10px;" type="text"
+                                                placeholder="请输入企业名称" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                        style="padding: 0px;height:699px !important;">
+                                        <ul id="treeDemo" class="ztreee" style="height:684px !important;overflow:auto;">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch2" style="cursor:pointer;">
+                                    <h3 class="panel-title fwb">终端型号 <span class="caret"></span></h3>
+                                    <div class="actions pull-right">
+                                        <i class="fa chevron-up" id="stretch2-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body fixed-table-body" style="display: none;" id="stretch2-body">
+                                    <div class="ToolPanel">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form" onkeydown="if(event.keyCode==13)return false;">
+                                                    <label><input type="text" class="Inlinesearch form-control"
+                                                            id="terminalTypeFuzzyParam" name="terminalTypeFuzzyParam"
+                                                            placeholder="请输入终端型号" autocomplete="off"></label>
+                                                    <button type="button" id="search"
+                                                        class="btn btn-outline btn-default"
+                                                        onclick="modelTable.requestData()">搜索
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div th:if="${hasRole}" class="dropdown pull-left">
+                                                <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">
+                                                    操作菜单<span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                    <li><a th:href="@{/m/basicinfo/equipment/device/terminalAddPage}"
+                                                            data-toggle="modal" data-target="#commonWin"><i
+                                                                class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a>
+                                                    </li>
+                                                    <li><a id="exportIdTerminalType"><i
+                                                                class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                    </li>
+                                                    <li><a href="#" id="del_model1"><i
+                                                                class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/equipment/device/terminalImportPage}"
+                                                            data-toggle="modal" data-target="#commonSmWin"><i
+                                                                class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="columns btn-group pull-right terminalManagement">
+                                            <button id="refreshModelTable" class="btn btn-default" type="button"
+                                                name="refresh" title="刷新">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group" title="定制显示列">
+                                                <button id="customizeModelColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text1">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="dataTables"
+                                        class="table table-striped table-bordered table-hover text-center checkTable"
+                                        cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th><input type="checkbox" id="checkAll1"></th>
+                                                <th>操作设置</th>
+                                                <th>终端厂商</th>
+                                                <th>终端型号</th>
+                                                <th>是否支持拍照</th>
+                                                <th>摄像头个数</th>
+                                                <th>是否支持行驶记录仪</th>
+                                                <th>是否支持监听</th>
+                                                <th>是否支持主动安全</th>
+                                                <th>是否为一体机</th>
+                                                <th>是否支持视频</th>
+                                                <!--                                                <th>音频格式</th>-->
+                                                <th>实时流音频格式</th>
+                                                <th>实时流采样率</th>
+                                                <th>实时流声道数</th>
+                                                <th>存储流音频格式</th>
+                                                <th>存储流采样率</th>
+                                                <th>存储流声道数</th>
+                                                <th>通道号个数</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" id="stretch">
+                                            <h3 class="panel-title fwb">终端列表</h3>
+                                            <div class="actions pull-right">
+                                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body fixed-table-body" id="stretch-body">
+                                            <div class="ToolPanel">
+                                                <div class="bars pull-left">
+                                                    <div class="btn-group pull-left barsMargin" role="group">
+                                                        <form role="form">
+                                                            <label><input type="text" class="Inlinesearch form-control"
+                                                                    id="simpleQueryParam" name="simpleQueryParam"
+                                                                    placeholder="请输入终端号/监控对象"
+                                                                    autocomplete="off"></label>
+                                                            <button type="button" id="search_button"
+                                                                class="btn btn-outline btn-default">搜索
+                                                            </button>
+                                                            <input id="hiddenText" type="text" style="display:none" />
+                                                        </form>
+                                                    </div>
+                                                    <div th:if="${hasRole}" class="dropdown pull-left">
+                                                        <button class="btn btn-default dropdown-toggle" type="button"
+                                                            id="dropdownMenu1" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="true">
+                                                            操作菜单<span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                            <li><a th:href="@{/m/basicinfo/equipment/device/add}"
+                                                                    id="addId" data-toggle="modal"
+                                                                    data-target="#commonWin"><i
+                                                                        class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a>
+                                                            </li>
+                                                            <li><a th:href="@{/m/basicinfo/equipment/device/export}"
+                                                                    id="exportId"><i
+                                                                        class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                            </li>
+                                                            <li><a href="#" id="del_model"><i
+                                                                        class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                            </li>
+                                                            <li><a th:href="@{/m/basicinfo/equipment/device/import}"
+                                                                    id="importId" data-toggle="modal"
+                                                                    data-target="#commonSmWin"><i
+                                                                        class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div th:if="${hasRole}" id="advancedBox" class="btn-group pull-left"
+                                                        style="margin-left: 4px">
+                                                        <button type="button" id="advanced_search"
+                                                            class="btn btn-outline btn-default">高级查询
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="columns btn-group pull-right terminalManagement">
+                                                    <button id="refreshTable" class="btn btn-default" type="button"
+                                                        name="refresh" title="刷新">
+                                                        <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                                    </button>
+                                                    <div class="keep-open btn-group" title="定制显示列">
+                                                        <button id="customizeColumns" type="button"
+                                                            class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown">
+                                                            <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                                class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="advanced_content" style="display: none"
+                                                class="form-group clearfix">
+                                                <label class="control-label" style="display: inline-block">通讯类型：</label>
+                                                <div style="display: inline-block;width: 230px;">
+                                                    <select name="deviceType" id="listDeviceType" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <label class="control-label"
+                                                    style="display: inline-block;margin-left: 20px;">终端厂商：</label>
+                                                <div style="display: inline-block;width: 150px;">
+                                                    <select name="terminalManufacturer" id="listTerminalManufacturer"
+                                                        class="form-control">
+                                                        <option selected="selected" value="">全部</option>
+                                                        <option value="-1">未下发</option>
+                                                        <option value="5">终端离线未下发</option>
+                                                        <option value="8">终端接收失败</option>
+                                                        <option value="2">参数消息有误</option>
+                                                        <option value="3">参数不支持</option>
+                                                        <option value="1">参数未生效</option>
+                                                        <option value="0">参数已生效</option>
+                                                    </select>
+                                                </div>
+                                                <label class="control-label"
+                                                    style="display: inline-block;margin-left: 20px;">终端型号：</label>
+                                                <div style="display: inline-block;width: 120px;">
+                                                    <select name="terminalType" id="listTerminalType"
+                                                        class="form-control">
+                                                        <option selected="selected" value="0">全部</option>
+                                                        <option value="1">在线</option>
+                                                        <option value="2">离线</option>
+                                                    </select>
+                                                </div>
+                                                <label class="control-label"
+                                                    style="display: inline-block;margin-left: 20px;">启停状态：</label>
+                                                <div style="display: inline-block;width: 120px;">
+                                                    <select name="state" id="listState" class="form-control">
+                                                        <option selected="selected" value="">全部</option>
+                                                        <option value="1">启用</option>
+                                                        <option value="0">停用</option>
+                                                    </select>
+                                                </div>
+                                                <button id="inquireClickOne" type="button"
+                                                    class="btn btn-primary search-btn"><i
+                                                        class="glyphicon glyphicon-search"></i>
+                                                    查询
+                                                </button>
+                                                <button id="emptyBtn" type="button" class="btn btn-default">清空</button>
+                                            </div>
+                                            <table id="dataTable"
+                                                class="table table-striped table-bordered table-hover checkTable"
+                                                cellspacing="0" width="100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th><input type="checkbox" id="checkAll"></th>
+                                                        <th>操作设置</th>
+                                                        <th>终端号</th>
+                                                        <th>所属企业</th>
+                                                        <th>通讯类型</th>
+                                                        <th>终端厂商</th>
+                                                        <th>终端型号</th>
+                                                        <th>功能类型</th>
+                                                        <th>终端名称</th>
+                                                        <th>制造商ID</th>
+                                                        <th>终端型号(注册)</th>
+                                                        <th>MAC地址</th>
+                                                        <th>制造商</th>
+                                                        <th>条码</th>
+                                                        <th>启停状态</th>
+                                                        <th>监控对象</th>
+                                                        <th>安装日期</th>
+                                                        <th>采购日期</th>
+                                                        <th>创建日期</th>
+                                                        <th>修改日期</th>
+                                                        <th>安装单位</th>
+                                                        <th>联系人</th>
+                                                        <th>联系电话</th>
+                                                        <th>是否符合要求</th>
+                                                        <th>备注</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+    var selectItem = [[#{ select.item }]];
+    var publicDelete = [[#{ public.delete }]];
+</script>
+<script src="/resources/js/deviceList.js" th:src="@{/resources/js/deviceList.js}"></script>
+
+</html>

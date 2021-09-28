@@ -1,0 +1,62 @@
+<form th:action="@{/r/riskManagement/TypeLevel/edit.gsp}" th:object="${result}" id="editForm" role="form" method="post"
+	class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">修改风险事件信息</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<input th:field="*{id}" type="text" hidden="true" />
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label
+						class="text-danger">*</label> 风险事件： </label>
+					<div class="col-md-4">
+						<input th:field="*{riskEvent}" placeholder="请输入风险事件" maxlength="20" 
+							type="text" class="form-control" />
+						   <input th:value="*{riskEvent}" id="oldRiskEvent" type="hidden"/> 
+					</div>
+					<label class="col-md-2 control-label"
+						style="padding-left: 0; padding-right: 0;"><label
+						class="text-danger">*</label> 风险类型： </label>
+					<div class="col-md-4">
+					<select th:field="*{riskType}" placeholder="" class="form-control">     
+							<option value="疲劳驾驶" >疲劳驾驶</option>
+							<option value="分心驾驶">分心驾驶</option>
+							<option value="碰撞危险">碰撞危险</option>
+							<option value="异常报警">异常报警</option>
+						</select>
+						<input th:value="*{riskType}" id="oldRiskType" type="hidden"/> 
+					</div>
+
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> 描述：</label>
+					<div class="col-md-10">
+						<textarea  th:field="*{description}" name="description" rows="5"  placeholder="请输入描述" class="form-control"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmits">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<label id="error_label" class='error' style='display: none;'></label>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"
+	th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+var riskEventNull = [[#{risk.riskEvent.null}]];
+var riskEventThingNull = [[#{riskEvent.thing.null}]];
+var riskEventThingLength = [[#{riskEvent.thing.length}]];
+var riskEventThingExist = [[#{riskEvent.thing.exist}]];
+</script>
+<script src="/wro/riskEventEdit.js" th:src="@{/wro/riskEventEdit.js}"></script>

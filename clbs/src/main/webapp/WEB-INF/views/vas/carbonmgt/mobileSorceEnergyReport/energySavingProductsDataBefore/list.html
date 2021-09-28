@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>节油产品前能耗数据</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body th:object="${result}">
+	<section class="leftMenuBg">
+		<div th:replace="fragments/nav">nav</div>
+		<section class="main-content-wrapper">
+			<div th:replace="fragments/menu">menu</div>
+			<section id="main-content">
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">碳排放监管</li>
+							<li class="active">移动源能耗报表</li>
+							<li class="active">节油产品前能耗数据</li>
+						</ul>
+						<h1 class="h1 ">节油产品前能耗数据</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch">
+								<h3 class="panel-title fwb">节油产品前能耗数据</h3>
+								<div class="actions pull-right">
+									<i class="fa fa-chevron-down" id="stretch"></i>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div class="ToolPanel clearfix ToolPanellable">
+								<form id="queryForm" name="reg_testdate">
+									<div class="col-md-4 col-sm-12">
+										<div class="form-group">
+											<label class="col-md-3 control-label">查询方式：</label>
+											<div class="col-md-9">
+												<select class="form-control" id="selectTabBox" name="queryWay">
+													<option value="list1">按日期查询</option>
+													<option value="list2">按日期统计</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4 col-sm-12 form-group">
+									  <div class="form-group">
+											<label class="col-md-3 control-label">组织：</label>
+											<div class="has-feedback col-md-9">
+												<input  class="form-control" id="zTreeCitySel"
+												readonly="readonly" name="groupName" th:field="*{groupName}" style="background-color: #fafafa; cursor: pointer;" type="text" />
+												<span id="arrowDown" class="fa fa-chevron-down form-control-feedback" style="top: 0;right: 15px;" aria-hidden="true"></span> 
+												<input type="hidden" name="groupId" id="groupId" th:field="*{groupId}" />
+												<div class="ztreeModelBox" id="zTreeContent" >
+													<ul id="ztreeDemo" class="ztree">
+													</ul>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4 col-sm-12 form-group">
+										<div class="form-group">
+											<label class="col-md-3 control-label">车牌号：</label>
+											<div class="col-md-9">
+												<select class="form-control" id="brands" name="vehicleId">
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="layDateBox form-group col-md-8" style="padding-left:0;padding-right:0;">
+										<div class="col-md-6 col-sm-12">
+											<div class="form-group">
+												<label class="col-md-3 control-label">开始时间：</label>
+												<div class="col-md-9">
+													<input class="form-control laydate-icon" id="startDate" name="startDate" type="text">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 col-sm-12">
+											<div class="form-group">
+												<label class="col-md-3 control-label">结束时间：</label>
+												<div class="col-md-9">
+													<input class="form-control laydate-icon" id="endDate" name="endDate" type="text">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4 col-sm-12 form-group" id="searchBtn">
+									    <div class="form-group">
+											<label class="col-md-3 control-label">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+											<div class="col-md-9">
+												<button type="button" class="btn btn-primary search-btn" id="inquireClick"><i class="glyphicon glyphicon-search"></i> 查询</button>
+												<a  th:href="@{/v/carbonmgt/energySavingBefore/export.gsp}" class = "btn btn-purple export-btn"><i class="glyphicon glyphicon-log-out"></i> 导出</a>
+											</div>
+										</div>
+									</div>
+									</form>
+								</div>
+                               <div class="dataTableBox">
+                               		<div id="dataTableBoxlist1">
+                               	    	<div class="form-group"><h4>企业名称：<span class="groupTitle"></span></h4></div>
+	                               	    <div style="overflow-x: auto; height: 100%;">
+		                               		<table id="dataTable" class="table table-striped table-bordered dataTable table-hover" cellspacing="0" width="100%">
+		                               			<thead id="list1_thead">
+		                               				<tr>
+		                               					<th class="text-center">序号</th>
+		                               					<th class="text-center">车牌号</th>
+		                               					<th class="text-center">车辆类型</th>
+		                               					<th class="text-center">燃料类型</th>
+		                               					<th class="text-center">打火时间</th>
+		                               					<th class="text-center">熄火时间</th>
+		                               					<th class="text-center">行驶时长</th>
+		                               					<th class="text-center">行驶里程（Km）</th>
+		                               					<th class="text-center">平均速度</th>
+		                               					<th class="text-center">空调开启时长</th>
+		                               					<th class="text-center">转动时长</th>
+		                               					<th class="text-center">能耗量（L或m³）</th>
+		                               					<th class="text-center">能源价格（元）</th>
+		                               					<th class="text-center">能耗费用</th>
+		                               					<th class="text-center">百公里能耗</th>
+		                               					<th class="text-center">CO₂排放量(t)</th>
+		                  								<th class="text-center">SO₂排放量(kg)</th>
+		                  								<th class="text-center">NOX排放量(kg)</th>
+		                  								<th class="text-center">HCX排放量(kg)</th>
+		                               				</tr>
+		                               			</thead>
+		                               			<thead id="list2_thead" style="display: none;">
+		                               				<tr>
+		                               					<th class="text-center">序号</th>
+		                               					<th class="text-center">日期</th>
+		                               					<th class="text-center">车牌号</th>
+		                               					<th class="text-center">车辆类型</th>
+		                               					<th class="text-center">燃料类型</th>
+		                               					<th class="text-center">行驶时长</th>
+		                               					<th class="text-center">行驶里程（Km）</th>
+		                               					<th class="text-center">平均速度</th>
+		                               					<th class="text-center">空调开启时长</th>
+		                               					<th class="text-center">转动时长</th>
+		                               					<th class="text-center">能耗量（L或m³）</th>
+		                               					<th class="text-center">能源价格（元）</th>
+		                               					<th class="text-center">能耗费用</th>
+		                               					<th class="text-center">百公里能耗</th>
+		                               					<th class="text-center">CO₂排放量(t)</th>
+		                  								<th class="text-center">SO₂排放量(kg)</th>
+		                  								<th class="text-center">NOX排放量(kg)</th>
+		                  								<th class="text-center">HCX排放量(kg)</th>
+		                               				</tr>
+		                               			</thead>
+		                               			<tbody id="dataList">
+		                               				
+		                               			</tbody>
+		                               		</table>
+	                               		</div>
+                               		</div>
+                               </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<label id="error_label" class='error' style='display: none;'></label>
+</body>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+	var queryConfirm = [[#{query.confirm}]];
+</script>
+<script src="/wro/energySavingProductsDataBefore.js" th:src="@{/wro/energySavingProductsDataBefore.js}"></script>
+</html>

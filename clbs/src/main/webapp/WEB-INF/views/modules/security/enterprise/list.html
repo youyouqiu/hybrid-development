@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>风险监管</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/resources/css/security/index.css" th:href="@{/resources/css/security/index.css}" />
+    <!--<link rel="stylesheet" href="resources/css/videoContent.css" th:href="@{/resources/css/videoContent.css}"/>-->
+    <link rel="stylesheet" href="resources/js/nstSlider/css/jquery.nstSlider.css"
+        th:href="@{/resources/js/nstSlider/css/jquery.nstSlider.css}" />
+    <link rel="stylesheet" href="/resources/css/security/enterprise.css"
+        th:href="@{/resources/css/security/enterprise.css}" />
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper main-content-toggle-left">
+            <div th:replace="fragments/menu_adas">menu</div>
+            <div id="container-box">
+                <div class="cont-top">
+                    <div class="panel panel-default cont-top-left-panel">
+                        <div class="panel-heading" id="stretch">
+                            <ul class="nav nav-tabs" style="height: 40px;">
+                                <li role="presentation" class="active"><a id="toAlarmAnalysis" data-toggle="tab"
+                                        href="#alarmAnalysis">报警分析</a></li>
+                                <li role="presentation"><a id="toRealTimeVideo" data-toggle="tab"
+                                        href="#realTimeVideo">实时视频</a></li>
+                            </ul>
+                        </div>
+                        <div class="panel-body" style="display: block;">
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="alarmAnalysis">
+                                    <div class="alarmChartLeft">
+                                        <div class="alarmAnalyze-left">
+                                            <div id="alarmAnalyzePieChart">
+
+                                            </div>
+                                            <div class="aMap-data left">
+                                                <div class="tit">当前报警事件数</div>
+                                                <div id="nowRiskNum" class="con"><span class="num"
+                                                        id="totalNum">0</span><span>件</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="alarmAnalyze-right">
+                                            <div id="alarmAnalyzeBarChart">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alarmChartRight">
+                                        <!--<div id="alarmChartBarBox"></div>-->
+                                        <div id="alarmChartScaleBox"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="realTimeVideo">
+                                    <div id="mapCont">
+                                        <div id="map">
+
+                                        </div>
+                                    </div>
+                                    <div id="realTimeVideoCont">
+                                        <div id="realTimeVideoBox" class="clearfix">
+                                            <div id="videoCont">
+                                                <div class="videoplayer-box">
+                                                    <div id="videoplayer">
+                                                        <div class="pull-left video-box v-one">
+                                                            <video autoplay
+                                                                style="width: 100%;height: 100%;object-fit: fill;"
+                                                                id="v_0_Source">
+                                                                <source src="" type="video/mp4">
+                                                                <source src="" type="video/ogg">
+                                                                您的浏览器不支持 video 标签。
+                                                            </video>
+                                                        </div>
+                                                        <div class="pull-left video-box v-two">
+                                                            <video autoplay
+                                                                style="width: 100%;height: 100%;object-fit: fill;"
+                                                                id="v_1_Source">
+                                                                <source src="" type="video/mp4">
+                                                                <source src="" type="video/ogg">
+                                                                您的浏览器不支持 video 标签。
+                                                            </video>
+                                                        </div>
+                                                        <div class="pull-left video-box v-three">
+                                                            <video autoplay
+                                                                style="width: 100%;height: 100%;object-fit: fill;"
+                                                                id="v_2_Source">
+                                                                <source src="" type="video/mp4">
+                                                                <source src="" type="video/ogg">
+                                                                您的浏览器不支持 video 标签。
+                                                            </video>
+                                                        </div>
+                                                        <div class="pull-left video-box v-four">
+                                                            <video autoplay
+                                                                style="width: 100%;height: 100%;object-fit: fill;"
+                                                                id="v_3_Source">
+                                                                <source src="" type="video/mp4">
+                                                                <source src="" type="video/ogg">
+                                                                您的浏览器不支持 video 标签。
+                                                            </video>
+                                                        </div>
+
+                                                    </div>
+                                                    <input type="hidden" id="videoHost" th:value="${videoHost}" />
+                                                    <input type="hidden" id="videoPort" th:value="${videoPort}" />
+                                                    <div id="taskmsg" style="display:none"></div>
+                                                    <div id="locmsg" style="display:none"></div>
+                                                </div>
+                                            </div>
+                                            <div id="videoTool">
+                                                <div class="talkback">
+                                                    <div class="icon-area" id="callSelect">
+                                                        <div class="icon" title="对讲">
+                                                            <i class="icon-off"></i>
+                                                            <i class="icon-on"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="media-time" style="width:50%;">
+                                                    <div class="clearfix">
+                                                        <div class="media-icon voice"></div>
+                                                        录音关闭
+                                                    </div>
+                                                    <div class="hide">
+                                                        录音:
+                                                        <span>999+</span>
+                                                        秒
+                                                    </div>
+                                                </div>
+
+                                                <div class="videoSwitch">
+                                                    <div class="icon-area" id="videoSelect">
+                                                        <div class="icon" title="视频">
+                                                            <i class="icon-off"></i>
+                                                            <i class="icon-on"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="media-time" style="width:50%;">
+                                                    <div>
+                                                        <div class="media-icon video"></div>
+                                                        录像关闭
+                                                    </div>
+                                                    <div class="hide">
+                                                        录像:
+                                                        <span>999+</span>
+                                                        秒
+                                                    </div>
+                                                </div>
+
+                                                <div class="monitorSwitch">
+                                                    <div class="icon-area" id="monitorSelect">
+                                                        <div class="icon" title="监听">
+                                                            <i class="icon-off"></i>
+                                                            <i class="icon-on"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="media-time" style="width:50%;">
+                                                    <div>
+                                                        <div class="media-icon voice"></div>
+                                                        录音关闭
+                                                    </div>
+                                                    <div class="hide">
+                                                        录音:
+                                                        <span>999+</span>
+                                                        秒
+                                                    </div>
+                                                </div>
+
+                                                <div class="btn-box">
+                                                    <button type="button" class="editBtn btn-primary"
+                                                        id="toTextInfoSend">TTS读播</button>
+                                                    <!--<button type="button" class="editBtn" disabled>人证对比</button>-->
+                                                </div>
+
+                                                <div class="video-control-panel" id="videoSeparated">
+                                                    <p>
+                                                        <i id="videoFour" class="video-four video-check" title=""></i>
+                                                        <i id="videoSix" class="video-six" title=""></i>
+                                                        <i id="videoNine" class="video-nine" title=""></i>
+                                                        <i id="videoTen" class="video-ten" title=""></i>
+                                                    </p>
+                                                    <p>
+                                                        <i id="videoSixteen" class="video-sixteen" title=""></i>
+                                                        <i id="videoFullScreen" class="video-full-screen" title=""></i>
+                                                        <i id="videoYunSett" class="video-yun-sett"></i>
+                                                        <i id="videoDimming" class="video-dimming"></i>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="cont-btm">
+                    <div id="riskTableBox">
+                        <div class="riskTable-head" style="position: relative;height: 48px;margin-bottom: 0;">
+                            <h3 class="panel-title fwb" style="float: left;margin-right: 30px;">当前报警</h3>
+                            <!--<div class="actions pull-right">-->
+                            <!--<i class="fa chevron-down"></i>-->
+                            <!--</div>-->
+
+                            <div class="filterCont" id="overseeState" target-id="confirmChooseState" fiterval="">
+                                督办状态：<span>全部</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <div class="filterCont" id="riskEvidence" target-id="confirmRiskEvidence" fiterval="">
+                                风险证据：<span>全部</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <div class="filterCont" id="monitoringBrand" target-id="confirmChooseBrand" fiterval="">
+                                监控对象：<span>渝A00000</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <div class="filterCont" id="monitoringGroup" target-id="confirmChooseGroup" fiterval="">
+                                所属企业：<span>全部</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <div class="filterCont" id="operationType" target-id="confirmChooseOperationType"
+                                fiterval="">
+                                运营类型：<span>全部</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <div class="filterCont" id="riskType" target-id="confirmChooseRiskType" fiterval="">
+                                风险类型：<span>全部</span>
+                                <button type="button" class="close">×</button>
+                            </div>
+                            <i class="glyphicon glyphicon-refresh icon-refresh"
+                                style="position: absolute;right: 30px;top: 15px;cursor: pointer"></i>
+                        </div>
+
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1" id="dropdownUl">
+                            <li>
+                                <div style="padding-left: 18px;" class="drop-menu-operation">
+                                    <label class="radio">
+                                        <input type="radio" name="overseeStateRadio" value="" checked /> 全部状态
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="overseeStateRadio" value="1" /> 已督办
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="overseeStateRadio" value="0" /> 未督办
+                                    </label>
+                                </div>
+                                <div style="text-align: right;">
+                                    <button id="confirmChooseState" type="button" class="btn btn-primary">确定</button>
+                                    <button type="button" class="cancelFilter btn btn-default">取消</button>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu6">
+                            <div style="padding-left: 18px;" class="drop-menu-operation">
+                                <label class="radio">
+                                    <input type="radio" name="riskTypeRadio" value="" checked> 全部证据
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="riskTypeRadio" value="videoAndPic"> 视频+图片
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="riskTypeRadio" value="video"> 视频证据
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="riskTypeRadio" value="pic"> 图片证据
+                                </label>
+                                <label class="radio">
+                                    <input type="radio" name="riskTypeRadio" value="noMedia"> 无证据
+                                </label>
+                            </div>
+                            <div style="text-align: right">
+                                <button id="confirmRiskEvidence" type="button" class="btn btn-primary">确定</button>
+                                <button type="button" class="cancelFilter btn btn-default">取消</button>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            <div class="form-group drop-menu-operation">
+                                <input class="form-control" type="text" placeholder="请输入监控对象" />
+                            </div>
+                            <div style="text-align: right">
+                                <button id="confirmChooseBrand" type="button"
+                                    class="confirmFilter btn btn-primary">确定</button>
+                                <button type="button" class="cancelFilter btn btn-default">取消</button>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+                            <div class="form-group drop-menu-operation">
+                                <input class="form-control" type="text" placeholder="请输入所属企业" />
+                            </div>
+                            <div style="text-align: right">
+                                <button id="confirmChooseGroup" type="button"
+                                    class="confirmFilter btn btn-primary">确定</button>
+                                <button type="button" class="cancelFilter btn btn-default">取消</button>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu4">
+                            <div class="form-group drop-menu-operation">
+                                <input class="form-control" type="text" placeholder="请输入运营类型" />
+                            </div>
+                            <div style="text-align: right">
+                                <button id="confirmChooseOperationType" type="button"
+                                    class="confirmFilter btn btn-primary">确定</button>
+                                <button type="button" class="cancelFilter btn btn-default">取消</button>
+                            </div>
+                        </div>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu5">
+                            <div class="form-group drop-menu-operation">
+                                <input class="form-control" type="hidden" id="alarmTypeChoose" />
+                                <ul id="alarmTypeTree" class="ztree"></ul>
+                            </div>
+                            <div style="text-align: right">
+                                <button id="confirmChooseRiskType" type="button"
+                                    class="confirmFilter btn btn-primary">确定</button>
+                                <button type="button" class="cancelFilter btn btn-default">取消</button>
+                            </div>
+                        </div>
+
+                        <div id="fixedTableHBox"
+                            style="position: absolute;left: 15px;top: 48px;padding-top:15px;width: calc(100% - 47px);background: #fff;height: 60px;overflow: hidden;z-index: 999;">
+                            <table class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%"></th>
+                                        <!--<th><input type="checkbox" id="checkAll"></th>-->
+                                        <!--<th>
+                                    督办情况
+                                    <img class="table-head-icon table-head-icon-choose" id="dropdownMenu1" src="/clbs/resources/img/choose-icon.svg">
+                                </th>
+                                <th>报警处置截止时间</th>-->
+                                        <th width="10%">风险证据
+                                            <img class="table-head-icon table-head-icon-choose" id="dropdownMenu6"
+                                                src="/clbs/resources/img/choose-icon.svg">
+                                        </th>
+                                        <th width="10%">监控对象
+                                            <img class="table-head-icon" id="dropdownMenu2"
+                                                src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">所属企业
+                                            <img class="table-head-icon" id="dropdownMenu3"
+                                                src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">运营类型
+                                            <img class="table-head-icon" id="dropdownMenu4"
+                                                src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">报警类型
+                                            <img class="table-head-icon table-head-icon-choose" id="dropdownMenu5"
+                                                src="/clbs/resources/img/choose-icon.svg">
+                                        </th>
+                                        <th width="10%">
+                                            <span>
+                                                <span class="clickTh">
+                                                    报警等级
+                                                </span>
+                                                <span class="table-icon">
+                                                    <i class="up" id="sortLevelUp">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                    <i class="down" id="sortLevelDown">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </span>
+                                        </th>
+                                        <th width="20%">
+                                            <span>
+                                                <span class="clickTh">
+                                                    报警时间
+                                                </span>
+                                                <span class="table-icon">
+                                                    <i class="up timeIcon" id="sortTimeUp">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                    <i class="down timeIcon" id="sortTimeDown">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="displayNoneTable">
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="riskTable-body" id="riskTableCont">
+                            <table id="dataTable" class="table table-striped table-bordered table-hover" cellspacing="0"
+                                width="100%">
+                                <thead>
+                                    <tr>
+                                        <th width="5%"></th>
+                                        <!--<th><input type="checkbox" id="checkAll1"></th>-->
+                                        <!--<th>
+                                    &lt;!&ndash;<div class="dropdown pull-left">&ndash;&gt;
+                                        &lt;!&ndash;操作/状态&ndash;&gt;
+                                        &lt;!&ndash;<span class="caret dropdown-toggle" style="cursor: pointer;" id="dropdownMenu11" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>&ndash;&gt;
+                                        &lt;!&ndash;<ul class="dropdown-menu" aria-labelledby="dropdownMenu11">&ndash;&gt;
+                                            &lt;!&ndash;<li><a  id="batchOverSee1"><i class="glyphicon glyphicon-log-out icoPaddingLeft"></i>批量督办</a></li>&ndash;&gt;
+                                        &lt;!&ndash;</ul>&ndash;&gt;
+                                    &lt;!&ndash;</div>&ndash;&gt;
+                                    督办情况
+                                    <img class="table-head-icon table-head-icon-choose" src="/clbs/resources/img/edit-icon.svg">
+                                </th>
+                                <th>报警处置截止时间</th>-->
+                                        <th width="10%">风险证据
+                                            <img class="table-head-icon table-head-icon-choose"
+                                                src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="10%">监控对象
+                                            <img class="table-head-icon" src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">所属企业
+                                            <img class="table-head-icon" src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">运营类型
+                                            <img class="table-head-icon" src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="15%">报警类型
+                                            <img class="table-head-icon" src="/clbs/resources/img/edit-icon.svg">
+                                        </th>
+                                        <th width="10%">
+                                            <span>
+                                                报警等级
+                                                <span class="table-icon">
+                                                    <i class="up">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                    <i class="down">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </span>
+                                        </th>
+                                        <th width="20%">
+                                            <span>
+                                                报警时间
+                                                <span class="table-icon">
+                                                    <i class="up">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M858.9 689L530.5 308.2c-9.4-10.9-27.5-10.9-37 0L165.1 689c-12.2 14.2-1.2 35 18.5 35h656.8c19.7 0 30.7-20.8 18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                    <i class="down">
+                                                        <svg viewBox="0 0 1024 1024" width="1em" height="1em"
+                                                            fill="currentColor" aria-hidden="true">
+                                                            <path
+                                                                d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z">
+                                                            </path>
+                                                        </svg>
+                                                    </i>
+                                                </span>
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="riskTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="riskDetailCont" class="clearfix">
+
+                        <div class="riskTable-head" style="position: relative;height: 47px;cursor: pointer;">
+                            <!--<h3 class="panel-title fwb">当前报警</h3>-->
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down"></i>
+                            </div>
+                        </div>
+
+                        <div style="height: calc(100% - 47px);overflow-x: auto;">
+                            <div style="height: 100%;min-width: 1900px;">
+                                <div class="alarm-msg">
+                                    <p class="msg-tit">预警信息</p>
+                                    <div class="alarm-msg-cont">
+                                        <div class="clearfix">
+                                            <label class="control-label">监控对象：</label>
+                                            <div class="col-md-2">
+                                                <span id="alarmBrand"></span>
+                                            </div>
+
+                                            <label class="control-label">所属企业：</label>
+                                            <div class="col-md-3">
+                                                <span id="alarmGroup"></span>
+                                            </div>
+
+                                            <label class="control-label">运营类型：</label>
+                                            <div class="col-md-2">
+                                                <span id="alarmBrandType"></span>
+                                            </div>
+                                        </div>
+                                        <!--<div class="clearfix">
+                                        <label class="control-label">运营类型：</label>
+                                        <div class="col-md-2">
+                                            <span id="alarmBrandType"></span>
+                                        </div>
+                                    </div>-->
+                                        <div class="clearfix">
+                                            <label class="control-label">报警类型：</label>
+                                            <div class="col-md-8">
+                                                <span id="detailAlarmType"></span>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix">
+                                            <label class="control-label">行驶速度：</label>
+                                            <div class="col-md-2">
+                                                <span id="alarmSpeed"></span>
+                                            </div>
+                                            <label class="control-label">天气情况：</label>
+                                            <div class="col-md-2">
+                                                <span id="alarmWeather"></span>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix">
+                                            <label class="control-label">报警时间：</label>
+                                            <div class="col-md-4">
+                                                <span id="alarmTimeStr"></span>
+                                            </div>
+                                            <label class="control-label">风险等级：</label>
+                                            <div class="col-md-2">
+                                                <span id="alarmLevel"></span>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix">
+                                            <label class="control-label">报警位置：</label>
+                                            <div class="col-md-8">
+                                                <span id="alarmAddr"></span>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix">
+                                            <label class="control-label">报警事件：</label>
+                                        </div>
+                                        <div class="clearfix alarm-event-list" id="alarmEventList">
+                                            <div id="alarmEventListCont" style="height: 100%;overflow-y: auto;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ICcard-msg">
+                                    <p class="msg-tit">IC卡从业证信息</p>
+                                    <div id="ICcard-box" class="clearfix">
+                                    </div>
+
+                                    <div class="prevCard">
+                                        <span class="prevCardBtn"></span>
+                                    </div>
+                                    <div class="nextCard">
+                                        <span class="nextCardBtn"></span>
+                                    </div>
+
+                                    <!--人证对比-->
+                                    <div class="compareBox">
+                                        <button type="button" class="btn" id="capture" disabled>抓拍</button>
+                                        <a id="compareSet" class="compare-set" href="javascript:void(0)"><img
+                                                src="/clbs/resources/img/photoSet.svg" alt=""></a>
+                                        <button type="button" class="btn" id="comparePhoto" disabled>人证对比</button>
+                                    </div>
+                                </div>
+                                <div class="photo-msg">
+                                    <p class="msg-tit">人证对比</p>
+                                    <div id="photoMsgCont"></div>
+                                    <div id="compareInfo" class="hide">
+                                        <div class="compare-progress-box">
+                                            <div class="compare-progress"></div>
+                                        </div>
+                                        <div class="text-center">
+                                            相似度: <span id="compareScore">25</span>%
+                                        </div>
+                                        <div class="compare-res text-center">
+                                            <span id="compareRes" class="">同一个人可能性极低</span>
+                                        </div>
+                                    </div>
+
+                                    <!--加载框-->
+                                    <div id="compareLoad" class="personCompare-loading">
+                                        <i class="fa fa-spinner loading-state"></i>
+                                    </div>
+                                </div>
+                                <div class="deal-risk-msg">
+                                    <p class="msg-tit">风险处理</p>
+                                    <div id="dealMsgCont">
+                                        <form id="riskForm" action="/clbs/adas/s/riskManage/intelligence/dealRisk"
+                                            method="post" role="form">
+                                            <div>
+                                                <div class="form-group clearfix">
+                                                    <div class="col-md-12 handle-people">
+                                                        <label>处理人：</label>
+                                                        <input name="riskId" type="hidden" id="dealRiskIds" value="" />
+                                                        <input name="status" type="hidden" value="6" />
+                                                        <input name="dealer" id="dealer" value=""
+                                                            style="border: none;" />
+                                                    </div>
+                                                </div>
+                                                <!--<div class="form-group clearfix">-->
+                                                <!--<div class="col-md-12">-->
+                                                <!--<label id="treatmentProcess">处理过程：</label>-->
+                                                <!--</div>-->
+                                                <!--</div>-->
+                                                <div style="padding-left: 5px;">
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>1.风险信息是否准确：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskAccuracySetting" class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="accuracy" value="1"
+                                                                        checked="checked">准确&emsp;
+                                                                </label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="accuracy" value="0">不准确
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>2.预警后车辆及驾驶员状态情况：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskDriverStatusSetting"
+                                                                class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="driverStatus" value="1"
+                                                                        checked="checked">正常&emsp;
+                                                                </label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="driverStatus"
+                                                                        value="0">异常&emsp;
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>3.是否人工干预：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskInterventionSetting"
+                                                                class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="intervention" value="1"
+                                                                        checked="checked">是&emsp;&emsp;
+                                                                </label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="intervention"
+                                                                        value="0">否&emsp;&emsp;
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>4.驾驶员是否配合：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskCooperationSetting"
+                                                                class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="cooperation" value="1"
+                                                                        checked="checked">配合&emsp;
+                                                                </label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="cooperation"
+                                                                        value="0">不配合&emsp;
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>5.风险预警后危险状态情况：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskWarnStatusSetting"
+                                                                class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="warnStatus" value="1"
+                                                                        checked="checked">已解除
+                                                                </label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="warnStatus" value="0">未解除
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>6.是否发生事故：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskRiskResultSetting"
+                                                                class="risk-control-results">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="radio" name="riskResult" value="0"
+                                                                        checked="checked">事故未发生
+                                                                </label>
+                                                                <label class="checkbox-inline"
+                                                                    style="padding-left: 0;margin-left: 5px;">
+                                                                    <input type="radio" name="riskResult"
+                                                                        value="1">事故已发生
+                                                                </label>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>7.驾驶员：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <span id="riskDriverSetting" class="risk-control-results">
+                                                                <select class="form-control" name="driver"
+                                                                    id="driverSelect">
+                                                                </select>
+                                                                <input type="hidden" id="driverId" name="driverId">
+                                                                <input type="hidden" id="driverNumber"
+                                                                    name="driverNumber">
+                                                            </span>
+                                                            <input id="driverName" type="hidden" name="driverName" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <div class="col-md-6">
+                                                            <label>8.其他：</label>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <textarea rows="1" name="other" id="otherTxt"
+                                                                class="form-control"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group archivingBtn group-bottom">
+                                                        <button type="button" class="btn btn-primary"
+                                                            id="doSubmits">确&nbsp;认</button>
+                                                        <button id="warningInfoEditCancel" type="button"
+                                                            class="btn btn-default">取&nbsp;消</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- 文本信息下发 -->
+    <div class="modal fade" id="textInfoSend" aria-hidden="true" data-backdrop="static" role="dialog"
+        aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form role="form" id="txtSend" th:action="@{/adas/v/monitoring/sendTTS}" method="post"
+                    class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        <h4 class="modal-title">文本信息下发：<span id="textInfoSendBrand"></span></h4>
+                        <input type="hidden" name="vehicleId" id="textSendVid">
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">文本内容：</label>
+                                <div class=" col-md-6">
+                                    <textarea class="form-control" maxlength="512" id="sendTextContent"
+                                        name="sendTextContent" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="goTxtSend" class="btn btn-primary">下发</button>
+                        <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查岗督办 -->
+    <div class="modal fade" id="overSeeModal" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+        aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <form action="/clbs/oversee/overseeRisk" class="form-horizontal" id="overSeeForm" method="post">
+                <input type="hidden" name="riskIds" id="riskIds" />
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title"><span>督办策略</span></h4>
+                    </div>
+                    <div class="modal-body" style="padding-right: 60px">
+                        <div class="row">
+                            <div class="form-group clearfix">
+                                <label class="col-md-3 control-label"><label class="text-danger">*</label>督办人：</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="overseePeople" name="overseePeople" />
+                                </div>
+                                <label class="col-md-3 control-label">督办等级：</label>
+                                <div class="col-md-3">
+                                    <select class="form-control" name="overseeLevel" id="overseeLevelSelect">
+                                        <option>1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-md-3 control-label"><label class="text-danger">*</label>应答时限：</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="validResponseTime" placeholder="单位（秒）"
+                                        id="validResponseTime" />
+                                </div>
+                                <label class="col-md-3 control-label">督办联系电话：</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="overseePhone" id="overseePhone" />
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-md-3 control-label">
+                                    督办联系电子邮件：
+                                </label>
+                                <div class=" col-md-3">
+                                    <input type="text" class="form-control" name="overseeMail" id="overseeMail" />
+                                </div>
+                            </div>
+                            <div class="form-group clearfix">
+                                <label class="col-md-3 control-label">
+                                    备注：
+                                </label>
+                                <div class=" col-md-7">
+                                    <textarea name="remark" id="remark" type="text" class="form-control"
+                                        rows="4"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="confirmOverSee" class="btn btn-primary">提交</button>
+                        <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--多媒体Modal-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">title</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="media-content">
+                        <!--tab-->
+                        <span class="media_tab Img">
+                            <button id="img" href="javascript:void(0);" class="btn btn-primary"
+                                data-value="0">终端图片</button>
+                        </span>
+                        <span class="media_tab Video">
+                            <button id="video" href="javascript:void(0);" class="btn btn-primary"
+                                data-value="2">终端视频</button>
+                        </span>
+
+                        <div id="showMedia">
+                            <!--media-->
+                            <div id="media" style="height:100%;"></div>
+                            <!--mask-->
+                            <div id="previewMask">
+                                <a id="download" href="#" download class="mask-img">
+                                    <img src="/clbs/resources/img/fkzjk_download.svg">
+                                    <hr>
+                                </a>
+                            </div>
+                            <!--arrow-->
+                            <div class="arrows left-btn" id="arrowsLeft">
+                                <i class="icon icon_left"></i>
+                            </div>
+                            <div class="arrows right-btn" id="arrowsRight">
+                                <i class="icon icon_right"></i>
+                            </div>
+                        </div>
+                        <!--count-->
+                        <div class="media_len">
+                            <span id="current">1</span>
+                            /
+                            <span id="count">20</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 拍照 -->
+    <div class="modal fade modal-hide-load" id="goPhotograph" aria-hidden="true" data-backdrop="static" role="dialog"
+        aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width:50%;">
+            <div class="modal-content">
+                <form th:action="@{/adas/s/riskManage/intelligence/setCurrentUserPhotoParam}" role="form" id="takePhoto"
+                    action="#" method="post" class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                        <h4 class="modal-title" id="goPhotographBrand">抓拍参数设置:</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="form-group hide">
+                                <label class="col-md-2 control-label">实现方式:</label>
+                                <div class="col-md-3">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photographType" value="0" checked>平台实现
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <!--隐藏项 start-->
+                                <!--<input class="hidden" id="vid1" name="vid" value="">
+                            <input class="hidden" name="orderType" value="1">-->
+                                <input class="hidden" name="time" value="0">
+                                <input class="hidden" name="command" value="1">
+                                <!--隐藏项 end-->
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class=" col-md-3">
+                                    <select id="wayID" name="wayID" class="form-control">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6" selected>6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                        <option value="24">24</option>
+                                        <option value="25">25</option>
+                                        <option value="26">26</option>
+                                        <option value="27">27</option>
+                                        <option value="28">28</option>
+                                        <option value="29">29</option>
+                                        <option value="30">30</option>
+                                        <option value="31">31</option>
+                                        <option value="32">32</option>
+                                        <option value="33">33</option>
+                                        <option value="36">36</option>
+                                        <option value="37">37</option>
+                                        <option value="64">64</option>
+                                        <option value="65">65</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">保存标志：</label>
+                                <div class=" col-md-3">
+                                    <select id="saveSign" name="saveSign" class="form-control">
+                                        <option value="0" selected="true">实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class=" col-md-3">
+                                    <select id="distinguishability" name="distinguishability" class="form-control">
+                                        <option value="1" selected>320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">176*144</option>
+                                        <option value="6">352*288</option>
+                                        <option value="7">704*288</option>
+                                        <option value="8">704*576</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    <i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                                        title="范围1-10,1代表质量损失最小，10代表压缩比最大">
+                                    </i>
+                                    图像质量：
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" id="quality" value="5" name="quality" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="luminance" value="125" name="luminance"
+                                        class="form-control" />
+                                </div>
+                                <label class="col-md-3 control-label">对比度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="contrast" value="127" name="contrast" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="saturability" value="127" name="saturability"
+                                        class="form-control" />
+                                </div>
+                                <label class="col-md-3 control-label">色度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" id="chroma" value="125" name="chroma" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="goPhotographs" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+                    </div>
+            </div>
+            </form>
+        </div>
+    </div>
+    <!-- 视频画面控制 -->
+    <div class="modal fade" id="videoScreenControl" tabindex="-1" aria-hidden="false" data-backdrop="static"
+        role="dialog">
+        <div class="modal-dialog" role="document" style="width: 500px !important">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">视频画面控制 </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row form-horizontal">
+                        <!-- 亮度 -->
+                        <div class="form-group">
+                            <div class="col-md-3 text-right control-label">亮度：</div>
+                            <div class="col-md-6">
+                                <div class="nstSlider nsBrightness" data-range_min="0" data-range_max="255"
+                                    data-cur_min="255">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                    id="brightnessVal" readonly /></div>
+                        </div>
+                        <!-- 色度 -->
+                        <div class="form-group">
+                            <div class="col-md-3 text-right control-label">色度：</div>
+                            <div class="col-md-6">
+                                <div class="nstSlider nsChroma" data-range_min="0" data-range_max="360"
+                                    data-cur_min="0">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                    id="chromaVal" readonly /></div>
+                        </div>
+                        <!-- 对比度 -->
+                        <div class="form-group">
+                            <div class="col-md-3 text-right control-label">对比度：</div>
+                            <div class="col-md-6">
+                                <div class="nstSlider nsContrast" data-range_min="0" data-range_max="255"
+                                    data-cur_min="51">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                    id="contrastVal" readonly /></div>
+                        </div>
+                        <!-- 饱和度 -->
+                        <div class="form-group">
+                            <div class="col-md-3 text-right control-label">饱和度：</div>
+                            <div class="col-md-6">
+                                <div class="nstSlider nsSaturation" data-range_min="0" data-range_max="255"
+                                    data-cur_min="51">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                    id="saturationVal" readonly /></div>
+                        </div>
+                        <!-- 音量 -->
+                        <div class="form-group">
+                            <div class="col-md-3 text-right control-label">音量：</div>
+                            <div class="col-md-6">
+                                <div class="nstSlider nsVolume" data-range_min="0" data-range_max="100"
+                                    data-cur_min="50">
+                                    <div class="leftGrip"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-center"><input type="text" class="form-control inp-brightness"
+                                    id="volumeVal" readonly /></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 云台 -->
+    <div class="modal fade" id="haeundaeModal" tabindex="-1" aria-hidden="false" data-backdrop="static" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="haeundaeBrand"></h4>
+                </div>
+                <div class="modal-body">
+                    <input id="connectState" value="" type="text" hidden />
+                    <div class="row">
+                        <div class="pull-left cloud-left">
+                            <table>
+                                <tr>
+                                    <td><i id="haeundaeLeftTop"></i></td>
+                                    <td><i id="haeundaeTop"></i></td>
+                                    <td><i id="haeundaeRightTop"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><i id="haeundaeLeft"></i></td>
+                                    <td><i id="haeundaeCenter"></i></td>
+                                    <td><i id="haeundaeRight"></i></td>
+                                </tr>
+                                <tr>
+                                    <td><i id="haeundaeLeftBottom"></i></td>
+                                    <td><i id="haeundaeBottom"></i></td>
+                                    <td><i id="haeundaeRightBottom"></i></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="pull-right cloud-right">
+                            <div class="cloud-right-top">
+                                <div class="col-md-7 col-padding-zero">
+                                    <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="zoomPlus"><i class="plus"></i></button>
+                                        <button type="button" class="btn btn-default btn-vertical-default">变焦</button>
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="zoomLess"><i class="less"></i></button>
+                                    </div>
+                                    <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="doublePlus">
+                                            <i class="plus"></i></button>
+                                        <button type="button" class="btn btn-default btn-vertical-default">变倍</button>
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="doubleLess">
+                                            <i class="less"></i></button>
+                                    </div>
+                                    <div class="col-md-4 col-padding-five btn-group-vertical" role="group">
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="aperturePlus"><i class="plus"></i></button>
+                                        <button type="button" class="btn btn-default btn-vertical-default">光圈</button>
+                                        <button type="button" class="btn btn-default btn-vertical-default"
+                                            id="apertureLess"><i class="less"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-padding-zero">
+                                    <div class="col-md-12 text-center">灯光</div>
+                                    <div class="col-md-12">
+                                        <label class="ag-switch">
+                                            <input type="checkbox" id="haeundaeLight" />
+                                            <i></i>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-12 text-center">雨刷</div>
+                                    <div class="col-md-12">
+                                        <label class="ag-switch">
+                                            <input type="checkbox" id="haeundaeWipers" />
+                                            <i></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cloud-right-bottom">
+                                <div class="left-grip">速度：慢</div>
+                                <div class="nstSlider haeundaeNstSlider" data-range_min="0" data-range_max="255"
+                                    data-cur_min="127">
+                                    <div class="leftGrip"></div>
+                                </div>
+                                <div class="right-grip">快</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
+<script src="resources/js/bootstrap/js/bootstrap.min.js"
+    th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/inputClear.min.js"
+    th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<script type="text/javascript"
+    src="https://webapi.amap.com/maps?v=1.4.0&amp;key=6b953aec395d345fd37e1b5434d587a9&amp;plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor,AMap.MarkerClusterer"></script>
+<script src="/resources/js/echarts-4.1.0.rc2.min.js" th:src="@{/resources/js/echarts-4.1.0.rc2.min.js}"></script>
+<script src="/resources/js/china.js" th:src="@{/resources/js/china.js}"></script>
+<script src="//a.amap.com/jsapi_demos/static/china.js"></script>
+
+<!--视频js-->
+<script src="/clbs/resources/js/media/three.min.js"></script>
+<script src="/clbs/resources/js/media/OrbitControls.js"></script>
+<script src="/wro/mediaController.js" th:src="@{/wro/mediaController.js}"></script>
+<!--视频js-->
+<script src="/resources/js/amapHot.js" th:src="@{/resources/js/amapHot.js}"></script>
+
+<script th:inline="javascript">
+    var videoRequestUrl = [[${ session.videoUrl }]];
+    var videoRequestPort = [[${ session.videoPort }]];
+    var audioRequestPort = [[${ session.audioPort }]];
+    //抓拍设置
+    var alarmSearchChannelID = [[#{ alarmSearch.channel.ID }]];
+    var alarmSearchIntervalTime = [[#{ alarmSearch.interval.time }]];
+    var alarmSearchIntervalError = [[#{ alarmSearch.interval.error }]];
+    var alarmSearchIntervalSize = [[#{ alarmSearch.interval.size }]];
+    var alarmSearchPhotoSize = [[#{ alarmSearch.photo.size }]];
+    var alarmSearchPhotoNull = [[#{ alarmSearch.photo.null }]];
+    var alarmSearchSaveNull = [[#{ alarmSearch.save.null }]];
+    var alarmSearchResolutionNull = [[#{ alarmSearch.resolution.null }]];
+    var alarmSearchMovieSize = [[#{ alarmSearch.movie.size }]];
+    var alarmSearchMovieNull = [[#{ alarmSearch.movie.null }]];
+    var alarmSearchBrightnessSize = [[#{ alarmSearch.brightness.size }]];
+    var alarmSearchBrightnessNull = [[#{ alarmSearch.brightness.null }]];
+    var alarmSearchContrastSize = [[#{ alarmSearch.contrast.size }]];
+    var alarmSearchContrastNull = [[#{ alarmSearch.contrast.null }]];
+    var alarmSearchSaturatedSize = [[#{ alarmSearch.saturated.size }]];
+    var alarmSearchSaturatedNull = [[#{ alarmSearch.saturated.null }]];
+    var alarmSearchColorSize = [[#{ alarmSearch.color.size }]];
+    var alarmSearchColorNull = [[#{ alarmSearch.color.null }]];
+    var publicIssuedSuccess = [[#{ public.Issued.success }]];
+</script>
+
+<script src="/resources/js/securityEnterprise.js" th:src="@{/resources/js/securityEnterprise.js}"></script>
+<script src="resources/js/securityVideoSeparate.js" th:src="@{/resources/js/securityVideoSeparate.js}"></script>
+<script src="/clbs/resources/js/nstSlider/js/jquery.nstSlider.js"
+    th:src="@{/resources/js/nstSlider/js/jquery.nstSlider.js}"></script>
+
+</html>

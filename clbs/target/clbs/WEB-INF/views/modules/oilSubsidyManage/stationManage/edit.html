@@ -1,0 +1,87 @@
+<form th:action="@{/m/station/manage/update}" id="editForm" role="form" action="#" method="post" class="form-horizontal"
+	th:object="${result}">
+	<style>
+		.amap-marker-label{
+			border:1px solid #ccc;
+			padding: 3px 8px;
+		}
+
+		.info{
+			position: relative;
+			top: 0;
+			right: 0;
+			min-width: 0;
+		}
+	</style>
+	<div class="modal-header">
+		<button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">站点修改</h4>
+	</div>
+	<div class="modal-body">
+		<input name="id" id="id" type="text" th:value="${result.id}" style="display: none"/>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label class="text-danger">*</label>站点名称：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入站点名称" name="name" id="name" type="text" th:value="${result.name}"
+							   maxlength="30" autocomplete="off"  class="form-control" />
+					</div>
+					<label class="col-md-2 control-label"><label class="text-danger">*</label>站点编号：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入站点编号" name="number" id="number" type="text" th:value="${result.number}"
+							   maxlength="20" autocomplete="off"	class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label class="text-danger">*</label>站点经度：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入站点经度" th:value="${result.longitude}" name="longitude" id="lng" type="text" autocomplete="off" class="form-control"/>
+					</div>
+					<label class="col-md-2 control-label"><label class="text-danger">*</label>站点纬度：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入站点纬度" th:value="${result.latitude}" name="latitude" id="lat" type="text" autocomplete="off" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">站点描述：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入站点描述" name="describe" id="describe" type="text" th:value="${result.describe}"
+							   maxlength="100" autocomplete="off"  class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">备注：</label>
+					<div class="col-md-4">
+						<input placeholder="请输入备注" name="remark" id="remark" maxlength="50" type="text" th:value="${result.remark}"
+							   autocomplete="off" class="form-control" />
+					</div>
+				</div>
+				<div style="position: relative;">
+					<p style="font-size: 16px; font-weight: bold; margin-left: 10px;">
+						点击下面地图位置获取经纬度信息(经纬度自动填写到站点经度、站点纬度输入框中)</p>
+					<div id="stationMannageMap" style="width:100%;height:380px">
+					</div>
+					<div id="POISearch" style="position: absolute;left: 100px;top: 50px;">
+						<div class="inputBox">
+							<div style="height: 100%;width: 315px;position: relative;float: left;">
+								<input class="form-control" type="text" style="height: 36px;" id="tipinput"
+									   placeholder="搜地点、查公交、找路线" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button id="doSubmitEdit" class="btn btn-primary" type="button">
+			<strong>保 存</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>取 消</strong>
+		</button>
+	</div>
+	<label id="error_label_edit" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/resources/js/oilSubsidyManage/stationManegeEdit.js"
+		th:src="@{/resources/js/oilSubsidyManage/stationManegeEdit.js}"></script>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cb.platform.repository.mysqlDao.ChatGroupUserDao">
+
+    <!-- 批量新增聊天分组信息 -->
+    <insert id = "insertBathChatGroup" parameterType="com.cb.platform.domain.ChatGroupUserDo">
+        insert into zw_m_chat_group_user(id,group_id,user_id,flag,create_data_time,create_data_username)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.groupId}, #{item.userId}, 1,
+            #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 批量删除聊天分组信息 -->
+    <delete id = "delBathChatGroup" parameterType="string" >
+        delete from zw_m_chat_group_user  WHERE group_id = #{groupId}
+    </delete>
+
+    <!-- 根据分组编号获取分组信息 -->
+    <select id = "findByGroupId" parameterType="string" resultType="com.cb.platform.domain.ChatGroupUserDo">
+        select * from zw_m_chat_group_user where group_id = #{groupId} and flag =1
+    </select>
+
+
+    <!-- 根据分组编号获取分组用户新信息 -->
+    <select id = "findGroupUserByGroupId" parameterType="string" resultType="java.lang.String">
+        select user_id from zw_m_chat_group_user where group_id = #{groupId} and flag =1
+    </select>
+
+    <!-- 根据用户id获取讨论组id列表 -->
+    <select id="getGroupListByUserId" resultType="java.lang.String">
+        select distinct group_id from zw_m_chat_group_user where user_id = #{userId} and flag = 1
+    </select>
+
+    <!-- 根据用户id获取讨论组id和name列表 -->
+    <select id="getGroupInfoListByUserId" resultType="com.cb.platform.domain.chat.UserGroup">
+        select distinct g.group_id userGroupId, g.group_name userGroupName from zw_m_chat_group g
+            inner join zw_m_chat_group_user gu on g.group_id = gu.group_id and gu.user_id = #{userId} and gu.flag = 1
+        where g.flag = 1
+    </select>
+
+    <!-- 根据用户id获取与该用户在相同讨论组下的用户id列表 -->
+    <select id="getRelatedUserIds" resultType="com.cb.platform.domain.chat.UserAndGroup">
+        select user_id, group_id
+        from zw_m_chat_group_user
+        where group_id in (select group_id
+                           from zw_m_chat_group_user
+                           where user_id = #{userId})
+            and flag = 1
+    </select>
+
+    <!-- 根据用户id获取与该用户在相同讨论组下的用户id列表 -->
+    <select id="getAllUserGroups" resultType="com.cb.platform.domain.chat.UserAndGroup">
+        select user_id, group_id from zw_m_chat_group_user where flag = 1
+    </select>
+
+</mapper>

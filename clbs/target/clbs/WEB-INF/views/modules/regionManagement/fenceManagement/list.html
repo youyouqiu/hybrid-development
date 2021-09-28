@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>电子围栏</title>
+  <div th:replace="fragments/header">header</div>
+  <link rel="stylesheet" href="/clbs/resources/css/realElectronicFence.css"
+    th:src="@{/clbs/resources/css/realElectronicFence.css}" />
+  <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
+  <link rel="stylesheet" href="resources/css/electronicFence-map.css"
+    th:href="@{/resources/css/electronicFence-map.css}" />
+  <link rel="stylesheet" href="resources/css/realTimeMonitoring.css"
+    th:href="@{/resources/css/realTimeMonitoring.css}" />
+  <link rel="stylesheet" href="resources/css/realTimeMonitoring-video.css"
+    th:href="@{/resources/css/realTimeMonitoring-video.css}" />
+  <link rel="stylesheet" href="resources/css/activeSafety.css"
+    th:href="@{/resources/css/activeSafety.css}" />
+    <link rel="stylesheet" href="/clbs/resources/css/electronicFence-new.css"/>
+  <style type="text/css">
+    #container {
+      background-color: white !important;
+    }
+
+    #thetree {
+      height: 20000px;
+    }
+
+    #MapContainer {
+      height: 20000px;
+    }
+
+    #dataTableBind td {
+      padding: 7px 10px;
+    }
+
+    .toolOperateClick .map-call::before {
+      content: "";
+      position: relative;
+      display: inline-block;
+      top: 6px;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      background-image: url(/clbs/resources/img/call-off.png) !important;
+      background-size: 22px 22px
+    }
+
+    .toolOperateClick .map-call.active::before {
+      content: "";
+      position: relative;
+      display: inline-block;
+      top: 6px;
+      left: 0;
+      width: 22px;
+      height: 22px;
+      background-image: url(/clbs/resources/img/call-on.png) !important;
+      background-size: 22px 22px
+    }
+
+    #warningManageClose, #warningManagePhoto {
+      margin: 0px 0px 1px 0px !important
+    }
+
+    #alarm-remark {
+      margin-top: 15px;
+      padding-left: 50px;
+    }
+
+    #alarm-remark > div {
+      padding-right: 0
+    }
+
+    .modal-footer select {
+      line-height: 22px !important;
+    }
+
+    #originalDataList .code {
+      position: relative;
+      padding: 0 10px;
+      word-wrap: break-word;
+      white-space: initial;
+      transition: all .3s linear;
+    }
+
+    #originalDataList .analysis {
+      height: 20px;
+      text-align: center;
+      background-color: #fff;
+      border: 1px solid #888;
+      padding: 0 10px;
+      color: #333;
+      border-radius: 5px;
+      z-index: 999;
+      cursor: pointer;
+    }
+
+    #originalDataList .analysis:hover {
+      background: #e5e5e5;
+    }
+
+    #originalDataList .db-active .analysis {
+      display: block;
+    }
+
+    .ope-buttons {
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+    }
+
+    .ope-buttons > .cell-div {
+      height: 30px !important;
+    }
+
+    .editBtn-security {
+      position: relative;
+      color: #fff;
+      background-color: #6dcff6;
+      /*padding-left:0px;*/
+    }
+
+    .hover-table {
+      margin-bottom: 10px;
+    }
+
+    .hover-table th {
+      text-align: center;
+    }
+
+    .hover-table tr td:nth-child(2n+1) {
+      text-align: right;
+      padding-right: 8px;
+      padding-left: 10px;
+      word-break: keep-all;
+
+    }
+
+    .hover-table tr td:nth-child(2n+0) {
+      padding-right: 10px;
+    }
+
+    .search-list {
+      height: 22px;
+      color: #5D5F63;
+      cursor: pointer;
+      -webkit-transition: all .3s;
+      transition: all .3s;
+    }
+
+    .io-modal-table {
+      margin-top: 16px;
+    }
+
+    .io-modal-table tr td:nth-child(2n+1) {
+      text-align: right;
+      padding-right: 10px;
+      padding-left: 15px;
+      font-weight: bold;
+      line-height: 22px;
+    }
+
+    .io-modal-table tr td:nth-child(2n+0) {
+      padding-left: 0px;
+    }
+
+    #commonWin .modal-lg {
+      width: 900px;
+    }
+
+    .related-btn[disabled] {
+      cursor: not-allowed;
+      filter: alpha(opacity=65);
+      opacity: .65;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+      background-color: #cacfd2;
+    }
+  </style>
+</head>
+<body style="overflow:hidden;">
+<section class="realTimePage" id="container">
+  <div th:replace="fragments/nav">nav</div>
+  <section class="main-content-wrapper main-content-toggle-left">
+    <div th:replace="fragments/menu">menu</div>
+    <section id="main-content">
+      <input th:value="${jumpId}" id="jumpId" type="hidden" />
+      <input id="adasSwitch" th:value="${session.adasSwitch}" type="hidden" />
+      <div class="row eightIsZero">
+        <div class="col-md-12 realtime-content">
+          <div id="fenceListWrapper">
+            <div class="panel panel-default" id="panDefLeft">
+              <div class="panel-heading" style="padding:0px;">
+                <div class="panel-title leftHeader">电子围栏</div>
+              </div>
+              <div id="fenceBox" style="top: 42px">
+                <div id="fenceList">
+                  <ul class="nav nav-tabs" id="fenceUl"></ul>
+                  <div id="fenceHandle" class="handleBox">
+                    <button href="/clbs/m/regionManagement/fenceManagement/getFenceTypeAddPage" data-toggle="modal" data-target="#commonWin" id="addFence">
+                      <i class="glyphicon glyphicon-plus"></i>
+                    </button>
+                    <button disabled href="" data-toggle="modal" data-target="#commonWin" id="editFence">
+                      <i class="glyphicon glyphicon-edit"></i>
+                    </button>
+                    <button disabled href="/clbs/m/regionManagement/fenceManagement/getFenceTypeAddPage" data-toggle="modal" data-target="#commonWin" id="fenceDetail">
+                      <i class="glyphicon glyphicon-list-alt"></i>
+                    </button>
+                    <button disabled id="deleteFence">
+                      <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div id="subFenceList" class="tab-content" style="border-right:0;">
+                  <div id="fenceContent" class="tab-pane active">
+                    <ul id="subFenceUl" class="ztree list-unstyled" style="padding-right:0;border: none"></ul>
+                  </div>
+                  <div id="subFenceHandle" class="handleBox">
+                    <button class="addSubFence">
+                      <i class="glyphicon glyphicon-plus"></i>
+                    </button>
+                    <button disabled class="editSubFence">
+                      <i class="glyphicon glyphicon-edit"></i>
+                    </button>
+                    <button disabled class="subFenceDetail">
+                      <i class="glyphicon glyphicon-list-alt"></i>
+                    </button>
+                    <button disabled class="deleteSubFence">
+                      <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="content-right">
+            <div class="panel panel-default contPanelMargin">
+              <div class="panel-body fixed-table-body form-horizontal btnPaddingTop">
+                <div class="form-group	mapDataPadd">
+                  <div class="col-md-12 mapPaddCon">
+
+                    <!-- map -->
+                    <div id="MapContainer">
+                      <!-- 原始数据 -->
+                      <div spellcheck="false" id="originalDataModal"
+                        style="width: 100%; position: absolute; bottom: -300px; left: 0;background: #f7f7f9;z-index: 999; cursor: default;">
+                        <div style="height: 38px; line-height: 38px;">
+                          <ul class="original-title-list">
+                            <li style="display: inline-block;">监控对象：<span
+                              id="searchForName"></span></li>
+                            <li style="display: inline-block;">终端号：<span
+                              id="searchDviceNumber"></span></li>
+                            <li style="display: inline-block;">终端手机号：<span
+                              id="searchSimNumber"></span></li>
+                            <li class="float-right"><i id="originalDataModalClose"
+                              class="glyphicon glyphicon-remove"></i>
+                            </li>
+                            <li class="float-right">
+                              <button id="controlGetData" type="button"
+                                class="btn btn-default btn-xs original-handle">暂停
+                              </button>
+                            </li>
+                            <li class="float-right">
+                              <button id="clearOriginalData" type="button"
+                                class="btn btn-default btn-xs original-handle">清空
+                              </button>
+                            </li>
+                            <li class="float-right">
+                              <button id="copyOriginalData" type="button"
+                                class="btn btn-default btn-xs original-handle">复制
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                        <pre id="originalDataList" class="original-content"
+                          style="user-select: text;-moz-user-select: text; -webkit-user-select: text; -ms-user-select: text;"></pre>
+                      </div>
+                      <!-- 围栏 -->
+                      <button type="button" th:href="@{/m/regionManagement/fenceManagement/getUserFenceDisplaySetPage}"
+                        data-toggle="modal" data-target="#commonSmWin" class="visual-setting">
+                        <img src="/clbs/resources/img/FenceIco.svg" style="width:18px;height:15.3px;" />
+                      </button>
+                      <!-- 工具条 -->
+                      <div class="toolClickArea">
+                        <div id="toolClick" class="toolClick">
+                          <img alt="" src="/clbs/resources/img/tool.svg">
+                        </div>
+                        <!-- 新加tool-phoneCall 类名 -->
+                        <div id="toolOperateClick" class="toolOperateClick tool-phoneCall">
+                          <a class="fenceA" id="mapDropSetting"><i
+                            class="map-drop-sett"></i><span>地图设置</span></a>
+                          <a class="fenceA" id="magnifyClick"><i class="map-magnify"></i><span
+                            class="mapToolClick">拉框放大</span></a>
+                          <a class="fenceA" id="shrinkClick"><i class="map-shrink"></i><span
+                            class="mapToolClick">拉框缩小</span></a>
+                          <a class="fenceA" id="countClick"><i class="map-count"></i><span
+                            class="mapToolClick">距离量算</span></a>
+                        </div>
+                      </div>
+                      <!-- 地图设置下拉 -->
+                      <div class="mapDropSettingMenu" id="mapDropSettingMenu">
+                        <p>
+                          <input type="radio" name="mapType" id="googleSatelliteMap" checked class="monitoringSelect" />
+                          <label for="googleSatelliteMap" id="googleSatelliteMapLab" class="monitoringSelect preBlue">谷歌卫星地图</label>
+                        </p>
+                        <hr>
+                        <p>
+                          <input type="radio" name="mapType" id="googleGeograpyMap" class="monitoringSelect" />
+                          <label for="googleGeograpyMap" id="googleGeograpyMapLab" class="monitoringSelect" style="margin:0px">地形地图</label>
+                        </p>
+                        <hr>
+                        <p>
+                          <input type="radio" name="mapType" id="amapMap" class="monitoringSelect" />
+                          <label for="amapMap" id="amapMapLab" class="monitoringSelect">高德地图</label>
+                        </p>
+                        <hr>
+                        <p>
+                          <input type="checkbox" id="realTimeRC" class="monitoringSelect" />
+                          <label for="realTimeRC" id="realTimeRCLab" class="monitoringSelect">路况</label>
+                        </p>
+                      </div>
+                      <!-- modal -->
+                      <!--<div th:replace="vas/monitoring/realtimeModal">realtimeModal</div>-->
+
+                      <div style="width: 220px;position: absolute;display: none;z-index:999;"
+                        id="markerInfoWindow">
+                        <div class="amap-info-content amap-info-outer">
+                          <div>名称：<span id="createName"></span></div>
+                          <!--<div>类型：<span id="createType"></span></div>-->
+                          <div>创建人：<span id="createPer"></span></div>
+                          <div>创建时间：<span id="createTime"></span></div>
+                          <div>描述：<span id="createDesc"></span></div>
+                        </div>
+                        <div class="amap-info-sharp" style="height: 23px;"></div>
+                      </div>
+                    </div>
+                    <!--导航路线-->
+                    <div id="drivenRoute">
+                      <div class="" role="document">
+                        <div class="modal-content">
+                          <div class="modal-body">
+                            <form class="form-horizontal"
+                              th:action="@{/m/functionconfig/fence/managefence/travelLine}"
+                              id="dragRouteLine" role="form" action="#" method="post">
+                              <table id=""
+                                class="table table-striped table-bordered table-hover table-lng-lat">
+                              </table>
+                              <div class="row">
+                                <div class="form-group">
+                                  <div class="col-md-12">
+                                    <input type="text" placeholder="请输入线路名称(必填)"
+                                      class="form-control"
+                                      id="dragRouteLineName" name="name" />
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                  <div class="col-md-12">
+                                    <input type="text" placeholder="请输入起点(或右键地图)"
+                                      class="form-control" id="startPoint"
+                                      name="startPoint" />
+                                  </div>
+                                </div>
+                                <div id="wayPointArea"></div>
+                                <div class="form-group">
+                                  <div class="col-md-10">
+                                    <input type="text" placeholder="请输入终点(或右键地图)"
+                                      class="form-control" id="endPoint"
+                                      name="endPoint" />
+                                  </div>
+                                  <button id="addWayToPoint" type="button"
+                                    class="btn btn-primary padBottom">
+                                                                        <span class="glyphicon glyphicon-plus"
+                                                                          aria-hidden="true"></span>
+                                  </button>
+                                </div>
+                                <div class="form-group">
+                                  <div class="col-md-12">
+                                    <select class="form-control" id="dragRouteType"
+                                      name="type">
+                                      <option value="国道">国道</option>
+                                      <option value="省道">省道</option>
+                                      <option value="县道">县道</option>
+                                      <option value="高速">高速</option>
+                                      <option value="高架立交">高架立交</option>
+                                      <option value="其他小路">其他小路</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                  <div class="col-md-12">
+                                    <input type="text" placeholder="请输入偏移量(必填)"
+                                      onkeyup="value=value.replace(/[^0-9]/g,'') "
+                                      class="form-control" id="excursion"
+                                      name="excursion" />
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                  <div class="col-md-12">
+                                                                        <textarea class="form-control"
+                                                                          placeholder="请输入描述" rows="3"
+                                                                          id="dragRouteDescription"
+                                                                          name="description"></textarea>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <input type="hidden" id="travelLineId"
+                                  name="travelLineId" />
+                                <input type="hidden" id="addOrUpdateTravelFlag"
+                                  name="addOrUpdateTravelFlag" />
+                                <input type="hidden" id="startToEndLng"
+                                  name="startToEndLng" />
+                                <input type="hidden" id="startToEndLat"
+                                  name="startToEndLat" />
+                                <input type="hidden" id="wayPointLng"
+                                  name="wayPointLng" />
+                                <input type="hidden" id="wayPointLat"
+                                  name="wayPointLat" />
+                                <input type="hidden" id="allPointLng"
+                                  name="allPointLng" />
+                                <input type="hidden" id="allPointLat"
+                                  name="allPointLat" />
+                                <button type="button" data-type="zw_m_travel_line"
+                                  id="lineDragRouteSave" class="btn btn-primary">
+                                  保存
+                                </button>
+                                <button type="button" id="lineDragRouteClose"
+                                  class="btn btn-default btn-off"
+                                  data-dismiss="modal">取消
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- 隐藏按钮 -->
+                    <div id="goShow">
+                      <i id="goHidden" class="fa fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
+
+<div class="modal fade" id="choseFenceModal" role="dialog" style="overflow-y:hidden" data-backdrop="static"
+  data-keyboard="false" aria-labelledby="choseFenceModal" aria-hidden="true">
+  <div class="modal-dialog" style="width:250px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">×</button>
+        <h4 class="modal-title">请选择围栏绘制类型</h4>
+      </div>
+      <div class="modal-body" style="padding:0px">
+        <div class="fence-type" onclick="fenceOperation.modalDrawFence('多边形');" id="polygonRow">
+          <span class="fence-icon fence-polygon"></span>
+          <span class="fence-text">多边形</span>
+        </div>
+        <div class="fence-type" onclick="fenceOperation.modalDrawFence('圆形');" id="circleRow">
+          <span class="fence-icon fence-circle"></span>
+          <span class="fence-text">圆形</span>
+        </div>
+        <div class="fence-type" onclick="fenceOperation.modalDrawFence('路线');" id="lineRow">
+          <span class="fence-icon fence-line"></span>
+          <span class="fence-text">路线</span>
+        </div>
+        <div class="fence-type" onclick="fenceOperation.modalDrawFence('标注');" id="markerRow">
+          <span class="fence-icon fence-marker"></span>
+          <span class="fence-text">标注</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 标注 -->
+<div class="modal fade" id="mark" aria-hidden="true" data-backdrop="static" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">标注</h4>
+      </div>
+      <div class="modal-body">
+        <!-- 新增标注表单 -->
+        <form class="form-horizontal" th:action="@{/m/regionManagement/fenceManagement/addOrUpdateMarker}" id="marker"
+          role="form" action="#" method="post">
+          <div class="row">
+            <div class="form-group" style="display:none;">
+              <input type="hidden" id="addOrUpdateMarkerFlag" name="addOrUpdateMarkerFlag" value="" />
+              <input type="hidden" id="markerId" name="markerId" value="" />
+              <input type="hidden" id="markerTypeId" name="typeId" value="" />
+              <label class="col-md-3 control-label">标注经度：</label>
+              <div class=" col-md-3">
+                <input id="mark-lng" type="text" value="" class="form-control" readonly="readonly"
+                  name="longitude" />
+              </div>
+              <label class="col-md-2 control-label">标注纬度：</label>
+              <div class=" col-md-3">
+                <input id="mark-lat" type="text" value="" class="form-control" readonly="readonly"
+                  name="latitude" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label"><label class="text-danger">*</label> 标注名称：</label>
+              <div class=" col-md-8">
+                <input type="text" placeholder="请输入标注名称" class="form-control" id="markerName" name="name" maxlength="10" />
+              </div>
+            </div>
+            <!--<div class="form-group">-->
+            <!--<label class="col-md-3 control-label">标注类型：</label>-->
+            <!--<div class=" col-md-8">-->
+            <!--<select class="form-control" id="markerType" name="type">-->
+            <!--<option value="普通标记">普通标记</option>-->
+            <!--<option value="线路点">线路点</option>-->
+            <!--</select>-->
+            <!--</div>-->
+            <!--</div>-->
+            <div class="form-group">
+              <label class="col-md-3 control-label">描述：</label>
+              <div class=" col-md-8">
+                <textarea class="form-control" rows="4" id="markerDescription" name="description"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-type="zw_m_marker" id="annotatedSave" class="btn btn-primary">保存</button>
+            <button type="button" id="markFenceClose" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!--线-->
+<div class="modal fade" id="addLine" aria-hidden="true" data-backdrop="static" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">路线</h4>
+      </div>
+      <div class="modal-body">
+        <!-- 新增围栏表单 -->
+        <form class="form-horizontal" th:action="@{/m/regionManagement/fenceManagement/addOrUpdateLine}" id="addLineForm"
+          role="form" action="#" method="post">
+          <input type="hidden" id="lineTypeId" name="typeId" value="" />
+          <table id="table-lng-lat" class="table table-striped table-bordered table-hover table-lng-lat">
+          </table>
+          <div class="row">
+            <div class="form-group">
+              <input type="hidden" id="addOrUpdateLineFlag" name="addOrUpdateLineFlag" />
+              <input type="hidden" id="lineId" name="lineId" />
+              <label class="col-md-3 control-label"><label class="text-danger">*</label> 路线名称：</label>
+              <div class=" col-md-8">
+                <input type="text" placeholder="请输入路线名称" class="form-control" id="lineName1" name="name" maxlength="10" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label"><label class="text-danger">*</label> 偏移量(m)：</label>
+              <div class=" col-md-8">
+                <input placeholder="请输入数字" onkeyup="value=value.replace(/[^0-9]/g,'') " class="form-control" id="lineWidth1" name="width" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">描述：</label>
+              <div class=" col-md-8">
+                <textarea class="form-control" rows="3" id="lineDescription1" name="description"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" id="pointSeqs" name="pointSeqs" />
+            <input type="hidden" id="longitudes" name="longitudes" />
+            <input type="hidden" id="latitudes" name="latitudes" />
+            <button type="button" data-type="zw_m_line" id="threadSave" class="btn btn-primary">保存</button>
+            <button type="button" id="lineEditClose" class="btn btn-default btn-off" data-dismiss="modal">
+              取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 多边形 -->
+<div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">多边形</h4>
+      </div>
+      <div class="modal-body">
+        <!-- 新增围栏表单 -->
+        <form class="form-horizontal" th:action="@{/m/regionManagement/fenceManagement/addOrUpdatePolygon}" id="polygons"
+          role="form" action="#" method="post">
+          <table id="table-lng-lat1" class="table table-striped table-bordered table-hover table-lng-lat">
+            <tbody></tbody>
+          </table>
+          <div class="row">
+            <div class="form-group">
+              <input type="hidden" id="addOrUpdatePolygonFlag" name="addOrUpdatePolygonFlag" />
+              <input type="hidden" id="polygonTypeId" name="typeId" value="" />
+              <input type="hidden" id="polygonId" name="polygonId" />
+              <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+              <div class=" col-md-8">
+                <input type="text" placeholder="请输入区域名称" class="form-control" id="polygonName" name="name" maxlength="10" />
+              </div>
+            </div>
+            <div class="form-group hidden">
+              <label class="col-md-3 control-label">形状：</label>
+              <div class=" col-md-8">
+                <select class="form-control" id="polygonShape" name="shape">
+                  <option value="多边形">多边形</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">描述：</label>
+              <div class=" col-md-8">
+                <textarea class="form-control" rows="3" id="polygonDescription" name="description"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label lngLat_show">经纬度<span class="fa fa-chevron-up" aria-hidden="true"></span></label>
+            </div>
+            <div class="pointList">
+              <div id="rectangleAllPointShow">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <input type="hidden" id="pointSeqsPolygons" name="pointSeqs" />
+            <input type="hidden" id="longitudesPolygons" name="longitudes" />
+            <input type="hidden" id="latitudesPolygons" name="latitudes" />
+            <input type="hidden" id="polygonArea" name="area" />
+            <button type="button" data-type="zw_m_polygon" id="polygonSave" class="btn btn-primary">保存</button>
+            <button type="button" id="polygonFenceClose" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 圆形 -->
+<div class="modal fade" id="circleArea" aria-hidden="true" data-backdrop="static" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">圆形</h4>
+      </div>
+      <div class="modal-body">
+        <!-- 新增圆形区域表单 -->
+        <form class="form-horizontal" th:action="@{/m/regionManagement/fenceManagement/addOrUpdateCircle}" id="circles"
+          role="form" action="#" method="post">
+          <div class="row">
+            <div class="form-group" style="display:none;">
+              <input type="hidden" id="addOrUpdateCircleFlag" name="addOrUpdateCircleFlag" />
+              <input type="hidden" id="circleId" name="circleId" />
+              <input type="hidden" id="circleTypeId" name="typeId" value="" />
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+              <div class=" col-md-8">
+                <input type="text" placeholder="请输入区域名称" class="form-control" id="circleName" name="name" maxlength="10" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">描述：</label>
+              <div class=" col-md-8">
+                <textarea class="form-control" rows="3" id="circleDescription" name="description"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label lngLat_show">经纬度<span class="fa fa-chevron-up" aria-hidden="true"></span></label>
+            </div>
+            <div class="pointList">
+              <div class="form-group">
+                <label class="col-md-3 control-label">中心点纬度：</label>
+                <div class=" col-md-8">
+                  <input id="editCircleLat" type="text" name="centerPointLat" value="" class="form-control" />
+                </div>
+                <div class="col-md-8 hidden">
+                  <input id="circle-lat" type="text" value="" class="form-control" name="latitude" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-md-3 control-label">中心点经度：</label>
+                <div class=" col-md-8">
+                  <input id="editCircleLng" type="text" name="centerPointLng" value="11" class="form-control" />
+                </div>
+                <div class=" col-md-8 hidden">
+                  <input id="circle-lng" type="text" value="11" class="form-control" name="longitude" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-md-3 control-label">半径(米)：</label>
+                <div class=" col-md-8">
+                  <input id="editCircleRadius" name="centerRadius" type="text" value="" class="form-control" />
+                </div>
+                <div class=" col-md-8 hidden">
+                  <input id="circle-radius" type="text" value="" class="form-control" name="radius" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-type="zw_m_circle" id="roundSave" class="btn btn-primary">保存</button>
+        <button type="button" id="circleFenceClose" class="btn btn-default btn-off" data-dismiss="modal">取消
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 详情 -->
+<div class="modal fade" id="detailsModel" aria-hidden="true" data-backdrop="static" role="dialog"
+  aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">围栏详情</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" role="form" action="#" method="post">
+          <div class="row">
+            <div class="form-group">
+              <label class="col-md-3 control-label">名称：</label>
+              <div class=" col-md-3 textShow">
+                <span id="detailsFenceName"></span>
+              </div>
+              <label class="col-md-3 control-label">形状：</label>
+              <div class=" col-md-3 textShow">
+                <span id="detailsFenceShape"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">创建人：</label>
+              <div class=" col-md-3 textShow">
+                <span id="detailsFenceCreateName"></span>
+              </div>
+              <label class="col-md-3 control-label">创建时间：</label>
+              <div class=" col-md-3 textShow">
+                <span id="detailsFenceCreateTime"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">描述：</label>
+              <div class="col-md-8 textShow">
+                <span id="detailsFenceDescribe" style="word-break:break-all"></span>
+              </div>
+            </div>
+            <div class="form-group" id="relatedThing">
+              <label class="col-md-3 control-label">关联排班：</label>
+              <div class="col-md-3" style="padding-top:2px">
+                <span id="relatedScheduleNumber"></span>
+                个
+                <button type="button"
+                  class="editBtn editBtn-info related-btn"
+                  id="relatedScheduleBtn"
+                  onclick="fenceOperation.toggleRelatedDiv(this)">
+                  <i class="fa fa-sun-o"></i>详情
+                </button>
+                <div class="related" id="relatedScheduleDetail"></div>
+              </div>
+              <label class="col-md-3 control-label">关联任务：</label>
+              <div class="col-md-3 " style="padding-top:2px">
+                <span id="relatedDesignateNumber"></span>
+                个
+                <button type="button"
+                  class="editBtn editBtn-info related-btn"
+                  id="relatedDesignateBtn"
+                  onclick="fenceOperation.toggleRelatedDiv(this)">
+                  <i class="fa fa-sun-o"></i>详情
+                </button>
+                <div class="related" id="relatedDesignateDetail"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<label id="error_label" class='error' style='display: none;'></label>
+<div th:replace="fragments/footer_realTime">footer</div>
+<div id="rMenu"></div>
+</body>
+<script type="text/javascript"
+  src="https://webapi.amap.com/maps?v=1.4.2&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor,AMap.MarkerClusterer,AMap.GeometryUtil"></script>
+<script src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/clockPlugins.js"></script>
+<script src="/clbs/resources/js/zTree/js/ztreeSearch.js"></script>
+
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="resources/js/clipboard.min.js" th:src="@{/resources/js/clipboard.min.js}"></script>
+<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/localization/messages_zh.js"></script>
+<script src="/wro/electronicFence.js" th:src="@{/wro/electronicFence.js}"></script>
+<script src="/clbs/resources/js/fenceHandle.js"></script>
+
+<script th:inline="javascript">
+  var systemError = [[#{system.error}]];
+  var lineNameNull = [[#{line.name.null}]];
+  var deviationNull = [[#{deviation.null}]];
+  var areaNameNull = [[#{area.name.null}]];
+  var markerNameNull = [[#{marker.name.null}]];
+  var accError = [[#{realTimeMonitoring.acc.error}]];
+  var trackAreaMonitorNull = [[#{track.areaMonitor.null}]];
+  var treeCheckError = [[#{tree.check.error}]];
+  var treeMaxLength5000 = [[#{tree.maxLength5000}]];
+  var userDeleteChooseNull = [[#{user.delete.choose.null}]];
+  var drivingTimeNull = [[#{dataTableOperation.drivingTime.null}]];
+  var sleepTimeNull = [[#{dataTableOperation.sleepTime.null}]];
+  var sosTimeNull = [[#{dataTableOperation.sosTime.null}]];
+  var defaultTimeNull = [[#{dataTableOperation.defaultTime.null}]];
+  var recordingNull = [[#{dataTableOperation.recording.null}]];
+  var positionNull = [[#{dataTableOperation.position.null}]];
+  var reportNull = [[#{dataTableOperation.report.null}]];
+  var fixedPointNull = [[#{dataTableOperation.fixedPoint.null}]];
+  var trackingNull = [[#{dataTableOperation.tracking.null}]];
+  var intervalTimeNull = [[#{dataTableOperation.intervalTime.null}]];
+  var trackingIntervalNull = [[#{dataTableOperation.trackingInterval.null}]];
+  var maxSpeedNull = [[#{dataTableOperation.maxSpeed.null}]];
+  var maxSpeedError = [[#{dataTableOperation.maxSpeed.error}]];
+  var timeError = [[#{dataTableOperation.time.error}]];
+  var speedTimeNull = [[#{dataTableOperation.speedTime.null}]];
+  var textNull = [[#{dataTableOperation.text.null}]];
+  var questionsNull = [[#{dataTableOperation.questions.null}]];
+  var answerNull = [[#{dataTableOperation.answer.null}]];
+  var instructionError = [[#{dataTableOperation.instruction.null}]];
+  var publicNumberFloat = [[#{public.number.float}]];
+  var publicNumberInt = [[#{public.number.int}]];
+  var publicSizeMoreLength = [[#{public.sizeMore.length}]];
+  var phoneNull = [[#{phone.null}]];
+  var phoneError = [[#{phone.error}]];
+  var publicNull = [[#{public.null}]];
+  var publicIssuedSuccess = [[#{public.Issued.success}]];
+  var publicIssuedError = [[#{public.Issued.error}]];
+  var publicIssuedFailure = [[#{public.Issued.failure}]];
+  var publicInputStartTime = [[#{public.input.startTime}]];
+  var publicInputEndTime = [[#{public.input.endTime}]];
+  var publicSize10 = [[#{public.size10.length}]];
+  var publicSize20 = [[#{public.size20.length}]];
+  var publicSize50 = [[#{public.size50.length}]];
+  var publicSize100 = [[#{public.size100.length}]];
+  var publicSelectGroupNull = [[#{public.selectGroup.null}]];
+  var publicNumberNull = [[#{public.number.null}]];
+  var alarmSearchChannelID = [[#{alarmSearch.channel.ID}]];
+  var alarmSearchIntervalTime = [[#{alarmSearch.interval.time}]];
+  var alarmSearchIntervalError = [[#{alarmSearch.interval.error}]];
+  var alarmSearchIntervalSize = [[#{alarmSearch.interval.size}]];
+  var alarmSearchPhotoSize = [[#{alarmSearch.photo.size}]];
+  var alarmSearchPhotoNull = [[#{alarmSearch.photo.null}]];
+  var alarmSearchSaveNull = [[#{alarmSearch.save.null}]];
+  var alarmSearchResolutionNull = [[#{alarmSearch.resolution.null}]];
+  var alarmSearchMovieSize = [[#{alarmSearch.movie.size}]];
+  var alarmSearchMovieNull = [[#{alarmSearch.movie.null}]];
+  var alarmSearchBrightnessSize = [[#{alarmSearch.brightness.size}]];
+  var alarmSearchBrightnessNull = [[#{alarmSearch.brightness.null}]];
+  var alarmSearchContrastSize = [[#{alarmSearch.contrast.size}]];
+  var alarmSearchContrastNull = [[#{alarmSearch.contrast.null}]];
+  var alarmSearchSaturatedSize = [[#{alarmSearch.saturated.size}]];
+  var alarmSearchSaturatedNull = [[#{alarmSearch.saturated.null}]];
+  var alarmSearchColorSize = [[#{alarmSearch.color.size}]];
+  var alarmSearchColorNull = [[#{alarmSearch.color.null}]];
+  var fenceOperationLableEdit = [[#{fenceOperation.lable.edit}]];
+  var fenceOperationAreaReelect = [[#{fenceOperation.area.reelect}]];
+  var fenceOperationFenceDeleteConfirm = [[#{fenceOperation.fence.deleteConfirm}]];
+  var fenceOperationOperationSelect = [[#{fenceOperation.operation.select}]];
+  var fenceOperationLineSubsection = [[#{fenceOperation.line.subsection}]];
+  var fenceOperationPointNameNull = [[#{fenceOperation.point.name.null}]];
+  var fenceOperationArriveTimeSelect = [[#{fenceOperation.arriveTime.select}]];
+  var fenceOperationLeaveTimeSelect = [[#{fenceOperation.leaveTime.select}]];
+  var fenceOperationAlTimeCheck = [[#{fenceOperation.alTime.check}]];
+  var fenceOperationOffsetNull = [[#{fenceOperation.offset.null}]];
+  var fenceOperationScope255 = [[#{fenceOperation.scope255}]];
+  var fenceOperationScope65535 = [[#{fenceOperation.scope65535}]];
+  var fenceOperationOverLength = [[#{fenceOperation.overLength}]];
+  var fenceOperationTooShort = [[#{fenceOperation.tooShort}]];
+  var fenceOperationMaxSpeed = [[#{fenceOperation.maxSpeed}]];
+  var fenceOperationOverSpeedTime = [[#{fenceOperation.overSpeedTime}]];
+  var fenceOperationLongitudeNull = [[#{fenceOperation.longitude.null}]];
+  var fenceOperationLongitudeScope = [[#{fenceOperation.longitude.scope}]];
+  var fenceOperationLatitudeNull = [[#{fenceOperation.latitude.null}]];
+  var fenceOperationLatitudeScope = [[#{fenceOperation.latitude.scope}]];
+  var fenceOperationLableExist = [[#{fenceOperation.lable.exist}]];
+  var fenceOperationLineExist = [[#{fenceOperation.line.exist}]];
+  var fenceOperationRectangleExist = [[#{fenceOperation.rectangle.exist}]];
+  var fenceOperationLoAlaNull = [[#{fenceOperation.loAla.null}]];
+  var fenceOperationLoAlaError = [[#{fenceOperation.loAla.error}]];
+  var fenceOperationPolygonExist = [[#{fenceOperation.polygon.exist}]];
+  var fenceOperationCircleExist = [[#{fenceOperation.circle.exist}]];
+  var fenceOperationLongitudeError = [[#{fenceOperation.longitude.error}]];
+  var fenceOperationLatitudeError = [[#{fenceOperation.latitude.error}]];
+  var fenceOperationCircleRadiusNull = [[#{fenceOperation.circle.radius.null}]];
+  var fenceOperationMonitorNull = [[#{fenceOperation.monitor.null}]];
+  var fenceOperationFenceBound = [[#{fenceOperation.fence.bound}]];
+  var fenceOperationFenceBoundSuccess = [[#{fenceOperation.fence.bound.success}]];
+  var fenceOperationFenceIssue = [[#{fenceOperation.fence.issue}]];
+  var fenceOperationDataNull = [[#{fenceOperation.data.null}]];
+  var fenceOperationTravelLineExist = [[#{fenceOperation.travelLine.exist}]];
+  var fenceOperationTravelLineError = [[#{fenceOperation.travelLine.error}]];
+  var fenceOperationTravelLineStart = [[#{fenceOperation.travelLine.start}]];
+  var fenceOperationTravelLineEnd = [[#{fenceOperation.travelLine.end}]];
+  var fenceOperationJudgementASExist = [[#{fenceOperation.judgementAS.exist}]];
+  var fenceManageFenceNameError = [[#{fenceManage.fenceName.error}]];
+  var treeMonitoringResetTrue = [[#{treeMonitoring.reset.true}]];
+  var oilElectricMsgTrue = [[#{treeMonitoring.oilElectricMsg.true}]];
+  var oilElectricMsgSuccess = [[#{treeMonitoring.oilElectricMsg.success}]];
+  var oilElectricMsgError = [[#{treeMonitoring.oilElectricMsg.error}]];
+  var oilElectricMsgLength6 = [[#{treeMonitoring.oilElectricMsg.length6}]];
+  var oilElectricMsgRecording = [[#{treeMonitoring.oilElectricMsg.recording}]];
+  var effectiveTimeLength5 = [[#{treeMonitoring.effectiveTime.length5}]];
+  var effectiveTimeNull = [[#{treeMonitoring.effectiveTime.null}]];
+
+  var alarmError = [[#{dataTableOperation.alarm.error}]];
+  var alarmDisabled = [[#{dataTableOperation.alarm.disabled}]];
+  var maxSpeedErrorScope = [[#{dataTableOperation.msxSpeed.errorScope}]];
+
+  var requiredInt = [[#{required.int}]];
+
+  var videoRequestUrl = [[${session.videoUrl}]];
+  var videoRequestPort = [[${session.videoPort}]];
+  var vehicleBrandError = [[#{vehicle.brand.error}]];
+  var vehicleBrandNull = [[#{vehicle.brand.null}]];
+  var vehicleBrandMaxlength = [[#{vehicle.brand.maxlength}]];
+  var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+</script>
+</html>

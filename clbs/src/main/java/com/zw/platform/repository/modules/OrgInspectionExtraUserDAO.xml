@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.OrgInspectionExtraUserDAO">
+
+    <insert id="saveAll">
+        INSERT IGNORE INTO zw_m_org_inspection_extra_user(username, org_id, create_data_username) VALUES
+        <foreach collection="collection" item="item" separator=",">
+            (#{item.username}, #{item.orgId}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <select id="listUsernameByOrgId" resultType="java.lang.String">
+        SELECT username FROM zw_m_org_inspection_extra_user WHERE org_id = #{orgId}
+    </select>
+
+    <select id="listByUsernameIn" resultType="com.zw.platform.domain.connectionparamsset_809.OrgInspectionExtraUserDO">
+        SELECT username, org_id FROM zw_m_org_inspection_extra_user WHERE username IN
+        <foreach collection="collection" item="username" separator="," open="(" close=")">
+            #{username}
+        </foreach>
+    </select>
+
+    <delete id="deleteByOrgId">
+        DELETE FROM zw_m_org_inspection_extra_user WHERE org_id = #{orgId}
+    </delete>
+
+    <delete id="deleteByUsernameIn">
+        DELETE FROM zw_m_org_inspection_extra_user
+        WHERE username IN
+        <foreach collection="collection" item="username" separator="," open="(" close=")">
+            #{username}
+        </foreach>
+    </delete>
+</mapper>

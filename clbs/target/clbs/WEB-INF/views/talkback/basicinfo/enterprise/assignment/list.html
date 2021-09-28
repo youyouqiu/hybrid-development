@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>群组管理</title>
+  <div th:replace="fragments/header">header</div>
+  <link rel="stylesheet" href="/clbs/resources/css/electronicFence.css" th:src="@{/clbs/resources/css/electronicFence.css}">
+</head>
+<style>
+  .openTape {
+    border: none;
+    font-size: 14px;
+    border-radius: 17px;
+    padding: 4px 9px;
+    margin-bottom: 0;
+    background-color: rgb(26, 188, 156);
+    color: #fff;
+    transition: background-color .5s;
+    -moz-transition: background-color .5s; /* Firefox 4 */
+    -webkit-transition: background-color .5s; /* Safari 和 Chrome */
+    -o-transition: background-color .5s; /* Opera */
+  }
+
+  .openTape:hover {
+    background-color: rgb(23, 158, 131);
+    color: #fff;
+  }
+
+  .shutTape {
+    border: none;
+    font-size: 14px;
+    border-radius: 17px;
+    padding: 4px 9px;
+    margin-bottom: 0;
+    background-color: #ccc;
+    color: #fff;
+    transition: background-color .5s;
+    -moz-transition: background-color .5s; /* Firefox 4 */
+    -webkit-transition: background-color .5s; /* Safari 和 Chrome */
+    -o-transition: background-color .5s; /* Opera */
+  }
+
+  .shutTape:hover {
+    background-color: #ababab;
+  }
+</style>
+<body>
+<section id="container">
+  <div th:replace="fragments/nav">nav</div>
+  <section class="main-content-wrapper">
+    <div th:replace="fragments/menu">menu</div>
+    <section id="main-content">
+      <div class="row eightIsZero">
+        <div class="col-md-12">
+          <ul class="breadcrumb">
+            <li><a th:href="@{/}">首页</a></li>
+            <li class="active">对讲管理</li>
+            <li class="active">群组管理</li>
+          </ul>
+          <h1 class="h1 ">群组管理</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="leftTreeBox noPadding">
+            <div th:replace="core/uum/group/list">list</div>
+          </div>
+          <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+            <div class="panel panel-default" id="panelBodyWid">
+              <div class="panel-heading" id="stretch">
+                <h3 class="panel-title fwb">群组列表</h3>
+                <div class="actions pull-right listActions">
+                  <i class="fa chevron-down" id="stretch-chevron"></i>
+                </div>
+              </div>
+              <div class="panel-body fixed-table-body" id="stretch-body">
+                <div class="ToolPanel">
+                  <div class="bars pull-left">
+                    <div class="btn-group pull-left barsMargin" role="group">
+                      <form role="form" id="ipScForm">
+                        <label id="formLabDis">
+                          <input autocomplete="off" type="text" class="Inlinesearch form-control"
+                            id="simpleQueryParam" name="simpleQueryParam"
+                            placeholder="请输入群组名称">
+                        </label>
+                        <button type="button" id="search_button"
+                          onclick="myTable.requestData()"
+                          class="btn btn-outline btn-default">搜索
+                        </button>
+                        <input id="hiddenText" type="text" style="display:none" />
+                      </form>
+                    </div>
+                    <div th:if="${hasRole}" class="dropdown pull-left">
+                      <button class="btn btn-default dropdown-toggle" type="button"
+                        id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="true">操作菜单<span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a th:href="@{/talkback/basicinfo/enterprise/assignment/add}" id="addId"
+                          data-toggle="modal" data-target="#commonWin"><i
+                          class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+                        <li><a th:href="@{/talkback/basicinfo/enterprise/assignment/export}"
+                          id="exportId"><i
+                          class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                        </li>
+                        <li><a href="javascript:void(0);" id="del_model"><i
+                          class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量解绑</a>
+                        </li>
+                        <!--<li><a th:href="@{/m/basicinfo/enterprise/assignment/import}" id="importId" data-toggle="modal" data-target="#commonSmWin"><i class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a></li>-->
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="columns btn-group pull-right groupRefShowRight">
+                    <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                      title="刷新">
+                      <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                    </button>
+                    <div class="keep-open btn-group" title="定制显示列">
+                      <button id="customizeColumns" type="button"
+                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <i class="glyphicon glyphicon-th icon-th"></i> <span
+                        class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <table id="dataTable"
+                  class="table table-striped table-bordered table-hover checkTable"
+                  cellspacing="0" width="100%">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th><input
+                      type="checkbox" id="checkAll"></th>
+                    <th>操作设置</th>
+                    <th>群组名称</th>
+                    <th>所属组织</th>
+                    <th>组呼号码</th>
+                    <th>录音状态</th>
+                    <th>联系人</th>
+                    <th>电话号码</th>
+                    <th>备注</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+  var selectItem = [[#{select.item}]];
+</script>
+<script src="/wro/assignmentListForDispatch.js" th:src="@{/wro/assignmentListForDispatch.js}"></script>
+</body>
+</html>

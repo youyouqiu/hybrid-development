@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.OriginalModelDao">
+
+    <select id="findOriginalModelAndIntercomModel"
+            resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        SELECT om.`index` as id, om.model_id, om.model_name, inm.`name` AS intercomName FROM zw_m_original_model om
+        LEFT JOIN zw_m_intercom_model inm ON om.`index` = inm.original_model_id AND inm.flag = 1
+        where om.flag = 1
+    </select>
+    <select id="getOriginalModelByModelId" resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        SELECT om.* ,inm.`name` AS intercomName FROM zw_m_original_model om
+        LEFT JOIN zw_m_intercom_model inm ON om.`index` = inm.original_model_id and inm.flag = 1
+        WHERE om.flag = 1 and om.`index` = #{originalModelId}
+    </select>
+    <select id="findAllOriginalModelInfo" resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+         SELECT om.`index`, om.model_id, inm.name AS intercomName FROM zw_m_original_model om
+        LEFT JOIN zw_m_intercom_model inm ON om.`index` = inm.original_model_id and  inm.flag = 1
+        where om.flag = 1
+    </select>
+
+    <insert id="addOriginalModel" parameterType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        INSERT INTO
+        zw_m_original_model(`index`,model_id,model_name,type,audio_ability,gis_ability,sensor_ability,video_ability,knob_num,max_group_num,max_friend_num,seneor_ctl_mx,
+        serial485_num,serial232_num,temp_group_enable,intercept_enable,intercept_num,patrol_enable,fence_enable,audio_conference_enable,video_conference_enable,
+        video_call_enable,send_text_enable,send_image_enable,send_audio_enable,support_locate,video_func_enable,chanls_num,comments,flag)
+        VALUES
+        <foreach collection="originalModelInfos" item="item" separator=",">
+            (#{item.index}, #{item.modelId}, #{item.modelName}, #{item.type}, #{item.audioAbility}, #{item.gisAbility},
+                #{item.sensorAbility}, #{item.videoAbility}, #{item.knobNum}, #{item.maxGroupNum}, #{item.maxFriendNum},
+                #{item.seneorCtlMx}, #{item.serial485num},#{item.serial232num},#{item.tempGroupEnable},
+                #{item.interceptEnable}, #{item.interceptNum}, #{item.patrolEnable}, #{item.fenceEnable},
+                #{item.audioConferenceEnable}, #{item.videoConferenceEnable}, #{item.videoCallEnable},
+                #{item.sendTextEnable}, #{item.sendImageEnable},#{item.sendAudioEnable},#{item.supportLocate},
+                #{item.videoFuncEnable},#{item.chanlsNum}, #{item.comments},1)
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        `index` = values(`index`), model_id = values(model_id), model_name = values(model_name), type = values(type),
+        audio_ability = values(audio_ability), gis_ability = values(gis_ability), sensor_ability =
+        values(sensor_ability), video_ability = values(video_ability), knob_num = values(knob_num),
+        max_group_num = values(max_group_num), max_friend_num = values(max_friend_num), seneor_ctl_mx =
+        values(seneor_ctl_mx), serial485_num = values(serial485_num)
+        , serial232_num = values(serial232_num), temp_group_enable = values(temp_group_enable), intercept_enable =
+        values(intercept_enable), intercept_num = values(intercept_num), patrol_enable =
+        values(patrol_enable), fence_enable = values(fence_enable), audio_conference_enable =
+        values(audio_conference_enable) , video_conference_enable = values(video_conference_enable), video_call_enable =
+        values(video_call_enable), send_text_enable = values(send_text_enable), send_image_enable =
+        values(send_image_enable), send_audio_enable = values(send_audio_enable), support_locate =
+        values(support_locate), video_func_enable = values(video_func_enable) , chanls_num = values(chanls_num),
+        comments = values(comments)
+    </insert>
+    <select id="getOriginalModelByIndex" resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        select * from zw_m_original_model where  `index` =#{index} and flag =1
+    </select>
+    <select id="getAllOriginalModel" resultType="hashmap">
+           select `index`,model_id as modelId from zw_m_original_model where flag =1 and `index` not in (SELECT DISTINCT original_model_id from zw_m_intercom_model where flag =1) or `index`=#{index}
+
+    </select>
+
+    <select id="getOriginalModelList" resultType="com.zw.talkback.domain.intercom.info.OriginalModelInfo">
+        SELECT om.* ,inm.`name` AS intercomName FROM zw_m_original_model om
+        LEFT JOIN zw_m_intercom_model inm ON om.`index` = inm.original_model_id
+        WHERE om.flag = 1
+    </select>
+</mapper>

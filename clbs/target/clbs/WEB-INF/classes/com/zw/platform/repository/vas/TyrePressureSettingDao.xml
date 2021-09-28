@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.TyrePressureSettingDao">
+
+    <select id="findTyrePressureSettingByIds" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        SELECT
+        DISTINCT  tsv.svId id, v.id AS vehicleId,v.monitorType,
+        v.brand as brand,
+        tsv.*
+        FROM
+        (
+        SELECT car.id id, car.brand brand, '0' monitorType,car.create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'1' monitorType,peo.create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time FROM zw_m_thing_info th WHERE th.flag=1
+        ) v
+        LEFT JOIN
+        (
+        SELECT
+        sv.id  svId,
+        sv.vehicle_id svVehicleId,
+        sv.sensor_id sensorId,
+        sv.number_of_tires numberOfTires,
+        sv.individuality_parameters tyrePressureParameterStr,
+        sif.sensor_number sensorName,
+        sif.compensate compensate,
+        sif.filter_factor filterFactor,
+        sif.sensor_type sensorType
+        FROM zw_m_sensor_vehicle sv,zw_m_sensor_info sif WHERE sif.id=sv.sensor_id AND sif.flag=1
+        AND sv.flag=1 AND sif.sensor_type= 7
+        ) tsv ON tsv.svVehicleId = v.id
+        WHERE 1 =1
+        <if test="list != null and list.size() > 0">
+            AND v.id IN
+            <foreach item="item" collection="list" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY v.create_data_time DESC,v.id asc
+    </select>
+
+    <select id="findTyrePressureSetting" resultType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        SELECT DISTINCT svi.*,vi.id AS vehicleId,vi.brand AS plateNumber,vi.group_id
+        FROM zw_m_vehicle_info vi
+        INNER JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag  = 1
+        INNER JOIN zw_m_assignment_vehicle assv ON assv.vehicle_id = vi.id AND assv.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = ass.id AND au.flag = 1
+        LEFT JOIN (
+        SELECT sv.id,sv.vehicle_id AS sVehicleId,sv.sensor_id, si.filter_factor,
+        si.compensate,si.sensor_type,si.sensor_number as sensorName,sv.individuality_parameters as tyrePressureParameterStr
+        FROM zw_m_sensor_vehicle sv
+        LEFT JOIN zw_m_sensor_info si ON si.id = sv.sensor_id AND si.flag = 1
+        WHERE sv.flag = 1 AND si.sensor_type = 7
+        ) svi ON svi.sVehicleId = vi.id
+
+        WHERE vi.flag = 1
+        AND au.user_id = #{userId}
+        AND vi.brand NOT LIKE '扫%'
+        AND ass.org_id IN
+        <foreach item="item" collection="list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="query != null">
+            <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+                AND (vi.brand LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                OR si.sensor_number LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                )
+            </if>
+            <if test="query.groupId != null and query.groupId!=''">
+                AND ass.org_id = #{query.groupId}
+            </if>
+            <if test="query.assignmentId != null and query.assignmentId!=''">
+                AND ass.id = #{query.assignmentId}
+            </if>
+
+            <if test="query.protocol != null and query.protocol!=''">
+                AND di.device_type = #{query.protocol}
+            </if>
+
+            <if test="query.vehicleId != null and query.vehicleId!=''">
+                AND vi.id = #{query.vehicleId}
+            </if>
+        </if>
+        ORDER BY vi.create_data_time DESC
+    </select>
+
+    <select id="findExistByVid" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        SELECT
+        sv.id
+        from
+        zw_m_sensor_vehicle sv
+        inner join zw_m_sensor_info si on si.id = sv.sensor_id
+        where
+        sv.vehicle_id = #{vid}
+        and si.sensor_type = 7
+        and sv.flag = 1
+        and si.flag = 1
+    </select>
+
+    <!-- 新增 -->
+    <insert id="addTyrePressureSetting"  parameterType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        insert into zw_m_sensor_vehicle
+        (id,vehicle_id,sensor_id,flag,create_data_username,create_data_time,number_of_tires,individuality_parameters)
+        values
+        (#{id},#{vehicleId},#{sensorId},#{flag},#{createDataUsername},#{createDataTime},#{numberOfTires},#{tyrePressureParameterStr})
+    </insert>
+
+    <!--  根据ID查询传感器 -->
+    <select id="findTyrePressureSettingById" parameterType="string"  resultType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        SELECT
+        sv.id,sv.vehicle_id,sv.sensor_id ,sv.number_of_tires,sv.individuality_parameters as tyrePressureParameterStr,
+        si.compensate, si.filter_factor, si.sensor_number as sensorName
+        FROM zw_m_sensor_vehicle sv
+        inner join zw_m_sensor_info si on  si.id = sv.sensor_id
+        WHERE sv.flag = 1
+        and si.flag = 1
+        and si.sensor_type = 7
+        AND sv.id = #{id}
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateTyrePressureSetting"  parameterType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        update zw_m_sensor_vehicle
+        set
+        vehicle_id = #{vehicleId},
+        sensor_id = #{sensorId},
+        number_of_tires = #{numberOfTires},
+        individuality_parameters = #{tyrePressureParameterStr},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where
+        flag = 1
+        and
+        id = #{id}
+    </update>
+
+    <!--  删除 -->
+    <update id="deleteTyrePressureSetting" parameterType="string" >
+        update zw_m_sensor_vehicle
+        set
+        flag = 0
+        where
+        id = #{id}
+    </update>
+
+    <!--  根据传感器名查询  校验唯一性 -->
+    <update id="deleteMore" parameterType="string" >
+        update zw_m_sensor_vehicle
+        set
+        flag = 0
+        where
+        id in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <!--  根据vid查询 -->
+    <select id="findTyrePressureSettingByVid" parameterType="string"  resultType="com.zw.platform.domain.basicinfo.form.TyrePressureSettingForm">
+        SELECT
+        sv.id,sv.vehicle_id,sv.sensor_id ,si.compensate ,si.filter_factor ,sv.number_of_tires,sv.individuality_parameters as tyrePressureParameterStr
+        FROM zw_m_sensor_vehicle sv
+        inner join zw_m_sensor_info si on sv.sensor_id = si.id
+        WHERE sv.flag = 1
+        and si.flag = 1
+        and si.sensor_type = 7
+        AND vehicle_id = #{vid}
+    </select>
+
+</mapper>

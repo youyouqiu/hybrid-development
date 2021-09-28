@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>基准信息录入</title>
+<div th:replace="fragments/header">header</div>
+</head>
+<body>
+	<section id="container">
+		<div th:replace="fragments/nav">nav</div>
+		<div th:replace="fragments/menu">menu</div>
+		<!--main content start-->
+		<section class="main-content-wrapper">
+			<section id="main-content">
+				<div class="row">
+					<div class="col-md-12">
+						<!--breadcrumbs start -->
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">碳排放监管</li>
+							<li class="active">基准信息录入</li>
+						</ul>
+						<!--breadcrumbs end -->
+						<h1 class="h1 ">基准信息录入</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h3 class="panel-title fwb">基准信息录入列表</h3>
+									<div class="actions pull-right">
+										<i class="fa fa-chevron-down"></i>
+									</div>
+								</div>
+								<div class="panel-body fixed-table-body">
+									<!--工具面板-->
+									<div class="ToolPanel">
+										<div class="bars pull-left">
+											<div class="btn-group pull-left barsMargin" role="group">
+												<form role="form"> 
+													<label><input type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" placeholder="请输入关键字"></label>
+													<button type="button" id="search_button" onclick="myTable.filter()" class="btn btn-outline btn-default">搜索</button>
+													<input id="hiddenText" type="text" style="display:none" />
+												 </form> 
+											</div>
+											<div th:if="${hasRole}" class="dropdown pull-left">
+												<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+													<li><a th:href="@{/v/carbonmgt/equipEntry/add}" id="addId" data-toggle="modal" data-target="#commonWin"><i class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+													<li><a href="#" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a></li>
+												</ul>
+											</div>
+										</div>
+										<div class="columns btn-group pull-right InformationEntry">
+											<button id="refreshTable" class="btn btn-default" type="button" name="refresh" title="刷新">
+												<i class="glyphicon glyphicon-refresh icon-refresh"></i>
+											</button>
+											<div class="keep-open btn-group" title="定制显示列">
+												<button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+													<i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+												</button>
+												<ul class="dropdown-menu" role="menu" id="Ul-menu-text">                
+												</ul>
+											</div>
+										</div>
+									</div>
+									<table id="dataTable"
+									class="table table-striped table-bordered table-hover"
+									cellspacing="0" width="100%">
+									<thead>
+										<tr>
+											<th style="width: 1px; padding: 0"></th>
+											<th style="width: 30px; padding: 10px"><input
+												type="checkbox" id="checkAll"></th>
+												<th>操作设置</th>
+												<th>车牌号</th>
+												<th>所属企业</th>
+                                                <th>车辆类型</th>
+												<th>燃料类型</th>
+												<th>里程基准能耗</th>
+												<th>怠速基准能耗</th>
+												<th>时间基准能耗</th>
+												<th>工时基准能耗</th>
+											</tr>
+										</thead>
+
+									</table>
+								</div>
+							</div>
+					</div>
+				</div>
+			</section>
+		</section>
+	</section>
+	<div th:replace="fragments/footer">footer</div>
+</body>
+<!--/***** 当前页js end *****/-->
+<script th:inline="javascript">
+(function(window,$){
+	
+	//显示隐藏列
+	var menu_text = "";
+	var table = $("#dataTable tr th:gt(1)");
+	var subChk = $("input[name='subChk']");
+	
+	baselineInformationEntry = {
+			
+		init: function(){
+			
+			menu_text += "<li><label><input type=\"checkbox\" checked=\"checked\" class=\"toggle-vis\" data-column=\"" + parseInt(2) +"\" disabled />"+ table[0].innerHTML +"</label></li>"
+			for(var i = 1; i < table.length; i++){
+			    menu_text += "<li><label><input type=\"checkbox\" checked=\"checked\" class=\"toggle-vis\" data-column=\"" + parseInt(i+2) +"\" />"+ table[i].innerHTML +"</label></li>"
+			};
+			$("#Ul-menu-text").html(menu_text);
+			//表格列定义
+			var columnDefs = [ {
+				//第一列，用来显示序号
+				"searchable" : false,
+				"orderable" : false,
+				"targets" : 0
+			} ];
+			var columns = [
+				{
+					//第一列，用来显示序号
+					"data" : null,
+					"class" : "text-center"
+				},
+				{
+					"data" : null,
+					"class" : "text-center",
+					render : function(data, type, row, meta) {
+						var result = '';
+						result += '<input  type="checkbox" name="subChk"  value="' + row.id + '" />';
+						return result;
+					}
+				},
+				{
+					"data" : null,
+					"class" : "text-center", //最后一列，操作按钮
+					render : function(data, type, row, meta) {
+						var editUrlPath = myTable.editUrl + row.id + ".gsp"; //修改地址
+						var result = '';
+						//修改按钮
+						result += '<button href="'+editUrlPath+'" data-target="#commonWin" data-toggle="modal"  type="button" class="editBtn editBtn-info"><i class="fa fa-pencil"></i>修改</button>&nbsp;';
+						//删除按钮
+						result += '<button type="button" onclick="myTable.deleteItem(\''
+								+ row.id
+								+ '\')" class="deleteButton editBtn disableClick"><i class="fa fa-trash-o"></i>删除</button>';
+						return result;
+					}
+				}, {
+					"data" : "brand",
+					"class" : "text-center"
+				}, {
+					"data" : "groupName",
+					"class" : "text-center"
+				},{
+					"data" : "vehicleType",
+					"class" : "text-center",
+				},  {
+					"data" : "fuelType",
+					"class" : "text-center"
+				}, {
+					"data" : "mileageBenchmark", 
+					"class" : "text-center"
+				}, {
+					"data" : "idleBenchmark",
+					"class" : "text-center"
+				},  {
+					"data" : "timeBenchmark",
+					"class" : "text-center"
+				}, {
+					"data" : "workHoursBenchmark",
+					"class" : "text-center"
+				}
+			];//ajax参数
+			var ajaxDataParamFun = function(d) {
+				d.simpleQueryParam = $('#simpleQueryParam').val(); //模糊查询
+			};
+			//表格setting
+			var setting = {
+				listUrl : /*[[@{/v/carbonmgt/equipEntry/list}]]*/'url',
+				editUrl : /*[[@{/v/carbonmgt/equipEntry/edit_}]]*/'url',
+				deleteUrl : /*[[@{/v/carbonmgt/equipEntry/delete_}]]*/'url',
+				deletemoreUrl : /*[[@{/v/carbonmgt/equipEntry/deletemore}]]*/'url',
+				enableUrl : /*[[@{/c/user/enable_}]]*/'url',
+				disableUrl : /*[[@{/c/user/disable_}]]*/'url',
+				columnDefs : columnDefs, //表格列定义
+				columns : columns, //表格列
+				dataTableDiv : 'dataTable', //表格
+				ajaxDataParamFun : ajaxDataParamFun, //ajax参数
+				pageable : true, //是否分页
+				showIndexColumn : true, //是否显示第一列的索引列
+				enabledChange : true
+			};
+			//创建表格
+			myTable = new TG_Tabel.createNew(setting);
+			//表格初始化
+			myTable.init();
+			
+		},
+		//全选
+		checkAllClick: function(){
+			$("input[name='subChk']").prop("checked", this.checked);
+		},
+		//单选
+		subChk: function(){
+			$("#checkAll").prop("checked",subChk.length == subChk.filter(":checked").length ? true: false);
+		},
+		//批量删除
+		delModel: function(){
+			//判断是否至少选择一项
+			var chechedNum = $("input[name='subChk']:checked").length;
+			if (chechedNum == 0) {
+				layer.msg([[#{select.item}]]);
+				return
+
+			}
+			var checkedList = new Array();
+			$("input[name='subChk']:checked").each(function() {
+				checkedList.push($(this).val());
+			});
+			myTable.deleteItems({
+				'deltems' : checkedList.toString()
+			});
+		},
+		//刷新
+		refreshTable: function(){
+        	$("#simpleQueryParam").val("");
+        	myTable.filter();
+		},
+			
+	}
+	
+	$(function(){
+		
+		baselineInformationEntry.init();
+		//全选
+		$("#checkAll").bind("click",baselineInformationEntry.checkAllClick);
+		//单选
+		subChk.bind("click",baselineInformationEntry,subChk);
+		//批量删除
+		$("#del_model").bind("click",baselineInformationEntry.delModel);
+		$("#refreshTable").bind("click",baselineInformationEntry.refreshTable);
+		
+	})
+	
+})(window,$)
+</script>
+</html>

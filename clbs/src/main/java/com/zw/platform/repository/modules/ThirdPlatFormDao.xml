@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ThirdPlatFormDao">
+    <select id="findList" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigQuery"
+            resultType="com.zw.platform.domain.forwardplatform.ThirdPlatForm">
+        SELECT t.id,t.status,t.platform_ip,t.platform_port,t.description,t.create_data_time,t.create_data_username,
+        t.update_data_time,t.update_data_username FROM zw_m_third_platform t where flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND t.description LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        ORDER BY t.create_data_time DESC
+    </select>
+
+    <select id="findById" parameterType="string" resultType="com.zw.platform.domain.forwardplatform.ThirdPlatForm">
+        SELECT t.id,t.status,t.platform_ip,t.platform_port,t.description,t.create_data_time,t.create_data_username,
+        t.update_data_time,t.update_data_username FROM zw_m_third_platform t where flag=1 AND t.id = #{id}
+    </select>
+    
+    <select id="findByIds" parameterType="java.util.List" resultType="com.zw.platform.domain.forwardplatform.ThirdPlatForm">
+        SELECT t.id,t.status,t.platform_ip,t.platform_port,t.description,t.create_data_time,t.create_data_username,
+        t.update_data_time,t.update_data_username FROM zw_m_third_platform t where flag=1 AND t.id IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+        	#{id}
+        </foreach>
+    </select>
+
+
+    <insert id="add" parameterType="com.zw.platform.domain.forwardplatform.ThirdPlatForm">
+        INSERT INTO zw_m_third_platform(id,status,platform_ip,platform_port,description,flag,
+          create_data_time,create_data_username) VALUES (#{id},#{status},#{platformIp},
+          #{platformPort},#{description},1,#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.domain.forwardplatform.ThirdPlatForm">
+        UPDATE zw_m_third_platform SET status = #{status},flag = 1,platform_ip=#{platformIp},platform_port = #{platformPort},
+        description = #{description},update_data_time = #{updateDataTime},update_data_username=#{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds" parameterType="java.util.List">
+        UPDATE zw_m_third_platform SET flag = 0  WHERE flag = 1 AND id IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+        	#{id}
+        </foreach>
+    </update>
+
+    <select id="findConfigViewList" parameterType="com.zw.platform.domain.intercomplatform.IntercomPlatFormConfigQuery"
+            resultType="com.zw.platform.domain.forwardplatform.ThirdPlatFormConfigView">
+        SELECT pc.id,p.id AS third_platform_id,c.id AS config_id ,p.platform_port AS third_platform_port,p.platform_ip
+        AS third_platform_ip,v.brand,v.id AS vehicle_id,p.description AS third_platform_description
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_third_platform_config pc ON c.id = pc.config_id AND pc.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id AND v.flag = 1
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (v.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR p.description LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        WHERE c.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConfigViewListByVehicleId"
+            resultType="com.zw.platform.domain.forwardplatform.ThirdPlatFormConfigView">
+        SELECT pc.id,p.id AS third_platform_id,c.id AS config_id ,p.platform_port AS third_platform_port,p.platform_ip AS third_platform_ip,v.brand,v.id AS vehicle_id,p.description AS third_platform_description
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_third_platform_config pc ON c.id = pc.config_id AND pc.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1 AND v.id = #{vehicleId}
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="addConfig">
+        INSERT INTO zw_m_third_platform_config(id,config_id,third_platform_id,flag,create_data_time,create_data_username)
+        VALUES (#{id},#{configId},#{thirdPlatformId},
+        1,#{createDataTime},#{createDataUsername})
+    </select>
+	
+	<select id="addConfigByBatch">
+        INSERT INTO zw_m_third_platform_config
+        (id,config_id,third_platform_id,create_data_time,create_data_username)
+        VALUES 
+        <foreach collection="list" item="item" index="index" separator=",">
+        	(#{item.id},#{item.configId},#{item.thirdPlatformId},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </select>
+	
+    <select id="updateConfigById">
+        UPDATE zw_m_third_platform_config SET config_id = #{configId},update_data_time=#{updateDataTime},flag = 1,
+        update_data_username=#{updateDataUsername} WHERE id = #{id}
+    </select>
+
+    <update id="deleteConfigById" parameterType="java.util.List">
+        UPDATE zw_m_third_platform_config SET flag = 0  WHERE flag = 1 AND id IN 
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+    		#{id}
+    	</foreach>
+    </update>
+
+    <select id="findConfigById" resultType="com.zw.platform.domain.forwardplatform.ThirdPlatFormConfig">
+        SELECT id,config_id,third_platform_id,flag,create_data_time,create_data_username,update_data_time,update_data_username
+        FROM  zw_m_third_platform_config WHERE id = #{id}
+    </select>
+    <select id="findConfigViewListByIds" resultType="int">
+        SELECT COUNT(0)
+        zw_m_third_platform_config pc
+        INNER JOIN zw_m_config c ON c.id = pc.config_id AND pc.flag = 1 AND c.flag = 1 AND pc.id=#{1}
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1 AND v.id = #{0}
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConFigUuidByPIds" resultType="string">
+        SELECT c.id FROM zw_m_third_platform_config c WHERE c.third_platform_id IN
+        <foreach item="item" collection="pids" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+
+    <select id="findConfigViewByConfigId" resultType="com.zw.platform.domain.forwardplatform.ThirdPlatFormConfigView">
+        SELECT pc.id,p.id AS third_platform_id,c.id AS config_id ,p.platform_port AS third_platform_port,p.platform_ip AS third_platform_ip,v.brand,v.id AS vehicle_id,p.description AS third_platform_description
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_third_platform_config pc ON c.id = pc.config_id AND pc.flag = 1 AND pc.id = #{configId}
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+    
+    <select id="findConfigViewByConfigIds" resultType="com.zw.platform.domain.forwardplatform.ThirdPlatFormConfigView">
+        SELECT pc.id,p.id AS third_platform_id,c.id AS config_id ,p.platform_port AS third_platform_port,p.platform_ip AS third_platform_ip,v.brand,v.id AS vehicle_id,p.description AS third_platform_description
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_third_platform_config pc ON c.id = pc.config_id AND pc.flag = 1 AND pc.id IN 
+        <foreach collection="list" item="configId" index="index" open="(" close=")" separator=",">
+        	#{configId}
+        </foreach>
+        INNER JOIN zw_m_vehicle_info v ON v.id = c.vehicle_id
+        AND v.flag = 1
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+    <select id="findConFigIdByVIds" resultType="string">
+        SELECT c.id FROM zw_m_config c WHERE c.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+
+
+    <select id="findDeviceNumberByFormId" parameterType="string"
+            resultType="string">
+        SELECT d.device_number
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_third_platform_config pc ON c.id = pc.config_id AND pc.flag = 1
+        INNER JOIN zw_m_third_platform p ON p.id = pc.third_platform_id AND p.flag = 1
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id
+        WHERE p.id = #{id}
+        ORDER BY pc.create_data_time DESC
+    </select>
+
+
+    <select id="findDeviceNumberByVIds" resultType="string">
+        SELECT
+        d.device_number
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_device_info d ON d.id = c.device_id
+        AND c.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+    
+    <select id="findVehiclesOfPlatform" parameterType="String" resultType="String">
+		SELECT vi.id
+		FROM zw_m_third_platform_config ip 
+		INNER JOIN zw_m_third_platform p ON p.id = ip.third_platform_id AND p.flag = 1
+		INNER JOIN zw_m_config c ON c.id = ip.config_id AND c.flag = 1
+		INNER JOIN zw_m_vehicle_info vi ON vi.id = c.vehicle_id AND vi.flag = 1
+		WHERE ip.flag = 1 AND ip.third_platform_id = #{platFormId}
+	</select>
+	
+	<resultMap type="com.zw.platform.domain.forwardplatform.ThirdPlatFormSubscribe" id="T808PlatFormResultMap">
+        <result column="third_platform_id" property="platId"/>
+        <collection property="deviceNumbers" ofType="java.lang.String">
+          <result column="device_number"/>
+        </collection>
+        <collection property="identifications" ofType="java.lang.String">
+            <result column="simcard_number"/>
+        </collection>
+    </resultMap>
+    
+    <select id="findConfigByConfigUuid" parameterType="java.util.List" 
+    	 resultMap="T808PlatFormResultMap">
+    	SELECT 
+    		di.device_number,c.third_platform_id,ci.simcard_number
+    	FROM zw_m_third_platform_config c
+    	INNER JOIN zw_m_config mc ON mc.id = c.config_id AND mc.flag = 1
+    	INNER JOIN zw_m_vehicle_info vi ON vi.id = mc.vehicle_id AND vi.flag = 1
+    	INNER JOIN zw_m_third_platform tp ON tp.id = c.third_platform_id AND tp.flag = 1
+    	INNER JOIN zw_m_device_info di ON di.id = mc.device_id AND di.flag = 1
+        INNER JOIN zw_m_sim_card_info ci ON ci.id = mc.sim_card_id AND ci.flag = 1
+    	WHERE c.flag = 1 AND c.id IN 
+    	<foreach collection="list" item="cid" index="index" open="(" close=")" separator=",">
+    		#{cid}
+    	</foreach>
+    </select>
+    
+    <select id="check808PlatFormSole" parameterType="string" resultType="String">
+        SELECT t.id FROM zw_m_third_platform t where flag = 1 AND t.description = BINARY #{platFormName}
+    </select>
+    
+    <select id="findConfigIdByVconfigIds" parameterType="java.util.List" resultType="String">
+    	SELECT id FROM zw_m_third_platform_config WHERE config_id IN
+    	<foreach collection="list" index="index" item="cid" open="(" close=")" separator=",">
+    		#{cid}
+    	</foreach>
+        AND flag = 1
+    </select>
+
+    <select id="findSimCardByVids" resultType="string">
+        SELECT
+        s.simcard_number
+        FROM
+        zw_m_sim_card_info s
+        INNER JOIN zw_m_config c ON c.sim_card_id = s.id
+        AND c.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND c.flag = 1
+    </select>
+</mapper>

@@ -1,0 +1,66 @@
+<form th:action="@{/talkback/basicinfo/monitoring/job/edit}"
+      th:object="${result}" id="editForm" role="form" action="#"
+      method="post" class="form-horizontal">
+    <style>
+        .modal-dialog {
+            width: 40%;
+        }
+    </style>
+    <input name="id" type="hidden" th:value="*{id}" id="editId"/>
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改职位信息</h4>
+    </div>
+    <div class="modal-body" style="overflow-y: auto;padding:15px;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label class="text-danger">*</label> 职位名称： </label>
+                    <div class="col-md-9">
+                        <input id="jobName" th:value="*{jobName}" name="jobName" placeholder="请输入职位名称" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> <label class="text-danger">*</label> 图标： </label>
+                    <div class="col-md-9">
+                        <div>
+                            <img id="preview" th:src="*{jobIconName}">
+                        </div>
+                        <input name="jobIconName" id="jobIconName" type="hidden" th:value="*{jobIconName}"/>
+                        <div class="inpFilePhoto">
+                            <input type="file" accept="image/png" name="file" id="doc" style="width: 202px;"
+                                   onchange="jobEdit.setImagePreview();"/>
+                            <label class="changeFile" for="doc" title="未选择文件。">点击选择照片</label>
+                        </div>
+                        <p>注：图标格式为png，大小建议35*42，范围为：[30-40]*[37-47]。</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-9">
+                        <input name="remark" th:value="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var publicNull = [[#{public.null}]];
+    var nameNull = [[#{job.name.null}]];
+    var jobNameError = [[#{job.name.error}]];
+    var jobNameExist = [[#{job.name.exist}]];
+</script>
+<script src="/clbs/resources/js/jobEdit.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

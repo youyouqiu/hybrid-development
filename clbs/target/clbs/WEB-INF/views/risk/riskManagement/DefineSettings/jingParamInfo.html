@@ -1,0 +1,2031 @@
+<form method="post" id="dsmInfoForm"
+      th:action="@{/v/oilmassmgt/oilvehiclesetting/updateSensorSetting}" role="form"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">读取外设参数设置(京标)</h4>
+        <style>
+            .modal-body {
+                padding-left: 60px
+            }
+            .modal-body h4{
+                font-size: 15px;
+                font-weight: 700;
+            }
+
+            .info-span {
+                cursor: pointer;
+            }
+
+            .title-info, .title-info label {
+                color: #ff0000;
+            }
+
+            .dsm-content {
+                margin: 0 -20px 15px -60px;
+                padding:0 20px 0 60px;
+                border-bottom: 1px solid #e5e5e5;
+            }
+            .dsm-content .info-content{display: none}
+            .dsmInfo .col-md-2{
+                padding-right: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body dsmInfo">
+        <input id="platformData" type="hidden" th:value="*{settingParam}"/>
+        <input type="hidden" id="vehicleId" th:value="*{vehicleId}">
+        <input type="hidden" id="msgId">
+        <input type="hidden" id="dealType" name="deal_type" value="pt">
+        <!--监控对象-->
+        <div class="form-group">
+            <label class="col-md-2 control-label">监控对象：</label>
+            <div class="col-md-8">
+                <input id="brand" th:value="*{brand}" placeholder="请输入监控对象" class="form-control" readonly/>
+            </div>
+        </div>
+        <!--tabs-->
+        <div class="form-group">
+            <ul class="nav nav-tabs">
+                <li id="driverBehaviorTab" class="active"><a href="#driverSystem" data-toggle="tab">驾驶员行为参数</a></li>
+                <li id="vehicleRunTab"><a href="#vehicleRunSystem" data-toggle="tab">车辆运行监测参数</a></li>
+            </ul>
+        </div>
+        <!--title-->
+        <div class="form-group">
+            <h4 class="col-md-3 col-md-offset-2 text-center">传感器上传参数</h4>
+            <h4 class="col-md-3 col-md-offset-2 text-center">平台设置参数</h4>
+        </div>
+
+        <div class="tab-content">
+            <!--tab1 驾驶员行为参数-->
+            <div data-type="51" class="tab-pane active" id="driverSystem">
+                <div class="dsm-content">
+                    <!--疲劳状态-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">疲劳状态</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class="parameterId" value="0xF511">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62737" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--分神驾驶-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">分神驾驶</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF512">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62738" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--抽烟-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">抽烟</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class="parameterId" value="0xF513">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62739" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--接打手持电话-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">接打手持电话</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF514">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62740" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--双手同时脱离方向盘-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">双手同时脱离方向盘</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF515">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62741" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--未系安全带-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">未系安全带</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF516">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62742" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--驾驶人异常-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">驾驶人异常</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <div class="form-group">
+                            <input type="hidden" class='parameterId' value="0xF517">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62743" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">下发状态：</label>
+                    <div class="col-md-3">
+                        <input id="dsmPoilSendStatus0" class="form-control sendStatus" readonly/>
+                    </div>
+                </div>
+            </div>
+
+            <!--tab2 车辆运行监测参数-->
+            <div data-type="52" class="tab-pane" id="vehicleRunSystem">
+                <div class="dsm-content">
+                    <!--前车碰撞-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">前车碰撞</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF521">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62753" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--车距过近-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">车距过近</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF522">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62754" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--车道偏离-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">车道偏离</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF523">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62755" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--行人碰撞-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">行人碰撞</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF524">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62756" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--盲区监测-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">盲区监测</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF525">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62757" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--限速-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">限速</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF526">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62758" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--限高-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">限高</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF527">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62759" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--限宽-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">限宽</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF528">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62760" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                    <!--限重-->
+                    <div class="form-group">
+                        <h4 class="col-md-6">限重</h4>
+                        <div class="col-md-6 control-label text-right">
+                            <div class="info-span">
+                                <font>显示更多</font>
+                                <span aria-hidden="true" class="fa fa-chevron-down"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-content">
+                        <input type="hidden" class='parameterId' value="0xF529">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-level62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">报警级别：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmLevel" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-alarmVolume62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">提示音量：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVolume" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-voiceBroadcast62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">语音播报：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speech" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoTime62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频时长：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-alarmVideoDuration" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-videoResolution62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">视频分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-videoResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraNum62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照张数：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographNumber" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraResolution62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照分辨率：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-cameraResolution" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-cameraTime62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">拍照间隔：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-photographTime" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-speedThreshold62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">速度阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-speedLimit" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control sensor-durationThreshold62761" readonly/>
+                            </div>
+                            <label class="col-md-2 control-label">持续时长阈值：</label>
+                            <div class="col-md-3">
+                                <input class="form-control platform-durationThreshold" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                            </div>
+                            <div class="col-md-3 col-md-offset-2">
+                                <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">下发状态：</label>
+                    <div class="col-md-3">
+                        <input id="dsmPoilSendStatus1" class="form-control sendStatus" readonly/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="dsmInfoRefresh">刷新</button>
+        <button type="button" class="btn btn-primary" id="dsmInfoSend" disabled>全部修正下发</button>
+        <button type="button" class="btn btn-primary" id="dsmInfoSend2" disabled>本页签修正下发</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+    </div>
+</form>
+<script src="/clbs/resources/js/jingParamInfo.js"></script>

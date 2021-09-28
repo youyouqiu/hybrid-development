@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DeviceRegisterDao">
+    <!-- 查询围栏绑定 -->
+    <select id="findListByDeviceId"
+            parameterType="string"
+            resultType="com.zw.platform.domain.topspeed_entering.DeviceRegister">
+		SELECT t.id,t.device_id,t.sim_number,t.brand,t.device_type FROM zw_m_unknow_device t WHERE t.device_id LIKE '%'+#{deviceId}+'%' AND t.flag = '1' ORDER BY t.create_data_time
+	</select>
+
+    <select id="findByDeviceId"
+            parameterType="string"
+            resultType="com.zw.platform.domain.topspeed_entering.DeviceRegister">
+        SELECT t.id,t.device_id,t.sim_number,t.brand,t.device_type FROM zw_m_unknow_device t WHERE t.device_id = #{deviceId} ORDER BY t.create_data_time
+    </select>
+
+    <select id="findListInUser" resultType="com.zw.platform.domain.topspeed_entering.DeviceRegister">
+	 SELECT ud.id,
+			ud.unique_number,
+			ud.device_id,
+			ud.brand,
+			ud.sim_number,
+			ud.fake_ip,
+			ud.device_type,
+			1 AS STATUS,
+			ud.update_data_time,
+			ud.manufacturer_id,
+			ud.device_modelNumber,
+			ud.province_id,
+			ud.city_id,
+			ud.plate_color
+		FROM
+			zw_m_unknow_device ud
+		WHERE
+			ud.flag = 1
+		AND ud.unique_number IN (
+			SELECT
+				di1.device_number
+			FROM
+				zw_m_device_info di1
+			WHERE
+				di1.flag = 1
+			AND di1.device_number NOT IN (
+				SELECT
+					di2.device_number
+				FROM
+					zw_m_device_info di2
+				INNER JOIN zw_m_config c ON c.device_id = di2.id
+				AND c.flag = 1
+				WHERE
+					di2.flag = 1
+			)
+			UNION
+				SELECT
+					si1.simcard_number
+				FROM
+					zw_m_sim_card_info si1
+				WHERE
+					si1.flag = 1
+				AND si1.simcard_number NOT IN (
+					SELECT
+						si2.simcard_number
+					FROM
+						zw_m_sim_card_info si2
+					INNER JOIN zw_m_config c ON c.sim_card_id = si2.id
+					AND c.flag = 1
+					WHERE
+						si2.flag = 1
+				)
+		)
+		ORDER BY ud.create_data_time DESC
+    </select>
+
+
+    <select id="findListOutUser"
+            resultType="com.zw.platform.domain.topspeed_entering.DeviceRegister">
+       	SELECT ud.id,ud.unique_number,ud.device_id,ud.brand,ud.sim_number,ud.fake_ip,ud.device_type,0 AS STATUS,
+			   ud.update_data_time,ud.manufacturer_id,ud.device_modelNumber,ud.province_id,ud.city_id,ud.plate_color
+      	FROM zw_m_unknow_device ud WHERE ud.flag =1 AND ud.unique_number NOT IN (
+		SELECT di2.device_number FROM zw_m_device_info di2 WHERE di2.flag=1    
+		UNION	
+		SELECT si.simcard_number FROM zw_m_sim_card_info si WHERE si.flag = 1	
+      	)
+        ORDER BY ud.create_data_time DESC
+    </select>
+
+
+    <select id="deleteByDeviceId"
+            parameterType="string">
+        UPDATE zw_m_unknow_device t SET t.flag = '0' WHERE t.unique_number = #{deviceId}
+    </select>
+
+    <!-- 根据唯一标识查询非法设备注册表的制造商ID和终端型号-->
+    <select id="getRegisterInfo" parameterType="string"
+            resultType="com.zw.platform.domain.topspeed_entering.DeviceRegister">
+		  select * from zw_m_unknow_device where unique_number = #{uniqueNumber}
+	</select>
+</mapper>

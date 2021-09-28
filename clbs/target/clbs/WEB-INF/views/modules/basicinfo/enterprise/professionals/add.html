@@ -1,0 +1,401 @@
+<style>
+    .new-err {
+        white-space: normal;
+        text-align: left;
+        color: #fff;
+        background: #b94a48;
+        border: solid thin #fff;
+        padding: 3px 5px;
+    }
+</style>
+<form th:action="@{/m/basicinfo/enterprise/professionals/add}"
+      id="addForm" role="form" action="#" method="post"
+      class="form-horizontal">
+    <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+           id="avoidRepeatSubmitToken">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">新增从业人员</h4>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 姓名：</label>
+                    <div class="col-md-4">
+                        <input name="name" placeholder="请输入姓名" type="text" id="name"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input class="form-control hidden" name="groupId"
+                               th:value="${orgId}" id="groupId"/> <input name="groupName"
+                                                                         th:value="${groupName}" class="form-control"
+                                                                         id="zTreeCitySel"
+                                                                         placeholder="请选择所属企业"
+                                                                         style="background-color: #fafafa; cursor: pointer;"
+                                                                         type="text" autocomplete="off"/>
+                        <span id="zTreeCitySelSpan"
+                              class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true"></span>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                        <label id="error_label_add" class="error" style="display: none;"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 服务企业：</label>
+                    <div class="col-md-4">
+                        <input name="serviceCompany" placeholder="请输入服务企业" type="text"
+                               class="form-control" maxlength="20"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 岗位类型：</label>
+                    <div class="col-md-4">
+                        <select name="positionType" id="positionType"
+                                placeholder="请输入岗位类型" class="form-control">
+                            <option selected="selected" value="1">经理</option>
+                            <option selected="selected" value="2">技术人员</option>
+                            <option selected="selected" value="3">销售人员</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        <label id="required" class="text-danger">*</label>
+                        身份证号：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="identity" placeholder="请输入身份证号" type="text"
+                               id="identity" class="form-control"/>
+                        <label id="identity-err" class="new-err hide">请输入身份证号</label>
+                    </div>
+                    <label class="col-md-2 control-label"> 状态：</label>
+                    <div class="col-md-4">
+                        <select name="state" placeholder="请输入岗位类型" class="form-control">
+                            <option selected="selected" value="0">正常</option>
+                            <option value="1">离职</option>
+                            <option value="2">停用</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 入职时间：</label>
+                    <div class="col-md-4 has-feedback">
+                        <input id="workDateAdd" name="hiredate" placeholder="请输入入职时间"
+                               class="form-control layer-date laydate-icon" autocomplete="off">
+                    </div>
+                    <label class="col-md-2 control-label"> 工号：</label>
+                    <div class="col-md-4">
+                        <input name="jobNumber" placeholder="请输入工号" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 从业资格证号：</label>
+                    <div class="col-md-4">
+                        <input name="cardNumber" placeholder="请输入从业资格证号" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        <!--<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+                           title="" data-original-title="从业资格类别数字代码由5位数字构成，前3位参照《JTT-415道路运输电子政务平台编目编码规则》的行业分类代码，
+                           后2位为职业编码，如01001表示经营性道路旅客运输驾驶员，其中010表示道路旅客运输，01表示驾驶员">
+                        </i>-->
+                        从业资格类别：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="qualificationCategory" placeholder="请输入从业资格类别" type="text"
+                               class="form-control" maxlength="50"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 发证机关：</label>
+                    <div class="col-md-4">
+                        <input name="icCardAgencies" placeholder="请输入从业资格证发证机关" type="text"
+                               id="icCardAgencies" class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 发证日期：</label>
+                    <div class="col-md-4 has-feedback">
+                        <input name="issueCertificateDate" id="issueCertificateDate"
+                               placeholder="请输入发证日期" class="form-control layer-date laydate-icon" autocomplete="off">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 证件有效期：</label>
+                    <div class="col-md-4">
+                        <input id="icCardEndDate" name="icCardEndDate" placeholder="请输入从业资格证有效期"
+                               class="form-control layer-date laydate-icon" autocomplete="off">
+                    </div>
+                    <label class="col-md-2 control-label"> 性别：</label>
+                    <div class="col-md-4">
+                        <label class="radio-inline"><input type="radio" name="gender" id="isRadio" value="1" checked> 男</label>
+                        <label class="radio-inline"><input type="radio" name="gender" id="noRadio" value="2"> 女</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 生日：</label>
+                    <div class="col-md-4 has-feedback">
+                        <input name="birthday" id="birthday" placeholder="请输入生日"
+                               class="form-control layer-date laydate-icon" autocomplete="off"> <label
+                            for="birthday" id="birthdayError" style="display: none"
+                            class="error">请选择今天之前的日期</label>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        所属地域：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="regional" maxlength="20" placeholder="请输入所属地域" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        籍贯：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="nativePlace" maxlength="20" placeholder="请输入籍贯" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">民族：</label>
+                    <div class="has-feedback col-md-4">
+                        <input type="hidden" th:value="${allNation}">
+                        <select name="nationId" id="national" class="form-control selectChange"
+                                style="padding-left: 5px">
+                            <option value=""></option>
+                            <option th:each="c:${allNation}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">文化程度：</label>
+                    <div class="has-feedback col-md-4">
+                        <select name="educationId" id="cultureDegree" class="form-control selectChange"
+                                style="padding-left: 5px">
+                            <option value="">- 请选择文化程度 -</option>
+                            <option th:each="c:${allEducation}" th:value="${c.id}" th:text="${c.name}"></option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        手机1：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="phone" placeholder="请输入手机" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        手机2：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="phoneTwo" placeholder="请输入手机" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">
+                        手机3：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="phoneThree" placeholder="请输入手机" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        座机：
+                    </label>
+                    <div class="col-md-4">
+                        <input name="landline" placeholder="请输入座机" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">紧急联系人：</label>
+                    <div class="col-md-4">
+                        <input name="emergencyContact" placeholder="请输入紧急联系人" type="text" maxlength="20"
+                               id="emergencyContact"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 紧急人联系电话：</label>
+                    <div class="col-md-4">
+                        <input name="emergencyContactPhone" placeholder="请输入紧急人联系电话" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 邮箱：</label>
+                    <div class="col-md-4">
+                        <input id="email" name="email" placeholder="请输入邮箱" type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 地址：</label>
+                    <div class="col-md-4">
+                        <input name="address" placeholder="请输入地址" type="text"
+                               class="form-control" maxlength="50"/>
+                    </div>
+                    <label class="col-md-2 control-label"> 照片：</label>
+                    <div class="col-md-4">
+                        <table width="50%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                            <tr>
+                                <td align="left">
+                                    <div id="localImag">
+                                        <img id="preview" src="" style="display: none;">
+                                    </div>
+                                    <input id="photograph" name="photograph" type="hidden"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="inpFilePhoto">
+                                        <input type="file"
+                                               accept="image/gif,image/jpeg,image/jpg,image/png"
+                                               name="file" id="doc" style="width: 202px;"
+                                               onchange="professionalsAdd.setImagePreview();">
+                                        <label class="changeFile" for="doc">点击选择照片</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        驾驶信息
+                    </label>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-6 control-label text-right">
+                        <span id="overSpeedHide" style="cursor: pointer;"><font>显示更多</font><span
+                                class="fa fa-chevron-down" aria-hidden="true"></span></span>
+                    </div>
+                </div>
+                <div id="overSpeedHide-content" style="display: none">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            操作证号：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="operationNumber" placeholder="请输入操作证号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            发证机关：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="operationAgencies" placeholder="请输入操作证发证机关" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            驾驶证号：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="drivingLicenseNo" placeholder="请输入驾驶证号" type="text"
+                                   class="form-control"/>
+                        </div>
+                        <label class="col-md-2 control-label">
+                            发证机关：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="drivingAgencies" placeholder="请输入驾驶证发证机关" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            准驾车型：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="drivingType" placeholder="请输入，例如A1、C1、A1E等" type="text"
+                                   class="form-control"/>
+                            <!--<select name="drivingType" id="drivingType" class="form-control">-->
+                            <!--<option value="-1" selected>-请选择准驾车型-</option>-->
+                            <!--<option value="0">A1(大型客车)</option>-->
+                            <!--<option value="1">A2(牵引车)</option>-->
+                            <!--<option value="2">A3(城市公交车)</option>-->
+                            <!--<option value="3">B1(中型客车)</option>-->
+                            <!--<option value="4">B2(大型货车)</option>-->
+                            <!--<option value="5">C1(小型汽车)</option>-->
+                            <!--<option value="6">C2(小型自动挡汽车)</option>-->
+                            <!--<option value="7">C3(低速载货汽车)</option>-->
+                            <!--<option value="8">C4(三轮汽车)</option>-->
+                            <!--<option value="9">D(普通三轮摩托车)</option>-->
+                            <!--<option value="10">E(普通二轮摩托车)</option>-->
+                            <!--<option value="11">F(轻便摩托车)</option>-->
+                            <!--<option value="12">M(轮式自行机械车)</option>-->
+                            <!--<option value="13">N(无轨电车)</option>-->
+                            <!--<option value="14">P(有轨电车)</option>-->
+                            <!--</select>-->
+                        </div>
+                        <label class="col-md-2 control-label">
+                            准驾有效期起：
+                        </label>
+                        <div class="col-md-4 has-feedback">
+                            <input name="drivingStartDate" id="drivingStartDate" placeholder="请输入准驾有效期起"
+                                   class="form-control layer-date laydate-icon" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">
+                            准驾有效期至：
+                        </label>
+                        <div class="col-md-4 has-feedback">
+                            <input name="drivingEndDate" id="drivingEndDate" placeholder="请输入准驾有效期至"
+                                   class="form-control layer-date laydate-icon" autocomplete="off">
+                        </div>
+                        <label class="col-md-2 control-label">
+                            提前提醒天数：
+                        </label>
+                        <div class="col-md-4">
+                            <input name="remindDays" placeholder="请输入提前提醒天数" type="text"
+                                   class="form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitAdd" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var nameNull = [[#{name.null}]];
+    var identityError = [[#{identity.error}]];
+    var phoneError = [[#{phone.error}]];
+    var telPhoneError = [[#{telPhone.error}]];
+    var emailError = [[#{email.error}]];
+    var userGroupNull = [[#{user.group.null}]];
+    var professionalsNameExists = [[#{professionals.name.exists}]];
+    var professionalsNameExistsIdentity = [[#{professionals.name.existsIdentity}]];
+
+    var personnelNameNull = [[#{Personnel.name.null}]];
+    var personnelIdentityExists = [[#{personnel.identity.exists}]];
+
+    var publicNull = [[#{public.null}]];
+    var publicSize1000Length = [[#{public.size1000.length}]];
+    var publicSize20Length = [[#{public.size20.length}]];
+    var publicSize30Length = [[#{public.size30.length}]];
+    var publicSize64Length = [[#{public.size64.length}]];
+    var publicSize4Length = [[#{public.size4.length}]];
+    var publicPictureError = [[#{public.picture.error}]];
+    var publicUploadingError = [[#{public.uploading.error}]];
+
+    var integerFour = [[#{info.integer.four}]];//输入值范围0-9999
+    var naturalNumber = [[#{info.natural.number}]];//输入类型为自然数
+</script>
+<script src="/wro/professionalsAdd.js"
+        th:src="@{/wro/professionalsAdd.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"
+        th:src="@{/resources/js/sendAjax.js}"></script>

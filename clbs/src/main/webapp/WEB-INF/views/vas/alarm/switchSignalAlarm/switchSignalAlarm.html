@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>开关信号报警查询</title>
+    <div th:replace="fragments/header">header</div>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="/resources/css/bootstrap-select.min.css"
+          th:href="@{/resources/css/bootstrap-select.min.css}">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="/resources/js/bootstrap-select.min.js" th:src="@{/resources/js/bootstrap-select.min.js}"></script>
+
+    <style>
+        /*#warningManageClose, #warningManagePhoto {
+            margin: 0px 0px 1px 0px !important
+        }*/
+
+        #alarm-remark {
+            margin-top: 15px;
+            padding-left: 67px;
+        }
+
+        #alarm-remark > div {
+            padding-right: 0
+        }
+
+        .modal-footer select {
+            line-height: 22px !important;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报警中心</li>
+                        <li class="active">开关信号报警查询</li>
+                    </ul>
+                    <h1 class="h1 ">开关信号报警查询</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-2 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">组织架构</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-12">
+                                        <input id="search_condition" name="search" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" placeholder="请输入监控对象"/>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                                     style="padding: 0px; height:590px!important;">
+                                    <ul id="treeDemo" class="ztreee"
+                                        style="height:575px !important;overflow:auto;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-sm-12" style="padding-right: 0px; padding-left:10px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">开关信号报警查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="alarmForm" class="form-horizontal" action="#" method="post" role="form">
+                                        <div class="form-group"><!-- fromSearchGrp -->
+                                            <label class="col-md-1 col-sm-3 control-label paddingRight">报警类型：</label>
+                                            <input id="alarmTypeName" th:value="${alarmTypeName}" type="text"
+                                                   hidden="true"/>
+                                            <input id="vehicleId" th:value="${vehicleId}" type="text" hidden="true"/>
+                                            <input id="alarmTime" th:value="${alarmTime}" type="text" hidden="true"/>
+                                            <div class="col-md-3 col-sm-8 searchListSelect has-feedback">
+                                                <input style="cursor: pointer; background-color: #fafafa;" value="全部"
+                                                       placeholder="请选择报警类型" class="form-control"
+                                                       id="groupSelect" name="groupSelect" readonly/>
+                                                <span class="fa fa-chevron-down form-control-feedback"
+                                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                      id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="treeTypeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label paddingRight">处理状态：</label>
+                                            <div class="col-md-3 col-sm-8 searchListSelect">
+                                                <select id="status" class="form-control">
+                                                    <option value="-1">全部</option>
+                                                    <option value="0">未处理</option>
+                                                    <option value="1">已处理</option>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label paddingRight">时间：</label>
+                                            <div class="col-md-3 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="timeInterval" name="timeInterval" readonly/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"><!-- fromSearchGrp -->
+                                            <div class="col-md-12 control-label">
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn">
+                                                    <i class="glyphicon glyphicon-search"></i>
+                                                    查询
+                                                </button>
+                                                <a id="alarmExport" disabled="disabled"
+                                                   class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-12 alarmTable" style="padding:0px 5px;">
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">序号</th>
+                                            <th class="text-center">监控对象</th>
+                                            <th class="text-center">车牌颜色</th>
+                                            <th class="text-center">所属企业</th>
+                                            <th class="text-center">所属分组</th>
+                                            <th class="text-center">从业人员</th>
+                                            <th class="text-center">处理状态</th>
+                                            <th class="text-center">报警类型</th>
+                                            <th class="text-center">报警开始速度</th>
+                                            <th class="text-center">报警开始时间</th>
+                                            <th class="text-center">报警结束时间</th>
+                                            <th class="text-center">报警开始经度</th>
+                                            <th class="text-center">报警开始纬度</th>
+                                            <th class="text-center">报警结束经度</th>
+                                            <th class="text-center">报警结束纬度</th>
+                                            <th class="text-center">报警开始位置</th>
+                                            <th class="text-center">报警结束位置</th>
+                                            <th class="text-center">处理人</th>
+                                            <th class="text-center">处理时间</th>
+                                            <th class="text-center">处理方式</th>
+                                            <th class="text-center">备注</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+<div class="modal fade" id="warningManage" role="dialog" style="overflow-y:hidden" data-backdrop="static"
+     data-keyboard="false" aria-labelledby="alarmSettingInfo" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">报警处理</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">监控对象：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningCarName"></span>
+                        </div>
+                        <label class="col-md-3 control-label">从业人员：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningPeo"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">所属分组：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningGroup" style="word-break: break-all"></span>
+                        </div>
+                        <label class="col-md-3 control-label">报警时间：</label>
+                        <div class="col-md-3 dataStatistics-value">
+                            <span id="warningTime"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">报警类型：</label>
+                        <div class="col-md-8 dataStatistics-value warningTypeArea">
+                            <span id="warningDescription"></span>
+                        </div>
+                    </div>
+                    <input id="warningType" type="hidden" name="warningType"/>
+                    <input type="hidden" id="simcard" name="simcard"/>
+                    <input type="hidden" id="vUuid" name="vUuid"/>
+                    <input type="hidden" id="device" name="device"/>
+                    <input type="hidden" id="sno" name="sno"/>
+                    <input type="hidden" id="eventId" name="eventId"/>
+                </div>
+            </div>
+            <div class="modal-footer" id="warningHiden" style="text-align:center!important;max-height: 500px;overflow-y: auto">
+                <button id="warningManageListening" type="button" class="btn btn-primary btn-alarm-manage">监听</button>
+                <button id="warningManagePhoto" type="button" class="btn btn-primary btn-alarm-manage">拍照</button>
+                <button id="warningManageSend" type="button" class="btn btn-primary btn-alarm-manage">下发短信</button>
+                <button id="warningManageAffirm" type="button"
+                        class="btn btn-primary btn-alarm-manage" style="padding: 9px 0 8px">人工确认报警
+                </button>
+                <button id="warningManageCancel" type="button" class="btn btn-primary btn-alarm-manage">不做处理</button>
+                <button id="warningManageFuture" type="button" class="btn btn-primary btn-alarm-manage">将来处理</button>
+                <button id="warningManageClose" type="button" class="btn btn-default btn-alarm-manage">关闭</button>
+
+                <!-- 报警处理-监听 -->
+                <div id="listeningContent">
+                    <form th:action="@{/v/monitoring/handleAlarm}" role="form" id="listeningAlarm" action="#"
+                          method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:20px 0px 0;text-align: left;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarmListen" name="vehicleId" value="">
+                                <input class="hidden" name="orderType" value="41">
+                                <input class="hidden" id="brandListen" name="plateNumber" value="">
+                                <input class="hidden" id="alarmListen" name="alarm" value="">
+                                <input class="hidden" id="startTimeListen" name="startTime" value="">
+                                <input class="hidden" id="simcardListen" name="simcard" value="">
+                                <input class="hidden" id="deviceListen" name="device" value="">
+                                <input class="hidden" id="snoListen" name="sno" value="">
+                                <input class="hidden" id="handleTypeListen" name="handleType" value="">
+                                <input class="hidden" id="descriptionListen" name="description" value="">
+                                <textarea class="hidden" id="remarkListen" name="remark" rows="4"></textarea>
+                                <label class="col-md-2 control-label">电话号码：</label>
+                                <div class=" col-md-9">
+                                    <input type="text" placeholder="请输入电话号码" autocomplete="off" class="form-control"
+                                           id="listenPhone"
+                                           name="monitorPhone" maxlength="20"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- 报警处理-拍照 -->
+                <div id="takePicturesContent">
+                    <form th:action="@{/v/monitoring/photo}" role="form" id="takePhotoForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidforAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="1">
+                                <input class="hidden" id="brandPhoto" name="plateNumber" value="">
+                                <input class="hidden" id="alarmPhoto" name="alarm" value="">
+                                <input class="hidden" id="startTimePhoto" name="startTime" value="">
+                                <input class="hidden" id="simcardPhoto" name="simcard" value="">
+                                <input class="hidden" id="devicePhoto" name="device" value="">
+                                <input class="hidden" id="snoPhoto" name="sno" value="">
+                                <input class="hidden" id="handleTypePhoto" name="handleType" value="">
+
+                                <label class="col-md-2 control-label">通道ID：</label>
+                                <div class=" col-md-3">
+                                    <select name="wayID" class="form-control">
+                                        <option value="1" selected="true">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">间隔时间(秒)：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="0表示按最小间隔拍照" class="form-control" name="time"
+                                           id="time"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">拍照张数：</label>
+                                <div class=" col-md-3">
+                                    <input type="text" placeholder="默认1,最大10" value="1" class="form-control"
+                                           name="command"
+                                           id="command"/>
+                                </div>
+                                <label class="col-md-3 control-label">保存标志：</label>
+                                <div class=" col-md-3">
+                                    <select name="saveSign" class="form-control">
+                                        <option value="0" selected>实时上传</option>
+                                        <option value="1">保存</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">分辨率：</label>
+                                <div class=" col-md-3">
+                                    <select name="distinguishability" class="form-control">
+                                        <option value="1" selected="true">320*240</option>
+                                        <option value="2">640*480</option>
+                                        <option value="3">800*600</option>
+                                        <option value="4">1024*768</option>
+                                        <option value="5">352*288</option>
+                                        <option value="6">704*288</option>
+                                        <option value="7">704*576</option>
+                                    </select>
+                                </div>
+                                <label class="col-md-3 control-label">
+                                    图像质量：
+                                </label>
+                                <div class="col-md-3">
+                                    <input type="text" value="5" name="quality" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">亮度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="luminance" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">对比度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="contrast" class="form-control"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">饱和度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="60" name="saturability" class="form-control"/>
+                                </div>
+                                <label class="col-md-3 control-label">色度：</label>
+                                <div class="col-md-3">
+                                    <input type="text" value="125" name="chroma" class="form-control"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <!-- 报警处理-下发短信 -->
+                <div id="sendTextMessages">
+                    <form th:action="@{/v/monitoring/sendTxt}" role="form" id="txtSendForAlarm" action="#" method="post"
+                          class="form-horizontal">
+                        <div class="modal-body" style="padding:10px 0px 10px 0px;">
+                            <div class="form-group">
+                                <input class="hidden" id="vidSendTxtForAlarm" name="vid" value="">
+                                <input class="hidden" name="orderType" value="5">
+                                <input class="hidden" id="brandTxt" name="plateNumber" value="">
+                                <input class="hidden" id="alarmTxt" name="alarm" value="">
+                                <input class="hidden" id="startTimeTxt" name="startTime" value="">
+                                <input class="hidden" id="simcardTxt" name="simcard" value="">
+                                <input class="hidden" id="deviceTxt" name="device" value="">
+                                <input class="hidden" id="snoTxt" name="sno" value="">
+                                <input class="hidden" id="handleTypeTxt" name="handleType" value="">
+                                <label class="col-md-3 control-label">文本内容：</label>
+                                <div class=" col-md-7">
+                                    <textarea class="form-control" id="smsTxt" name="txt" rows="3"
+                                              maxlength="512"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="1" type="checkbox"/>紧急</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="3" checked="checked" type="checkbox"/>终端显示器显示</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="4" checked="checked" type="checkbox"/>终端TTS读播</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="checkbox">
+                                            <label><input name="marks" value="5" checked="checked"
+                                                          type="checkbox"/>广告屏显示</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div id="alarm-remark" class="clearfix">
+                    <label class="col-md-1 col-sm-3 control-label paddingRight text-right">备注：</label>
+                    <div class="col-md-10 col-sm-8 searchListSelect" style="padding-right: 9px">
+                        <textarea rows="4" class="form-control" id="alarmRemark" maxlength="50"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer listenFooter" style="display: none;margin-top: 10px;">
+                    <button type="button" id="goListeningForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer takePicturesFooter" style="display: none">
+                    <button type="button" id="goPhotographsForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+                <div class="modal-footer sendTextFooter" style="display: none">
+                    <button type="button" id="goTxtSendForAlarm" class="btn btn-primary btn-alarm-manage">下发
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 应答 -->
+<div class="modal fade" id="goTraceResponse" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title" id="traceParameterResponse"><span id="msgTitle"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"><span id="question"></span></label>
+                        <div class=" col-md-7">
+                            <input type="hidden" id="infoId">
+                            <input type="hidden" id="msgDataType">
+                            <input type="hidden" id="objectType">
+                            <input type="hidden" id="objectId">
+                            <input type="text" placeholder="请输入应答" class="form-control" name="interval"
+                                   id="answer"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="parametersResponse" class="btn btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<label id="error_label" class='error' style='display: none;'></label>
+</body>
+<!--/***** 当前页js end *****/-->
+<script th:inline="javascript">
+    var publicIssuedSuccess = [[#{public.Issued.success}]];
+    var publicIssuedFailure = [[#{public.Issued.failure}]];
+    var alarmSearchChannelID = [[#{alarmSearch.channel.ID}]];
+    var alarmSearchIntervalTime = [[#{alarmSearch.interval.time}]];
+    var alarmSearchIntervalError = [[#{alarmSearch.interval.error}]];
+    var alarmSearchIntervalSize = [[#{alarmSearch.interval.size}]];
+    var alarmSearchPhotoSize = [[#{alarmSearch.photo.size}]];
+    var alarmSearchPhotoNull = [[#{alarmSearch.photo.null}]];
+    var alarmSearchSaveNull = [[#{alarmSearch.save.null}]];
+    var alarmSearchResolutionNull = [[#{alarmSearch.resolution.null}]];
+    var alarmSearchMovieSize = [[#{alarmSearch.movie.size}]];
+    var alarmSearchMovieNull = [[#{alarmSearch.movie.null}]];
+    var alarmSearchBrightnessSize = [[#{alarmSearch.brightness.size}]];
+    var alarmSearchBrightnessNull = [[#{alarmSearch.brightness.null}]];
+    var alarmSearchContrastSize = [[#{alarmSearch.contrast.size}]];
+    var alarmSearchContrastNull = [[#{alarmSearch.contrast.null}]];
+    var alarmSearchSaturatedSize = [[#{alarmSearch.saturated.size}]];
+    var alarmSearchSaturatedNull = [[#{alarmSearch.saturated.null}]];
+    var alarmSearchColorSize = [[#{alarmSearch.color.size}]];
+    var alarmSearchColorNull = [[#{alarmSearch.color.null}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/switchSignalAlarm.js"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+</html>

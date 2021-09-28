@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.OBDManagerSettingDao">
+
+    <!-- 页面查询 -->
+    <select id="findList" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select
+        v.id as vehicleId,v.monitorType, v.brand, o.id,o.obd_vehicle_type_id,o.`time`,o.name as obdVehicleName, o.type as vehicleType , o.code
+        from
+        (
+        SELECT car.id id, car.brand brand, '1' monitorType,car.create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'3' monitorType,peo.create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time FROM zw_m_thing_info th WHERE th.flag=1
+        ) v
+        left join
+        (select s.id,s.vehicle_id as vid,s.obd_vehicle_type_id,s.`time`,ov.name, ov.type, ov.code
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        where s.flag = 1) o
+        on o.vid = v.id
+        where
+        v.id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findOBDSetting" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        SELECT DISTINCT svi.*,vi.id AS vehicleId,vi.brand AS brand
+        FROM   (
+        SELECT car.id id, car.brand brand, '1' monitorType,car.create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'3' monitorType,peo.create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time FROM zw_m_thing_info th WHERE th.flag=1
+        ) vi
+        INNER JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag  = 1
+        INNER JOIN zw_m_assignment_vehicle assv ON assv.vehicle_id = vi.id AND assv.flag = 1
+        INNER JOIN zw_m_assignment ass ON ass.id = assv.assignment_id AND ass.flag = 1
+        INNER JOIN zw_m_assignment_user au ON au.assignment_id = ass.id AND au.flag = 1
+        LEFT JOIN (
+        SELECT sv.id,sv.vehicle_id AS sVehicleId,sv.obd_vehicle_type_id,sv.time,
+        si.name as obdVehicleName, si.type as vehicleType, si.code,
+        si.description,si.initial
+        FROM zw_m_obd_setting sv
+        LEFT JOIN zw_m_obd_vehicle_type si ON si.id = sv.obd_vehicle_type_id AND si.flag = 1
+        WHERE sv.flag = 1
+        ) svi ON svi.sVehicleId = vi.id
+        WHERE
+         au.user_id = #{userId}
+        AND vi.brand NOT LIKE '扫%'
+        AND ass.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="query != null">
+            <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+                AND (vi.brand LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                OR si.name LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+                )
+            </if>
+            <if test="query.groupId != null and query.groupId!=''">
+                AND ass.org_id = #{query.groupId}
+            </if>
+            <if test="query.assignmentId != null and query.assignmentId!=''">
+                AND ass.id = #{query.assignmentId}
+            </if>
+
+            <if test="query.protocol != null and query.protocol!=''">
+                AND di.device_type = #{query.protocol}
+            </if>
+
+            <if test="query.vehicleId != null and query.vehicleId!=''">
+                AND vi.id = #{query.vehicleId}
+            </if>
+        </if>
+        ORDER BY vi.create_data_time DESC
+    </select>
+
+    <!-- 新增 -->
+    <insert id="addOBDManagerSetting" parameterType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        insert into zw_m_obd_setting
+        (id,vehicle_id,obd_vehicle_type_id,`time`,flag,create_data_time,create_data_username)
+        values
+        (#{id},#{vehicleId},#{obdVehicleTypeId},#{time},#{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <!-- 按车id查询 -->
+    <select id="findOBDSettingByVId" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select
+        s.id, s.vehicle_id, s.obd_vehicle_type_id, s.`time`, ov.name as obdVehicleName, ov.type as vehicleType, ov.code
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        where s.flag = 1
+        and  s.vehicle_id = #{id}
+    </select>
+
+    <!-- 查询参考对象 -->
+    <select id="getReferentInfo" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select
+        s.id, s.vehicle_id, s.obd_vehicle_type_id, s.`time`, ov.name as obdVehicleName, ov.type as vehicleType, ov.code,vi.brand
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        inner join
+        (
+        SELECT car.id id, car.brand brand, '1' monitorType,car.create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'3' monitorType,peo.create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time FROM zw_m_thing_info th WHERE th.flag=1
+        ) vi on vi.id = s.vehicle_id
+        INNER JOIN zw_m_assignment_vehicle av ON s.vehicle_id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        where s.flag = 1
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupId" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="protocols != null and protocols.size > 0">
+            and di.device_type IN
+            <foreach collection="protocols" item="protocol" open="(" separator="," close=")">
+                #{protocol}
+            </foreach>
+        </if>
+        GROUP BY s.id
+        ORDER BY s.id
+    </select>
+
+    <!-- 修改 -->
+    <update id="updateOBDManagerSetting" parameterType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        update zw_m_obd_setting
+        set
+        vehicle_id = #{vehicleId},
+        obd_vehicle_type_id = #{obdVehicleTypeId},
+        `time` = #{time},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where flag = 1
+        and id = #{id}
+    </update>
+
+    <!-- 按id查询 -->
+    <select id="findOBDSettingById" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select
+        s.id, s.vehicle_id, s.obd_vehicle_type_id, s.`time`, ov.name as obdVehicleName, ov.type as vehicleType, ov.code
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        where s.flag = 1
+        and  s.id = #{id}
+    </select>
+
+    <!-- 按id查询 -->
+    <select id="findOBDSettingByVid" parameterType="String" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select
+        s.id, s.vehicle_id, s.obd_vehicle_type_id, s.`time`, ov.name as obdVehicleName, ov.type as vehicleType, ov.code
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        where s.flag = 1
+        and  s.vehicle_id = #{vid}
+    </select>
+
+    <!-- 删除 -->
+    <delete id="deleteOBDManagerSetting" parameterType="String">
+        update zw_m_obd_setting
+        set
+        flag = 0
+        where flag = 1
+        and id in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 查找绑定过的OBD（初始化缓存使用） -->
+    <select id="findAllSetting" resultType="Map">
+        select s.vehicle_id as id, CONCAT(ov.name, "#@!@#", s.id) AS `type`
+        from zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        where s.flag = 1
+    </select>
+    
+    <select id="findIsBandObdSensor" resultType="java.lang.Integer">
+        SELECT COUNT(s.id) FROM zw_m_obd_setting s
+        inner join zw_m_obd_vehicle_type ov on s.obd_vehicle_type_id = ov.id and ov.flag = 1
+        WHERE s.flag = 1
+        AND s.vehicle_id = #{monitorId}
+    </select>
+
+    <select id="getByObdVehicleTypeIds" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select id, vehicle_id, obd_vehicle_type_id, time, create_data_time, create_data_username, update_data_time,
+        update_data_username from zw_m_obd_setting where flag = 1 and obd_vehicle_type_id in
+        <foreach collection="obdVehicleTypeIds" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getListByMoIds" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select zmos.id, zmos.vehicle_id, zmos.obd_vehicle_type_id, zmos.time, zmovt.name obdVehicleName, zmovt.type
+        vehicleType, zmovt.code
+        from zw_m_obd_setting zmos left join zw_m_obd_vehicle_type zmovt on zmos.obd_vehicle_type_id = zmovt.id
+        and zmovt.flag = 1
+        where zmos.flag = 1 and zmos.vehicle_id in
+        <foreach collection="moIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getListByIds" resultType="com.zw.platform.domain.basicinfo.form.OBDManagerSettingForm">
+        select zmos.id, zmos.vehicle_id, zmos.obd_vehicle_type_id, zmos.time, zmovt.name obdVehicleName, zmovt.type
+        vehicleType, zmovt.code
+        from zw_m_obd_setting zmos left join zw_m_obd_vehicle_type zmovt on zmos.obd_vehicle_type_id = zmovt.id
+        and zmovt.flag = 1
+        where zmos.flag = 1 and zmos.id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

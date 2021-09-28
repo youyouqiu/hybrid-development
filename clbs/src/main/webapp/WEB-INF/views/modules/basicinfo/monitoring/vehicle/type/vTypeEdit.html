@@ -1,0 +1,83 @@
+<form  th:action="@{/m/basicinfo/monitoring/vehicle/type/editCategory}"  id="editCategory" role="form" action="#" method="post" class="form-horizontal" th:object="${result}" >
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">修改车辆类别</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<input th:field="*{id}" type="text" hidden="true" id="cid"/>
+				<input th:value="*{standard}" name="standard" type="hidden"/>
+				<div class="form-group">
+					<label class="col-md-3 control-label"> 标准：</label>
+					<div class="col-md-6">
+						<select disabled th:field="*{standard}" id="standard" class="form-control">
+							<option value="0">通用</option>
+							<option value="1">货运</option>
+							<option value="2">工程机械</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">车辆类别：</label>
+					<div class="col-md-6">
+						<input th:field="*{vehicleCategory}" name="vehicleCategory" placeholder="如：其它车辆" type="text" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">备注：</label>
+					<div class="col-md-6">
+						<input th:field="*{description}" class="form-control" placeholder="请输入备注" name="description" type="text"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-3 control-label">图标：</label>
+					<div class="col-md-6" id="vIcoManagement">
+						<div class="col-md-12 vicopadd">
+							<div class="inpVicoPhoto">
+								<input type="file" accept="image/png" name="file" id="doc" onchange="editVehicleCategory.setImagePreviewIndex()">
+								<img src="../../../../../resources/img/vico/addVIco.png" width="96px" height="96px"/>
+							</div>
+							<div class="thisVIcoInfo" id="thisVIcoInfo">
+								<input id="ico" th:value="*{ico}" name="ico" type="hidden" />
+								<input id="icoName" th:value="*{icoName}"type="hidden" />
+								<div class="vico" id="upIcoSize"><img id="preview" src=""></div>
+							</div>
+						</div>
+						<ul class="col-md-12 vicopadd" id="vIcoTypeNum"></ul>
+					</div>
+					<div class="col-md-4"></div>
+					<div class="col-md-4 text-center">
+						<div class="btn-group btn-group-sm vIcoPages" role="group">
+						  	<button type="button" class="btn btn-white" id="pro-arrow">上一页</button>
+						  	<button type="button" class="btn btn-white" id="next-arrow">下一页</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<div class="text-left">
+			<p style="color:#ff0000">注：图标大小不要超过67*37， 为保证显示效果，要求监控对象图标的朝向统一朝右；</p>
+		</div>
+		<button class="btn btn-primary" type="button" id="editSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script th:inline="javascript">
+	document.body.onselectstart=document.body.oncontextmenu=function(){ return false;}
+    var vehicleCategoryNull = [[#{vehicle.category.null}]];
+    var vehicleCategoryExists = [[#{vehicle.category.exists}]];
+    var publicSize20=[[#{public.size20.length}]];
+    var publicSize50=[[#{public.size50.length}]];
+    var categoryIcoBind=[[#{vehicle.category.icoBind}]];
+    var categoryIco=[[#{vehicle.category.ico}]];
+</script>
+<script src="/wro/vehicleTypeIcoEdit.js" th:src="@{/wro/vehicleTypeIcoEdit.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

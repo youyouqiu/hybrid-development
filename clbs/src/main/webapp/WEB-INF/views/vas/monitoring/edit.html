@@ -1,0 +1,474 @@
+<form th:action="@{/m/functionconfig/fence/bindfence/edit.gsp}"
+      th:object="${result}" id="editForm" role="form"
+      method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title" th:text="${vehicleName}"></h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input th:field="*{id}" type="text" hidden="true"/>
+                    <input th:field="*{fenceId}" type="text" hidden="true"/>
+                    <input th:field="*{vehicleId}" type="text" hidden="true"/>
+                    <label class="col-md-2 control-label">围栏名称：</label>
+                    <div class="col-md-4">
+                        <input type="text" th:value="${fenceName}" class="form-control inputStyleHide" readonly>
+                    </div>
+                    <label class="col-md-2 control-label">围栏类型：</label>
+                    <div class="has-feedback col-md-4">
+                        <input id="fenceType" type="text" th:value="${fenceType}" class="form-control inputStyleHide"
+                               readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div th:if="${fenceType!='zw_m_line' && fenceType!='zw_m_polygon' && fenceType != 'zw_m_travel_line' && fenceType != 'zw_m_administration'}">
+                        <label class="col-md-2 control-label">下发类型：</label>
+                        <div class="col-md-4">
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{sendFenceType}"
+                                                                   name="sendFenceType" id="isRadioUpdate" value=0> 更新
+                            </label>
+                            <label class="checkbox-inline" style="margin-left: -4px;"> <input type="radio"
+                                                                                              th:field="*{sendFenceType}"
+                                                                                              name="sendFenceType"
+                                                                                              id="isRadioAdd" value=1>
+                                追加
+                            </label>
+                            <label class="checkbox-inline" style="margin-left: -4px;"> <input type="radio"
+                                                                                              th:field="*{sendFenceType}"
+                                                                                              name="sendFenceType"
+                                                                                              id="isRadioEdit" value=2>
+                                修改
+                            </label>
+                        </div>
+                    </div>
+                    <div th:if="${fenceType=='zw_m_line' || fenceType=='zw_m_polygon' || fenceType=='zw_m_travel_line' || fenceType=='zw_m_administration'}">
+                        <label class="col-md-2 control-label" show>下发类型：</label>
+                        <div class="col-md-4" show>
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{sendFenceType}"
+                                                                   name="sendFenceType" id="isRadioUpdate" value=0
+                                                                   checked>更新
+                            </label>
+                        </div>
+                    </div>
+                    <label class="col-md-2 control-label">报警来源：</label>
+                    <div class="col-md-4" id="alarmSource">
+                        <p class="form-control-static" th:if="*{alarmSource==0}">终端报警</p>
+                        <p class="form-control-static" th:if="*{alarmSource==1}">平台报警</p>
+                        <p class="form-control-static" th:if="*{alarmSource==2}">平台与终端</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">驶入报警给驾驶员：</label>
+                    <div class="col-md-4">
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmInDriver}"
+                                                               name="alarmInDriver" value=1 id="isAlarmInDriver"> 是
+                        </label>
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmInDriver}"
+                                                               name="alarmInDriver" value=0 id="noAlarmInDriver"> 否
+                        </label>
+                    </div>
+                    <label class="col-md-2 control-label">驶入报警给平台：</label>
+                    <div class="col-md-4">
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmInPlatform}"
+                                                               name="alarmInPlatform" value=1> 是
+                        </label>
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmInPlatform}"
+                                                               name="alarmInPlatform" value=0> 否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">驶出报警给驾驶员：</label>
+                    <div class="col-md-4">
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmOutDriver}"
+                                                               name="alarmOutDriver" value=1> 是
+                        </label>
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmOutDriver}"
+                                                               name="alarmOutDriver" value=0> 否
+                        </label>
+                    </div>
+                    <label class="col-md-2 control-label">驶出报警给平台：</label>
+                    <div class="col-md-4">
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmOutPlatform}"
+                                                               name="alarmOutPlatform" value=1> 是
+                        </label>
+                        <label class="checkbox-inline"> <input type="radio" th:field="*{alarmOutPlatform}"
+                                                               name="alarmOutPlatform" value=0> 否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">开始日期：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{alarmStartTime}" id="alarmStartTimeEdit" name="alarmStartTime"
+                               placeholder="请输入开始日期" type="text" style="cursor: pointer;"
+                               class="form-control layer-date laydate-icon"/>
+                    </div>
+                    <label class="col-md-2 control-label">开始时间：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{alarmStartDate}" placeholder="请输入开始时间"
+                               class='form-control layer-date laydate-icon' name='alarmStartDate'
+                               style="cursor: pointer; background-color: rgb(250, 250, 250);" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">结束日期：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{alarmEndTime}" placeholder="请输入开始日期" type="text" style="cursor: pointer;"
+                               class="form-control layer-date laydate-icon"/>
+                    </div>
+                    <label class="col-md-2 control-label">结束时间：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{alarmEndDate}" placeholder="请输入开始时间"
+                               class='form-control layer-date laydate-icon' name='alarmEndDate'
+                               style="cursor: pointer; background-color: rgb(250, 250, 250);" readonly/>
+                    </div>
+                </div>
+                <div class="platform-alarm-displayed"
+                     th:if="${fenceType != 'zw_m_line' && fenceType != 'zw_m_travel_line'}">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">允许开门：</label>
+                        <div class="col-md-3">
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{openDoor}"
+                                                                   name="openDoor" value=0> 是
+                            </label>
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{openDoor}"
+                                                                   name="openDoor" value=1> 否
+                            </label>
+                        </div>
+                        <label class="col-md-3 control-label">进区域不采集GNSS详细定位数据：</label>
+                        <div class="col-md-4">
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{gnssFlag}"
+                                                                   name="gnssFlag" value=0> 是
+                            </label>
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{gnssFlag}"
+                                                                   name="gnssFlag" value=1> 否
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">进区域开启通信模块：</label>
+                        <div class="col-md-4">
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{communicationFlag}"
+                                                                   name="communicationFlag" value=0> 是
+                            </label>
+                            <label class="checkbox-inline"> <input type="radio" th:field="*{communicationFlag}"
+                                                                   name="communicationFlag" value=1> 否
+                            </label>
+                        </div>
+                        <label class="col-md-2 control-label">围栏ID：</label>
+                        <div class="col-md-4">
+                            <input type="text" th:field="*{sendDownId}" name="sendDownId" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="isPlatformAlarm" th:if="${fenceType=='zw_m_line'}">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label"> 行驶时间过长阈值(s)：</label>
+                        <div class="col-md-4">
+                            <input type="text" th:field="*{travelLongTime}" name="travelLongTime" class="form-control">
+                        </div>
+                        <label class="col-md-2 control-label">行驶时间不足阈值(s)：</label>
+                        <div class="has-feedback col-md-4">
+                            <input type="text" th:field="*{travelSmallTime}" name="travelSmallTime"
+                                   class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">围栏ID：</label>
+                        <div class="col-md-4">
+                            <input type="text" th:field="*{sendDownId}" name="sendDownId" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 最高速度(km/h)：</label>
+                    <div class="col-md-4">
+                        <input type="text" th:field="*{speed}" name="speed" class="form-control">
+                    </div>
+                    <div th:if="${fenceType=='zw_m_line'||fenceType=='zw_m_rectangle'||fenceType=='zw_m_circle'||fenceType=='zw_m_polygon'}">
+                        <label class="col-md-2 control-label"> 夜间最高速度(km/h)：</label>
+                        <div class="has-feedback col-md-4">
+                            <input type="text" th:field="*{nightMaxSpeed}" name="nightMaxSpeed" class="form-control">
+                        </div>
+                    </div>
+                    <div class="isPlatformAlarm"
+                         th:if="${fenceType!='zw_m_line'&&fenceType!='zw_m_rectangle'&&fenceType!='zw_m_circle'&&fenceType!='zw_m_polygon'}">
+                        <label class="col-md-2 control-label">超速持续时间(s)：</label>
+                        <div class="has-feedback col-md-4">
+                            <input type="text" th:field="*{overSpeedLastTime}" name="overSpeedLastTime"
+                                   class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group"
+                     th:if="${fenceType=='zw_m_line'||fenceType=='zw_m_rectangle'||fenceType=='zw_m_circle'||fenceType=='zw_m_polygon'}">
+                    <label class="col-md-2 control-label"> 夜间限速时间段：</label>
+                    <div class="col-md-4">
+                        <input th:value="*{nightLimitTime}" style="cursor: pointer;  background-color: #fafafa;"
+                               class="dateTime2 form-control layer-date laydate-icon valid" id="nightLimitTimeEdit"
+                               name="nightLimitTime" readonly>
+                    </div>
+                    <div class="isPlatformAlarm">
+                        <label class="col-md-2 control-label">超速持续时间(s)：</label>
+                        <div class="has-feedback col-md-4">
+                            <input type="text" th:field="*{overSpeedLastTime}" name="overSpeedLastTime"
+                                   class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmitEdit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    (function ($, window) {
+        var time_id, hourseEditSelect, minuteEditSelect, secondEditSelect;
+        bindFenceEdit = {
+            init: function () {
+                var hmsTimeEdit = '<div id="hmsTimeEdit" style="text-align:center;background-color:#ffffff;border:1px solid #cccccc;width:200px; display:none;"><div id="hourseEditSelect"><div style="text-align:center;width:200px;background-color:#6dcff6;color:#ffffff;">时</div><table style="width:200px;border-top:1px solid #cccccc; color:#6dcff6;"><thead></thead><tbody><tr><td>01</td><td>02</td><td>03</td><td>04</td></tr><tr><td>05</td><td>06</td><td>07</td><td>08</td></tr><tr><td>09</td><td>10</td><td>11</td><td>12</td></tr><tr><td>13</td><td>14</td><td>15</td><td>16</td></tr><tr><td>17</td><td>18</td><td>19</td><td>20</td></tr><tr><td>21</td><td>22</td><td>23</td><td>00</td></tr></tbody></table></div><div id="minuteEditSelect" style="display:none;"><div style="text-align:center;width:200px;background-color:#6dcff6;color:#ffffff;">分</div><table style="width:200px;border-top:1px solid #cccccc; color:#6dcff6"><thead></thead><tbody><tr><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td></tr><tr><td>07</td><td>08</td><td>09</td><td>10</td><td>11</td><td>12</td></tr><tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td></tr><tr><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr><tr><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td></tr><tr><td>31</td><td>32</td><td>33</td><td>34</td><td>35</td><td>36</td></tr><tr><td>37</td><td>38</td><td>39</td><td>40</td><td>41</td><td>42</td></tr><tr><td>43</td><td>44</td><td>45</td><td>46</td><td>47</td><td>48</td></tr><tr><td>49</td><td>50</td><td>51</td><td>52</td><td>53</td><td>54</td></tr><tr><td>55</td><td>56</td><td>57</td><td>58</td><td>59</td><td>00</td></tr></tbody></table></div><div id="secondEditSelect" style="display:none;"><div style="text-align:center;width:200px;background-color:#6dcff6;color:#ffffff;">秒</div><table style="width:200px;border-top:1px solid #cccccc;color:#6dcff6;"><thead></thead><tbody><tr><td>01</td><td>02</td><td>03</td><td>04</td><td>05</td><td>06</td></tr><tr><td>07</td><td>08</td><td>09</td><td>10</td><td>11</td><td>12</td></tr><tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td></tr><tr><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td></tr><tr><td>25</td><td>26</td><td>27</td><td>28</td><td>29</td><td>30</td></tr><tr><td>31</td><td>32</td><td>33</td><td>34</td><td>35</td><td>36</td></tr><tr><td>37</td><td>38</td><td>39</td><td>40</td><td>41</td><td>42</td></tr><tr><td>43</td><td>44</td><td>45</td><td>46</td><td>47</td><td>48</td></tr><tr><td>49</td><td>50</td><td>51</td><td>52</td><td>53</td><td>54</td></tr><tr><td>55</td><td>56</td><td>57</td><td>58</td><td>59</td><td>00</td></tr></tbody></table></div></div>';
+                $("body").append(hmsTimeEdit);
+                $("#hmsTimeEdit tr td").on("mouseover", function () {
+                    $(this).css({
+                        "background-color": "#6dcff6",
+                        "color": "#ffffff"
+                    })
+                }).on("mouseout", function () {
+                    $(this).css({
+                        "background-color": "#ffffff",
+                        "color": "#6dcff6"
+                    })
+                });
+                //报警来源为平台时
+                if ($("#alarmSource>p.form-control-static").text() == "平台报警") {
+                    $(".isPlatformAlarm").hide();
+                    $(".platform-alarm-displayed").hide();
+                }
+                laydate.render({elem: '#alarmStartTimeEdit', type: 'date', theme: '#6dcff6'});
+                laydate.render({elem: '#alarmEndTime', type: 'date', theme: '#6dcff6'});
+
+                laydate.render({
+                    elem: '#nightLimitTimeEdit'
+                    , type: 'time'
+                    , range: '--'
+                    , format: 'HH:mm'
+                    , noSecond: true
+                    , trigger: 'click'
+                });
+            },
+            fencetypepid: function (fencetype) {
+                if (fencetype == "zw_m_marker") {
+                    return "标注";
+                } else if (fencetype == "zw_m_line") {
+                    return "线";
+                } else if (fencetype == "zw_m_rectangle") {
+                    return "矩形";
+                } else if (fencetype == "zw_m_circle") {
+                    return "圆形";
+                } else if (fencetype == "zw_m_polygon") {
+                    return "多边形";
+                } else if (fencetype == "zw_m_administration") {
+                    return "行政区划";
+                } else if (fencetype == "zw_m_travel_line") {
+                    return "导航路线";
+                }
+            },
+            laydateEditTime: function (e) {
+                var $element = $(this);
+                time_id = $element.attr('id');
+                var offset = $element.offset();
+                var height = $element.height();
+                $("#hmsTimeEdit").show().css({
+                    "position": "absolute",
+                    "top": (offset.top + height + 10) + "px",
+                    "left": offset.left + "px",
+                    "z-index": "999999999999999999"
+                });
+            },
+            doSubmit: function () {
+                if (bindFenceEdit.validates()) {
+                    var nowDate = new Date();
+                    var YMD = nowDate.getFullYear() + "-" + (parseInt(nowDate.getMonth() + 1) < 10 ? "0" + parseInt(nowDate.getMonth() + 1) : parseInt(nowDate.getMonth() + 1)) + "-" + (nowDate.getDate() < 10 ? "0" + nowDate.getDate() : nowDate.getDate());
+                    // 开始时间结束时间格式转换
+                    var alarmStart = $("#alarmStartDate").val();
+                    var alarmEnd = $("#alarmEndDate").val();
+                    //表单转json
+                    var dataJson = $("#editForm").serializeObject();
+                    if (alarmStart != null && alarmStart != undefined && alarmStart != '') {
+                        dataJson.alarmStartDate = YMD + " " + alarmStart;
+                    }
+                    if (alarmEnd != null && alarmEnd != undefined && alarmEnd != '') {
+                        dataJson.alarmEndDate = YMD + " " + alarmEnd;
+                    }
+                    $.ajax({
+                        url: $("#editForm").attr('action'),
+                        type: 'POST', //GET
+                        data: dataJson,
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                $("#commonWin").modal("hide");
+                                layer.msg("修改成功");
+                                myTable.refresh()
+                            } else {
+                                if (data.msg == null) {
+                                    layer.msg("修改失败");
+                                } else if (data.msg.toString().indexOf("系统错误") > -1) {
+                                    layer.msg(data.msg, {move: false});
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            }
+                        },
+                        error: function () {
+                            layer.msg("系统错误");
+                        },
+                    })
+                }
+                ;
+            },
+            validates: function () {
+                return $("#editForm").validate({
+                    rules: {
+                        alarmEndTime: {
+                            compareDate: "#alarmStartTimeEdit",
+                            timeNotNull: "#alarmStartTimeEdit"
+                        },
+                        alarmStartTime: {
+                            timeNotNull: "#alarmEndTime"
+                        },
+                        alarmEndDate: {
+                            timeNotNull: "#alarmStartDate",
+                            compareTime: "#alarmStartDate"
+                        },
+                        alarmStartDate: {
+                            timeNotNull: "#alarmEndDate"
+                        },
+                        travelLongTime: {
+                            isInteger: true,
+                            range: [0, 65535]
+                        },
+                        travelSmallTime: {
+                            isInteger: true,
+                            range: [0, 65535]
+                        },
+                        speed: {
+                            isInteger: true,
+                            range: [0, 65535]
+                        },
+                        nightMaxSpeed: {
+                            isInteger: true,
+                            range: [0, 65535]
+                        },
+                        overSpeedLastTime: {
+                            isInteger: true,
+                            range: [0, 65535]
+                        }
+                    },
+                    messages: {
+                        alarmEndTime: {
+                            compareDate: "结束日期必须大于开始日期！",
+                            timeNotNull: "请输入结束日期！"
+                        },
+                        alarmStartTime: {
+                            timeNotNull: "请输入开始日期！"
+                        },
+                        alarmEndDate: {
+                            timeNotNull: "请输入结束时间！",
+                            compareTime: "结束时间必须大于开始时间！"
+                        },
+                        alarmStartDate: {
+                            timeNotNull: "请输入开始时间！"
+                        },
+                        travelLongTime: {
+                            isInteger: "必须为整数 ",
+                            range: "输入值必须介于0到65535之间"
+                        },
+                        travelSmallTime: {
+                            isInteger: "必须为整数 ",
+                            range: "输入值必须介于0到65535之间"
+                        },
+                        speed: {
+                            isInteger: "必须为整数 ",
+                            range: "输入值必须介于0到65535之间"
+                        },
+                        nightMaxSpeed: {
+                            isInteger: "必须为整数 ",
+                            range: "输入值必须介于0到65535之间"
+                        },
+                        overSpeedLastTime: {
+                            isInteger: "必须为整数 ",
+                            range: "输入值必须介于0到65535之间"
+                        }
+                    }
+                }).form();
+            },
+            hourseEditSelectClick: function () {
+                hourseEditSelect = $(this).text();
+                $("#hourseEditSelect").hide();
+                $("#minuteEditSelect").show();
+            },
+            minuteEditSelectClick: function () {
+                minuteEditSelect = $(this).text();
+                $("#minuteEditSelect").hide();
+                $("#secondEditSelect").show();
+            },
+            secondEditSelectClick: function () {
+                secondEditSelect = $(this).text();
+                $("#secondEditSelect").hide();
+                $("#hourseEditSelect").show();
+                $("#hmsTimeEdit").hide();
+                var this_time = hourseEditSelect + ":" + minuteEditSelect + ":" + secondEditSelect;
+                $("#" + time_id).val(this_time);
+            },
+            bodyClickEvent: function (event) {
+                if ($(event.target).parents("#hmsTimeEdit").length == 0 && event.target.id != "hmsTimeEdit" && event.target.id.indexOf('alarm') == -1) {
+                    $("#hmsTimeEdit").hide();
+                }
+            },
+
+        }
+        $(function () {
+            bindFenceEdit.init();
+            $('input').inputClear();
+            $("#hourseEditSelect tr td").off('click').bind("click", bindFenceEdit.hourseEditSelectClick);
+            $("#minuteEditSelect tr td").off('click').bind("click", bindFenceEdit.minuteEditSelectClick);
+            $("#secondEditSelect tr td").off('click').bind("click", bindFenceEdit.secondEditSelectClick);
+            $("#fenceType").val(bindFenceEdit.fencetypepid($("#fenceType").val()));
+            $("#doSubmitEdit").off('click').on("click", bindFenceEdit.doSubmit);
+            $("body").off('click').bind("click", bindFenceEdit.bodyClickEvent);
+            //$('#alarmEndDate, #alarmStartDate').off('click').on('click',bindFenceEdit.laydateEditTime);
+            laydate.render({elem: '#alarmEndDate', theme: '#6dcff6', type: 'time'});
+            laydate.render({elem: '#alarmStartDate', theme: '#6dcff6', type: 'time'});
+        })
+
+        $.fn.serializeObject = function () {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    })($, window)
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>

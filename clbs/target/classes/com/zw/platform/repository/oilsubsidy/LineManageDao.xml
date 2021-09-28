@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.oilsubsidy.LineManageDao">
+
+    <insert id="add" parameterType="com.zw.platform.domain.oilsubsidy.line.LineDO">
+     insert into zw_m_oil_subsidy_line_info values(#{id},#{dockingCodeOrgId},#{identify},#{name},#{lineType},#{remark},1,now())
+    </insert>
+    <update id="update" parameterType="com.zw.platform.domain.oilsubsidy.line.LineDO">
+     update zw_m_oil_subsidy_line_info
+     <set>
+        <if test="identify != null and identify !=''">
+            identify = #{identify},
+        </if>
+         <if test="name != null and name !=''">
+             name = #{name},
+         </if>
+         <if test="lineType != null">
+             line_type = #{lineType},
+         </if>
+         <if test="dockingCodeOrgId != null and dockingCodeOrgId !=''">
+             docking_code_org_id = #{dockingCodeOrgId},
+         </if>
+         remark = #{remark}
+     </set>
+      where id =#{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+      update zw_m_oil_subsidy_line_info set flag =0 where id =#{id}
+    </delete>
+
+    <delete id="deleteBatch">
+      update zw_m_oil_subsidy_line_info set flag =0 where id in
+          <foreach collection="list" item="id" open="(" separator="," close=")">
+             #{id}
+          </foreach>
+    </delete>
+    <select id="getAllFieldById" resultType="com.zw.platform.domain.oilsubsidy.line.LineDO" parameterType="String">
+     select id,docking_code_org_id,identify,name,line_type,remark
+     from zw_m_oil_subsidy_line_info where flag = 1 and id =#{id}
+    </select>
+
+    <select id="getListByKeyword" resultType="com.zw.platform.domain.oilsubsidy.line.LineDTO">
+     select id,docking_code_org_id,identify,name,line_type,remark from zw_m_oil_subsidy_line_info where flag = 1
+     <if test="query.currentUserOrgIds != null and query.currentUserOrgIds.size() > 0 ">
+        and docking_code_org_id  in
+        <foreach collection="query.currentUserOrgIds" item="orgId" open="(" separator="," close=")">
+            #{orgId}
+        </foreach>
+     </if>
+     <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+        AND (name LIKE CONCAT('%',#{query.simpleQueryParam},'%')
+        OR identify LIKE CONCAT('%',#{query.simpleQueryParam},'%'))
+     </if>
+       order by create_data_time desc
+    </select>
+
+    <select id="getNamesByIds" resultType="String">
+        select name from zw_m_oil_subsidy_line_info where flag = 1 and id in
+        <foreach collection="ids" separator="," open="(" item="id"  close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getListMapByIds" resultType="java.util.Map">
+        select id,docking_code_org_id,identify,name,line_type,remark
+        from zw_m_oil_subsidy_line_info where flag = 1 and id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getBindLine" resultType="com.zw.platform.domain.oilsubsidy.line.Line1301CommandDTO">
+      select distinct t1.identify,t1.name,t1.line_type,t2.org_code,t2.forwarding_platform_id,
+             t3.direction_type,t3.mile,t3.distance,t3.summer_first_train_time,t3.summer_last_train_time,t3.morning_peak_start_time,
+             t3.evening_peak_start_time,t3.morning_peak_end_time,t3.evening_peak_end_time,t3.peak_departure_interval,
+             t3.off_peak_departure_interval,t3.winter_first_train_time,t3.winter_last_train_time,t4.ip,t4.center_id,
+             t3.first_station_id,t3.last_station_id
+             from zw_m_oil_subsidy_line_info t1
+             inner join zw_m_oil_subsidy_vehicle_info t2 on t1.id = t2.line_id
+             inner join zw_m_oil_subsidy_direction_info t3 on t2.line_id = t3.line_id
+             inner join zw_m_809_setting t4 on t4.id = t2.forwarding_platform_id
+             where t1.flag = 1 and t2.flag = 1 and t4.flag = 1 and t2.forwarding_platform_id IS NOT NULL
+               and t2.org_code IS NOT NULL
+    </select>
+
+    <select id="getBindLineStation" resultType="com.zw.platform.domain.oilsubsidy.line.Line1302CommandDTO">
+        select distinct t1.identify,t3.direction_type,t4.ip,t4.center_id,t6.longitude,t6.latitude,t5.station_info_order,
+               t2.org_code,t2.forwarding_platform_id
+        from zw_m_oil_subsidy_line_info t1
+                 inner join zw_m_oil_subsidy_vehicle_info t2 on t1.id = t2.line_id
+                 inner join zw_m_oil_subsidy_direction_info t3 on t2.line_id = t3.line_id
+                 inner join zw_m_809_setting t4 on t4.id = t2.forwarding_platform_id
+                 inner join zw_m_oil_subsidy_direction_station_middle t5 on t5.direction_info_id =t3.id
+                 inner join zw_m_oil_subsidy_station_info t6 on t6.id = t5.station_info_id
+          where t1.flag = 1 and t2.flag = 1 and t4.flag = 1 and t2.forwarding_platform_id IS NOT NULL
+          and t2.org_code IS NOT NULL
+    </select>
+
+    <select id="getVehicleIdByLineId"  resultType="string" >
+        select t2.match_vehicle_id from zw_m_oil_subsidy_line_info t1 inner join zw_m_oil_subsidy_vehicle_info t2 on t1.id = t2.line_id
+        where t2.flag = 1 and t1.flag = 1 and t1.id =#{lineId}
+    </select>
+
+    <select id="checkIdentifyExist" resultType="java.lang.Integer">
+        select count(*) from zw_m_oil_subsidy_line_info where identify = #{identify} and docking_code_org_id = #{orgId}
+                                                          and id <![CDATA[ <> ]]> #{id} and flag = 1
+    </select>
+    <select id="getNameAndIdentifyByIds" resultType="java.util.Map">
+        select name,identify from zw_m_oil_subsidy_line_info where flag = 1 and id in
+        <foreach collection="ids" separator="," open="(" item="id" close=")" >
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getLineByOrgId" resultType="com.zw.platform.domain.oilsubsidy.line.LineDTO">
+        select id,name from zw_m_oil_subsidy_line_info where flag = 1 and docking_code_org_id =#{orgId}
+        order by create_data_time desc
+    </select>
+</mapper>

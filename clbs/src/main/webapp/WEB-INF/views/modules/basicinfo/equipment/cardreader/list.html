@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>读卡器管理</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+<body>
+    <section class="">
+        <div th:replace="fragments/nav">nav</div>
+        <div th:replace="fragments/menu">menu</div>       
+        <!--main content start-->
+        <section class="main-content-wrapper">
+            <section id="main-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">设备管理</li>
+                            <li class="active">读卡器管理</li>
+                        </ul>
+                        <h1 class="h1 ">读卡器管理</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">读卡器列表</h3>
+                                <div class="actions pull-right">
+                                    <i class="fa fa-chevron-down"></i>
+                                    <!-- <i class="fa fa-times"></i> -->
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body">
+                                    <!--工具面板-->
+                    <div class="ToolPanel">
+                        <div class="bars pull-left">
+                            <div class="btn-group pull-left barsMargin" role="group">
+                                <form role="form">
+                                   <label><input type="text" class="Inlinesearch form-control" id="simpleQueryParam" name="simpleQueryParam" placeholder="请输入关键字"></label>
+                                   <button type="button" onclick="myTable.filter()" class="btn btn-outline btn-default">搜索</button>
+                                </form>
+                            </div>
+                            <div th:if="${hasRole}" class="dropdown pull-left">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a th:href="@{/m/cardreader/add}" id="addId" data-toggle="modal" data-target="#commonSmWin"><i class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+                                    <li><a th:href="@{/m/cardreader/export.gsp}" id="exportId"><i class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a></li>
+                                    <li><a href="#" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a></li>
+                                    <li><a th:href="@{/m/cardreader/import}" id="importId" data-toggle="modal" data-target="#commonSmWin"><i class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="columns btn-group pull-right">
+                            <button class="btn btn-default" type="button" name="refresh" title="刷新">
+                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                            </button>
+                            <div class="keep-open btn-group" title="定制显示列">
+                                <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">                
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!--工具面板 end-->
+                                
+                                        <!-- <div class="domab">
+                                             <label>
+                                                <input type="text" id="simpleQueryParam" name="simpleQueryParam" class="dsearch form-control" placeholder="请输入关键字" aria-controls="example">
+                                             </label>
+                                             <button onclick="myTable.filter()" class="btn btn-default btn-trans">搜索</button>
+                                             <button class="showUl btn btn-default btn-trans">自定义字段</button>
+                                                <ul class="showUlField dropdown-menu" style="display:none;">
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="2"/>操作</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="3"/>读卡器编号</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="4"/>读卡器类型</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="5"/>启停状态</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="6"/>设备厂商</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="7"/>出厂时间</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="8"/>安装地址</li>
+                                                    <li><input type="checkbox" class="toggle-vis" data-column="8"/>描述</li>
+                                                </ul>
+                                            <span class="dropdown">
+                                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                    <li><a th:href="@{/m/cardreader/add}" id="addId" data-toggle="modal" data-target="#commonSmWin">新增</a></li>
+                                                    <li><a th:href="@{/m/cardreader/export.gsp}" id="exportId">导出</a></li>
+                                                    <li><a href="#" id="del_model">批量删除</a></li>
+                                                    <li><a th:href="@{/m/cardreader/import}" id="importId" data-toggle="modal" data-target="#commonSmWin">导入组织架构图</a></li>
+                                                </ul>
+                                            </span>
+                                        </div> -->
+                                        <table id="dataTable" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th style=" width:1px; padding:0"></th>
+                                                    <th style="width:30px; padding:10px"><input type="checkbox" id="checkAll"></th>
+                                                    <th>操作设置</th>
+                                                    <th>读卡器编号</th>
+                                                    <th>读卡器类型</th>
+                                                    <th>启停状态</th>
+                                                    <th>读卡器厂商</th>
+                                                    <th>出厂时间</th>
+                                                    <!-- <th>安装地址</th> -->
+                                                    <th>描述</th>
+                                                </tr>
+                                            </thead>
+                                            
+                                        </table>
+                                  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+//显示隐藏列
+var menu_text = "";
+var table = $("#dataTable tr th:gt(1)");
+menu_text += "<li><label><input type=\"checkbox\" class=\"toggle-vis\" data-column=\"" + parseInt(2) +"\" disabled />"+ table[0].innerHTML +"</label></li>"
+for(var i = 1; i < table.length; i++){
+    menu_text += "<li><label><input type=\"checkbox\" class=\"toggle-vis\" data-column=\"" + parseInt(i+2) +"\" />"+ table[i].innerHTML +"</label></li>"
+};
+$("#Ul-menu-text").html(menu_text);
+    //表格
+    var myTable;
+    //表格列定义
+    var columnDefs = [ {
+        //第一列，用来显示序号
+        "searchable" : false,
+        "orderable" : false,
+        "targets" : 0
+    } ];
+    var columns = [ {
+        //第一列，用来显示序号
+        "data" : null,
+        "class" : "text-center"
+    }, {
+        //第二列，checkbox
+        "data" : null,
+        "class" : "text-center",
+        render: function (data, type, row, meta) {
+            return '<input type="checkbox" name="subChk" value="' + row.id + '" /> ';
+        }
+    }, {//第三列，操作按钮列
+        "data": null,
+        "class": "text-center", //最后一列，操作按钮
+        render: function (data, type, row, meta) {
+            var editUrlPath = myTable.editUrl+ row.id + ".gsp"; //修改地址
+            var result = '';
+            //修改按钮
+            result += '<button href="' + editUrlPath + '" data-target="#commonSmWin" data-toggle="modal"  type="button" class="editBtn editBtn-info"><i class="fa fa-pencil"></i>修改</button>&nbsp;';
+            //删除按钮
+            result += '<button type="button" onclick="myTable.deleteItem(\'' + row.id + '\')" class="deleteButton editBtn disableClick"><i class="fa fa-trash-o"></i>删除</button>';
+            return result;
+        }
+    }, {//第四列，读卡器编号
+        "data" : "cardReaderNumber",
+        "class" : "text-center"
+    }, {
+        "data" : "cardReaderType",
+        "class" : "text-center",
+        /* render: function (data, type, row, meta) {
+            if (data == "1") {
+                return 'RFID读卡器';
+            } else if (data == "2") {
+                return 'IC读卡器';
+            } else if (data == "3") {
+                return 'ID读卡器';
+            }
+        } */
+    }, {
+        "data" : "isStart",
+        "class" : "text-center",
+        render: function (data, type, row, meta) {
+            if (data == "1") {
+                return '启用';
+            } else if (data !== "1") {
+                return '停用';
+            }
+        }
+    },{
+        "data" : "manuFacturer",
+        "class" : "text-center"
+    }, {
+        "data" : "factoryDate",
+        "class" : "text-center",
+        render : function (data, type, row, meta) {
+            return data == null ? "" : (data.length > 10 ? data.substr(0, 10) : data);
+        }
+    }, {
+        "data" : "description",
+        "class" : "text-center"
+    }];
+    //全选
+    $("#checkAll").click(function () {
+        $("input[name='subChk']").prop("checked",this.checked);
+    });
+    //单选
+    var subChk = $("input[name='subChk']");
+    subChk.click(function () {
+        $("#checkAll").prop("checked",subChk.length ==subChk.filter(":checked").length ? true:false );
+    });
+    //批量删除
+    $("#del_model").click(function () {
+        //判断是否至少选择一项
+        var chechedNum=$("input[name='subChk']:checked").length;
+        if(chechedNum==0){
+        	layer.msg([[#{select.item}]],{move:false});
+            return;
+        }
+        var checkedList = new Array();
+        $("input[name='subChk']:checked").each(function () {
+            checkedList.push($(this).val());
+        });
+        myTable.deleteItems({'deltems':checkedList.toString()});
+    });
+    //ajax参数
+    var ajaxDataParamFun = function(d) {
+        d.simpleQueryParam = $('#simpleQueryParam').val(); //模糊查询
+    };
+    //表格setting
+    var setting = {
+        listUrl : "/clbs/m/cardreader/list",
+        editUrl : "/clbs/m/cardreader/edit_",
+        deleteUrl : "/clbs/m/cardreader/delete_",
+        deletemoreUrl : "/clbs/m/cardreader/deletemore",
+        enableUrl : /*[[@{/c/user/enable_}]]*/'url',
+        disableUrl : /*[[@{/c/user/disable_}]]*/'url',
+        columnDefs : columnDefs, //表格列定义
+        columns : columns, //表格列
+        dataTableDiv : 'dataTable', //表格
+        ajaxDataParamFun : ajaxDataParamFun, //ajax参数
+        pageable : true, //是否分页
+        showIndexColumn : true, //是否显示第一列的索引列
+        enabledChange : true
+    };
+    //创建表格
+    myTable = new TG_Tabel.createNew(setting);
+    //加载完成后执行
+    $(function() {
+        //表格初始化
+        myTable.init();
+    });
+</script>
+
+</html>

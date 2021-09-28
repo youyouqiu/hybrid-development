@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.talkback.repository.mysql.InConfigDao">
+
+    <select id="getIsBand" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.InConfigInfoForm">
+        SELECT c.id,c.monitor_type as monitorType,c.vehicle_id as brandID,vi.brand brands,sim.id as
+        simID,sim.simcard_number as sims,
+        device.device_number as devices,c.device_id as deviceID,c.intercom_info_id as intercomInfoID
+        FROM zw_m_config c
+        left JOIN
+        (
+        SELECT car.id id, car.brand brand, '0' as type FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand, '1' as type FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number brand, '2' as type FROM zw_m_thing_info th WHERE th.flag = 1
+        ) vi
+        ON c.vehicle_id = vi.id
+        LEFT JOIN zw_m_sim_card_info sim ON c.sim_card_id=sim.id
+        LEFT JOIN zw_m_device_info device on c.device_id=device.id
+        WHERE c.flag = 1
+        <if test="monitorName != null and monitorName != ''">
+            and vi.brand = #{monitorName}
+            and vi.type = #{monitorType}
+        </if>
+        <if test="simNum != null and simNum != ''">
+            and sim.simcard_number=#{simNum}
+        </if>
+        <if test="device != null and device != ''">
+            and device.device_number=#{device}
+        </if>
+    </select>
+
+    <select id="getIsBands" parameterType="string" resultType="com.zw.talkback.domain.basicinfo.form.InConfigInfoForm">
+        SELECT c.id,c.monitor_type as monitorType,c.vehicle_id as brandID,vi.brand brands,sim.id as
+        simID,sim.simcard_number as sims,
+        device.device_number as devices,c.device_id as deviceID,c.intercom_info_id as intercomInfoID
+        FROM zw_m_config c
+        left JOIN
+        (
+        SELECT car.id id, car.brand brand, '0' as type FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand, '1' as type FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number brand, '2' as type  FROM zw_m_thing_info th WHERE th.flag = 1
+        ) vi
+        ON c.vehicle_id = vi.id
+        LEFT JOIN zw_m_sim_card_info sim ON c.sim_card_id=sim.id
+        LEFT JOIN zw_m_device_info device on c.device_id=device.id
+        WHERE c.flag = 1 and ((vi.brand = #{monitorName} and vi.type = #{monitorType}) or  sim.simcard_number=#{simNum} or  device.device_number = #{device})
+    </select>
+    <select id="getIsBandIntercomObject" parameterType="string" resultType="int">
+       select count(1)
+        from zw_m_config c
+        left JOIN zw_m_intercom_info n on c.intercom_info_id = n.id
+       WHERE c.flag = 1
+         and right(n.intercom_device_id,7) = right(#{device},7)
+    </select>
+
+    <update id="updateConfigIntercomID" parameterType="string">
+        update zw_m_config c
+           set  c.intercom_info_id = #{intercomInfoId}
+          where c.id = #{configId}
+    </update>
+
+    <select id="getBindMonitorId" parameterType="string" resultType="java.lang.String">
+        select c.vehicle_id from zw_m_config c
+        where c.flag = 1
+        <![CDATA[and c.intercom_info_id <> '']]>
+        and c.monitor_type = #{monitorType}
+    </select>
+
+    <select id="getBindSimId" resultType="java.lang.String">
+        <![CDATA[
+
+
+         select c.sim_card_id from zw_m_config c where c.flag = 1 and c.intercom_info_id <> ''
+
+
+        ]]>
+    </select>
+
+    <update id="updateConfigListBatch">
+        update zw_m_config
+        set intercom_info_id = null
+        where
+        id in
+        <foreach collection="configIdList" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </update>
+
+    <select id="getMonitorIdByFuzzyQuery" resultType="java.lang.String">
+        select p.id
+        from zw_m_intercom_info ini
+        left join zw_m_config c on ini.id = c.intercom_info_id
+        LEFT JOIN (
+        SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id,th.thing_number brand FROM zw_m_thing_info th WHERE th.flag = 1
+        ) p ON p.id = c.vehicle_id
+        left join zw_m_sim_card_info sci ON sci.id = ini.simcard_id AND sci.flag = 1
+        where ini.flag = 1
+        and (
+        ini.intercom_device_id LIKE CONCAT('%', #{simpleQueryParam},'%')
+        or sci.simcard_number LIKE CONCAT('%', #{simpleQueryParam},'%')
+        or p.brand like CONCAT('%', #{simpleQueryParam},'%')
+        )
+    </select>
+
+    <select id="getIsBandConfigIdForDevice" resultType="java.lang.String">
+      select c.id
+        from zw_m_config c
+        left JOIN zw_m_intercom_info n on c.intercom_info_id = n.id
+       WHERE c.flag = 1
+        and right(n.intercom_device_id,7) = #{device}
+    </select>
+
+    <select id="getIdbySimDeviceOrmonitor" resultType="java.lang.String">
+     select monitor.id from
+            (SELECT car.id id, car.brand brand,'0' as type FROM zw_m_vehicle_info car WHERE car.flag=1
+                    UNION
+                   SELECT peo.id id, peo.people_number brand,'1' as type FROM zw_m_people_info peo WHERE peo.flag=1
+                    UNION
+                   SELECT th.id id,th.thing_number brand,'2' as type FROM zw_m_thing_info th WHERE th.flag = 1
+            ) monitor
+       where monitor.brand = #{monitorName} and monitor.type =  #{monitorType}
+       UNION all
+      select id from zw_m_sim_card_info where flag = 1 and simcard_number =#{simNum}
+      union all
+     select id from zw_m_device_info where flag = 1 and device_number = #{device}
+    </select>
+
+    <update id="updateDeviceFuncType" parameterType="string">
+        update zw_m_device_info
+        set  functional_type = #{functionalType}
+        where id = #{deviceId}
+    </update>
+    <update id="updateBatchConfigIntercomID" parameterType="com.zw.talkback.domain.basicinfo.IntercomObjectInfo">
+        update zw_m_config
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="intercom_info_id =case" suffix="end,">
+                <foreach collection="intercomObjects" item="item" index="index">
+                    when id=#{item.configId} then #{item.id}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="intercomObjects" index="index" item="item" separator="," open="(" close=")">
+            #{item.configId}
+        </foreach>
+    </update>
+</mapper>

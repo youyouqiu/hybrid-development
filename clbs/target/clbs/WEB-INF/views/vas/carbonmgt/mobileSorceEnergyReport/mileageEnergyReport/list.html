@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>里程能耗报表</title>
+<div th:replace="fragments/header">header</div>
+</head>
+<body th:object="${result}">
+	<section class="leftMenuBg">
+		<div th:replace="fragments/nav">nav</div>
+		<section class="main-content-wrapper">
+			<div th:replace="fragments/menu">menu</div>
+			<section id="main-content">
+				<div class="row eightIsZero">
+					<div class="col-md-12">
+						<ul class="breadcrumb">
+							<li><a th:href="@{/}">首页</a></li>
+							<li class="active">碳排放监管</li>
+							<li class="active">移动源能耗报表</li>
+							<li class="active">里程能耗报表</li>
+						</ul>
+						<h1 class="h1 ">里程能耗报表</h1>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title fwb">里程能耗列表</h3>
+								<div class="actions pull-right">
+									<i class="fa fa-chevron-down"></i>
+								</div>
+							</div>
+							<div class="panel-body">
+								<div class="ToolPanel clearfix ToolPanellable">								
+									<form id="queryForm" name="reg_testdate" th:action="@{/v/carbonmgt/mileage/list}" role="form" action="#" method="post">
+										<div class="col-md-4 col-sm-12">
+											<div class="form-group">
+												<label class="col-md-3 control-label">查询方式：</label>
+												<div class="col-md-9">
+													<select class="form-control"
+														id="selectTabBox" name="inquiryMode">
+														<option value="list1">按日期查询</option>
+														<option value="list2">按日期统计</option>
+														<option value="list3">按月份统计</option>
+														<option value="list4">按季度统计</option>
+														<option value="list5">按年份统计</option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4 col-sm-12 form-group">
+											<div class="form-group">
+												<label class="col-md-3 control-label">组织：</label>
+												<div class="has-feedback col-md-9">
+													<input class="form-control" id="zTreeCitySel" th:field="*{groupName}" name="groupName"
+														readonly="readonly"
+														style="background-color: #fafafa; cursor: pointer;"
+														type="text"/> <span
+														class="fa fa-chevron-down form-control-feedback" id="arrowDown"
+														style="top: 0; right: 15px;" aria-hidden="true"></span>
+													<input type="hidden" id="groupId" name="groupId" th:field="*{groupId}" />
+													<div class="ztreeModelBox" id="zTreeContent">
+														<ul id="ztreeDemo" class="ztree">
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-4 col-sm-12 form-group">
+											<div class="form-group">
+												<label class="col-md-3 control-label">车牌号：</label>
+												<div class="col-md-9">
+													<div class="input-group">
+                                                   		<input id="brands" name="brands" type="text" maxlength="10" class="form-control" >
+                                                   		<div class="input-group-btn">
+	                                                        <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
+	                                                             <span class="caret"></span>
+	                                                        </button>
+	                                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+	                                                        </ul>
+                                                     	</div>
+                                               		</div>
+												</div>
+											</div>
+										</div>
+										<div class="layDateBox form-group col-md-8" style="padding-left:0;padding-right:0;">
+											<div class="col-md-6 col-sm-12">
+												<div class="form-group">
+													<label class="col-md-3 control-label">开始时间：</label>
+													<div class="col-md-9">
+														<input id="startDate" name="startDate" th:field="*{startDate}"
+															class="form-control laydate-icon" type="text"
+															onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+													</div>
+												</div>
+											</div>
+											<div class="col-md-6 col-sm-12">
+												<div class="form-group">
+													<label class="col-md-3 control-label">结束时间：</label>
+													<div class="col-md-9">
+														<input id="endDate" name="endDate" th:field="*{endDate}" 
+															class="form-control laydate-icon" type="text" 
+															onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="layDateBox1 form-group col-md-8" style="padding-left:0;padding-right:0;">
+											<div class="col-md-6 col-sm-12">
+												<div class="form-group">
+													<label class="col-md-3 control-label">年份：</label>
+													<div class="col-md-9">
+														<select name="YYYY" id="year" class="form-control"
+															onChange="YYYYDD(this.value)">
+														</select>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-6 col-sm-12" id="ladydataMM">
+												<div class="form-group">
+													<label class="col-md-3 control-label">月份：</label>
+													<div class="col-md-9">
+														<select name="MM" id="month" class="form-control"
+															onChange="MMDD(this.value)">
+														</select> <select name="DD" style="display: none;"></select>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-6 col-sm-12" id="ladydataJD" style="display: none;">
+												<div class="form-group">
+													<label class="col-md-3 control-label">季度：</label>
+													<div class="col-md-9">
+														<select name="quarter" id="quarter" class="form-control">
+															<option value="1">第1季度</option>
+															<option value="2">第2季度</option>
+															<option value="3">第3季度</option>
+															<option value="4">第4季度</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+										</div>
+										<div class="col-md-4 col-sm-12 form-group">
+											<div class="form-group">
+												<label class="col-md-3 control-label">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+												<div class="col-md-9">
+													<button type="button" id="curTimeQuery" class="btn btn-primary search-btn" style="display: none">本&nbsp;&nbsp;月</button>
+													<button type="button" id="preTimeQuery" class="btn btn-primary search-btn" style="display: none">上&nbsp;&nbsp;月</button>
+													<button type="button" id="inquireClick" class="btn btn-primary search-btn">
+														<i class="glyphicon glyphicon-search" ></i> 查询
+													</button>
+													<a  th:href="@{/v/carbonmgt/mileageEnergyReport/export.gsp}" class = "btn btn-purple export-btn"><i class="glyphicon glyphicon-log-out"></i> 导出</a>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="dataTableBox">
+									<div id="dataTableBoxlist1">
+										<div class="form-group ladydataTitle">
+											<h4 class="title_name">里程能耗列表</h4>
+											<h5></h5>
+										</div>
+										<div class="form-group">
+											<h4>
+												企业名称：<span class="groupTitle"></span>
+											</h4>
+										</div>
+									<div style="overflow-x: auto; height: 100%;">
+										<table id="dataTable" class="table table-striped table-bordered dataTable table-hover" cellspacing="0" width="100%">
+											<thead id="list2to5_thead" style="display: none">
+												<tr>
+													<th rowspan="2" class="text-center">序号</th>
+													<th rowspan="2" class="text-center">日期</th>
+													<th rowspan="2" class="text-center">车牌号</th>
+													<th rowspan="2" class="text-center">车辆类型</th>
+													<th rowspan="2" class="text-center">燃料类型</th>
+													<th rowspan="2" class="text-center">行驶时长</th>
+													<th rowspan="2" class="text-center">行驶里程(km)</th>
+													<th rowspan="2" class="text-center">平均速度</th>
+													<th rowspan="2" class="text-center">空调开启时长</th>
+													<th rowspan="2" class="text-center">转动时长</th>
+													<th rowspan="1" class="text-center">基准能耗</th>
+                               					    <th rowspan="1" class="text-center">当期平均能耗</th>
+                               					    <th colspan="2" class="text-center">能耗量（L或m³）</th>
+                               					    <th colspan="2" class="text-center">能源节约量</th>
+                               					    <th colspan="4" class="text-center">基准排放量</th>
+                               					    <th colspan="4" class="text-center">当期排放量</th>
+													<th rowspan="2" class="text-center">节能率（%）</th>
+													<th colspan="4" class="text-center">减少排放量</th>
+												</tr>
+												<tr>
+													<th colspan="2" class="text-center">(L或m³/百公里)</th>
+													<th class="dataTableBorderL text-center" >基准能耗量</th>   
+													<th class="dataTableBorderL text-center" >当期能耗量</th>   
+                               					    <th class="dataTableBorderL text-center" >燃料（L或m³）</th>
+                               					    <th class="dataTableBorderL text-center">标准煤（t）</th>
+                               					    <th class="dataTableBorderL text-center">CO₂(t)</th>
+													<th class="dataTableBorderL text-center">SO₂(kg)</th>
+													<th class="dataTableBorderL text-center">NOX(kg)</th>
+													<th class="dataTableBorderL text-center">HCX(kg)</th>
+													<th class="dataTableBorderL text-center">CO₂(t)</th>
+													<th class="dataTableBorderL text-center">SO₂(kg)</th>
+													<th class="dataTableBorderL text-center">NOX(kg)</th>
+													<th class="dataTableBorderL text-center">HCX(kg)</th>
+													<th class="dataTableBorderL text-center">CO₂(t)</th>
+													<th class="dataTableBorderL text-center">SO₂(kg)</th>
+													<th class="dataTableBorderL text-center">NOX(kg)</th>
+													<th class="dataTableBorderL text-center">HCX(kg)</th>
+												</tr>
+											</thead>
+											<thead id="list1_thead">
+												<tr>
+													<th rowspan="2" class="text-center">序号</th>
+													<th rowspan="2" class="text-center">车牌号</th>
+													<th rowspan="2" class="text-center">车辆类型</th>
+													<th rowspan="2" class="text-center">燃料类型</th>
+													<th rowspan="2" class="text-center">打火时间</th>
+                               					    <th rowspan="2" class="text-center">熄火时间</th>
+													<th rowspan="2" class="text-center">行驶时长</th>
+													<th rowspan="2" class="text-center">行驶里程(km)</th>
+													<th rowspan="2" class="text-center">平均速度</th>
+													<th rowspan="2" class="text-center">空调开启时长</th>
+													<th rowspan="2" class="text-center">转动时长</th>
+													<th rowspan="2" class="text-center">油耗量（L或m³）</th>
+													<th rowspan="1" class="text-center">基准能耗</th>
+                               					    <th rowspan="1" class="text-center">当期平均能耗</th>
+                               					    <th colspan="2" class="text-center">能源节约量</th>   
+													<th colspan="4" class="text-center">减少排放量</th>
+												</tr>
+												<tr>
+													<th colspan="2" class="text-center">(L或m³/百公里)</th>
+                               					    <th class="dataTableBorderL text-center" >燃料（L或m³）</th>   
+                               					    <th class="dataTableBorderL text-center">标准煤（t）</th>
+													<th class="dataTableBorderL text-center">CO₂(t)</th>
+													<th class="dataTableBorderL text-center">SO₂(kg)</th>
+													<th class="dataTableBorderL text-center">NOX(kg)</th>
+													<th class="dataTableBorderL text-center">HCX(kg)</th>
+												</tr>
+											</thead>
+											<tbody id="dataList">
+											</tbody>
+										</table>
+										</div>
+										<div class="form-group footerDIV" style="display:none;">
+                               			<p class="col-md-6">甲方负责人：</p>
+                               			<p class="col-md-6">乙方负责人：</p>
+                               			<p class="col-md-6">甲方统计员：</p>
+                               			<p class="col-md-6">乙方统计员：</p>
+                               		    </div>
+							     </div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</section>
+	</section>
+	<div th:replace="fragments/footer">footer</div>
+	<label id="error_label" class='error' style='display: none;'></label>
+</body>
+<script th:inline="javascript">
+	var systemError = [[#{system.error}]];
+	var queryConfirm = [[#{query.confirm}]];
+</script>
+<script src="resources/js/laydate/laydateselect.js" th:src="@{/resources/js/laydate/laydateselect.js}"></script>
+<script src="/wro/mileageEnergyReport.js" th:src="@{/wro/mileageEnergyReport.js}"></script>
+</html>

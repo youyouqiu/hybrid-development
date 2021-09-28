@@ -1,0 +1,132 @@
+<style>
+    .schedule-list{border:1px solid #eee;padding:0 20px;margin-bottom:20px;/*max-height:260px;overflow: hidden;overflow-y: auto;*/}
+    .zw-title{background:#eee;padding:5px;height:38px;margin-top:20px;}
+    .zw-title .btn{padding:4px 8px;margin-bottom:0;}
+    .zw-title .control-label{padding-top:0;height:28px;line-height:28px;}
+    .person-mark{height:36px;line-height:36px;}
+    #peopleIds{position:absolute;width:0;height:0;padding:0;z-index: -1;overflow: hidden;}
+</style>
+<form th:object="${designate}" id="editForm"
+      role="form"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;</button>
+        <h4 class="modal-title">修改指派</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <input type="hidden" th:value="*{id}" id="id">
+                <input type="hidden" th:value="${taskTree}" id="taskTree"><!--任务树-->
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 指派名称： </label>
+                    <div class="col-md-4">
+                        <input th:value="*{designateName}" name="name" maxlength="20" type="text"
+                               class="form-control readonly" id="designateName" placeholder="请输入指派名称"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 选择任务： </label>
+                    <div class="col-md-4">
+                        <select th:data-value="*{taskId}" name="taskList" id="taskList" class="form-control readonly"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <button id="taskDetail" style="padding:8px 14px;margin-bottom:0;" class="btn btn-primary" type="button">任务详情</button>
+                    </div>
+                </div>
+                <!--任务详情 start-->
+                <ul id="schedule-list" class="schedule-list" style="display:none;"></ul>
+                <!--任务详情 end-->
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 指派开始日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="*{startDateStr}" id="startDate" readonly="readonly" name="startDateStr" placeholder="请选择指派开始日期" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 指派结束日期： </label>
+                    <div class="col-md-4">
+                        <input th:value="*{endDateStr}" id="endDate" readonly="readonly" name="endDateStr" placeholder="请选择指派结束日期" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off" style="cursor: pointer; background-color: rgb(250, 250, 250);" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 日期重复类型： </label>
+                    <div class="col-md-4">
+                        <select name="dateDuplicateType" id="repeatType" class="form-control readonly">
+                            <option value="0" th:selected="*{dateDuplicateType.indexOf('8') != -1}">每天</option>
+                            <option value="1" th:selected="*{dateDuplicateType.indexOf('8') == -1}">周期</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="weeks" class="form-group" th:style="*{dateDuplicateType.indexOf('8') != -1 ? 'display:none;' : ''}">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <label class="checkbox-inline" for="week1"><input class="readonly" id="week1" name="week" type="checkbox" value="1" th:checked="*{dateDuplicateType=='8' || dateDuplicateType.indexOf('1') != -1}"/> 周一</label>
+                        <label class="checkbox-inline" for="week2"><input class="readonly" id="week2" name="week" type="checkbox" value="2" th:checked="*{dateDuplicateType=='8' || dateDuplicateType.indexOf('2') != -1}"/> 周二</label>
+                        <label class="checkbox-inline" for="week3"><input class="readonly" id="week3" name="week" type="checkbox" value="3" th:checked="*{dateDuplicateType=='8' || dateDuplicateType.indexOf('3') != -1}"/> 周三</label>
+                        <label class="checkbox-inline" for="week4"><input class="readonly" id="week4" name="week" type="checkbox" value="4" th:checked="*{dateDuplicateType=='8' || dateDuplicateType.indexOf('4') != -1}"/> 周四</label>
+                        <label class="checkbox-inline" for="week5"><input class="readonly" id="week5" name="week" type="checkbox" value="5" th:checked="*{dateDuplicateType=='8' || dateDuplicateType.indexOf('5') != -1}"/> 周五</label>
+                        <label class="checkbox-inline" for="week6"><input class="readonly" id="week6" name="week" type="checkbox" value="6" th:checked="*{dateDuplicateType.indexOf('6') != -1}"/> 周六</label>
+                        <label class="checkbox-inline" for="week7"><input class="readonly" id="week7" name="week" type="checkbox" value="7" th:checked="*{dateDuplicateType.indexOf('7') != -1}"/> 周日</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 选择对象： </label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input class="form-control" id="groupSelect"
+                               placeholder="请选择" style="background-color: #fafafa; cursor: pointer;" type="text" autocomplete="off"/>
+                        <span class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true" id="groupSelectSpan"></span>
+                        <div class="menuContent" id="menuContent">
+                            <ul id="treeTypeDemo" class="ztree" th:data-value="*{designatePeopleInfosStr}"></ul>
+                        </div>
+                        <input name="peopleIds" type="text" value="0" id="peopleIds"><!--隐藏域-->
+                    </div>
+                    <div class="person-mark col-md-2">当前选择：<span id="selectNum">0</span>个</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 备注： </label>
+                    <div class="col-md-10">
+                        <input th:value="*{remark}" name="remark" maxlength="100" type="text"
+                               class="form-control readonly" id="remarks" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var simCompareOpenCardTime = [[#{sim.endTime.compareOpenCardTime}]];
+    var nameNull = [[#{designateManage.name.null}]];
+    var peopleIdsNull = [[#{designateManage.peopleIds.null}]];
+    var startDateStrNull = [[#{designateManage.startDateStr.null}]];
+    var endDateStrNull = [[#{designateManage.endDateStr.null}]];
+    var fenceInfoIdNull = [[#{designateManage.fenceInfoId.null}]];
+    var startDateNull = [[#{designateManage.startDate.null}]];
+    var endDateNull = [[#{designateManage.endDate.null}]];
+    var residenceTimeNull = [[#{designateManage.residenceTime.null}]];
+    var nameExists = [[#{designateManage.name.exists}]];
+    var nameError = [[#{designateManage.name.error}]];
+    var endDateError = [[#{designateManage.endDate.error}]];
+    var timeExists = [[#{designateManage.time.exists}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js"></script>
+<script type="text/javascript" src="/clbs/resources/js/designateEdit.js"></script>

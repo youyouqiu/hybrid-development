@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.core.OperationDao">
+    
+    <!-- 查询全部资质类别的信息-->
+    <select id="findAllOperation" resultType="com.zw.platform.domain.core.Operations">
+    	select id,operationType,explains from zw_c_operational where flag=1 and operationType like BINARY CONCAT(CONCAT('%',#{type}),'%') order by create_data_time desc
+    </select>
+    
+    <!-- 根据id查询运营资质类别 -->
+    <select id="findOperationById" resultType="com.zw.platform.domain.core.Operations">
+    	select id,operationType,explains from zw_c_operational where flag=1 and id=#{id}
+    </select>
+    
+    <!-- 根据运营资质类别查询运营资质类别 -->
+    <select id="findOperationByOperation" resultType="com.zw.platform.domain.core.Operations">
+    	select id,operationType,explains from zw_c_operational where operationType= BINARY #{type} and flag=1
+    </select>
+	<!-- 新增运营资质类别 -->
+	<insert id="addOperation" parameterType="com.zw.platform.domain.core.OperationForm">
+			insert into zw_c_operational(id,operationType,explains,flag,create_data_time,create_data_username) 
+			values (#{id},#{operationType},#{explains},#{flag},#{createDataTime},#{createDataUsername})
+	</insert>
+	
+	<update id="updateOperations" parameterType="com.zw.platform.domain.core.OperationForm">
+			update zw_c_operational set operationType=#{operationType},explains=#{explains},
+			update_data_time=#{updateDataTime},update_data_username=#{updateDataUsername} where flag=1 and id=#{id}
+	</update>
+    
+    <!-- 根据运营资质类别(名称)删除数据 -->
+	<update id="deleteOperation" parameterType="com.zw.platform.domain.core.OperationForm">
+		update zw_c_operational set flag=0 where id=#{id} and flag=1
+	</update>
+
+	<select id="findOperationList" resultType="com.zw.platform.domain.core.Operations">
+		select id,operationType,explains from zw_c_operational where flag=1  order by create_data_time desc
+	</select>
+</mapper>

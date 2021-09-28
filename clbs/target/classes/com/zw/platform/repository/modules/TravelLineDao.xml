@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.TravelLineDao">
+    <!-- 保存新增导航路线起点、终点信息 -->
+    <insert id="saveStartAndEndPoint" parameterType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+        insert into zw_m_travel_line (
+        		id,name,start_longitude,start_latitude,
+        		end_longitude,end_latitude,line_type,line_offset,group_id,
+        		description,flag,create_data_time,create_data_username 
+        		)
+         values (
+         		#{id},#{name},#{startLongitude},#{startLatitude},
+        		#{endLongitude},#{endLatitude},#{type},#{excursion},#{groupId},
+        		#{description},#{flag},#{createDataTime},#{createDataUsername} 
+        		)
+    </insert>
+    
+     <!-- 保存途经点信息 -->
+    <insert id="savePassPoint" parameterType="com.zw.platform.domain.functionconfig.form.LinePassPointForm">
+        insert into zw_m_line_pass_point (
+        		id,line_id,sort_order,longitude,latitude,flag,create_data_time,create_data_username
+        		)
+         values 
+           <foreach collection="list" item="item" index="index" 
+			separator="," >
+			(
+         		#{item.id},#{item.lineId},#{item.sortOrder},#{item.longitude},
+         		#{item.latitude},#{item.flag},#{item.createDataTime},#{item.createDataUsername} 
+         	)
+			</foreach>
+    </insert>
+    
+     <!-- 保存所有点信息 -->
+    <insert id="saveAllPoint" parameterType="com.zw.platform.domain.functionconfig.LineContent">
+        insert into zw_m_line_content (
+        		line_id,sort_order,longitude,latitude,flag,create_data_time,create_data_username,type
+        		)
+         values 
+         	<foreach collection="list" item="item" index="index"
+			separator=",">
+         		( #{item.lineId},#{item.sortOrder},#{item.longitude},
+         		  #{item.latitude},#{item.flag},#{item.createDataTime},#{item.createDataUsername},#{item.type}
+         		)
+			</foreach>
+    </insert>
+    
+      <!-- 保存导航路线到围栏总表 -->
+    <insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.ManageFenceFrom">
+        INSERT INTO zw_m_fence_info (
+        id, type, shape, flag, create_data_time, create_data_username
+        )
+        VALUES(
+        #{id}, #{type}, #{shape}, #{flag},#{createDataTime},#{createDataUsername}
+        )
+    </insert>
+    
+    <!-- 根据导航路线id查询导航路线信息 -->
+	<select id="findTravelLineById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.TravelLine">
+		SELECT travel.* FROM zw_m_travel_line travel WHERE flag = 1 
+		<if test="id != null and id != ''">
+			AND id = #{id}
+		</if>
+	</select>
+	
+	<!-- 根据id删除当前导航路线上所有点数据 -->
+	<delete id="deletePassPoint" parameterType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+	    delete from zw_m_line_pass_point where line_id = #{travelLineId} and flag = 1
+	</delete>
+	
+	<delete id="deleteLineContent" parameterType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+	    delete from zw_m_line_content where line_id = #{travelLineId} and flag = 1
+	</delete>
+
+	<select id="countTravelLineById" resultType="java.lang.Integer" parameterType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+		SELECT count(*) from zw_m_line_content where line_id = #{travelLineId}
+	</select>
+	
+	<!-- 修改起点、终点等信息 -->
+	<update id="updateStartAndEndPoint" parameterType="com.zw.platform.domain.functionconfig.form.TravelLineForm">
+		 update zw_m_travel_line 
+		 set
+        		name = #{name},
+        		start_longitude = #{startLongitude},
+        		start_latitude = #{startLatitude},
+        		end_longitude = #{endLongitude},
+        		end_latitude = #{endLatitude},
+        		line_type = #{type},
+        		line_offset = #{excursion},
+        		description = #{description},
+        		update_data_time = #{updateDataTime},
+        		update_data_username = #{updateDataUsername}
+        where flag=1 and id = #{travelLineId}
+	</update>
+	 <!-- 修改途经点信息 -->
+    <insert id="updatePassPoint" parameterType="com.zw.platform.domain.functionconfig.form.LinePassPointForm">
+        insert into zw_m_line_pass_point (
+        		id,line_id,sort_order,longitude,latitude,flag,update_data_time,update_data_username
+        		)
+         values 
+           <foreach collection="list" item="item" index="index"  separator=",">
+         		(
+         			#{item.id},#{item.lineId},#{item.sortOrder},#{item.longitude},
+         			#{item.latitude},#{item.flag},#{item.updateDataTime},#{item.updateDataUsername} 
+         		)
+			</foreach>
+    </insert>
+    
+     <!-- 修改所有点信息 -->
+    <insert id="updateAllPoint" parameterType="com.zw.platform.domain.functionconfig.LineContent">
+        insert into zw_m_line_content (
+        		line_id,sort_order,longitude,latitude,flag,update_data_time,update_data_username,type 
+        		)
+         values 
+         	<foreach collection="list" item="item" index="index" 
+			separator="," >
+         		(   
+         			#{item.lineId},#{item.sortOrder},#{item.longitude},
+         			#{item.latitude},#{item.flag},#{item.updateDataTime},#{item.updateDataUsername} ,#{item.type}
+         		)
+			</foreach>
+    </insert>
+    
+    <!-- 更新导航路线信息 -->
+    <!-- <update id="updateTravelLine" parameterTycom.zw.platform.domain.functionconfignfig.form.TravelLineForm">
+       update 
+       		zw_m_travel_line 
+       set
+       		name = #{name},start_longitude = #{startLongitude},
+       		start_latitude = #{startLatitude},end_longitude = #{endLongitude},
+       		end_latitude = #{endLatitude},line_type = #{lineType},
+       		line_offset = #{lineOffset},description = #{description},
+       		update_data_time = #{updateDataTime},
+        	update_data_username = #{updateDataUsername}
+       where id= #{travelLineId} and flag = 1
+    </update> -->
+    
+    <!-- 根据id查询途经点信息 -->
+    <select id="getPassPointById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.LinePassPoint">
+    	SELECT * 
+    	from zw_m_line_pass_point 
+    	where flag = 1 and line_id = #{id} 
+    	ORDER BY sort_order
+    </select>
+    <!-- 根据id查询导航路线信息 -->
+    <select id="getTravelLineById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.TravelLine">
+    	SELECT * from zw_m_travel_line where flag = 1 and id = #{id}
+    </select>
+    <!-- 根据id查询所有点信息 -->
+    <select id="getAllPointsById" parameterType="string" resultType="com.zw.platform.domain.functionconfig.LineContent">
+    	SELECT * from zw_m_line_content where flag = 1 and line_id = #{id} ORDER BY sort_order
+    </select>
+    
+    <!-- 删除导航路线信息 -->
+    <delete id="deleteTravelLineById" parameterType="string">
+    	update zw_m_travel_line t set t.flag = 0 where t.id = #{id}
+    </delete>
+    
+    <delete id="deletePassPointById" parameterType="string">
+    	update zw_m_line_pass_point p set p.flag = 0 where p.line_id = #{id}
+    </delete>
+    
+    <delete id="deleteLineContentById" parameterType="string">
+    	update zw_m_line_content c set c.flag = 0 where c.line_id = #{id}
+    </delete>
+</mapper>

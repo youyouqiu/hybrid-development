@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>燃料管理</title>
+<div th:replace="fragments/header">header</div>
+</head>
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+        	<div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">监控对象</li>
+                            <li class="active">车辆信息</li>
+                            <li class="active">燃料管理</li>
+                        </ul>
+                        <h1 class="h1 ">燃料管理</h1>
+                    </div>
+                </div>
+                <!-- 燃料类型 -->
+				<div class="col-md-12" style="padding-right: 0px; padding-left:0px;">
+					<div class="panel panel-default">
+						<div class="panel-heading" id="stretch"  style="cursor:pointer;">
+							<h3 class="panel-title fwb">燃料类型<span class="caret"></h3>
+							<div class="actions pull-right listActions">
+								<i class="fa chevron-up"   id="stretch-chevron" ></i>
+							</div>
+						</div>						
+						<div class="panel-body fixed-table-body" style="display: none;"  id="stretch-body">
+							<!--工具面板-->
+							<div class="ToolPanel">
+								<div class="bars pull-left">
+									<div class="btn-group pull-left barsMargin" role="group">
+										<form role="form">
+											<label><input autocomplete="off" type="text"
+												class="Inlinesearch form-control" id="fuelTypeQuery"  onkeydown="fuelPriceManagement.findType(event)"
+												placeholder="请输入燃料类型"></label>
+											<button type="button" id="search_button"
+												class="btn btn-outline btn-default" >搜索</button>
+											<input id="hiddenText" type="text" style="display: none" />
+										</form>
+									</div>
+									<div th:if="${hasRole}" class="dropdown pull-left">
+										<button class="btn btn-default dropdown-toggle" type="button"
+											id="dropdownMenu1Two" data-toggle="dropdown"
+											aria-haspopup="true" aria-expanded="true">
+											操作菜单<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+											<li onclick="fuelPriceManagement.cleanTypeVal()"><a id="addId" data-toggle="modal" data-target="#addFuelType"><i class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a></li>
+											<li><a id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<table id="dataTable"
+								class="table table-striped table-bordered table-hover text-center checkTable"
+								cellspacing="0" width="100%">
+								<thead>
+								<div th:if="${hasRole}">
+									<tr>
+										<th></th>
+										<th><input
+											type="checkbox" id="checkAll" onclick="fuelPriceManagement.checkAll(this)"></th>
+										<th class="text-center">操作设置</th>
+										<th class="text-center">燃料类别</th>
+										<th class="text-center">燃料类型</th>
+										<th class="text-center">类型说明</th>
+									</tr>
+									</div>
+									<div th:if="!${hasRole}">
+									<tr>
+										<th></th>
+										<th class="text-center">燃料类别</th>
+										<th class="text-center">燃料类型</th>
+										<th class="text-center">类型说明</th>
+									</tr>
+									</div>
+								</thead>
+							</table>
+						</div>
+					</div>
+				</div>
+				<!-- --新增燃料类型-- -->
+				<div class="modal fade" id="addFuelType" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<form th:action="@{/v/monitoring/orderMsg}" id="speedLimit" role="form" action="#" method="post" class="form-horizontal">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+								<h4 class="modal-title" id="increaseFuelType">新增燃料类型</h4>
+                                <input class="hidden" id="vid9" name="vid" value="">
+                                <input class="hidden" name="orderType" value="9">
+							</div>
+							<div class="modal-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label class="col-md-4 control-label" >燃料类别：</label>
+											<div class=" col-md-7">
+												<select name="fuelCategory" placeholder="请选择燃料类别"
+													class="form-control" id="addFuelCategory">
+													<option selected="selected" value="柴油">柴油</option>
+													<option value="汽油">汽油</option>
+													<option value="天然气">天然气</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label class="col-md-4 control-label"><label
+					  							class="text-danger">*</label> 燃料类型：</label>
+											<div class=" col-md-7">
+												<input autocomplete="off" type="text" name="fuelType" placeholder="如:95#汽油"
+													class="form-control" id="fuelType" />
+											</div>
+										</div>
+
+										<div class="form-group">
+											<label class="col-md-4 control-label">类型描述：</label>
+											<div class=" col-md-7">
+												<textarea name="description" rows="3"  placeholder="请输入描述" class="form-control" id="typeDescribe"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" id="addFuelTypeSubm" class="btn btn-primary">提交</button>
+								<button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+							</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<!-- --修改燃料类型-- -->
+				<div class="modal fade" id="updateFuelType" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+					<div class="modal-dialog" role="document">
+						<div class="modal-content">
+							<form th:action="@{/v/monitoring/orderMsg}" id="editSpeedLimit" role="form" action="#" method="post" class="form-horizontal">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+								<h4 class="modal-title" id="modifyFuelType">修改燃料类型</h4>
+                                <input class="hidden" id="vid9" name="vid" value="">
+                                <input class="hidden" name="orderType" value="9">
+							</div>
+							<div class="modal-body">
+								<div class="row">
+									<div class="col-md-12">
+										<div class="form-group">
+											<label class="col-md-4 control-label">燃料类别：</label>
+											<div class=" col-md-7">
+												<select name="fuelCategory" disabled placeholder="请选择燃料类别"
+													class="form-control" id="reviseFuelCategory">
+													<option selected="selected" value="柴油">柴油</option>
+													<option value="汽油">汽油</option>
+													<option value="天然气">天然气</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-md-4 control-label"><label class="text-danger">*</label> 燃料类型：</label>
+											<div class=" col-md-7">
+												<input autocomplete="off" type="text" name="reviseFuelType" placeholder="如：93#汽油"
+													class="form-control" id="reviseFuelType" />
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-md-4 control-label">类型描述：</label>
+											<div class=" col-md-7">
+												<textarea name="describes" rows="3" placeholder="请输入描述" id="reviseTypeDescribes"
+													class="form-control"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" onclick="fuelPriceManagement.updateFuelType()" class="btn btn-primary">提交</button>
+								<button type="button" class="btn btn-default btn-off" data-dismiss="modal">关闭</button>
+							</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+                    <div class="col-md-12">
+						<div class="panel panel-default">
+						
+							<div class="panel-heading" id="stretch2" >
+								<h3 class="panel-title fwb">查询</span></h3>
+								<div class="actions pull-right">
+									<i class="fa chevron-down"  id="stretch2-chevron" ></i>
+								</div>
+							</div>
+							<div class="panel-body"  id="stretch2-body">
+								<div class="col-md-12 fuelPrice-tool">
+		                            <form id="fuelPriceForm" class="form-horizontal" action="#" method="post" role="form">
+		                                <div class="form-group">
+		                                	<label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+											<div class="col-md-4 col-sm-8 searchListSelect">
+												<input style="cursor: pointer; background-color: #fafafa;"
+													class="form-control layer-date laydate-icon"
+													id="timeInterval" name="timeInterval" readonly />
+											</div>
+		                                    <label class="col-md-1 control-label">区域:</label>
+											<div class="col-md-2">
+												<select id = "district" class="form-control">
+													<option value ="北京">北京市</option>
+													<option value ="重庆">重庆市</option>
+													<option value ="上海">上海市</option>
+													<option value ="天津">天津市</option>
+													<option value ="黑龙江">黑龙江省</option>
+													<option value ="吉林">吉林省</option>
+													<option value ="辽宁">辽宁省</option>
+													<option value ="河北">河北省</option>
+													<option value ="河南">河南省</option>
+													<option value ="山东">山东省</option>
+													<option value ="山西">山西省</option>
+													<option value ="陕西">陕西省</option>
+													<option value ="甘肃">甘肃省</option>
+													<option value ="青海">青海省</option>
+													<option value ="海南">海南省</option>
+													<option value ="贵州">贵州省</option>
+													<option value ="湖北">湖北省</option>
+													<option value ="湖南">湖南省</option>
+													<option value ="浙江">浙江省</option>
+													<option value ="江苏">江苏省</option>
+													<option value ="福建">福建省</option>
+													<option value ="安徽">安徽省</option>
+													<option value ="四川">四川省</option>
+													<option value ="江西">江西省</option>
+													<option value ="广东">广东省</option>
+													<option value ="宁夏">宁夏回族自治区</option>
+													<option value ="新疆">新疆维吾尔自治区</option>
+													<option value ="内蒙古">内蒙古自治区</option>
+													<option value ="广西">广西壮族自治区</option>
+													<option value ="西藏">西藏自治区</option>
+												</select>
+		                                    </div>
+		                                    <div class="col-md-1 btn-fpAreaSearch">
+		                                        <button id="areaSearch" type="button"  class="btn btn-primary" onclick="fuelPriceManagement.OilPricesQuery()">查询</button>
+		                                    </div>
+		                            	</div>
+		                            </form>
+	                            </div>
+							</div>
+						</div>
+                    </div>
+                    <div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch3" >
+								<h3 class="panel-title fwb">数据展示</span></h3>
+								<div class="actions pull-right">
+									<i class="fa chevron-down"  id="stretch3-chevron"  ></i>
+								</div>
+							</div>
+							<div class="panel-body"  id="stretch3-body">
+	                            <div class="col-md-12 fuelPrice-container">
+	                            	<div class="col-md-2 btn-group" id="fuelBtnGroup">
+	                            	</div>
+	                            	<div class="col-md-4 fuelPmData">
+										<table id="fuelPriceTable"
+										class="table table-striped table-bordered table-hover"
+										cellspacing="0" width="100%">
+											<thead>
+												<tr>
+													<th class="text-center">日期</th>
+													<th class="text-center">燃料类型</th>
+													<th class="text-center">燃料价格</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="even fuelTheight"><td></td><td></td><td></td></tr>
+												<tr class="odd fuelTheight"><td></td><td></td><td></td></tr>
+											</tbody>
+										</table>
+	                            	</div>
+	                            	<div class="col-md-6 fuelpGraph">
+	                            		<div id="graphicsMain"></div>
+	                            	</div>
+	                            </div>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+
+    var publicNull = [[#{public.null}]];
+    var publicSize20=[[#{public.size20.length}]];
+    var publicSize50=[[#{public.size50.length}]];
+    var publicSelectThanDate = [[#{public.selectThan.date}]];
+    var publicDelete = [[#{public.delete}]];
+    var publicError = [[#{public.error}]];
+    var publicNoChecked = [[#{public.noChecked}]];
+    var fuelPriceTypeNull = [[#{fuelPrice.type.null}]];
+    var fuelPriceTypeError = [[#{fuelPrice.type.error}]];
+    var fuelPriceRemarkError = [[#{fuelPrice.remark.error}]];
+
+
+</script>
+<script src="/wro/fuelPriceManagement.js" th:src="@{/wro/fuelPriceManagement.js}"></script>
+<script type="text/javascript" src="/wro/bd-echatrs.js" th:src="@{/wro/bd-echatrs.js}"></script>
+</html>

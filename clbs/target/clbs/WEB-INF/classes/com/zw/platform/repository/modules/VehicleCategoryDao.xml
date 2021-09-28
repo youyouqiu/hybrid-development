@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.VehicleCategoryDao">
+    <!-- 查询 flog为1的所有参数 -->
+    <!-- 参数类型，返回值类型 -->
+    <select id="find" parameterType="com.zw.platform.domain.basicinfo.query.VehicleTypeQuery" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.*,ic.ico_name FROM zw_m_vehicle_category vc 
+		LEFT JOIN zw_c_ico_config  ic  on ic.id=vc.ico         
+        where vc.flag=1
+        and vc.vehicle_category LIKE BINARY CONCAT('%',#{vehicleCategory},'%')
+        ORDER BY vc.create_data_time DESC
+    </select> 
+    <!-- 查询所有的车辆类别 -->
+    <select id="findCategory" parameterType="string" resultType="string">
+        SELECT vehicle_category FROM zw_m_vehicle_category VehicleType where flag=1
+        ORDER BY create_data_time DESC
+    </select> 
+    <!-- 通过图标ID查询该图标绑定的车辆类别 -->
+    <select id="findCategoryByico" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+    	SELECT * from zw_m_vehicle_category where ico=#{ico} and flag=1
+    </select>
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        INSERT INTO zw_m_vehicle_category (
+        id, vehicle_category,ico,description, create_data_time, create_data_username,standard
+        )
+        VALUES(
+         #{id}, #{vehicleCategory},#{ico},#{description}, #{createDataTime},#{createDataUsername},#{standard}
+        )
+    </insert>
+     <!-- 根据id删除一个 ThingInfo -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_vehicle_category set flag=0 WHERE id = #{id}
+    </delete>
+    <update id="updateVtype" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+    	 UPDATE zw_m_vehicle_type SET
+        vehicle_category = '0839a5f1-5837-4a87-911b-1eb8e06c295c'
+        WHERE id = #{id}
+    </update>
+     <!-- 通过id得到一个 User-->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.*,ic.ico_name FROM zw_m_vehicle_category vc 
+		LEFT JOIN zw_c_ico_config  ic  on ic.id=vc.ico         
+        where vc.flag=1
+        and  vc.id = #{id}
+    </select>
+
+     <!-- 通过ID查询该类别下是否有车辆类型, 由于vehicle_type表中存在类型和子类型，这里pid为null表示是车辆类型，否则是车辆子类型 -->
+    <select id="findVtypeById" parameterType="string" resultType="String">
+       SELECT vehicle_type from zw_m_vehicle_type where vehicle_category=#{id} and flag=1 AND ISNULL(pid)
+    </select>
+
+    <select id="findVehicleTypeByCategoryId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        SELECT id,vehicle_category,vehicle_type,description from zw_m_vehicle_type where vehicle_category=#{id} and flag=1 AND ISNULL(pid) ORDER BY create_data_time DESC
+    </select>
+    <!-- 修改 PER -->
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.form.VehicleTypeForm">
+        UPDATE zw_m_vehicle_category SET
+        vehicle_category = #{vehicleCategory}, description = #{description},ico=#{ico},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername},
+        standard = #{standard}
+        WHERE id = #{id} and flag = 1
+    </update>
+	<!-- 去重:  -->
+	<select id="findByVehicleType" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT * FROM zw_m_vehicle_category WHERE flag = 1 and vehicle_category = BINARY #{vehicleCategory}
+    </select>
+
+    <select id="getByStandard" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.*,ic.ico_name FROM zw_m_vehicle_category vc
+        LEFT JOIN zw_c_ico_config  ic  on ic.id=vc.ico
+        where vc.flag=1
+        and  vc.id = #{id}
+    </select>
+    <!--根据子类型查询类别中的standard-->
+    <select id="getStandardBySubTypeId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.standard,vc.vehicle_category AS category,vt.vehicle_category,vt.ico_id AS ico FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        WHERE vt.flag = 1 AND vt.pid IS NOT NULL AND vt.id = #{id}
+    </select>
+
+    <select id="getStandardByVehicleTypeId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.standard,vt.code_num FROM zw_m_vehicle_type vt
+        INNER JOIN zw_m_vehicle_category vc ON vc.id = vt.vehicle_category AND vc.flag = 1
+        WHERE vt.flag = 1 AND ISNULL(vt.pid) AND vt.id = #{id}
+    </select>
+
+    <select id="findVehicleCategoryList" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.*,ic.ico_name FROM zw_m_vehicle_category vc
+        LEFT JOIN zw_c_ico_config ic on ic.id=vc.ico AND ic.flag = 1
+        where vc.flag=1
+        ORDER BY vc.create_data_time DESC
+    </select>
+    <select id="findVehicleCategorysByStandard" parameterType="int" resultType="com.zw.platform.domain.basicinfo.VehicleType">
+        SELECT vc.* FROM zw_m_vehicle_category vc
+        WHERE vc.flag=1
+        AND vc.standard=#{standard}
+        ORDER BY vc.create_data_time DESC
+    </select>
+
+    <select id="getBusId" resultType="string">
+        SELECT  id from zw_m_vehicle_category where vehicle_category = '客车' and flag =1
+    </select>
+
+    <select id="countStandardById" resultType="int">
+        SELECT count(id) from zw_m_vehicle_category where id=#{id} and flag =1 and standard=1
+    </select>
+</mapper>

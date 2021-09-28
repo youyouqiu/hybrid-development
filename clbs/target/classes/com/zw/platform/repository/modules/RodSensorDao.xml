@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.RodSensorDao">
+    <sql id="Example_Where_Clause" >
+        <trim prefix="where" prefixOverrides="and|or" >
+            <if test="condition.name != null" >
+                and name = #{condition.name}
+            </if>
+            <if test="condition.birthday != null" >
+                and birthday = #{condition.birthday}
+            </if>
+            <if test="condition.gender != null" >
+                and gender = #{condition.gender}
+            </if>
+            <if test="condition.identity != null" >
+                and identity = #{condition.identity}
+            </if>
+            <if test="condition.phone != null" >
+                and phone = #{condition.phone}
+            </if>
+            <if test="condition.address != null" >
+                and address = #{condition.address}
+            </if>
+            <if test="condition.email != null" >
+                and email = #{condition.email}
+            </if>
+            <if test="condition.flag != null" >
+                and flag = #{condition.flag}
+            </if>
+            <if test="condition.createDataTime != null" >
+                and create_data_time = #{condition.createDataTime}
+            </if>
+            <if test="condition.createDataUsername != null" >
+                and create_data_username = #{condition.createDataUsername}
+            </if>
+            <if test="condition.updateDataTime != null" >
+                and update_data_time = #{condition.updateDataTime}
+            </if>
+            <if test="condition.updateDataUsername != null" >
+                and update_data_username = #{condition.updateDataUsername}
+            </if>
+        </trim>
+    </sql>
+    <sql id="Base_Column_List" >
+        id, name, birthday, gender, identity, phone, address, email, flag, create_data_time,
+        create_data_username, update_data_time, update_data_username
+    </sql>
+    <!-- 查询  -->
+    <select id="find" parameterType="com.zw.platform.domain.basicinfo.query.RodSensorQuery" resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT * FROM zw_m_oil_rod_sensor_info
+        WHERE flag=1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            and (sensor_number LIKE BINARY CONCAT('%',#{simpleQueryParam},'%')
+            or manu_facturer LIKE BINARY CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <!-- 查询  -->
+    <select id="findAllow" resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT * FROM zw_m_oil_rod_sensor_info
+        WHERE flag=1
+        ORDER BY sensor_number asc
+    </select>
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.basicinfo.form.RodSensorForm">
+        INSERT INTO zw_m_oil_rod_sensor_info (
+        id, sensor_number, sensor_length, filtering_factor, baud_rate, odd_even_check, compensation_can_make,is_start,
+        create_data_time,create_data_username,remark)
+        VALUES(
+         #{id},#{sensorNumber}, #{sensorLength}, #{filteringFactor}, #{baudRate}, #{oddEvenCheck},
+         #{compensationCanMake},#{isStart},#{createDataTime},#{createDataUsername},#{remark})
+    </insert>
+    <!-- 根据id删除一个 Peopel -->
+    <delete id="delete" parameterType="string">
+        UPDATE zw_m_oil_rod_sensor_info set flag=0 WHERE id = #{id}
+    </delete>
+    <!-- 修改 PER -->
+    <update id="update" parameterType="com.zw.platform.domain.basicinfo.form.RodSensorForm">
+        Update zw_m_oil_rod_sensor_info set sensor_number=#{sensorNumber},sensor_length=#{sensorLength},
+        filtering_factor=#{filteringFactor},baud_rate=#{baudRate},odd_even_check=#{oddEvenCheck},compensation_can_make=#{compensationCanMake},
+        update_data_time=#{updateDataTime},update_data_username = #{updateDataUsername},remark=#{remark} where id=#{id}
+    </update>
+    <!-- 修改 波特率/奇偶效验 -->
+    <update id="updateParamById" parameterType="com.zw.platform.domain.basicinfo.form.RodSensorForm">
+        Update zw_m_oil_rod_sensor_info set
+        <if test="baudRate!=null">
+            baud_rate=#{baudRate},
+        </if>
+        <if test="oddEvenCheck!=null">
+            odd_even_check=#{oddEvenCheck},
+        </if>
+        <if test="sensorLength!=null">
+            sensor_length=#{sensorLength},
+        </if>
+        <if test="compensationCanMake!=null">
+            compensation_can_make=#{compensationCanMake},
+        </if>
+        <if test="filteringFactor!=null">
+            filtering_factor=#{filteringFactor},
+        </if>
+        update_data_time=#{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        where id=#{id}
+    </update>
+
+    <!--&lt;!&ndash; 通过id得到一个 User&ndash;&gt;-->
+    <select id="get" parameterType="string" resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT * FROM zw_m_oil_rod_sensor_info WHERE id = #{id} and flag = 1
+    </select>
+
+    <!-- 根据查询 -->
+    <select id="findBySensorNumber" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT A.* FROM zw_m_oil_rod_sensor_info A
+        WHERE flag = 1
+        <if test="sensorNumber != null and sensorNumber != ''">
+            AND sensor_number = BINARY #{sensorNumber}
+        </if>
+    </select>
+
+    <!-- 批量新增 -->
+    <insert id="addByBatch" parameterType="com.zw.platform.domain.basicinfo.form.RodSensorForm">
+       INSERT INTO zw_m_oil_rod_sensor_info (
+        id, sensor_number, sensor_length, filtering_factor, baud_rate, odd_even_check, compensation_can_make,is_start,
+        create_data_time,create_data_username,remark)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.sensorNumber}, #{item.sensorLength}, #{item.filteringFactor}, #{item.baudRate}, #{item.oddEvenCheck},
+            #{item.compensationCanMake}, #{item.isStart},#{item.createDataTime},#{item.createDataUsername},#{item.remark})
+        </foreach>
+    </insert>
+     <!-- 去重 -->
+	<select id="findByRodSensor" parameterType="string" resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT * FROM zw_m_oil_rod_sensor_info WHERE flag = 1 and sensor_number = BINARY #{sensorNumber}
+    </select>
+    <!-- 根据ID查询是否绑定油箱 -->
+    <select id="getIsBand" parameterType="string" resultType="int">
+        SELECT count(*) from zw_m_oil_box_vehicle WHERE
+        flag=1
+        and
+        sensor_type = #{id}
+    </select>
+
+    <!-- 根据id查询传感器信息 -->
+    <select id="findById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT A.* FROM zw_m_oil_rod_sensor_info A
+        WHERE flag = 1
+        AND A.id = #{id}
+    </select>
+    <select id="isExist" parameterType="string" resultType="com.zw.platform.domain.basicinfo.RodSensor">
+        SELECT * FROM zw_m_oil_rod_sensor_info WHERE flag = 1 and sensor_number = #{sensorNumber} and  id <![CDATA[ <> ]]> #{id}
+    </select>
+</mapper>

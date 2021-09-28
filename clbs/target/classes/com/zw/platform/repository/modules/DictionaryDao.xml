@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DictionaryDao">
+   <select id="findOBD" resultType="map">
+	   select * from zw_c_dictionary where type like 'OBD%' order by type,code
+   </select>
+
+    <select id="getValueByCodeAndType" resultType="string">
+        SELECT `value` FROM zw_c_dictionary d WHERE d.`code` = #{code} AND d.type = #{type}
+    </select>
+
+    <select id="findByType" resultType="com.zw.platform.domain.statistic.DictionaryInfo" parameterType="string">
+        select * from zw_c_dictionary where type = #{type}
+    </select>
+
+    <select id="findById" resultType="com.zw.platform.domain.statistic.DictionaryInfo" parameterType="string">
+        select * from zw_c_dictionary where
+        id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

@@ -1,0 +1,160 @@
+<form th:action="@{/m/monitoring/vehicle/transport/addTransport}" id="addForm"
+      role="form" action="#" method="post" class="form-horizontal" onkeydown="if(event.keyCode==13)return false;">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">新增危险货物运输信息</h4>
+    </div>
+    <!--<input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+           id="avoidRepeatSubmitToken">-->
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 车牌号：</label>
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                   id="brand" placeholder="- 请选择危险品运输车的车牌号 -"
+                                   onkeyup="this.value=this.value.replace(/(^\s+)|(\s+$)/g,'')">
+                            <div class="input-group-btn">
+                                <button id="objectMonitoring" type="button" style="margin-bottom: 0"
+                                        class="btn btn-white dropdown-toggle disabled loading-state-button"
+                                        data-toggle="dropdown">
+                                    <i class="fa fa-spinner loading-state"></i>
+                                </button>
+                                <ul id="charNumList" class="dropdown-menu dropdown-menu-right"
+                                    role="menu" style="right:0;width:100%!important;min-width:100%;max-width:100%;">
+                                </ul>
+                            </div>
+                        </div>
+                        <input id="vehicleId" name="vehicleId" class="hidden">
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 品名：</label>
+                    <div class="col-md-4">
+                        <select name="itemNameId" id="itemNameId"
+                                class="form-control"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">危险品类别：</label>
+                    <div class="col-md-4">
+                        <select disabled id="dangerType" class="form-control">
+                            <option value=""></option>
+                            <option value="3">危险货物3类</option>
+                            <option value="7">危险货物7类</option>
+                            <option value="8">危险货物8类</option>
+                            <option value="9">危险货物9类</option>
+                            <option value="11">危险货物1类1项</option>
+                            <option value="12">危险货物1类2项</option>
+                            <option value="13">危险货物1类3项</option>
+                            <option value="14">危险货物1类4项</option>
+                            <option value="15">危险货物1类5项</option>
+                            <option value="16">危险货物1类6项</option>
+                            <option value="21">危险货物2类1项</option>
+                            <option value="22">危险货物2类2项</option>
+                            <option value="23">危险货物2类3项</option>
+                            <option value="41">危险货物4类1项</option>
+                            <option value="42">危险货物4类2项</option>
+                            <option value="43">危险货物4类3项</option>
+                            <option value="51">危险货物5类1项</option>
+                            <option value="52">危险货物5类2项</option>
+                            <option value="61">危险货物6类1项</option>
+                            <option value="62">危险货物6类2项</option>
+                        </select>
+                    </div>
+                    <label class="col-md-2 control-label">单位：</label>
+                    <div class="col-md-4">
+                        <select disabled id="unit" class="form-control">
+                            <option value=""></option>
+                            <option value="1">kg</option>
+                            <option value="2">L</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">数量：</label>
+                    <div class="col-md-4">
+                        <input id="count" name="count" placeholder="请输入数量" type="text" class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">运输类型：</label>
+                    <div class="col-md-4">
+                        <select id="transportType" name="transportType" class="form-control">
+                            <option value="">- 请选择运输类型 -</option>
+                            <option value="1">营运性危险货物运输</option>
+                            <option value="2">非营运性危险货物运输</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">运输日期：</label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer;  background-color: #fafafa;"
+                               class="form-control layer-date laydate-icon" autocomplete="off" placeholder="请选择运输日期"
+                               id="transportDate" name="transportDate"/>
+                    </div>
+                    <label class="col-md-2 control-label">起始地点：</label>
+                    <div class="col-md-4">
+                        <input id="startSite" name="startSite" placeholder="请输入起始地点" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">途径地点：</label>
+                    <div class="col-md-4">
+                        <input id="viaSite" name="viaSite" placeholder="请输入途径地点，多个用逗号隔开" type="text" class="form-control"/>
+                    </div>
+                     <label class="col-md-2 control-label">目的地点：</label>
+                    <div class="col-md-4">
+                        <input id="aimSite" name="aimSite" placeholder="请输入目的地点" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">押运员：</label>
+                    <div class="col-md-4">
+                        <select id="professinoalId" name="professinoalId" class="form-control">
+                            <option value="">- 请选择从业人员 -</option>
+                        </select>
+                    </div>
+                     <label class="col-md-2 control-label">从业资格证号：</label>
+                    <div class="col-md-4">
+                        <input readonly id="card" type="text" class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">电话：</label>
+                    <div class="col-md-4">
+                        <input id="phone" readonly name="phone" placeholder="请输入电话" type="text" class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input id="remark" name="remark" placeholder="请输入备注" type="text" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" id="tripDoSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script th:inline="javascript">
+    var brandNull = [[#{vehicleInsurance.brand}]];
+    var productNameChknull = [[#{dangerousGoods.productName.checknull}]];
+    var productNameExists = [[#{dangerousGoods.productName.exists}]];
+    var mustInt = [[#{public.number.int}]];
+    var publicSize9 = [[#{public.size9.length}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+
+</script>
+<script src="/resources/js/dangerousTripAdd.js" th:src="@{/resources/js/dangerousTripAdd.js}"></script>
+<script type="text/javascript" src="/wro/sendAjax.js" th:src="@{/wro/sendAjax.js}"></script>

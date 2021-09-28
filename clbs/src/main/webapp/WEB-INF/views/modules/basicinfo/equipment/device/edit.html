@@ -1,0 +1,208 @@
+<form th:action="@{/m/basicinfo/equipment/device/edit.gsp}"
+      th:object="${result}" id="editForm" role="form" action="#"
+      method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXEdit" type="button" class="close" data-dismiss="modal"
+                aria-hidden="true">&times;
+        </button>
+        <h4 class="modal-title">修改终端信息</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <input th:value="${result}" type="text" hidden="true"/>
+                    <input th:field="*{id}" id="deviceId" type="text" hidden="true"/>
+                    <input th:value="*{bindId}" id="bindId" type="hidden"/>
+                    <input th:value="*{deviceType}" id="agreementType" type ='hidden'>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 终端号：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{deviceNumber}" name="deviceNumber" placeholder="请输入终端号" type="text"
+                               id="deviceNumber"
+                               class="form-control"/>
+                        <label id="deviceNumber-error" style="display: none" class="error" for="deviceNumber">请输入终端号，范围：7~30</label>
+                        <input th:value="*{deviceNumber}" id="scn" type="hidden"/>
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 所属企业：</label>
+                    <div class="has-feedback col-md-4 fastClear">
+                        <input th:field="*{groupName}" name="groupName"
+                               style="background-color: #fafafa; cursor: pointer;"
+                               class="form-control" id="zTreeCitySel" placeholder="请选择所属企业"
+                               type="text" value="" autocomplete="off"/>
+                        <span class="fa fa-chevron-down form-control-feedback"
+                              aria-hidden="true" id="zTreeCitySelSpan"></span>
+                        <input class="form-control hidden" name="groupId" id="groupId" th:field="*{groupId}"/>
+                        <div class="ztreeModelBox" id="zTreeContent">
+                            <ul id="ztreeDemo" class="ztree"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 通讯类型：</label>
+                    <div class="col-md-4">
+                        <select th:field="*{deviceType}" name="deviceType" id="deviceType" class="form-control">
+                        </select>
+                    </div>
+
+                    <label class="col-md-2 control-label"> 终端厂商：</label>
+                    <div class="has-feedback col-md-4">
+                        <select name="terminalManufacturer" placeholder="请选择终端厂商" id="terminalManufacturer"
+                                th:field="*{terminalManufacturer}"
+                                class="form-control">
+                        </select>
+                        <input type="hidden" name="terminalManufacturerName" id="terminalManufacturerName"
+                               th:value="*{terminalManufacturer}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label"> 终端型号：</label>
+                    <div class="has-feedback col-md-4">
+                        <select name="terminalTypeId" placeholder="请选择终端型号" id="terminalTypeId"
+                                th:tid="*{terminalTypeId}"
+                                class="form-control">
+                        </select>
+                        <input type="hidden" name="terminalType" id="terminalType" th:value="*{terminalType}">
+                    </div>
+                    <label class="col-md-2 control-label"><label
+                            class="text-danger">*</label> 功能类型：</label>
+                    <div class="col-md-4">
+                        <select th:field="*{functionalType}" id="functionalType" name="functionalType"
+                                placeholder="请选择功能类型"
+                                class="form-control">
+                            <option value='1'>简易型车机</option>
+                            <option value='2'>行车记录仪</option>
+                            <option value='3'>对讲设备</option>
+                            <option value='4'>手咪设备</option>
+                            <option value='5'>超长待机设备</option>
+                            <option value='6'>定位终端</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">终端名称：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{deviceName}" name="deviceName" placeholder="请输入终端名称" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">制造商ID：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{manufacturerId}" name="manufacturerId" maxlength="11" placeholder="请输入制造商ID"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">终端型号（注册）：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{deviceModelNumber}" name="deviceModelNumber" maxlength="30"
+                               placeholder="请输入终端型号" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">MAC地址：</label>
+                    <div class="col-md-4">
+                        <input id="macAddress" name="macAddress" th:field="*{macAddress}" placeholder="请输入MAC地址" type="text" class="form-control" maxlength="17"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">条码：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{barCode}" id="barCode" name="barCode" placeholder="请输入条码" type="text"
+                               class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">制造商：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{manuFacturer}" id="manuFacturer" name="manuFacturer" placeholder="请输入制造商"
+                               type="text"
+                               class="form-control"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">安装日期：</label>
+                    <div class="col-md-4">
+                        <input id="installDateEdit" readonly="readonly" th:field="*{installTimeStr}"
+                               placeholder="请输入安装时间" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off"
+                               style="cursor: pointer; background-color: rgb(250, 250, 250);"/>
+                    </div>
+                    <label class="col-md-2 control-label">启停状态：</label>
+                    <div class="col-md-4">
+                        <label class="radio-inline"> <input type="radio" th:field="*{isStart}"
+                                                            name="isStart" id="isRadio" value=1 checked>
+                            启用
+                        </label> <label class="radio-inline"> <input type="radio" th:field="*{isStart}"
+                                                                     name="isStart" id="noRadio" value=0> 停用
+                    </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">安装单位：</label>
+                    <div class="col-md-4">
+                        <input placeholder="请输入安装单位" th:field="*{installCompany}" type="text" maxlength="50" class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">采购日期：</label>
+                    <div class="col-md-4">
+                        <input id="procurementDateEdit" readonly="readonly" th:field="*{procurementTimeStr}"
+                               placeholder="请输入采购时间" type="text"
+                               class="form-control layer-date laydate-icon" autocomplete="off"
+                               style="cursor: pointer; background-color: rgb(250, 250, 250);"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">联系人：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{contacts}" placeholder="请输入联系人" maxlength="20" type="text" class="form-control"/>
+                    </div>
+                    <label class="col-md-2 control-label">符合要求：</label>
+                    <div class="col-md-4">
+                        <label class="radio-inline"> <input type="radio" th:field="*{complianceRequirements}" id="yes"
+                                                            value="1" checked> 是</label>
+                        <label class="radio-inline"> <input type="radio" th:field="*{complianceRequirements}" id="no"
+                                                            value="0"> 否</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">备注：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{remark}" type="text" class="form-control" placeholder="请输入备注">
+                    </div>
+                    <label class="col-md-2 control-label">联系电话：</label>
+                    <div class="col-md-4">
+                        <input th:field="*{telephone}" placeholder="请输入联系电话" maxlength="20" type="text" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div id="bindMsg" hidden="true" style="text-align:left;color:red;">
+            <p> 注 ： 该终端已和监控对象绑定，终端号和通讯类型不允许修改，如需修改请先解除绑定！</p>
+        </div>
+        <button class="btn btn-primary" type="button" id="doSubmit">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script th:inline="javascript">
+    var deviceNumberNull = [[#{device.number.null}]];
+    var deviceNumberError2 = [[#{device.number.error2}]];
+    var deviceNumberExists = [[#{device.number.exists}]];
+    var deviceTypeNull = [[#{device.deviceType.null}]];
+
+    var publicSize6 = [[#{public.size6.length}]];
+    var publicSize10 = [[#{public.size10.length}]];
+    var publicSize20 = [[#{public.size20.length}]];
+    var publicSize30 = [[#{public.size30.length}]];
+    var publicSize50 = [[#{public.size50.length}]];
+    var publicSize64 = [[#{public.size64.length}]];
+    var publicSize100 = [[#{public.size100.length}]];
+    var phoneError = [[#{phone.error}]];
+    var publicNull = [[#{public.null}]];
+</script>
+<script src="/wro/deviceEdit.js" th:src="@{/wro/deviceEdit.js}"></script>

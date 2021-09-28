@@ -1,0 +1,61 @@
+<form id="addForm" th:action="@{/cb/chat/chatGroup/add}" action="#"   role="form" method="post"  class="form-horizontal">
+    <div class="modal-header">
+        <button id="doXAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">新增讨论组</h4>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="col-md-4 control-label"><label class="text-danger">*</label> 讨论组名称：</label>
+                    <div class="col-md-6">
+                        <input type="hidden" name="userIds" id="input_user_ids" hidden/>
+                        <input id="groupName" name="groupName"  maxlength="25" placeholder="请输入讨论组名称" type="text" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label"><label class="text-danger">*</label> 用户：</label>
+                    <input class="form-control hidden" />
+                    <div class="has-feedback col-md-6 col-sm-8">
+                        <input
+                                style="cursor: pointer; background-color: #fafafa;"
+                                placeholder="请选择用户" class="form-control"
+                                id="groupSelect3" readonly /> <span
+                            class="fa fa-chevron-down form-control-feedback"
+                            style="top: 0; right: 15px; cursor: pointer;"
+                            aria-hidden="true" id="groupSelectSpan3"></span>
+                        <div id="menuContent3" class="menuContent">
+                            <ul id="treeDemo3" class="ztree"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label">备注： </label>
+                    <div class="col-md-6  has-feedback">
+                        <textarea  name="groupRemark" maxlength="50" placeholder="请输入备注" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+               id="avoidRepeatSubmitToken">
+        <button class="btn btn-primary" type="button" id="doSubmits">
+            <strong>提 交</strong>
+        </button>
+        <button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var chatGroupUserNull = [[#{chat.group.user.null}]];
+    var chatGroupNameNull = [[#{chat.group.name.null}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="/resources/js/chatGroupAdd.js" th:src="@{/resources/js/chatGroupAdd.js}"></script>

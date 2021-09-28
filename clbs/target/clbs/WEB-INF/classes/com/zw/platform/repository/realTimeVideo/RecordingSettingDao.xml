@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.RecordingSettingDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.RecordingSetting" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="threshold_value" property="thresholdValue" jdbcType="INTEGER" />
+    <result column="keep_time" property="keepTime" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="INTEGER" />
+    <result column="flag" property="flag" jdbcType="SMALLINT" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, vehicle_id, threshold_value, keep_time, start_time, flag, create_data_time, create_data_username, 
+    update_data_time, update_data_username
+  </sql>
+  
+  <!-- 根据车辆id查询报警参数列表 -->
+  <select id="getVedioAlarmsByVehicleId" resultType="map">
+	SELECT
+		ps.`ignore`,
+		ps.alarm_push alarmPush,
+		t.`name`,
+		t.`pos`,
+		ps.parameter_value parameterValue
+	FROM
+		zw_m_alarm_parameter_setting ps
+	INNER JOIN zw_m_alarm_parameter p ON ps.alarm_parameter_id = p.id
+	INNER JOIN zw_m_alarm_type t ON t.id = p.alarm_type_id
+	WHERE
+		t.type = 'videoAlarm' AND ps.vehicle_id=#{vehicleId,jdbcType=VARCHAR} AND ps.flag = 1
+  </select>
+  
+  <select id="getVedioAlarmsByVid" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+	SELECT
+		ps.`ignore`,
+		ps.alarm_push alarmPush,
+		t.`name`,
+		t.`pos`,
+		ps.parameter_value parameterValue
+	FROM
+		zw_m_alarm_parameter_setting ps
+	INNER JOIN zw_m_alarm_parameter p ON ps.alarm_parameter_id = p.id
+	INNER JOIN zw_m_alarm_type t ON t.id = p.alarm_type_id
+	WHERE
+		t.type = 'videoAlarm' AND ps.vehicle_id=#{vehicleId,jdbcType=VARCHAR} AND ps.flag = 1
+  </select>
+
+    <select id="getVideoAlarmsByVehicleIds" resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT
+        ps.`ignore`,
+        ps.alarm_push alarmPush,
+        t.`name`,
+        t.`pos`,
+        ps.parameter_value parameterValue,
+        ps.vehicle_id
+        FROM
+        zw_m_alarm_parameter_setting ps
+        INNER JOIN zw_m_alarm_parameter p ON ps.alarm_parameter_id = p.id
+        INNER JOIN zw_m_alarm_type t ON t.id = p.alarm_type_id
+        WHERE t.type = 'videoAlarm'
+        AND ps.flag = 1
+        AND ps.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY ps.vehicle_id
+    </select>
+  
+  <!-- 根据车辆id查询音视频录像参数 -->
+  <select id="getVedioRecordingByVehicleId" resultType="map">
+    select vehicle_id vehicleId,threshold_value thresholdValue,keep_time keepTime,start_time startTime
+    from zw_m_recording_setting
+    where vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据车辆id查询音视频录像参数 -->
+  <select id="getVedioRecordingSettingByVehicleId" resultMap="BaseResultMap" parameterType="string">
+    select <include refid="Base_Column_List"></include>
+    from zw_m_recording_setting
+    where vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据报警类型和报警名称查询报警参数id的集合 -->
+  <select id="getIdsByAlarmTypeAndName" resultType="string">
+  SELECT id FROM zw_m_alarm_type t WHERE t.type='videoAlarm' AND `name` LIKE CONCAT('%', #{name}, '%')
+  </select>
+  
+  <!-- 根据报警类型和报警标识查询报警参数id的集合 -->
+    <select id="getAlarmTypesByName" resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT p.id alarmParameterId, alt.name, alt.pos
+        FROM zw_m_alarm_parameter p
+                 INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE p.flag = 1
+          AND alt.type = 'videoAlarm'
+          AND alt.pos LIKE CONCAT(#{pos}, '%')
+    </select>
+
+    <select id="getAlarmParametersByPosList"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT p.id alarmParameterId, alt.name, alt.pos
+        FROM zw_m_alarm_parameter p
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE p.flag = 1
+        AND alt.type = 'videoAlarm'
+        AND
+        <foreach collection="posCollection" item="pos" open="(" separator=" or " close=")">
+            alt.pos LIKE CONCAT(#{pos}, '%')
+        </foreach>
+    </select>
+
+    <!-- 删除该车辆id下所有的视频录像参数设置  -->
+  <delete id="deleteByVehicleId" parameterType="java.lang.String" >
+    DELETE FROM zw_m_recording_setting WHERE vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+  </delete>
+
+    <delete id="deleteByMonitorIds">
+    DELETE FROM zw_m_recording_setting WHERE vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+  </delete>
+  
+  <!-- 删除该车辆id下所有的报警参数设置  -->
+  <delete id="deleteVedioAlarmParamByVehicleId" parameterType="java.lang.String" >
+    DELETE FROM zw_m_alarm_parameter_setting WHERE flag = 1 AND vehicle_id=#{vehicleId,jdbcType=VARCHAR}
+     AND alarm_parameter_id IN (SELECT id FROM zw_m_alarm_parameter WHERE alarm_type_id IN 
+     (SELECT id FROM zw_m_alarm_type WHERE type='videoAlarm'))
+  </delete>
+  
+  
+  <!-- 批量添加报警参数设置  -->
+  <insert id="addVedioAlarmParamSettings" parameterType="java.util.List">  
+       insert into zw_m_alarm_parameter_setting 
+       (id, vehicle_id, alarm_parameter_id, parameter_value, alarm_push, `ignore`, create_data_time, create_data_username)  
+       values  
+        <foreach collection="list" item="item" index="index" separator=",">  
+            (#{item.id,jdbcType=VARCHAR } ,#{item.vehicleId,jdbcType=VARCHAR } , #{item.alarmParameterId,jdbcType=VARCHAR } ,  
+             #{item.paramValue,jdbcType=VARCHAR } , #{item.alarmPush,jdbcType=INTEGER } , #{item.ignore,jdbcType=INTEGER }, 
+             #{item.createDataTime,jdbcType=TIMESTAMP}, #{item.createDataUsername,jdbcType=VARCHAR})
+        </foreach>  
+  </insert> 
+  
+  <!-- 批量添加报警参数设置  -->
+  <insert id="addVedioAlarmParams" parameterType="java.util.List">  
+       insert into zw_m_alarm_parameter_setting 
+       (id, vehicle_id, alarm_parameter_id, parameter_value, alarm_push, `ignore`, create_data_time, create_data_username)  
+       values  
+        <foreach collection="list" item="item" index="index" separator=",">  
+            (#{item.id,jdbcType=VARCHAR } ,#{item.vehicleId,jdbcType=VARCHAR } , #{item.alarmParameterId,jdbcType=VARCHAR } ,  
+             #{item.parameterValue,jdbcType=VARCHAR } , #{item.alarmPush,jdbcType=INTEGER } , #{item.ignore,jdbcType=INTEGER },
+             #{item.createDataTime,jdbcType=TIMESTAMP}, #{item.createDataUsername,jdbcType=VARCHAR})
+        </foreach>  
+  </insert> 
+  
+  <!-- 添加音视频录像参数  -->
+  <insert id="addVedioRecordingParamSettings" parameterType="com.zw.platform.vo.realTimeVideo.VideoAlarmParam" >
+    insert into zw_m_recording_setting (id, vehicle_id, threshold_value, keep_time, start_time)
+    values (#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR}, #{thresholdValue,jdbcType=INTEGER}, 
+      #{keepTime,jdbcType=INTEGER}, #{startTime,jdbcType=INTEGER})
+  </insert>
+  
+  <!-- 添加音视频录像参数  -->
+  <insert id="insertVedioRecordingParamSettings" parameterType="com.zw.platform.domain.realTimeVideo.RecordingSetting" >
+    insert into zw_m_recording_setting (id, vehicle_id, threshold_value, 
+      keep_time, start_time, flag, 
+      create_data_time, create_data_username, update_data_time, 
+      update_data_username)
+    values (#{id,jdbcType=VARCHAR}, #{vehicleId,jdbcType=VARCHAR}, #{thresholdValue,jdbcType=INTEGER}, 
+      #{keepTime,jdbcType=INTEGER}, #{startTime,jdbcType=INTEGER}, #{flag,jdbcType=SMALLINT}, 
+      #{createDataTime,jdbcType=TIMESTAMP}, #{createDataUsername,jdbcType=VARCHAR}, #{updateDataTime,jdbcType=TIMESTAMP}, 
+      #{updateDataUsername,jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- 修改 -->
+  <update id="updateVedioRecordingById" parameterType="com.zw.platform.domain.realTimeVideo.RecordingSetting" >
+    update zw_m_recording_setting
+    <set >
+        threshold_value = #{thresholdValue,jdbcType=INTEGER},
+        
+        keep_time = #{keepTime,jdbcType=INTEGER},
+        
+        start_time = #{startTime,jdbcType=INTEGER},
+        
+        flag = #{flag,jdbcType=SMALLINT},
+        
+        create_data_time = #{createDataTime,jdbcType=TIMESTAMP},
+        
+        create_data_username = #{createDataUsername,jdbcType=VARCHAR},
+        
+        update_data_time = #{updateDataTime,jdbcType=TIMESTAMP},
+        
+        update_data_username = #{updateDataUsername,jdbcType=VARCHAR}
+    </set>
+    where vehicle_id = #{vehicleId,jdbcType=VARCHAR}
+  </update>
+
+    <delete id="deleteVideoAlarmParamByMonitorIds">
+    DELETE FROM zw_m_alarm_parameter_setting WHERE flag = 1 and vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+  </delete>
+</mapper>

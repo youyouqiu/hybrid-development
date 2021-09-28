@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ParameterDao">
+    <!-- 查询 flog为1的所有参数 -->
+    <!-- 参数类型，返回值类型 -->
+    <!--  <select id="find" parameterTycom.zw.platform.domain.systemstems.query.ParameterQuery" resultTycom.zw.platform.domain.systemstems.Parameter">
+          select distinct vi.brand monitoring, sci.simcard_number simcard, di.device_number device,l.`name`, fc.send_down_time, fc.`status`, GROUP_CONCAT(distinct cg.group_id SEPARATOR '#') groupId
+           from zw_m_fence_config fc
+           left join zw_m_fence_info fi on fc.fence_id = fi.id
+           left join zw_m_vehicle_info vi on fc.vehicle_id = vi.id
+           left join zw_m_line l on fi.shape = l.id
+           left join zw_m_config c on c.vehicle_id = vi.id
+           left join zw_m_sim_card_info sci on sci.id = c.sim_card_id
+           left join zw_m_device_info di on di.id = c.device_id
+           left join zw_m_config_group cg on cg.config_id = c.id
+           where fc.flag = 1 and fi.`type` = 'zw_m_line'
+           group by fc.id
+     </select>  -->
+
+    <!-- 根据id查询 -->
+    <select id="findById" resultType="com.zw.platform.domain.systems.Directive" parameterType="java.lang.String">
+        select directive.*
+        from zw_m_directive directive
+        where directive.flag = 1
+        and directive.id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 参数类型，返回值类型 -->
+    <select id="find" parameterType="com.zw.platform.domain.systems.query.ParameterQuery"
+            resultType="com.zw.platform.domain.systems.Parameter">
+        SELECT t.* FROM (
+        SELECT DISTINCT dir.*, vi.brand monitoring, sci.simcard_number simcard, di.device_number device,
+        fence.name,vi.group_Id
+        FROM zw_m_directive dir
+        INNER JOIN zw_m_fence_config fc ON fc.id = dir.parameter_name AND fc.flag = 1
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON fc.vehicle_id = vi.id AND vi.flag = 1
+        LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = c.sim_card_id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_marker fence ON fi.shape = fence.id AND fence.flag = 1
+        WHERE dir.flag = 1
+        UNION
+
+        SELECT DISTINCT dir.*, vi.brand monitoring, sci.simcard_number simcard, di.device_number device,
+        fence.name,vi.group_Id
+        FROM zw_m_directive dir
+        INNER JOIN zw_m_fence_config fc ON fc.id = dir.parameter_name AND fc.flag = 1
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON fc.vehicle_id = vi.id AND vi.flag = 1
+        LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = c.sim_card_id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_line fence ON fi.shape = fence.id AND fence.flag = 1
+        WHERE dir.flag = 1
+        UNION
+
+        SELECT DISTINCT dir.*, vi.brand monitoring, sci.simcard_number simcard, di.device_number device,
+        fence.name,vi.group_Id
+        FROM zw_m_directive dir
+        INNER JOIN zw_m_fence_config fc ON fc.id = dir.parameter_name AND fc.flag = 1
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON fc.vehicle_id = vi.id AND vi.flag = 1
+        LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = c.sim_card_id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_polygon fence ON fi.shape = fence.id AND fence.flag = 1
+        WHERE dir.flag = 1
+        UNION
+        SELECT DISTINCT dir.*, vi.brand monitoring, sci.simcard_number simcard, di.device_number device,
+        fence.name,vi.group_Id
+        FROM zw_m_directive dir
+        INNER JOIN zw_m_fence_config fc ON fc.id = dir.parameter_name AND fc.flag = 1
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON fc.vehicle_id = vi.id AND vi.flag = 1
+        LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = c.sim_card_id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_rectangle fence ON fi.shape = fence.id AND fence.flag = 1
+        WHERE dir.flag = 1
+        UNION
+
+        SELECT DISTINCT dir.*, vi.brand monitoring, sci.simcard_number simcard, di.device_number device,
+        fence.name,vi.group_Id
+        FROM zw_m_directive dir
+        INNER JOIN zw_m_fence_config fc ON fc.id = dir.parameter_name AND fc.flag = 1
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag = 1
+        INNER JOIN zw_m_vehicle_info vi ON fc.vehicle_id = vi.id AND vi.flag = 1
+        LEFT JOIN zw_m_config c ON c.vehicle_id = vi.id AND c.flag = 1
+        LEFT JOIN zw_m_sim_card_info sci ON sci.id = c.sim_card_id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_circle fence ON fi.shape = fence.id AND fence.flag = 1
+        WHERE dir.flag = 1
+        ) t
+        <if test="vehicleIds != null and vehicleIds.size() > 0">
+            WHERE t.monitor_object_id IN
+            <foreach item="item" collection="vehicleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vehicleIds == null or vehicleIds.size() == 0">
+            WHERE 0 = 1
+        </if>
+
+        <if test="groupId != null and groupId!=''">
+            AND (t.groupId LIKE CONCAT(#{groupId},'#%')
+            OR t.groupId LIKE CONCAT('%#',#{groupId})
+            OR t.groupId = #{groupId})
+
+        </if>
+        <if test="monitoring != null and monitoring !=''">
+            AND t.monitor_object_id = #{monitoring}
+        </if>
+        <if test="status != null and status !=''">
+            AND t.status = #{status}
+        </if>
+        <if test="parameterType != null and parameterType !=''">
+            AND t.parameter_type = #{parameterType}
+        </if>
+        <if test="name != null and name !=''">
+            AND t.name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="simcard != null and simcard !=''">
+            AND t.simcard LIKE CONCAT('%',#{simcard},'%')
+        </if>
+        <if test="device != null and device !=''">
+            AND t.device LIKE CONCAT('%',#{device},'%')
+        </if>
+
+        ORDER BY t.create_data_time DESC
+    </select>
+
+    <!-- 新增参数下发 -->
+    <insert id="addDirective" parameterType="com.zw.platform.domain.systems.form.DirectiveForm">
+	    insert into zw_m_directive (id, directive_name, monitor_object_id, parameter_type, parameter_name,
+	      status, down_time, swift_number, reply_code, remark, flag, create_data_time, create_data_username)
+	    values (#{id}, #{directiveName}, #{monitorObjectId}, #{parameterType}, #{parameterName},
+	      #{status}, #{downTime}, #{swiftNumber}, #{replyCode}, #{remark}, #{flag}, #{createDataTime}, #{createDataUsername})
+  	</insert>
+
+    <!-- 批量新增参数下发 -->
+    <insert id="addDirectiveByBatch" parameterType="com.zw.platform.domain.systems.form.DirectiveForm">
+        insert into zw_m_directive (id, directive_name, monitor_object_id, parameter_type, parameter_name,
+        status, down_time,swift_number, reply_code, remark, flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.directiveName}, #{item.monitorObjectId}, #{item.parameterType},
+            #{item.parameterName}, #{item.status},
+            #{item.downTime}, #{item.swiftNumber}, #{item.replyCode}, #{item.remark}, #{item.flag},
+            #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 根据id修改  -->
+    <update id="updateStatusByMsgSN">
+        SELECT id
+        FROM zw_m_directive
+        WHERE swift_number = #{msgSN}
+          AND monitor_object_id = #{vehicleId}
+          AND reply_code = 1
+          AND flag = 1
+        FOR UPDATE;
+
+	    UPDATE zw_m_directive
+	    SET STATUS = #{status},
+	    reply_code = 0
+	    WHERE swift_number = #{msgSN}
+	    AND monitor_object_id = #{vehicleId}
+	    and reply_code = 1
+	    and flag=1
+	  </update>
+
+    <!-- 根据id修改  -->
+    <update id="updateStatusByMsgSNAndReplyCode">
+        SELECT id
+        FROM zw_m_directive
+        WHERE swift_number = #{msgSN}
+          AND monitor_object_id = #{vehicleId}
+          AND flag = 1
+          AND reply_code = 1
+        FOR UPDATE;
+
+		UPDATE zw_m_directive
+		SET STATUS = #{status}
+		WHERE swift_number = #{msgSN}
+		AND monitor_object_id = #{vehicleId}
+		and flag=1
+		and reply_code = 1
+	</update>
+
+
+    <!-- 根据id修改流水号  -->
+    <update id="updateMsgSNById">
+        SELECT id FROM zw_m_directive WHERE id IN
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND flag = 1
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET swift_number = #{msgSN},
+        reply_code = #{replyCode},
+        STATUS = #{status}
+        WHERE id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and flag=1
+    </update>
+
+    <!-- 根据id修改流水号 和绑定id值 -->
+    <update id="updateMsgSNAndNameById">
+        SELECT id FROM zw_m_directive WHERE id IN
+        <foreach item="idItem" collection="ids" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+        AND flag = 1
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET swift_number = #{msgSN},
+        reply_code = #{replyCode},
+        parameter_name = #{parameterName},
+        STATUS = #{status}
+        WHERE id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and flag=1
+    </update>
+
+    <!-- 根据车辆id和流水号查询围栏绑定id -->
+    <select id="selectFenceConfigId" resultType="String">
+	    SELECT parameter_name
+	    FROM zw_m_directive
+	    WHERE flag = 1
+	    AND monitor_object_id = #{vehicleId}
+	    AND swift_number = #{msgSN}
+	 </select>
+
+    <!-- 根据类型查询 -->
+    <select id="findParameterByType" resultType="com.zw.platform.domain.systems.Directive">
+        select directive.*
+        from zw_m_directive directive
+        where directive.flag = 1
+        <if test="vehicleId != null and vehicleId !=''">
+            and directive.monitor_object_id = #{vehicleId}
+        </if>
+        <if test="parameterName != null and parameterName !=''">
+            and directive.parameter_name = #{parameterName}
+        </if>
+        <if test="type != null and type !=''">
+            and directive.parameter_type = #{type}
+        </if>
+        order by directive.create_data_time desc
+    </select>
+
+    <!-- 根据类型查询 （模糊查）-->
+    <select id="findParameterFuzzyByType" resultType="com.zw.platform.domain.systems.Directive">
+        select directive.*
+        from zw_m_directive directive
+        where directive.flag = 1
+        <if test="vehicleId != null and vehicleId !=''">
+            and directive.monitor_object_id = #{vehicleId}
+        </if>
+        <if test="parameterName != null and parameterName !=''">
+            and directive.parameter_name LIKE CONCAT('%',#{parameterName},'%')
+        </if>
+        <if test="type != null and type !=''">
+            and directive.parameter_type = #{type}
+        </if>
+        order by create_data_time desc
+    </select>
+
+    <!-- 根据configId删除  -->
+    <update id="deleteByConfigId">
+        SELECT id FROM zw_m_directive
+        WHERE monitor_object_id = (SELECT c.vehicle_id FROM zw_m_config c WHERE c.flag = 1 AND c.id = #{configId})
+        FOR UPDATE;
+
+	     UPDATE zw_m_directive
+		    SET flag = 0
+		    WHERE
+		    monitor_object_id = (SELECT c.vehicle_id FROM zw_m_config c WHERE c.flag = 1 AND c.id = #{configId})
+	  </update>
+
+    <!-- 根据车辆不同下发类型及绑定的id删除  -->
+    <update id="deleteByVechicleidParameterName">
+        SELECT id FROM zw_m_directive
+        WHERE flag = 1
+        <if test="vechicleid != null and vechicleid !=''">
+            AND monitor_object_id =#{vechicleid}
+        </if>
+        <if test="parameterName != null and parameterName !=''">
+            AND parameter_name = #{parameterName}
+        </if>
+        <if test="type != null and type !=''">
+            AND parameter_type = #{type}
+        </if>
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET flag = 0
+        WHERE flag = 1
+        <if test="vechicleid != null and vechicleid !=''">
+            AND monitor_object_id =#{vechicleid}
+        </if>
+        <if test="parameterName != null and parameterName !=''">
+            AND parameter_name = #{parameterName}
+        </if>
+        <if test="type != null and type !=''">
+            AND parameter_type = #{type}
+        </if>
+    </update>
+
+    <update id="deleteProtocolParameterByVechicleId">
+        SELECT id FROM zw_m_directive
+        WHERE flag = 1
+        AND monitor_object_id =#{vechicleid}
+        AND parameter_type in ("F3_ADAS_12","F3_ADAS_13")
+        AND parameter_name in ("70_ADAS","65_ADAS","64_ADAS")
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET flag = 0
+        WHERE flag = 1
+        AND monitor_object_id =#{vechicleid}
+        AND parameter_type in ("F3_ADAS_12","F3_ADAS_13")
+        AND parameter_name in ("70_ADAS","65_ADAS","64_ADAS")
+    </update>
+
+    <delete id="deleteByVechicleidType">
+    	DELETE from zw_m_directive
+    	WHERE flag = 1
+		AND monitor_object_id =#{vechicleid}
+		AND parameter_type = #{type}
+  	</delete>
+    <select id="listIdByParameterName" parameterType="string" resultType="string">
+        SELECT id FROM zw_m_directive WHERE flag = 1 and parameter_name in
+        <foreach collection="list" item="parameterName" open="(" separator="," close=")">
+            #{parameterName}
+        </foreach>
+    </select>
+    <delete id="deleteByIds">
+        delete from zw_m_directive where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 当修改绑定时，下发状态也要一同修改  -->
+    <update id="updateStatusByParameterName">
+        SELECT id FROM zw_m_directive
+        WHERE monitor_object_id = #{vehicleId}
+	    and parameter_name = #{parameterName}
+	    and parameter_type = #{parameterType}
+	    and flag=1
+        FOR UPDATE;
+
+	    UPDATE zw_m_directive
+	    SET status = #{status},
+	    reply_code = 1
+	    WHERE monitor_object_id = #{vehicleId}
+	    and parameter_name = #{parameterName}
+	    and parameter_type = #{parameterType}
+	    and flag=1
+	  </update>
+
+    <!-- 当修改绑定时，下发状态也要一同修改  -->
+    <update id="updateStatusByBatch">
+        SELECT id FROM zw_m_directive
+        WHERE monitor_object_id IN
+        <foreach collection="conditions" item="item" open="(" close=")" separator=",">
+            #{item.monitorObjectId}
+        </foreach>
+        and flag = 1
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET status = #{status},
+        reply_code = 1
+        WHERE
+        <foreach collection="conditions" item="item" index="index" open="((" separator=") or (" close="))">
+            monitor_object_id = #{item.monitorObjectId}
+            AND parameter_name = #{item.parameterName}
+            AND parameter_type = #{item.parameterType}
+        </foreach>
+        and flag=1
+    </update>
+
+    <select id="selectDirectiveByConditions" parameterType="map" resultType="com.zw.platform.domain.systems.Directive">
+		 select * from zw_m_directive where
+		 parameter_type =#{parameterType}
+         and  swift_number =#{swiftNumber}
+         and monitor_object_id =#{vehicleId}
+         and flag='1' ORDER  BY  create_data_time desc
+	</select>
+
+
+    <update id="updateSendStatus">
+        SELECT id FROM zw_m_directive
+        WHERE monitor_object_id = #{vehicleId}
+		AND parameter_name = #{sensorConfigId}
+		AND flag = 1
+        FOR UPDATE;
+
+		UPDATE zw_m_directive
+		SET status = null
+		WHERE
+		monitor_object_id = #{vehicleId} and
+		parameter_name = #{sensorConfigId} and flag = 1
+	</update>
+
+    <!-- 根据id修改流水号 和绑定id值 -->
+    <update id="updateMsgSNAndNameAndRemarkById">
+        SELECT id FROM zw_m_directive WHERE id IN
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND flag = 1
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET swift_number = #{msgSN},
+        down_time = #{downTime},
+        reply_code = #{replyCode},
+        parameter_name = #{parameterName},
+        STATUS = #{status},
+        remark = #{remark}
+        WHERE id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and flag=1
+    </update>
+
+    <select id="findParameterStatus" resultType="com.zw.platform.domain.systems.Directive">
+		select directive.*
+		from zw_m_directive  directive
+		where directive.flag = 1 and monitor_object_id =#{vehicleId}
+		and parameter_name = #{parameterName}
+		and parameter_type = #{type}
+		and swift_number =#{swiftNumber}
+	</select>
+
+    <select id="findDirective" resultType="com.zw.platform.domain.systems.form.DirectiveForm">
+        select directive.*
+        from zw_m_directive directive
+        where directive.flag = 1
+          and monitor_object_id = #{monitorId}
+          and parameter_type = #{parameterType}
+        order by down_time desc
+        limit 1
+	</select>
+
+    <update id="updateDirectiveById" parameterType="com.zw.platform.domain.systems.form.DirectiveForm">
+        UPDATE zw_m_directive
+        SET swift_number   = #{swiftNumber},
+            reply_code     = 1,
+            STATUS         = #{status},
+            directive_name = #{directiveName},
+            parameter_name = #{parameterName},
+            down_time      = #{downTime}
+        WHERE flag = 1
+          and id = #{id}
+    </update>
+
+    <select id="getSendStatusList" resultType="com.zw.platform.domain.systems.form.DirectiveForm">
+        select directive.*
+        from zw_m_directive directive
+        where
+        directive.flag = 1
+        AND parameter_type = #{parameterType}
+        AND monitor_object_id IN
+        <foreach item="item" collection="monitorIdList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getLastDirective" resultType="com.zw.platform.domain.systems.form.DirectiveForm">
+		SELECT * FROM zw_m_directive
+	    WHERE swift_number = #{msgSN}
+	    AND monitor_object_id = #{vehicleId}
+	    and reply_code = 1
+	    and flag=1
+	    and parameter_type = #{parameterType}
+	</select>
+
+    <update id="deleteByMonitorIds">
+        SELECT id FROM zw_m_directive
+        WHERE monitor_object_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+        FOR UPDATE;
+
+        UPDATE zw_m_directive
+        SET flag = 0
+        WHERE
+        monitor_object_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </update>
+
+    <update id="updateStatusById">
+        UPDATE zw_m_directive
+        SET status = #{status}
+        WHERE id = #{id}
+          and flag = 1
+    </update>
+
+    <select id="findParameterByVehicleIds" resultType="com.zw.platform.domain.systems.Directive">
+        select directive.*
+        from zw_m_directive directive
+        where directive.flag = 1
+        and directive.monitor_object_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and directive.parameter_name in
+        <foreach item="item" collection="parameterNames" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and directive.parameter_type =#{type}
+
+        order by directive.create_data_time desc
+    </select>
+    <select id="getSendAdasStatus" resultType="java.lang.Integer">
+        select status
+        from zw_m_directive
+        where flag=1
+        and parameter_type=#{parameterType}
+        and parameter_name =#{parameterName}
+        and monitor_object_id =#{vehicleId}
+        order by create_data_time desc limit 1
+    </select>
+
+    <select id="findDirectiveByMoIdAndType" resultType="com.zw.platform.domain.systems.Directive">
+        select *
+        from zw_m_directive
+        where flag = 1
+        and parameter_type = #{type}
+        and monitor_object_id in
+        <foreach item="item" collection="moIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

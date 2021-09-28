@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.core.RoleDao">
+    <!-- 通过id得到一个角色的权限 -->
+    <select id="getPermissionById" parameterType="string"
+            resultType="com.zw.platform.domain.core.Resource">
+		SELECT DISTINCT resource.* FROM zw_c_resource resource
+		INNER JOIN
+		zw_c_role_resource
+		r_resource ON resource.id =
+		r_resource.resource_id
+		WHERE
+		r_resource.flag = 1
+		and resource.flag = 1
+		and r_resource.role_id = #{id}
+	</select>
+
+    <!-- 根据roleId查询角色和资源的关联 -->
+    <select id="getRoleResourceByRoleId" parameterType="string"
+            resultType="com.zw.platform.domain.core.RoleResource">
+        SELECT DISTINCT r_resource.resource_id,r_resource.editable FROM zw_c_role_resource r_resource
+        WHERE
+        r_resource.flag = 1
+        AND r_resource.role_id IN
+        <foreach item="item" collection="roleIds" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="listResourceIdByRoleId" resultType="java.lang.String">
+        SELECT DISTINCT resource_id FROM zw_c_role_resource
+        WHERE flag = 1 AND role_id IN
+        <foreach item="item" collection="collection" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 为某个角色新增资源 同时插入多条数据 -->
+    <insert id="addRoleResourceByBatch" parameterType="list">
+        INSERT INTO zw_c_role_resource(
+        id, role_id, resource_id, editable,
+        create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.roleId},#{item.resourceId}, #{item.editable},
+                #{item.createDataTime}, #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <update id="deleteByRoleId">
+		update zw_c_role_resource
+		set flag = 0
+		where flag =1
+		and role_id = #{roleId}
+	</update>
+
+	<update id="deleteBatchByRoleId">
+		update zw_c_role_resource
+		set flag = 0
+		where flag =1
+		and role_id in
+		<foreach item="item" collection="roleIds" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+	</update>
+
+    <update id="deleteByRoleIdResource">
+		update zw_c_role_resource
+		set flag = 0
+		where flag =1
+		and role_id = #{roleId}
+		and resource_id = #{resuorceId}
+	</update>
+
+    <update id="deleteByResourceId" parameterType="string">
+		update zw_c_role_resource
+		set flag = 0
+		where flag =1
+		and resource_id = #{resourceId}
+	</update>
+
+    <select id="findIdByRoleId" parameterType="java.lang.String"
+            resultType="com.zw.platform.domain.core.RoleResource">
+		select
+		roleResource.*
+		from zw_c_role_resource roleResource
+		where flag = 1
+		and role_id = #{roleId}
+	</select>
+
+    <select id="getMenuEditableByRoles" resultType="String">
+        SELECT
+        DISTINCT r.perm_value
+        FROM zw_c_resource r
+        INNER JOIN zw_c_role_resource rResource ON rResource.resource_id = r.id
+        WHERE rResource.flag = 1
+        AND r.flag = 1
+        AND rResource.editable = 1
+        AND role_id IN
+        <foreach item="item" collection="roleList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="countMenuEditableByRoles" resultType="int">
+        SELECT
+        count(*) from zw_c_role_resource rResource
+        WHERE rResource.flag = 1
+        AND rResource.editable = 1
+        AND rResource.resource_id =#{resourceId}
+        AND rResource.role_id IN
+        <foreach item="item" collection="roleList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+
+    </select>
+    <select id="getMenuByRoles" resultType="com.zw.platform.domain.core.Resource">
+        SELECT
+        DISTINCT r.*
+        FROM zw_c_resource r
+        INNER JOIN zw_c_role_resource rResource ON rResource.resource_id = r.id
+        WHERE rResource.flag = 1
+        AND r.flag = 1
+        AND role_id IN
+        <foreach item="item" collection="roleList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="getReportMenuByRolesAndReportIds" resultType="string">
+        SELECT
+        DISTINCT r.resource_name
+        FROM zw_c_resource r
+        INNER JOIN zw_c_role_resource rResource ON rResource.resource_id = r.id
+        WHERE rResource.flag = 1
+        AND r.flag = 1
+        <if test="reportIds != null and reportIds.size() > 0">
+            and r.id in
+            <foreach item="item" collection="reportIds" separator="," open="("
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND role_id IN
+        <foreach item="item" collection="roleList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getIdByNameAndType" parameterType="map" resultType="string">
+		select id from zw_c_resource
+		 where  resource_name =#{resourceName} and type=#{type} and flag =1 order by sort_order
+	</select>
+    <delete id="deleteByAdmin" parameterType="string">
+		delete from zw_c_role_resource where flag = 1 and role_id = #{roleId}
+	</delete>
+</mapper>

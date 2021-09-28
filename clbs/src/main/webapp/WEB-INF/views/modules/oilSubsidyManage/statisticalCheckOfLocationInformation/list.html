@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>定位信息统计</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #logContent {
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">系统管理</li>
+                            <li class="active">油补转发管理</li>
+                            <li class="active">定位信息统计</li>
+
+                        </ul>
+                        <h1 class="h1 ">定位信息统计</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch">
+                                    <h3 class="panel-title fwb">查询</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="stretch-body">
+                                    <div class="col-md-12 alarmSearchToolPanel">
+                                        <form id="locationInformationList" class="form-horizontal" action="#" method="post"
+                                            role="form">
+                                            <div class="form-group">
+                                                <label class="col-md-1 col-sm-3 control-label">转发平台组织：</label>
+                                                <input class="form-control hidden"/>
+                                                <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                    <input type="text" style="cursor: pointer; background-color: #fafafa;"
+                                                           placeholder="请输入选择要查询的组织" class="form-control" autocomplete="off"
+                                                           id="groupSelect" name="groupSelect"/>
+                                                    <span class="fa fa-chevron-down form-control-feedback"
+                                                          style=" top: 0; right: 15px;cursor:pointer;"
+                                                          aria-hidden="true"
+                                                          id="groupSelectSpan"></span>
+                                                    <div id="menuContent" class="menuContent">
+                                                        <ul id="treeDemo" class="ztree"></ul>
+                                                    </div>
+                                                </div>
+                                                <label
+                                                    class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                                <div class="col-md-4 col-sm-8 searchListSelect">
+                                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                                        class="form-control layer-date laydate-icon" id="timeInterval"
+                                                        name="timeInterval" readonly />
+                                                </div>
+<!--                                                <button id="bcClick" type="button" onclick="locationInformation.bcClick()"-->
+<!--                                                        style="width: 99px; height: 34px; margin: 0 0 0 95px;">补传</button>-->
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-12 control-label" id="dateSearchData">
+                                                    <button id="todayClick" type="button" class="btn btn-primary"
+                                                        onclick="locationInformation.inquireClick(0)">今天</button>
+                                                    <button id="yesterdayClick" type="button" class="btn btn-primary"
+                                                        onclick="locationInformation.inquireClick(-1)">前一天 </button>
+                                                    <button id="nearlyThreeDays" type="button" class="btn btn-primary"
+                                                        onclick="locationInformation.inquireClick(-3)">前三天 </button>
+                                                    <button id="nearlySevenDays" type="button" class="btn btn-primary"
+                                                        onclick="locationInformation.inquireClick(-7)">前七天 </button>
+                                                    <button id="inquireClick" type="button" class="btn btn-primary"
+                                                        name="1" onclick="locationInformation.inquireClick(1)">查询</button>
+                                                    <button id="export" type="button" class="btn btn-purple export-btn" disabled="disabled"
+                                                        onclick="locationInformation.export()"><i
+                                                            class="glyphicon glyphicon-log-out"></i> 导出</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch2">
+                                    <h3 class="panel-title fwb">定位信息统计列表</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" id="stretch2-body">
+                                   <div style="width: 100%;height:50px;">
+                                       <div class="columns btn-group pull-right vehicleTypeManagement">
+                                           <button id="refreshTable" class="btn btn-default" type="button"
+                                                   name="refresh"
+                                                   title="刷新">
+                                               <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                           </button>
+                                           <div class="keep-open btn-group" title="定制显示列" style="margin-bottom:8px">
+                                               <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle"
+                                                       data-toggle="dropdown">
+                                                   <i class="glyphicon glyphicon-th icon-th"></i>
+                                                   <span class="caret"></span>
+                                               </button>
+                                               <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                               </ul>
+                                           </div>
+                                       </div>
+                                   </div>
+
+                                    <div class="alarmTable" style="overflow:auto">
+                                        <table id="dataTable"
+                                            class="table table-striped table-bordered table-hover noCheckTable"
+                                            cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>序号</th>
+                                                    <th class="text-center">转发平台组织</th>
+                                                    <th class="text-center">开始时间</th>
+                                                    <th class="text-center">结束时间</th>
+                                                    <th class="text-center">油补平台收到的定位数据量</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+<!--    <div id="bcModelBox" style="visibility: hidden; position: absolute;-->
+<!--        background: white;-->
+<!--        top: 300px;-->
+<!--        left: 300px;-->
+<!--        margin-left: 16%;-->
+<!--        display: flex;-->
+<!--        justify-content: space-between;-->
+<!--        flex-direction: column;-->
+<!--        padding: 20px;-->
+<!--        width: 800px;-->
+<!--        height: 600px;-->
+<!--        border-radius: 9px;-->
+<!--        border: 1px solid rgb(189 189 189)">-->
+<!--        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">-->
+<!--            <h3 style="margin: 0; padding: 0;">补传详情</h3>-->
+<!--            <span id="closeBox" style="width: 22px; cursor: pointer;">X</span>-->
+<!--        </div>-->
+<!--        <div style="flex: 1; overflow: auto">-->
+<!--            <table id="bcDataTable"-->
+<!--                   class="table table-striped table-bordered table-hover noCheckTable"-->
+<!--                   cellspacing="0" width="100%">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>序号</th>-->
+<!--                    <th class="text-center">车牌号</th>-->
+<!--                    <th class="text-center">补传进度</th>-->
+<!--                    <th class="text-center" style="width: 300px">备注</th>-->
+<!--                    <th class="text-center">操作</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--        <div style="display: flex; justify-content: center; margin-top: 20px;">-->
+<!--            <button id="bcStartClick" type="button" onclick="locationInformation.bcStartClick()"-->
+<!--                    style="width: 122px; height: 34px; background: rgb(22,155,213);-->
+<!--                border: 0;-->
+<!--                border-radius: 3px;-->
+<!--                color: white;"-->
+<!--            >开始补传</button>-->
+<!--        </div>-->
+<!--        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">-->
+<!--            <button id="bcCloseClick" type="button" onclick="locationInformation.bcCloseClick()"-->
+<!--                    style="width: 99px; height: 34px; background: rgb(22,155,213);-->
+<!--                border: 0;-->
+<!--                border-radius: 3px;-->
+<!--                color: white;"-->
+<!--            >关闭</button>-->
+<!--        </div>-->
+<!--    </div>-->
+
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{ export.fail }]];
+    var monitoringObjecNull = [[#{monitoring.objec.null}]];
+</script>
+<script src="/clbs/resources/js/html2canvas.min.js"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/resources/js/oilSubsidyManage/locationInformation.js"
+    th:src="@{/resources/js/oilSubsidyManage/locationInformation.js}"></script>
+
+</html>

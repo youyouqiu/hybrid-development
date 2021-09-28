@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.CommandParametersDao">
+    <select id="findByVehicleIds" resultType="com.zw.platform.domain.param.form.CommandParametersForm">
+        select v.id as vehicleId,v.monitorType, v.brand, o.id as id,o.param_id as settingParamId,o.command_type
+        from
+        (
+        SELECT car.id id, car.brand brand, '1' monitorType,car.create_data_time FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION ALL
+        SELECT peo.id id, peo.people_number brand,'3' monitorType,peo.create_data_time FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION ALL
+        SELECT th.id id, th.thing_number brand,'2' monitorType,th.create_data_time FROM zw_m_thing_info th WHERE th.flag=1
+        ) v
+        left join ( select m.id,m.param_id,m.command_type,m.vid from zw_m_realtime_command_setting m,
+        (select command_type,vid,MAX(CREATE_data_time)mx_time from zw_m_realtime_command_setting where flag=1 and command_type = #{commandType}
+        and vid in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach> GROUP BY command_type,vid )tmp where m.vid = tmp.vid and m.command_type = tmp.command_type and m.flag =1 and m.create_data_time = tmp.mx_time
+        ) o on o.vid = v.id where v.id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

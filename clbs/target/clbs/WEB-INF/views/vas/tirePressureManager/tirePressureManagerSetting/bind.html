@@ -1,0 +1,197 @@
+<form id="bindForm" role="form" action="#"
+      method="post" class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">胎压监测设置</h4>
+        <style>
+            label.control-label{
+                padding-left: 0;
+                padding-right: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="referenceList" th:value="${referenceList}" type="hidden"/><!--参考对象-->
+                <input id="allSensor" th:value="${allSensor}" type="hidden"/><!--传感器对象-->
+                <input id="curBox" type="hidden"/>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">
+                        <label class="text-danger">*</label> 监控对象：
+                    </label>
+                    <div class="col-md-4">
+                        <input style="cursor: pointer" th:value="${vehicleInfo.brand}" name="vehicleBrand"
+                               class="form-control" readonly/>
+                        <input th:value="${vehicleInfo.id}" id="vehicleId" name="vehicleId" type="hidden"/>
+                    </div>
+                    <label class="col-md-2 control-label">参考对象：</label>
+                    <div class="col-md-4">
+                        <div class="input-group" style="margin-right:15px">
+                            <input name="brands" type="text" class="form-control" id="brands">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown"><span
+                                        class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">轮胎数量：</label>
+                    <div class="col-md-4">
+                        <select id="numberOfTires" name="numberOfTires" class="form-control">
+                            <option value="1">单轮</option>
+                            <option value="2">双轮胎</option>
+                            <option value="3">三轮胎</option>
+                            <option value="4" selected>4轮</option>
+                            <option value="6">6轮</option>
+                            <option value="8">8轮</option>
+                            <option value="10">10轮</option>
+                            <option value="12">12轮</option>
+                            <option value="14">14轮</option>
+                            <option value="16">16轮</option>
+                            <option value="20">20轮</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="humidityContent">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
+                            传感器基本参数
+                        </label>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">
+                                <label class="text-danger">*</label> 传感器型号：
+                            </label>
+                            <input name="sensorId" type="hidden" class="form-control" id="sensorId">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input name="sensorNumber" type="text" class="form-control" id="sensorNumber">
+                                    <label id="errorMsg" class="error" style='display: none;'>请选择已有的传感器型号</label>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-white dropdown-toggle"
+                                                data-toggle="dropdown"><span class="caret"></span></button>
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="col-md-4"></label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">补偿使能：</label>
+                            <div class="col-md-4">
+                                <select disabled name="compensate" id="compensate" class="form-control">
+                                    <option value="-1"></option>
+                                    <option value="1">使能</option>
+                                    <option value="2">禁用</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label">滤波系数：</label>
+                            <div class="col-md-4">
+                                <select disabled name="filterFactor" id="filterFactor" placeholder=""
+                                        class="form-control">
+                                    <option value="-1"></option>
+                                    <option value="1">实时</option>
+                                    <option value="2">平滑</option>
+                                    <option value="3">平稳</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" id="remark" name="remark"/>
+                        <hr/>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">个性参数</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label class="text-danger">*</label> 自动上传时间(s)：</label>
+                            <div class="col-md-4">
+                                <select id = "autoTime" name="autoTime" placeholder="请选择自动上传时间"
+                                        class="form-control">
+                                    <option selected="selected" value="1">被动</option>
+                                    <option value="2">10</option>
+                                    <option value="3">20</option>
+                                    <option value="4">30</option>
+                                </select>
+                            </div>
+                            <label class="col-md-2 control-label"><label class="text-danger">*</label> 输出修正系数K：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id = "correctionFactorK" name = "correctionFactorK" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入数字，范围1-200" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"><label class="text-danger">*</label> 输出修正系数B：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id = "correctionFactorB" name = "correctionFactorB" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入数字，范围0-200" class="form-control" />
+                            </div>
+                            <label class="col-md-2 control-label"> 正常胎压值(bar)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="normalTirePressure" name="normalTirePressure" value="2.4"
+                                       placeholder="请输入1.5-20之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 胎压不平衡门限(%)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="pressureImbalanceThreshold" name="pressureImbalanceThreshold"
+                                       value="20" placeholder="请输入0-100之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label"> 慢漏气门限(%)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="slowLeakThreshold" name="slowLeakThreshold" value="5"
+                                       placeholder="请输入0-100之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 高温阈值(℃)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="highTemperatureThreshold" name="highTemperatureThreshold"
+                                       value="80" placeholder="请输入0-100之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label"> 低压阈值(bar)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="lowVoltageThreshold" name="lowVoltageThreshold" value="2"
+                                       placeholder="请输入1.5-20之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"> 高压阈值(bar)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="highVoltageThreshold" name="highVoltageThreshold" value="2.8"
+                                       placeholder="请输入1.5-20之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                            <label class="col-md-2 control-label"> 电量报警阈值(%)：</label>
+                            <div class="col-md-4">
+                                <input autocomplete="off" type="text" id="powerAlarmThreshold" name="powerAlarmThreshold" value="20"
+                                       placeholder="请输入1-100之间数字或留空"
+                                       class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer" style="margin:0px;">
+        <button class="btn btn-primary" type="button" id="doSubmit"><strong>提 交</strong></button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><strong>关 闭</strong></button>
+    </div>
+
+    <label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/tirePressureManagerSettingBind.js"></script>

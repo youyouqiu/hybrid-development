@@ -1,0 +1,163 @@
+<style type="text/css">form#editForm .dropdown-menu{min-width: 488px;}</style>
+<form th:action="@{/v/oilmgt/fluxsensorbind/edit.gsp}" th:object="${result}"
+ id="editForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXEdit" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">油耗管理设置修改</h4>
+	</div>
+     <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+      	<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<input th:field="*{id}" type="hidden"/>
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input style="cursor: pointer"  th:field="*{brand}" name = "vehicleBrand" placeholder="请输入监控对象" class="form-control" readonly />
+						<input th:field="*{vehicleId}" name = "vehicleId" type="hidden"/>
+					</div>
+					<label class="col-md-2 control-label">参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input name="brands" type="text" class="form-control" id="brands">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+                <div class="col-md-12">
+                       <div class="panel-body">
+                           <div class="tab-content" >
+							<hr/>
+						    <div class="form-group">
+							    <label class="col-sm-2 control-label">
+								   传感器基本参数
+							    </label>
+						    </div>
+							<div class="form-group">
+								<label class="col-md-2 control-label"> <label
+									class="text-danger">*</label> 传感器型号：
+									<input name="sensorId" type="hidden" class="form-control" id="sensorId">
+								</label>
+								<div class="col-md-4">
+									<input type="hidden" name="oilWearId" th:field="*{oilWearId}" id="formFluxSensor" />
+									<div class="input-group">									
+										<input  type="text"  placeholder="请选择流量传感器型" class="form-control" th:field="*{oilWearNumber}" th:data-id="*{oilWearId}"  id="fluxSensor" value=" ">
+										<label id="errorMsg" class="error" style='display: none;'>请选择传感器型号</label>
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-white dropdown-toggle"
+												data-toggle="dropdown">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right" role="menu">
+											</ul>
+										</div>
+									</div>
+								</div>
+								<label class="col-md-4"></label>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">补偿使能：</label>
+								<div class="col-md-4">
+			                       <select disabled name="compensate" th:field="*{inertiaCompEn}"  id = "compensate" placeholder="" class="form-control">                        	
+			                        	<option value="1" selected>使能</option>
+			                        	<option value="2">禁用</option>                        	
+			                       	</select> 
+			                    </div>
+			                    <label class="col-md-2 control-label">奇偶校验：</label>
+								<div class="col-md-4">
+									<select id = "parity" th:field="*{parity}" name="parity" placeholder="请选择奇偶校验"
+										class="form-control" disabled>
+										<option selected="selected" value="0"></option>
+										<option value="3">无校验</option>
+										<option value="1">奇校验</option>
+										<option value="2">偶校验</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+							<label class="col-md-2 control-label">波特率：</label>
+							<div class="col-md-4">
+								<select id = "baudRate" th:field="*{baudRate}" name="baudRate" placeholder="请选择波特率" disabled
+									class="form-control">
+									<option selected="selected" value="0"></option>
+									<option value="1">2400</option>
+									<option value="2">4800</option>
+									<option value="3">9600</option>
+									<option value="4">19200</option>
+									<option value="5">38400</option>
+									<option value="6">57600</option>
+									<option value="7">115200</option>
+								</select>
+							</div>
+							<label class="col-md-2 control-label">滤波系数：</label>
+							<div class="col-md-4">
+		                        <select disabled name="filterFactor" th:field="*{filterFactor}" id = "filterFactor" placeholder="" class="form-control">      
+		                        	<option value="1">实时</option>                  	
+		                        	<option value="2" >平滑</option>                        	
+		                        	<option value="3">平稳</option>                        	
+		                       	</select>
+		                    </div>
+							</div>
+							<hr/>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">
+								个性参数
+								</label>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">自动上传时间(s)：</label>
+								<div class="col-md-4">
+									<select  th:field="*{autoUploadTime}" id = "autoUploadTime" name="autoUploadTime" placeholder="请选择自动上传时间" 
+										class="form-control"  style="background-color: #fafafa">
+										<option selected="selected" value="01">被动</option>
+										<option value="02">10</option>
+										<option value="03">20</option>
+										<option value="04">30</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-2 control-label">输出修正系数K：</label>
+								<div class="col-md-4">
+									<input type="text" id = "outputCorrectionK"  th:field="*{outputCorrectionK}"  name = "outputCorrectionK" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数K" class="form-control" />
+								</div>
+								<label class="col-md-2 control-label">输出修正系数B：</label>
+								<div class="col-md-4">
+									<input type="text" id = "outputCorrectionB" th:field="*{outputCorrectionB}"  name = "outputCorrectionB" value = "100" onkeyup="value=value.replace(/[^0-9]/g,'')" placeholder="请输入修正系数B" class="form-control" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+	  </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseEdit" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script th:inline="javascript">
+	var sensorNull = [[#{sensor.null}]];
+</script>
+<input id = "vehicleList"  th:value="${vehicleList}" type="hidden"/>
+<input id = "fluxSensorList"  th:value="${fluxSensorList}" type="hidden"/>
+<input id="selectFluxSensor" th:value="${result.oilWearId}" type="hidden"/>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="/wro/fluxsensorbindEdit.js" th:src="@{/wro/fluxsensorbindEdit.js}"></script>

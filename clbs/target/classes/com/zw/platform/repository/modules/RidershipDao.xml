@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.RidershipDao">
+    <sql id="Base_Column_List">
+        id, vehicle_id, brand, group_name, assignment_name, plate_color, vehicle_type, start_time,end_time,aboard,get_off,
+         flag, create_data_time, create_data_username, update_data_time, update_data_username
+    </sql>
+    <!-- 新增 -->
+    <insert id="insert" parameterType="com.zw.platform.domain.reportManagement.Ridership">
+        INSERT INTO zw_m_ridership (
+        id, vehicle_id, brand, group_name, assignment_name, plate_color, vehicle_type, start_time,end_time,aboard,get_off,
+         flag, create_data_time, create_data_username)
+        VALUES(
+         #{id},#{vehicleId}, #{brand}, #{groupName}, #{assignmentName}, #{plateColor},
+         #{vehicleType},#{startTime},#{endTime},#{aboard},#{getOff},
+         #{flag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+    <select id="findByVehicleIdAndDate" parameterType="com.zw.platform.domain.reportManagement.query.RidershipQuery"
+            resultType="com.zw.platform.domain.reportManagement.Ridership">
+        SELECT * FROM
+        zw_m_ridership
+        WHERE 1 = 1
+        <if test="ridershipQuery.plateNumber != null and ridershipQuery.plateNumber!=''">
+            and brand = BINARY #{ridershipQuery.plateNumber}
+        </if>
+        <if test="ridershipQuery.startTime != null and ridershipQuery.startTime!=''">
+            and <![CDATA[ DATE_FORMAT(start_time, '%Y-%m-%d') >= DATE_FORMAT(#{ridershipQuery.startTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="ridershipQuery.endTime != null and ridershipQuery.endTime!=''">
+            and <![CDATA[ DATE_FORMAT(end_time, '%Y-%m-%d') <= DATE_FORMAT(#{ridershipQuery.endTime}, '%Y-%m-%d') ]]>
+        </if>
+        <if test="ridershipQuery.vehicleIds != null and ridershipQuery.vehicleIds.size > 0">
+            and vehicle_id in
+            <foreach item="item" collection="ridershipQuery.vehicleIds" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+
+</mapper>

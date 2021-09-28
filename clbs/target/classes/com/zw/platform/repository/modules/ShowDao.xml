@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ShowDao">
+    <select id="EventAndRisks" resultType="com.zw.platform.domain.leaderboard.RiskEvnet">
+      select
+             risk_total  as riskTotal,
+             event_phone as eventPhone ,
+             event_exception as eventException,
+             event_vehicle_crash as eventVehicleCrash,
+             event_vehicle_distance as eventVehicleDistance,
+             event_distraction as eventDistraction,
+             event_vehicle_offset as eventVehicleOffset,
+             event_yawning as eventYawning,
+             event_eye_close as eventEyeClose,
+             event_smoke as eventSmoke,
+             event_bow_head as eventBowHead,
+             event_obstacles as eventObstacles,
+             event_hit_people as eventHitPeople,
+             event_frequent_offset as eventFrequentOffset,
+             alarm_overspeed as alarmOverspeed,
+             alarm_overtime as alarmOvertime,
+             alarm_crash as alarmCrash,
+             rtype_distraction as rtypeDistraction,
+             rtype_exception AS rtypeException,
+             rtype_crash as rtypeCrash,
+             rtype_tired as rtypeTired,
+             rtype_cluster as rtypeCluster,
+             rlevel_special_serious as specialSerious,
+             rlevel_serious as serious,
+             rlevel_general as general,
+             rlevel_heavier as heavier
+      from
+             zw_lb_today_compare_yesterday
+      WHERE
+             group_id = #{id} and time = #{time} and flag = 1
+
+    </select>
+    <select id="getRsRank" resultType="java.util.Map">
+              select
+                    risk_total as riskTotal,
+                    rtype_distraction as distraction ,
+                    rtype_tired as tired,
+                    rtype_crash as crash,
+                    rtype_exception as rException,
+                    rtype_cluster as cluster
+
+              from
+                    zw_lb_vehicle_risk_report
+              where
+                    group_id =#{adminGid} and time=#{timeNode} and type = 0
+
+       </select>
+
+
+    <!--上线总数查询-->
+    <select id="getLineRate" resultType="Integer">
+        select
+        sum(vehicle_online)
+        from
+        zw_lb_org_veh_online_rank
+        where
+        time = #{time}
+    </select>
+
+    <select id="getVidsByGid" parameterType="java.util.List" resultType="java.lang.String">
+        select vehicle_id from zw_m_vehicle_info where group_id IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </select>
+
+
+</mapper>

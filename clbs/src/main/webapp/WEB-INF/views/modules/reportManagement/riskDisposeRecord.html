@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>主动安全处置报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/activeSafety.css">
+    <link rel="stylesheet" href="/clbs/resources/css/riskEnterpriseList.css">
+</head>
+<style>
+    #dataTable tbody tr {
+        cursor: pointer;
+    }
+    .dataTables_wrapper .dataTables_paginate .pagination li:not(.first):not(.previous):not(.next) {
+        display: none;
+    }
+    .risk_img{
+        width:23px;
+        height:20px;
+        background-image: url(/clbs/resources/img/previewimg-blue.svg);
+        background-size: 23px 20px;
+        background-position:0 0;
+        margin-right: 2px;
+    }
+    .risk_video{
+        width:23px;
+        height:20px;
+        background-image: url(/clbs/resources/img/video-blue.svg);
+        background-size: 23px 20px;
+        background-position:0 0;
+        margin-top:5px;
+    }
+    .risk_grey{
+        width: 23px;
+        height: 20px;
+        padding-top: 5px;
+        background-image: url(/clbs/resources/img/previewimg-grey.svg);
+        background-size: 23px 20px;
+        background-repeat: no-repeat;
+        display: inline-block;
+        margin-right: 2px;
+        background-position: 0 0;
+        cursor: pointer;
+    }
+    .risk_blue{
+        width: 23px;
+        height: 20px;
+        padding-top: 5px;
+        background-image: url(/clbs/resources/img/video-grey.svg);
+        background-size: 23px 20px;
+        background-repeat: no-repeat;
+        display: inline-block;
+        background-position: 0 0;
+        cursor: pointer;
+    }
+    .editBtn.btn-default{
+        padding-left:12px !important;
+    }
+    .editBtn.btn-defaultr{
+        padding-right: 16px;
+    }
+    #riskTypePop{
+        /*max-height:250px;*/
+        /*overflow-x: hidden;*/
+        /*overflow-y: auto;*/
+    }
+    #dataTableRiskType_wrapper{
+        overflow: inherit;
+    }
+    /*@-moz-document url-prefix() {*/
+    /*#dataTableRiskType_wrapper{*/
+    /*padding-right:15px;*/
+    /*}*/
+    /*}*/
+    .popover-title{
+        max-width: 1800px;
+        min-width: 1620px;
+        height: 35px;
+        background-color: #f7f7f7;
+        margin:0;
+        padding: 8px 14px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 18px;
+        border-bottom: 1px solid #ebebeb;
+        border-radius: 5px 5px 0 0;
+    }
+</style>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">主动安全处置报表</li>
+                    </ul>
+                    <h1 class="h1 ">主动安全处置报表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="hourslist" class="form-horizontal" action="#" method="post" role="form"  autocomplete="off">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                            <input class="form-control hidden" />
+                                            <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                <select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+                                                    <option value="monitor">监控对象</option>
+                                                    <option value="group">企业</option>
+                                                    <option value="assignment">分组</option>
+                                                </select>
+                                                <input type="text" style="cursor: pointer; background-color: #fafafa;" class="form-control moreQueryGroup"
+                                                       id="groupSelect" placeholder="请选择" name="groupSelect"/>
+                                                <span class="fa fa-chevron-down form-control-feedback" style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true" id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="treeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                            <div class="col-md-4 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon" id="timeInterval"
+                                                       name="timeInterval" readonly/>
+                                            </div>
+                                            <div id="highlever" class="col-md-1 col-sm-3 control-label"
+                                                 style="float:right;margin-right:30px;font-weight:bold;cursor:pointer;padding:0px;">
+                                                高级搜索<span class="fa fa-caret-down"
+                                                          style="font-size:22px;position:relative;top:2px;left:2px;"></span>
+                                            </div>
+                                        </div>
+
+                                        <div id="highsearch" class="highsearch" style="display:none;">
+                                            <div class="form-group">
+                                                <label class="col-md-1 col-sm-3 control-label hide">风险编号：</label>
+                                                <div class="col-md-2 hide">
+                                                    <input id="riskNumber" type="text" class="form-control" placeholder="请输入风险编号"/>
+                                                </div>
+
+                                                <label class="col-md-1 col-sm-3 control-label">监控对象：</label>
+                                                <div class="col-md-2"><input placeholder="请输入监控对象" id="brand"
+                                                                             type="text"
+                                                                             class="form-control"/>
+                                                </div>
+                                                <label class="col-md-1 col-sm-3 control-label">风险类型：</label>
+                                                <input class="form-control hidden"/>
+                                                <div class="has-feedback col-md-2 col-sm-8">
+                                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                                           class="form-control" placeholder="所有" id="alarmTypeSelect"
+                                                           readonly/>
+
+                                                    <div id="alarmTypeContent" class="menuContent">
+                                                        <ul id="alarmTypeTree" class="ztree"></ul>
+                                                    </div>
+                                                    <span class="fa fa-chevron-down form-control-feedback"
+                                                          style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                          id="alarmTypeSelectSpan"></span>
+                                                </div>
+
+                                                <label class="col-md-1 col-sm-3 control-label">风险等级：</label>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" id="riskLevel">
+                                                        <option value="">所有</option>
+                                                        <option value="1">一般(低)</option>
+                                                        <option value="2">一般(中)</option>
+                                                        <option value="3">一般(高)</option>
+                                                        <option value="4">较重(低)</option>
+                                                        <option value="5">较重(中)</option>
+                                                        <option value="6">较重(高)</option>
+                                                        <option value="7">严重(低)</option>
+                                                        <option value="8">严重(中)</option>
+                                                        <option value="9">严重(高)</option>
+                                                        <option value="10">特重(低)</option>
+                                                        <option value="11">特重(中)</option>
+                                                        <option value="12">特重(高)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-1 col-sm-3 control-label">处理人：</label>
+                                                <div class="col-md-2"><input id="dealUser" type="text"
+                                                                             class="form-control" placeholder="请输入处理人"/>
+                                                </div>
+                                                <label class="col-md-1 col-sm-3 control-label">驾驶员：</label>
+                                                <div class="col-md-2"><input placeholder="请输入驾驶员" id="driver"
+                                                                             type="text"
+                                                                             class="form-control"/>
+                                                </div>
+                                                <label class="col-md-1 col-sm-3 control-label">状态：</label>
+                                                <div class="col-md-2"><select class="form-control" id="status">
+                                                    <option value="">所有</option>
+                                                    <option value="1">未处理</option>
+                                                    <!--<option>处理中</option>
+                                                    <option>待回访</option>
+                                                    <option>回访中</option>
+                                                    <option>跟踪中</option>-->
+                                                    <option value="6">已处理</option>
+                                                </select></div>
+                                            </div>
+
+                                            <div class="form-group hide">
+                                                <label class="col-md-1 col-sm-3 control-label">回访次数：</label>
+                                                <div class="col-md-2"><select id="visitTime" class="form-control">
+                                                    <option>所有</option>
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                </select></div>
+                                                <label class="col-md-1 col-sm-3 control-label">风控结果：</label>
+                                                <div class="col-md-2"><select id="riskResult" class="form-control">
+                                                    <option>所有</option>
+                                                    <option>风控成功归档</option>
+                                                    <option>风控失效归档</option>
+                                                    <option>事故发生归档</option>
+                                                </select></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-11.5 control-label" id="dateSearchData">
+                                            <button id="todayClick" type="button" class="btn btn-primary" name="0"
+                                                    onclick="riskDisposeRecord.inquireClick(0)">今天
+                                            </button>
+                                            <button id="yesterdayClick" type="button" class="btn btn-primary" name="-1"
+                                                    onclick="riskDisposeRecord.inquireClick(-1)">前一天
+                                            </button>
+                                            <button id="nearlyThreeDays" type="button" class="btn btn-primary" name="-3"
+                                                    onclick="riskDisposeRecord.inquireClick(-3)">前三天
+                                            </button>
+                                            <button id="nearlySevenDays" type="button" class="btn btn-primary" name="-7"
+                                                    onclick="riskDisposeRecord.inquireClick(-7)">前七天
+                                            </button>
+                                            <button id="inquireClick" type="button" class="btn btn-primary search-btn"
+                                                    name="1" onclick="riskDisposeRecord.inquireClick(1)"><i
+                                                    class="glyphicon glyphicon-search"></i> 查询
+                                            </button>
+                                            <button id="exportRisk" type="button" class="btn btn-purple export-btn"
+                                                    disabled><i
+                                                    class="glyphicon glyphicon-log-out"></i> 导出
+                                            </button>
+                                            <!-- 暂时屏蔽掉,后面再打开-->
+                                            <!--<button id="exportDocByBatch" type="button" class="btn btn-purple export-btn"
+                                                    style="width: 100px;"><i
+                                                    class="glyphicon glyphicon-log-out"></i> 批量导出
+                                            </button>-->
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">主动安全处置列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body">
+                                <div >
+                                    <div class="ToolPanel">
+                                        <div class="columns btn-group pull-right vehicleTypeManagement">
+                                            <button id="refreshTable" class="btn btn-default" type="button"
+                                                    name="refresh"
+                                                    title="刷新">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group" title="定制显示列" style="margin-bottom:8px">
+                                                <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle"
+                                                        data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i>
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="overflow:auto">
+                                        <table id="dataTable"
+                                               class="table table-striped table-bordered table-hover checkTable"
+                                               cellspacing="0" width="100%">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">序号</th>
+                                                <th class="text-center">操作/状态</th>
+                                                <th class="text-center">处理结果</th>
+                                                <th class="text-center">风险证据</th>
+                                                <th class="text-center">监控对象</th>
+                                                <th class="text-center">风险编号</th>
+                                                <th class="text-center">驾驶员</th>
+                                                <th class="text-center">驾驶证号</th>
+                                                <th class="text-center">所属企业</th>
+                                                <th class="text-center">风险类型</th>
+                                                <th class="text-center">风险等级</th>
+                                                <th class="text-center">速度</th>
+                                                <th class="text-center">报警位置</th>
+                                                <th class="text-center">天气情况</th>
+                                                <th class="text-center">开始报警时间</th>
+                                                <th class="text-center">结束报警时间</th>
+                                                <th class="text-center">处理人</th>
+                                                <th class="text-center">处理时间</th>
+                                                <th class="text-center">多媒体附件</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="popover fade top" id="riskTypePop">
+                                    <div class="popover-title">
+                                        <span id="closePopover" style="cursor: pointer">关闭</span>
+                                    </div>
+                                    <div class="popover-content" style="max-height: 251px;overflow-y: auto; overflow-x: hidden">
+                                        <table id="dataTableRiskType"
+                                               class="table table-striped table-bordered table-hover text-center">
+                                            <thead>
+                                            <tr>
+                                                <th>风险类型</th>
+                                                <th>报警事件</th>
+                                                <th>报警等级</th>
+                                                <th>开始报警时间</th>
+                                                <th>结束报警时间</th>
+                                                <th>车辆速度</th>
+                                                <th>路网限速</th>
+                                                <th>道路类型</th>
+                                                <th>经度</th>
+                                                <th>纬度</th>
+                                                <th>事件编号</th>
+                                                <th>车辆状态</th>
+                                                <th>预览</th>
+                                                <th>终端证据</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<!--多媒体Modal-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">title</h4>
+            </div>
+            <div class="modal-body">
+                <div class="media-content">
+                    <!--tab-->
+                        <span class="media_tab Img">
+                            <button id="img" href="javascript:void(0);" class="btn btn-primary" data-value="0">终端图片</button>
+                        </span>
+                        <span class="media_tab Video">
+                            <button id="video" href="javascript:void(0);" class="btn btn-primary" data-value="2">终端视频</button>
+                        </span>
+
+                    <div id="showMedia">
+                        <!--media-->
+                        <div id="media" style="height:100%;"></div>
+                        <!--mask-->
+                        <div id="previewMask">
+                            <a id="download" href="#" download class="mask-img">
+                                <img src="/clbs/resources/img/fkzjk_download.svg">
+                                <hr>
+                            </a>
+                        </div>
+                        <!--arrow-->
+                        <div class="arrows left-btn" id="arrowsLeft">
+                            <i class="icon icon_left"></i>
+                        </div>
+                        <div class="arrows right-btn" id="arrowsRight">
+                            <i class="icon icon_right"></i>
+                        </div>
+                    </div>
+                    <!--count-->
+                    <div class="media_len">
+                        <span id="current">1</span>
+                            /
+                        <span id="count">20</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var monitoringObjecNull = [[#{monitoring.objec.null}]];
+</script>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="/wro/riskDisposeRecord.js" th:src="@{/wro/riskDisposeRecord.js}"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+</html>

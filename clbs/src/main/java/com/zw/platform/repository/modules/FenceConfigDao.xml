@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.FenceConfigDao">
+    <!-- 查询围栏绑定 -->
+    <select id="findFenceConfig"
+            parameterType="com.zw.platform.domain.functionconfig.query.FenceConfigQuery"
+            resultType="map">
+        SELECT t.* FROM (
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id AS fenceId, info.monitorType, fence.group_id AS
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        LEFT JOIN (
+        SELECT id,`name`,group_id,flag FROM zw_m_marker
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_line
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_polygon
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_rectangle
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_circle
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_administration
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_travel_line
+        )fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        UNION
+        SELECT th.id id, th.thing_number brand,'2' monitorType FROM zw_m_thing_info th WHERE th.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        WHERE fc.flag = 1
+        ) t
+        <if test="vehicleIds != null and vehicleIds.size() > 0">
+            WHERE t.vehicle_id IN
+            <foreach item="item" collection="vehicleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vehicleIds == null or vehicleIds.size() == 0">
+            WHERE 0 = 1
+        </if>
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (t.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR t.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        <if test="queryFenceId != null and queryFenceId.size() > 0">
+            and t.fenceId in
+            <foreach item="item" collection="queryFenceId" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="groupIds != null and groupIds.size() > 0">
+            AND t.groupId IN
+            <foreach item="item" collection="groupIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY t.create_data_time DESC
+
+        <!--SELECT t.* FROM (
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_marker fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_line fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_polygon fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_rectangle fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_circle fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_administration fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        UNION
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id as fenceId, info.monitorType, fence.group_id as
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN zw_m_travel_line fence ON fence.id = fi.shape AND fence.flag = 1
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info
+        ON info.id = fc.vehicle_id
+        &lt;!&ndash; LEFT JOIN zw_m_directive dir ON fc.id = dir.parameter_name AND dir.flag = 1 AND dir.parameter_type = 1 and parameter_type = 1 &ndash;&gt;
+        WHERE fc.flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam!=''">
+            AND (fence.name LIKE CONCAT('%',#{simpleQueryParam},'%')
+            OR info.brand LIKE CONCAT('%',#{simpleQueryParam},'%')
+            )
+        </if>
+        ) t
+        <if test="vehicleIds != null and vehicleIds.size() > 0">
+            WHERE t.vehicle_id IN
+            <foreach item="item" collection="vehicleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="vehicleIds == null or vehicleIds.size() == 0">
+            WHERE 0 = 1
+        </if>
+        <if test="queryFenceId != null and queryFenceId.size() > 0">
+            and t.fenceId in
+            <foreach item="item" collection="queryFenceId" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="groupIds != null and groupIds.size() > 0">
+            AND t.groupId IN
+            <foreach item="item" collection="groupIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY t.create_data_time DESC-->
+    </select>
+
+    <!-- 新增围栏绑定 -->
+    <insert id="addFenceConfig"
+            parameterType="com.zw.platform.domain.functionconfig.form.FenceConfigForm">
+		insert into zw_m_fence_config (id, fence_id, vehicle_id,
+		send_fence_type,alarm_source, alarm_in_platform, alarm_out_platform, 
+		alarm_in_driver, alarm_out_driver, alarm_start_time,
+		flag, create_data_time, create_data_username, alarm_end_time, alarm_start_date, alarm_end_date, speed,
+		travel_long_time,travel_small_time,open_door,communication_flag,
+		gnss_flag
+		)
+		values (#{id}, #{fenceId}, #{vehicleId}, #{sendFenceType}, #{alarmSource}, #{alarmInPlatform}, #{alarmOutPlatform},
+		#{alarmInDriver},#{alarmOutDriver},#{alarmStartTime},
+		#{flag}, #{createDataTime}, #{createDataUsername}, #{alarmEndTime},
+		#{alarmStartDate}, #{alarmEndDate}, #{speed},
+		#{travelLongTime},#{travelSmallTime},#{openDoor},#{communicationFlag},
+		#{gnssFlag})
+	</insert>
+
+    <!-- 批量新增 -->
+    <insert id="addFenceConfigByBatch"
+            parameterType="com.zw.platform.domain.functionconfig.form.FenceConfigForm">
+        INSERT INTO zw_m_fence_config (
+        id, fence_id, vehicle_id,send_fence_type, alarm_source, alarm_in_platform,
+        alarm_out_platform, alarm_in_driver, alarm_out_driver,alarm_start_time,
+        flag, create_data_time, create_data_username, alarm_end_time,
+        alarm_start_date, alarm_end_date, speed, over_speed_last_time,
+        travel_long_time,travel_small_time,open_door,communication_flag,
+        gnss_flag,send_down_id,night_max_speed,night_limit_time
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.fenceId}, #{item.vehicleId},
+            #{item.sendFenceType}, #{item.alarmSource}, #{item.alarmInPlatform},
+            #{item.alarmOutPlatform},#{item.alarmInDriver},#{item.alarmOutDriver}, #{item.alarmStartTime},
+            #{item.flag}, #{item.createDataTime}, #{item.createDataUsername},
+            #{item.alarmEndTime}, #{item.alarmStartDate}, #{item.alarmEndDate}, #{item.speed},
+            #{item.overSpeedLastTime},
+            #{item.travelLongTime},#{item.travelSmallTime},#{item.openDoor},#{item.communicationFlag},
+            #{item.gnssFlag},#{item.sendDownId},#{item.nightMaxSpeed},#{item.nightLimitTime})
+        </foreach>
+    </insert>
+
+    <!-- 查询轨迹列表 -->
+    <select id="findOrbitList" resultType="com.zw.platform.domain.functionconfig.FenceConfig"
+            parameterType="com.zw.platform.domain.functionconfig.query.FenceConfigQuery">
+        select fc.id fenceConfigId, vi.brand carLicense, l.name lineName, fc.create_data_time createDataTime,
+        l.description lineDescription
+        from zw_m_fence_config fc
+        left join zw_m_vehicle_info vi on fc.vehicle_id = vi.id
+        left join zw_m_fence_info fi on fc.fence_id = fi.id
+        left join zw_m_line l on fi.shape = l.id
+        where fi.`type` = 'zw_m_line' and fc.flag = 1 and vi.flag = 1 and fi.flag = 1 and l.flag = 1
+        <if test="query.vehicleIds != null and query.vehicleIds.size() > 0">
+            and fc.vehicle_id IN
+            <foreach item="item" collection="query.vehicleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND ( vi.brand LIKE CONCAT('%',#{simpleQueryParam},'%') OR l.name LIKE CONCAT('%',#{simpleQueryParam},'%'))
+        </if>
+    </select>
+
+    <!-- 根据围栏车辆关联表id查询轨迹 -->
+    <select id="getFenceConfigById" resultType="com.zw.platform.domain.functionconfig.FenceConfig"
+            parameterType="string">
+		select fc.id fenceConfigId, vi.brand carLicense, l.name lineName, l.type lineType, l.width lineWidth, fi.type reTableName, fi.shape shapeId, fc.create_data_time createDataTime, l.description lineDescription
+		from zw_m_fence_config fc 
+			left join zw_m_vehicle_info vi on fc.vehicle_id = vi.id 
+			left join zw_m_fence_info fi on fc.fence_id = fi.id 
+			left join zw_m_line l on fi.shape = l.id 
+		where fi.`type` = 'zw_m_line' and fc.flag = 1 and vi.flag = 1 and fi.flag = 1 and l.flag = 1 and fc.id = #{id}
+	</select>
+
+    <!-- 解除围栏绑定 -->
+    <update id="unbindFence" parameterType="string">
+		update zw_m_fence_config
+		set flag = 0
+		where 
+		flag = 1 
+		and id = #{id}
+	</update>
+
+    <!-- 根据车辆id解除车辆与围栏的绑定 -->
+    <update id="unbindFenceByVid" parameterType="string">
+		update zw_m_fence_config
+		set flag = 0
+		where 
+		flag = 1 
+		and vehicle_id = #{vid}
+	</update>
+
+    <!-- 根据信息配置id解除车辆与围栏的绑定 -->
+    <update id="unbindFenceByConfigId" parameterType="string">
+		update zw_m_fence_config
+		set flag = 0
+		where 
+		flag = 1 
+		and vehicle_id = (
+			select vehicle_id from zw_m_config where id = #{configId} and flag = 1
+		)
+	</update>
+
+    <!-- 恢复围栏绑定 -->
+    <update id="updateFenceConfigById" parameterType="string">
+		update zw_m_fence_config
+		set flag = 1
+		where 
+		id = #{id}
+	</update>
+
+    <!-- 删除关键点-->
+    <update id="deleteKeyPoint" parameterType="string">
+		update zw_m_line_spot
+		set flag = 0
+		where
+		id = #{id}
+	</update>
+
+    <!-- 批量解除围栏绑定 -->
+    <update id="unbindFenceByBatch">
+        update zw_m_fence_config
+        set flag = 0
+        where
+        flag = 1
+        and id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findFenceConfigById" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+		SELECT DISTINCT info.* FROM  zw_m_fence_info info
+		INNER JOIN zw_m_fence_config config ON config.fence_id = info.id AND config.flag = 1
+		WHERE info.flag = 1 
+		AND config.id =  #{id}
+	</select>
+    <!-- 修改下发状态 -->
+    <update id="updateStatus">
+        UPDATE zw_m_fence_config
+        SET
+        status = #{status}
+        WHERE flag = 1
+        AND id IN
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryFenceConfigById" parameterType="string"
+            resultType="com.zw.platform.domain.functionconfig.FenceConfig">
+		SELECT * FROM  zw_m_fence_config 
+		WHERE flag = 1 
+		AND id =  #{id}
+	</select>
+
+    <!-- 根据id 批量查询 -->
+    <select id="findFenceConfigByIds" parameterType="string"
+            resultType="map">
+        SELECT c.id as bindId, c.vehicle_id as vehicleId, c.fence_id, info.shape as fenceId,info.type,c.alarm_source
+        alarmSource FROM zw_m_fence_config c
+        LEFT JOIN zw_m_fence_info info ON c.fence_id = info.id AND info.flag = 1
+        WHERE c.flag = 1
+        AND c.id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findByVIdAndFId" parameterType="string" resultType="map">
+        SELECT c.*,info.brand,fi.type, fence.name,fence.group_id FROM  zw_m_fence_config c
+        INNER JOIN
+        (
+            SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1 AND car.id = #{vehicleId}
+            UNION
+            SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1 AND peo.id = #{vehicleId}
+            UNION
+            SELECT th.id id, th.thing_number brand FROM zw_m_thing_info th WHERE th.flag=1 AND th.id = #{vehicleId}
+        ) info ON info.id = c.vehicle_id
+        INNER JOIN zw_m_fence_info fi ON fi.id = c.fence_id AND fi.flag = 1
+        INNER JOIN
+        (
+            SELECT id, NAME, group_id FROM zw_m_marker WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_line WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_polygon WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_rectangle WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_circle WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_administration WHERE flag = 1
+            UNION SELECT id, NAME, group_id FROM zw_m_travel_line WHERE flag = 1
+        ) fence ON fence.id = fi.shape
+        WHERE c.flag = 1
+        AND c.vehicle_id =  #{vehicleId}
+        AND c.fence_id =  #{fenceId}
+	</select>
+
+    <!-- 修改围栏绑定 -->
+    <update id="updateFenceConfig" parameterType="com.zw.platform.domain.functionconfig.form.FenceConfigForm">
+		update zw_m_fence_config
+		set alarm_in_platform = #{alarmInPlatform},alarm_out_platform = #{alarmOutPlatform},speed = #{speed},
+		alarm_start_time = #{alarmStartTime},alarm_end_time = #{alarmEndTime},alarm_start_date = #{alarmStartDate},
+		alarm_end_date = #{alarmEndDate},over_speed_last_time = #{overSpeedLastTime},update_data_time = #{updateDataTime},
+		update_data_username = #{updateDataUsername},send_fence_type= #{sendFenceType},travel_long_time = #{travelLongTime},
+		travel_small_time = #{travelSmallTime},alarm_in_driver = #{alarmInDriver},alarm_out_driver = #{alarmOutDriver},
+		open_door = #{openDoor},communication_flag = #{communicationFlag},gnss_flag = #{gnssFlag},send_down_id = #{sendDownId}
+		,night_max_speed=#{nightMaxSpeed},night_limit_time =#{nightLimitTime}
+		where 
+		flag = 1 
+		and id = #{id}
+	</update>
+
+    <select id="findFenceInfoByVehicle" parameterType="string" resultType="map">
+		SELECT c.*,info.brand,fi.type, fence.name,fence.group_id FROM  zw_m_fence_config c
+		INNER JOIN
+		   (
+			   SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1 AND car.id = #{vehicleId}
+			   UNION
+			   SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1 AND peo.id = #{vehicleId}
+			   UNION
+			   SELECT th.id id, th.thing_number brand FROM zw_m_thing_info th WHERE th.flag=1 AND th.id = #{vehicleId}
+		   ) info ON info.id = c.vehicle_id
+		INNER JOIN zw_m_fence_info fi ON fi.id = c.fence_id AND fi.flag = 1
+		INNER JOIN
+		   (
+			   SELECT id, NAME, group_id FROM zw_m_marker WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_line WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_polygon WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_rectangle WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_circle WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_administration WHERE flag = 1 AND id= #{shapeId}
+			   UNION SELECT id, NAME, group_id FROM zw_m_travel_line WHERE flag = 1 AND id= #{shapeId}
+		   ) fence ON fence.id = fi.shape
+		WHERE c.flag = 1
+	</select>
+
+    <!--根据监控对象id和下发围栏的hashCode值查询围栏信息 -->
+    <select id="findFenceInfoByVehicleIdAndHashCode" resultType="map">
+		SELECT c.*,info.brand,fi.type, fence.name FROM  zw_m_fence_config c
+		INNER JOIN
+		(
+		SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1
+		UNION
+		SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1
+		) info
+		ON info.id = c.vehicle_id
+		INNER JOIN zw_m_fence_info fi ON fi.id = c.fence_id AND fi.flag = 1
+		INNER JOIN
+			(
+			SELECT id, NAME FROM zw_m_marker WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_line WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_polygon WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_rectangle WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_circle WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_administration WHERE flag = 1
+			UNION SELECT id, NAME FROM zw_m_travel_line WHERE flag = 1
+			) fence ON fence.id = fi.shape
+		WHERE c.flag = 1
+		AND c.vehicle_id =  #{vehicleId}
+		AND c.send_down_id =  #{sendDownId}
+	</select>
+
+    <!--根据围栏绑定表id存入下发hashCode值-->
+    <update id="addHashCodeByConfigId">
+		update zw_m_fence_config
+		set send_down_id = #{hashCodeNumber}
+		where
+		flag = 1
+		and id = #{configId}
+	</update>
+
+    <select id="getFenceType" parameterType="string" resultType="string">
+		SELECT type from zw_m_fence_info WHERE id= #{fid} and flag= 1
+	</select>
+
+    <select id="getVehicleIdsByFenceId" parameterType="string" resultType="string">
+        <!-- select vehicle_id from zw_m_fence_config where fence_id = #{fenceId}; -->
+        SELECT t.vehicle_id FROM (
+        SELECT DISTINCT fc.*, fi.type, fence.name, info.brand, fence.id AS fenceId, info.monitorType, fence.group_id AS
+        groupId FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        INNER JOIN (
+        SELECT id,`name`,group_id,flag FROM zw_m_marker WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_line WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_polygon WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_rectangle WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_circle WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_administration WHERE flag = 1
+        UNION
+        SELECT id,`name`,group_id,flag FROM zw_m_travel_line WHERE flag = 1
+        )fence ON fence.id = fi.shape
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand,'0' monitorType FROM zw_m_vehicle_info car WHERE car.flag=1
+        UNION
+        SELECT peo.id id, peo.people_number brand,'1' monitorType FROM zw_m_people_info peo WHERE peo.flag=1
+        ) info ON info.id = fc.vehicle_id
+        WHERE fc.flag = 1
+        ) t
+        <if test="vehicleIds != null and vehicleIds.size() > 0">
+            WHERE t.vehicle_id IN
+            <foreach item="item" collection="vehicleIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        and t.fenceId = #{fenceId}
+    </select>
+
+    <select id="findFenceInfoByVehicleIdAndFenceConfigId" resultType="map">
+        SELECT c.*,info.brand,fi.type, fence.name,fence.group_id FROM zw_m_fence_config c
+        INNER JOIN
+        (
+        SELECT car.id id, car.brand brand FROM zw_m_vehicle_info car WHERE car.flag=1 AND car.id = #{vehicleId}
+        UNION
+        SELECT peo.id id, peo.people_number brand FROM zw_m_people_info peo WHERE peo.flag=1 AND peo.id = #{vehicleId}
+        UNION
+        SELECT th.id id, th.thing_number brand FROM zw_m_thing_info th WHERE th.flag=1 AND th.id = #{vehicleId}
+        ) info ON info.id = c.vehicle_id
+        INNER JOIN zw_m_fence_info fi ON fi.id = c.fence_id AND fi.flag = 1
+        INNER JOIN
+        (
+        SELECT id, NAME, group_id FROM zw_m_marker WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_line WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_polygon WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_rectangle WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_circle WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_administration WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_travel_line WHERE flag = 1
+        ) fence ON fence.id = fi.shape
+        WHERE c.flag = 1
+        AND c.vehicle_id = #{vehicleId}
+        AND c.id IN
+        <foreach collection="fenceConfigIds" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </select>
+    <select id="findFenceConfigInfo" resultType="java.util.Map">
+        SELECT DISTINCT fc.*, fi.type, fence.name, fence.id AS fenceId, fence.group_id AS groupId,fence.markIcon
+        FROM zw_m_fence_config fc
+        INNER JOIN zw_m_fence_info fi ON fc.fence_id = fi.id AND fi.flag =1
+        LEFT JOIN (
+        SELECT id,`name`,group_id,flag,mark_icon AS markIcon FROM zw_m_marker
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_line
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_polygon
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_rectangle
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_circle
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_administration
+        UNION
+        SELECT id,`name`,group_id,flag,0 AS markIcon FROM zw_m_travel_line
+        )fence ON fence.id = fi.shape AND fence.flag = 1
+        WHERE fc.flag = 1
+        AND fc.vehicle_id = #{monitorId}
+        <if test="groupIds != null and groupIds.size() > 0">
+            AND fence.group_id IN
+            <foreach item="item" collection="groupIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY fc.create_data_time DESC
+    </select>
+
+    <update id="unbindBatchFenceByVid">
+        update zw_m_fence_config
+        set flag = 0
+        where
+        flag = 1
+        and vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </update>
+
+    <select id="getPointFenceIdByGroupIds" resultType="string">
+        SELECT id from zw_m_circle where type='途经点' and flag =1
+        and group_id in
+        <foreach collection="groupIds" item="groupId" open="(" separator="," close=")">
+            #{groupId}
+        </foreach>
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+        UNION
+        SELECT id from zw_m_rectangle where type='途经点' and flag =1
+        and group_id in
+        <foreach collection="groupIds" item="groupId" open="(" separator="," close=")">
+            #{groupId}
+        </foreach>
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+        UNION
+        SELECT id from zw_m_polygon where type='途经点' and flag =1
+        and group_id in
+        <foreach collection="groupIds" item="groupId" open="(" separator="," close=")">
+            #{groupId}
+        </foreach>
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+    </select>
+
+
+    <select id="getPointFenceIdByMonitorIds" resultType="string">
+        SELECT DISTINCT info.shape from zw_m_fence_config config INNER JOIN zw_m_fence_info info on
+        config.fence_id=info.id and config.flag =1 and info.flag =1
+        JOIN (
+        SELECT id from zw_m_circle where flag =1 and type='途经点'
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+        UNION
+        SELECT id from zw_m_rectangle where flag =1 and type='途经点'
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+        UNION
+        SELECT id from zw_m_polygon where flag =1 and type='途经点'
+        <if test="fenceName != null and fenceName !=''">
+            and name LIKE CONCAT('%',#{fenceName},'%')
+        </if>
+        ) t on t.id=info.shape
+        where config.vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </select>
+
+    <select id="getFenceInfoByFenceConfigIds" resultType="com.zw.platform.domain.functionconfig.FenceInfo">
+        select zmfi.id, zmfi.type, zmfi.shape, fence.name fenceName from zw_m_fence_config zmfc
+        inner join zw_m_fence_info zmfi on zmfi.id = zmfc.fence_id and zmfi.flag = 1
+        INNER JOIN (
+        SELECT id, NAME, group_id FROM zw_m_marker WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_line WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_polygon WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_rectangle WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_circle WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_administration WHERE flag = 1
+        UNION SELECT id, NAME, group_id FROM zw_m_travel_line WHERE flag = 1
+        ) fence ON fence.id = zmfi.shape
+        where zmfc.flag = 1 and
+        zmfc.id in
+        <foreach collection="fenceConfigIds" item="fenceConfigId" open="(" separator="," close=")">
+            #{fenceConfigId}
+        </foreach>
+    </select>
+</mapper>

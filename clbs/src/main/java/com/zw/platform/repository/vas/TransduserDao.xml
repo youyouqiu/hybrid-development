@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.TransduserDao">
+	<!-- 根据传感器类别查询传感器管理 -->
+	<select id="findTransduserManageBytype" resultType="com.zw.platform.domain.vas.f3.TransduserManage">
+				SELECT
+				si.id id,
+				si.sensor_number sensorNumber,
+				si.baud_rate baudRate,
+				si.compensate compensate,
+				si.odd_even_check oddEvenCheck,
+				si.filter_factor filterFactor,
+				si.auto_time autoTime,
+				si.remark remark
+				FROM
+				zw_m_sensor_info si
+				WHERE
+				si.sensor_type = #{transduserType} AND si.flag=1
+				<if test="param != null and param!=''">
+					AND (si.sensor_number LIKE BINARY CONCAT('%',#{param},'%') OR si.remark LIKE BINARY CONCAT('%',#{param},'%'))
+				</if>
+				ORDER BY si.create_data_time DESC
+	</select>
+
+	<!-- 根据传感器型号及类型查询传感器信息 -->
+	<select id="getSensorByNumber" resultType="com.zw.platform.domain.vas.f3.TransduserManage">
+				SELECT
+				si.id id,
+				si.sensor_number sensorNumber,
+				si.baud_rate baudRate,
+				si.compensate compensate,
+				si.odd_even_check oddEvenCheck,
+				si.filter_factor filterFactor,
+				si.auto_time autoTime,
+				si.remark remark
+				FROM
+				zw_m_sensor_info si
+				WHERE
+				si.sensor_number = BINARY #{sensorNumber} and sensor_type = #{sensorType} and si.flag=1
+	</select>
+
+		<!-- 增加传感器管理 -->
+	<insert id="addTransduserManage" parameterType="com.zw.platform.domain.vas.f3.TransduserManage">
+		insert into zw_m_sensor_info(id,sensor_number,baud_rate,odd_even_check,compensate,filter_factor,
+		auto_time,sensor_type,remark,create_data_time,create_data_username) values (#{id},#{sensorNumber},#{baudrate},#{oddEvenCheck},
+		#{compensate},#{filterFactor},#{autoTime},#{sensorType},#{remark},#{createDataTime},#{createDataUsername})
+	</insert>
+
+	<!-- 修改传感器管理 -->
+	<update id="updateTransduserManage" parameterType="com.zw.platform.domain.vas.f3.TransduserManage">
+		update zw_m_sensor_info set
+		sensor_number=#{sensorNumber},
+		baud_rate=#{baudrate},
+		filter_factor=#{filterFactor},
+		odd_even_check=#{oddEvenCheck},
+		compensate=#{compensate},
+		remark=#{remark},
+		update_data_time=#{updateDataTime},
+		update_data_username=#{updateDataUsername}
+		where flag=1 and id=#{id}
+	</update>
+
+	<!-- 删除传感器 -->
+	<delete id="deleteTransduserManage" parameterType="String">
+		update zw_m_sensor_info set flag=0 where id=#{id}
+	</delete>
+
+	<!-- 根据传感器id查询绑定车辆条数 -->
+	<select id="checkBoundNumberById" parameterType="String" resultType="java.lang.Integer">
+		SELECT COUNT(sv.id) FROM zw_m_sensor_info si
+		LEFT JOIN zw_m_sensor_vehicle sv ON si.id=sv.sensor_id AND sv.flag=1
+		WHERE si.id=#{id} AND si.flag=1
+	</select>
+
+	<!-- 根据id查询传感器管理-->
+	<select id="findTransduserManageById" parameterType="String" resultType="com.zw.platform.domain.vas.f3.TransduserManage">
+				SELECT
+				si.id id,
+				si.sensor_number sensorNumber,
+				si.baud_rate baudRate,
+				si.compensate compensate,
+				si.odd_even_check oddEvenCheck,
+				si.filter_factor filterFactor,
+				si.sensor_type sensorType,
+				si.auto_time autoTime,
+				si.remark remark
+				FROM
+				zw_m_sensor_info si
+				WHERE
+				si.id =#{Id} and si.flag=1
+	</select>
+
+	<!-- 批量新增传感器 -->
+	<insert id="addTransduserByBatch" parameterType="com.zw.platform.domain.vas.f3.TransduserManage" >
+	  insert into zw_m_sensor_info (id, sensor_number, baud_rate, odd_even_check, compensate, filter_factor,
+	  auto_time,sensor_type,remark,flag,create_data_time,create_data_username)
+	  values
+	  <foreach collection="list" item="item" index="index"
+	separator=",">
+	   (#{item.id}, #{item.sensorNumber}, #{item.baudrate}, #{item.oddEvenCheck}, #{item.compensate},
+	     #{item.filterFactor}, #{item.autoTime}, #{item.sensorType}, #{item.remark}, #{item.flag},
+	     #{item.createDataTime}, #{item.createDataUsername})
+	    </foreach>
+	</insert>
+
+</mapper>

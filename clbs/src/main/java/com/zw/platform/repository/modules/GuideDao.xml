@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.GuideDao">
+    <select id="getRankOfVehicle" resultType="com.zw.platform.domain.leaderboard.VehicleRank">
+        SELECT ran.brand,ran.vid,ran.total,ran.time,(ran.total/num.sum) as percentage from (
+        SELECT
+        v.brand,
+        r.vid,
+        r.total,
+        r.time
+        FROM
+        zw_m_vehicle_adas_event_rank r
+        JOIN zw_m_vehicle_info v ON r.vid = v.id
+        AND v.flag = 1
+        WHERE
+        time = #{time} and vid in
+        <foreach item="item" collection="vids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) ran ,
+        (SELECT sum(total) sum from zw_m_vehicle_adas_event_rank WHERE
+        time = #{time} and vid in
+        <foreach item="item" collection="vids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) num ORDER BY
+        ran.total DESC LIMIT 10
+    </select>
+
+    <select id="getVehicleToal" resultType="java.util.Map">
+        select vid ,total from zw_m_vehicle_adas_event_rank WHERE
+        time = #{time} and vid in
+        <foreach item="item" collection="vids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="getRankOfGroup" resultType="com.zw.platform.domain.leaderboard.GroupRank">
+        SELECT
+        gt.org_id as groupId,
+        sum(gt.total) AS total,
+        sum(gt.total) / pr.sum AS percentage,
+        gt.time as time
+        FROM
+        (
+        SELECT
+        c.org_id,
+        r.*
+        FROM
+        (
+        SELECT DISTINCT
+        g.org_id,
+        v.vehicle_id AS vid
+        FROM
+        zw_m_assignment g
+        INNER JOIN zw_m_assignment_user u ON u.assignment_id = g.id
+        INNER JOIN zw_m_assignment_vehicle v ON v.assignment_id = u.assignment_id
+        AND u.flag = 1
+        AND v.flag = 1
+        and u.assignment_id in
+        <foreach item="item" collection="assignmentIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) c
+        INNER JOIN zw_m_vehicle_adas_event_rank r ON r.vid = c.vid
+        where r.time = #{time}
+        ORDER BY
+        c.org_id
+        ) gt,
+        (
+        SELECT
+        sum(total) AS sum
+        FROM
+        zw_m_vehicle_adas_event_rank
+        WHERE
+        time = #{time} and vid in
+        <foreach item="item" collection="vids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) pr
+        GROUP BY
+        gt.org_id
+        ORDER BY
+        total DESC LIMIT 10
+    </select>
+    <select id="getYesGroup" resultType="com.zw.platform.domain.leaderboard.GroupRank">
+        SELECT
+        gt.org_id AS groupId,
+        sum(gt.total) AS total
+        FROM
+        (
+        SELECT
+        c.org_id,
+        r.*
+        FROM
+        (
+        SELECT DISTINCT
+        g.org_id,
+        v.vehicle_id AS vid
+        FROM
+        zw_m_assignment g
+        INNER JOIN zw_m_assignment_user u ON u.assignment_id = g.id
+        and g.org_id in
+        <foreach item="item" collection="groupIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        INNER JOIN zw_m_assignment_vehicle v ON v.assignment_id = u.assignment_id
+        AND u.flag = 1
+        AND v.flag = 1
+        and u.assignment_id in
+        <foreach item="item" collection="assignmentIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) c
+        INNER JOIN zw_m_vehicle_adas_event_rank r ON r.vid = c.vid
+        where r.time = #{time}
+        ORDER BY
+        c.org_id
+        ) gt
+        GROUP BY
+        gt.org_id
+    </select>
+
+    <select id="countPermissionByRoles" resultType="java.lang.Integer">
+        SELECT
+        count(*) from zw_c_role_resource rResource
+        WHERE rResource.flag = 1
+        AND rResource.resource_id =#{resourceId}
+        AND rResource.role_id IN
+        <foreach item="item" collection="roleList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

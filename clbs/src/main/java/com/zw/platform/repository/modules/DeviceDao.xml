@@ -1,0 +1,859 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DeviceDao">
+
+    <sql id="Example_Where_Clause">
+        <trim prefix="where" prefixOverrides="and|or">
+            <if test="condition.deviceNumber != null">
+                and device_number = #{condition.deviceNumber}
+            </if>
+            <if test="condition.deviceName != null">
+                and device_name = #{condition.deviceName}
+            </if>
+            <if test="condition.isStart != null">
+                and is_start = #{condition.isStart}
+            </if>
+            <if test="condition.deviceType != null">
+                and device_type = #{condition.deviceType}
+            </if>
+            <if test="condition.channelNumber != null">
+                and channel_number = #{condition.channelNumber}
+            </if>
+            <if test="condition.isVideo != null">
+                and is_video = #{condition.isVideo}
+            </if>
+            <if test="condition.barCode != null">
+                and bar_code = #{condition.barCode}
+            </if>
+            <if test="condition.manuFacturer != null">
+                and manu_facturer = #{condition.manuFacturer}
+            </if>
+            <if test="condition.flag != null">
+                and flag = #{condition.flag}
+            </if>
+            <if test="condition.createDataTime != null">
+                and create_data_time = #{condition.createDataTime}
+            </if>
+            <if test="condition.createDataUsername != null">
+                and create_data_username =
+                #{condition.createDataUsername}
+            </if>
+            <if test="condition.updateDataTime != null">
+                and update_data_time = #{condition.updateDataTime}
+            </if>
+            <if test="condition.updateDataUsername != null">
+                and update_data_username =
+                #{condition.updateDataUsername}
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 查询终端 -->
+    <select id="findDevice" resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+		SELECT deviceInfo.* FROM
+		zw_m_device_info deviceInfo
+		WHERE deviceInfo.flag = 1
+		ORDER BY create_data_time DESC
+	</select>
+
+    <!-- 新增终端 -->
+    <insert id="addDevice" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+		INSERT INTO
+		zw_m_device_info (
+		id, device_number, device_name, is_start,
+		device_type, functional_type,channel_number,
+		is_video, bar_code,
+		manu_facturer,install_time, procurement_time,remark,flag,
+		create_data_time,
+		create_data_username,
+		manufacturer_id,
+		device_modelNumber,
+		terminal_type_id,
+		compliance_requirements,
+		install_company,
+		contacts,
+		telephone,
+		mac_address
+		)
+		VALUES(
+		#{id}, #{deviceNumber},
+		#{deviceName}, #{isStart}, #{deviceType},#{functionalType},
+		#{channelNumber},
+		#{isVideo}, #{barCode},
+		#{manuFacturer},#{installTime},#{procurementTime},#{remark},#{flag},
+		#{createDataTime},
+		#{createDataUsername},
+		#{manufacturerId},
+		#{deviceModelNumber},
+		#{terminalTypeId},
+		#{complianceRequirements},
+		#{installCompany},
+		#{contacts},
+		#{telephone},
+		#{macAddress}
+		)
+	</insert>
+
+    <!-- 批量新增车辆 -->
+    <insert id="addDeviceByBatch" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+        INSERT INTO zw_m_device_info (
+        id, device_number, device_name,
+        is_start, device_type,
+        functional_type,
+        bar_code, manu_facturer, install_time, remark,flag,
+        create_data_time,procurement_time,
+        create_data_username,
+        manufacturer_id,
+        device_modelNumber,
+        terminal_type_id,
+        compliance_requirements,
+        install_company,
+        contacts,
+        telephone,
+        mac_address
+
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.deviceNumber}, #{item.deviceName},
+            #{item.isStart},
+            #{item.deviceType},#{item.functionalType},
+            #{item.barCode},
+            #{item.manuFacturer},
+            #{item.installTime},#{item.remark},
+            #{item.flag},
+            #{item.createDataTime},#{item.procurementTime},
+            #{item.createDataUsername},#{item.manufacturerId},#{item.deviceModelNumber},#{item.terminalTypeId},
+            #{item.complianceRequirements},#{item.installCompany},#{item.contacts},#{item.telephone},#{item.macAddress})
+        </foreach>
+    </insert>
+
+    <!-- 修改终端 -->
+    <update id="updateDeviceByBatch" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+        insert into  zw_m_device_info (id, device_number, device_type, functional_type, terminal_type_id,update_data_time, update_data_username)
+        values
+        <foreach collection="list" separator="," item="item" >
+            (#{item.id}, '', #{item.deviceType},#{item.functionalType},#{item.terminalTypeId},#{item.updateDataTime},#{item.updateDataUsername})
+        </foreach>
+        ON DUPLICATE KEY UPDATE device_type = VALUES(device_type), functional_type = VALUES(functional_type), terminal_type_id = VALUES(terminal_type_id),
+        update_data_time = VALUES(update_data_time), update_data_username = VALUES(update_data_username)
+    </update>
+
+    <!-- 修改终端 -->
+    <update id="updateDevice" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+        UPDATE zw_m_device_info
+        <set>
+            <if test="deviceNumber != null">
+                device_number = #{deviceNumber},
+            </if>
+            <if test="deviceName != null">
+                device_name = #{deviceName},
+            </if>
+            <if test="isStart != null">
+                is_start = #{isStart},
+            </if>
+            <if test="deviceType != null">
+                device_type = #{deviceType},
+            </if>
+            <if test="functionalType != null">
+                functional_type = #{functionalType},
+            </if>
+            <if test="channelNumber != null">
+                channel_number = #{channelNumber},
+            </if>
+            <if test="isVideo != null">
+                is_video = #{isVideo},
+            </if>
+            <if test="barCode != null">
+                bar_code = #{barCode},
+            </if>
+            <if test="manuFacturer != null">
+                manu_facturer = #{manuFacturer},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+            install_time=#{installTime},
+            procurement_time=#{procurementTime},
+            remark=#{remark},
+            manufacturer_id=#{manufacturerId},
+            device_modelNumber = #{deviceModelNumber},
+            terminal_type_id = #{terminalTypeId},
+            install_company = #{installCompany},
+            contacts = #{contacts},
+            telephone = #{telephone},
+            compliance_requirements = #{complianceRequirements},
+            mac_address = #{macAddress}
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateDeviceNumber" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+        UPDATE zw_m_device_info
+        <set>
+            <if test="deviceNumber != null">
+                device_number = #{deviceNumber},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据id删除一个终端 -->
+    <delete id="deleteDeviceById">
+		DELETE FROM zw_m_device_info WHERE id = #{id}
+	</delete>
+
+    <!-- 根据id批量删除终端 -->
+    <update id="deleteDeviceByBatch">
+        update zw_m_device_info
+        set flag = 0
+        where flag = 1
+        and id in
+        <foreach item="item" collection="array" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+    <!-- <delete id="deleteDeviceByBatch"> DELETE FROM zw_m_device_info WHERE
+        id in <foreach item="idItem" collection="array" open="(" separator="," close=")">
+        #{idItem} </foreach> </delete> -->
+
+    <!-- 根据终端编号查询终端 -->
+    <select id="findDeviceByDeviceNumber" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id, di.device_number, di.device_name, di.is_start, di.device_type, di.bar_code,
+        di.manu_facturer, di.install_time,di.create_data_time, di.procurement_time, di.flag, di.auth_code, di.remark,
+        di.device_modelNumber, di.manufacturer_id,
+        di.org_id groupId, tt.terminal_manufacturer as terminalManufacturer, tt.terminal_type as terminalType,
+        tt.id as terminalTypeId, tt.support_photo_flag as isVideo, tt.channel_number as channelNumber
+        FROM zw_m_device_info di
+        inner join zw_m_terminal_type tt on tt.id = di.terminal_type_id
+        WHERE di.flag = 1
+        <if test="deviceNumber != null and deviceNumber != ''">
+            AND di.device_number = BINARY #{deviceNumber}
+        </if>
+    </select>
+
+    <!-- 根据终端id查询终端 -->
+        <select id="findDeviceById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id, di.device_number, di.device_name, di.is_start, di.device_type, di.bar_code, di.functional_type,
+        di.manu_facturer, di.install_time,di.create_data_time, di.procurement_time, di.flag, di.auth_code, di.remark,
+        di.device_modelNumber, di.manufacturer_id,
+        di.org_id groupId, tt.terminal_manufacturer as terminalManufacturer, tt.terminal_type as terminalType,
+        tt.id as terminalTypeId, tt.support_photo_flag as isVideo, tt.channel_number as channelNumber
+        FROM zw_m_device_info di
+        inner join zw_m_terminal_type tt on tt.id = di.terminal_type_id
+        where tt.flag = 1
+        <if test="id != null and id != ''">
+            and di.flag = 1 and di.id = #{id}
+        </if>
+
+    </select>
+
+    <select id="findDeviceByIds"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id, di.device_number, di.device_name, di.is_start, di.device_type, di.bar_code, di.functional_type,
+        di.manu_facturer, di.install_time,di.create_data_time, di.procurement_time, di.flag, di.auth_code, di.remark,
+        di.device_modelNumber, di.manufacturer_id,
+        di.org_id groupId, tt.terminal_manufacturer as terminalManufacturer, tt.terminal_type as terminalType,
+        tt.id as terminalTypeId, tt.support_photo_flag as isVideo, tt.channel_number as channelNumber
+        FROM zw_m_device_info di
+        inner join zw_m_terminal_type tt on tt.id = di.terminal_type_id
+        where tt.flag = 1
+        and di.id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+             #{item}
+        </foreach>
+
+    </select>
+
+
+
+    <select id="groupAndDeviceMap" parameterType="java.util.List"
+            resultType="java.util.Map">
+        SELECT deviceInfo.id, di.org_id groupId FROM zw_m_device_info
+        deviceInfo
+        WHERE deviceInfo.flag = 1 and deviceInfo.id
+        IN
+        <foreach item="item" collection="deviceIds" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY groupId
+    </select>
+
+    <select id="deviceIdAndGroupId" parameterType="java.util.List"
+            resultType="java.util.Map">
+        SELECT deviceInfo.id, di.org_id groupId FROM zw_m_device_info
+        deviceInfo
+        WHERE deviceInfo.flag = 1 and deviceInfo.id
+        IN
+        <foreach item="item" collection="deviceIds" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <!-- 新增设备组织关联 -->
+    <insert id="addDeviceGroup"
+            parameterType="com.zw.platform.domain.basicinfo.form.DeviceGroupForm">
+		insert into zw_m_device_group (id, device_id,
+		group_id,
+		flag, create_data_time, create_data_username)
+		values
+		(#{id},
+		#{deviceId}, #{groupId}, #{flag},
+		#{createDataTime},
+		#{createDataUsername})
+	</insert>
+
+    <!-- 修改设备组织关联表 -->
+    <update id="updateDeviceGroup">
+        update zw_m_device_group
+        <set>
+            <if test="groupId != null">
+                group_id = #{groupId},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+            <if test="updateDataTime != null">
+                update_data_time = #{updateDataTime},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_username = #{updateDataUsername},
+            </if>
+        </set>
+        where device_id = #{deviceId}
+        and flag = 1
+    </update>
+
+    <!-- 批量删除终端与组织的关联 -->
+    <update id="deleteDeviceGroupByBatch">
+        update zw_m_device_group
+        set flag = 0
+        where flag = 1
+        and device_id in
+        <foreach item="item" collection="array" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据id查询设备及其组织 -->
+    <select id="findDeviceGroupById" parameterType="string"
+            resultType="java.util.HashMap">
+		SELECT
+		pg.group_id AS groupName,
+		p.id AS id,
+		p.is_start AS isStart,
+		p.manu_facturer AS manuFacturer,
+		p.device_number AS deviceNumber,
+		p.remark,
+		p.device_name AS deviceName,
+		p.manufacturer_Id AS manufacturerId,
+		p.device_modelNumber AS deviceModelNumber,
+		p.device_type AS deviceType,
+		p.functional_type AS functionalType,
+	    p.bar_code AS barCode,
+		p.compliance_requirements AS complianceRequirements,
+		p.contacts,
+		p.telephone,
+		p.mac_address as macAddress,
+		p.install_company AS installCompany,
+		p.procurement_time AS procurementTime,
+		install_time AS installTime,
+		c.id AS bindId,
+		tt.terminal_manufacturer as terminalManufacturer,
+		tt.id as terminalTypeId,
+		tt.channel_number AS channelNumber,
+	    tt.support_video_flag AS isVideo,
+	    tt.terminal_type as terminalType
+		FROM
+		zw_m_device_info p
+		LEFT JOIN
+		zw_m_device_group
+		pg ON p.id = pg.device_id AND pg.flag = 1
+		LEFT
+		JOIN zw_m_config c ON c.device_id = p.id AND c.flag = 1
+		left
+		join zw_m_terminal_type tt on tt.id = p.terminal_type_id and tt.flag = 1
+		WHERE
+		p.flag = 1
+		AND p.id = #{id}
+	</select>
+    <!-- 批量新增设备组织关联表 -->
+    <insert id="addDeviceGroupByBatch"
+            parameterType="com.zw.platform.domain.basicinfo.form.DeviceGroupForm">
+        insert into zw_m_device_group (id, device_id,
+        group_id, flag,
+        create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},
+            #{item.deviceId},
+            #{item.groupId},
+            #{item.flag},
+            #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+    <!-- 根据当前登录用户查询其组织下的设备，如果绑定了车的需显示车牌号 -->
+    <select id="findDeviceByUser" resultType="map">
+        <!-- SELECT de.id as id,de.device_number as deviceNumber,de.device_name
+            deviceName, de.is_start as isStart,de.device_type as deviceType,de.channel_number
+            as channelNumber, de.is_video as isVideo,de.bar_code as barCode,de.manu_facturer
+            as manuFacturer, DATE_FORMAT( de.install_time, '%Y-%m-%d') as installTimeStr,
+            de.install_time as installTime, v.brand,dg.group_id as groupName FROM zw_m_device_info
+            de LEFT JOIN zw_m_device_group dg ON de.id = dg.device_id AND dg.flag = 1
+            LEFT JOIN zw_m_config m ON de.id = m.device_id AND m.flag=1 LEFT JOIN zw_m_vehicle_info
+            v ON m.vehicle_id = v.id AND v.flag=1 WHERE de.flag = 1 AND dg.group_id IN
+            <foreach item="item" collection="groupList" separator="," open="(" close=")">
+            #{item} </foreach> <if test="param != null"> <if test="param.simpleQueryParam
+            != null and param.simpleQueryParam !=''"> AND ( device_number LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+            OR device_name LIKE CONCAT('%',#{param.simpleQueryParam},'%') OR v.brand
+            LIKE CONCAT('%',#{param.simpleQueryParam},'%') ) </if> </if> ORDER BY de.create_data_time
+            DESC -->
+        SELECT de.id AS id, p.people_number as peopleName,de.device_number AS
+        deviceNumber,de.device_name
+        deviceName,de.is_start AS
+        isStart,de.device_type AS deviceType,de.functional_type AS
+        functionalType,tt.channel_number AS channelNumber, tt.terminal_manufacturer as terminalManufacturer,
+        tt.terminal_type as terminalType, tt.id as terminalTypeId,
+        tt.support_photo_flag AS
+        isVideo,de.bar_code AS barCode,de.manu_facturer AS
+        manuFacturer,DATE_FORMAT( de.install_time,
+        '%Y-%m-%d') AS
+        installTimeStr, de.install_time AS installTime,
+        v.brand,di.org_id AS
+        groupName,de.create_data_time AS
+        createDataTime,DATE_FORMAT(
+        de.create_data_time,
+        '%Y-%m-%d') AS createDataTimeStr,
+        DATE_FORMAT(
+        de.procurement_time, '%Y-%m-%d') AS
+        procurementTimeStr,de.procurement_time AS
+        procurementTime,de.remark AS
+        remark,
+        de.update_data_time AS updateDataTime,DATE_FORMAT(
+        de.update_data_time, '%Y-%m-%d') AS
+        updateDataTimeStr
+        FROM
+        zw_m_device_info de
+        inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+        LEFT JOIN zw_m_config m ON de.id =
+        m.device_id AND m.flag=1
+        LEFT JOIN zw_m_people_info p on
+        m.vehicle_id=p.id and p.flag=1
+        LEFT JOIN zw_m_vehicle_info v ON
+        m.vehicle_id = v.id AND v.flag=1
+        WHERE de.flag = 1
+        AND
+        de.create_data_time LIKE'%%'
+        AND di.org_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+                AND (de.device_number LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                OR de.device_name LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                OR v.brand LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+        ORDER BY de.create_data_time DESC
+    </select>
+    <!-- 查询所有的设备 -->
+    <select id="findAllDevice" resultType="map">
+		SELECT de.id AS id,
+		p.people_number as peopleNumber,de.device_number AS
+		deviceNumber,t.thing_number AS thingNumber,de.device_name deviceName,de.is_start AS
+		isStart,de.device_type AS deviceType,de.functional_type AS
+		functionalType,tt.channel_number AS channelNumber, tt.terminal_manufacturer as terminalManufacturer,
+		tt.terminal_type as terminalType, tt.id as terminalTypeId,
+		tt.support_photo_flag AS
+		isVideo,de.bar_code AS barCode,de.manu_facturer AS
+		manuFacturer,DATE_FORMAT( de.install_time, '%Y-%m-%d') AS
+		installTimeStr, de.install_time AS installTime,
+		v.brand,di.org_id AS
+		groupName,de.create_data_time AS createDataTime,DATE_FORMAT(
+		de.create_data_time, '%Y-%m-%d') AS createDataTimeStr,
+		DATE_FORMAT(
+		de.procurement_time, '%Y-%m-%d') AS
+		procurementTimeStr,de.procurement_time AS procurementTime,de.remark AS
+		remark,
+		de.update_data_time AS updateDataTime,
+		DATE_FORMAT(de.update_data_time, '%Y-%m-%d') AS updateDataTimeStr,
+		de.manufacturer_id AS manufacturerId,
+		de.device_modelNumber AS deviceModelNumber,
+		de.install_time AS installTime,
+		de.contacts,
+		de.telephone,
+		de.install_company AS installCompany,
+		de.compliance_requirements AS complianceRequirements,
+		de.mac_address as macAddress
+		FROM
+		zw_m_device_info de
+		inner join zw_m_terminal_type tt on tt.id = de.terminal_type_id and tt.flag = 1
+		LEFT JOIN zw_m_config m ON de.id =
+		m.device_id AND m.flag=1
+		LEFT JOIN zw_m_people_info p on
+		m.vehicle_id=p.id and p.flag=1
+		LEFT JOIN zw_m_vehicle_info v ON
+		m.vehicle_id = v.id AND v.flag=1
+		LEFT JOIN zw_m_thing_info t
+		ON m.vehicle_id = t.id
+		AND t.flag = 1
+		WHERE de.flag = 1
+		AND
+		de.create_data_time LIKE'%%'
+		ORDER BY de.create_data_time DESC
+	</select>
+    <!-- 去重 -->
+    <select id="findbyDevice" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+		SELECT
+	  	p.id AS id, p.is_start AS
+		isStart,
+		p.manu_facturer AS manuFacturer,
+		p.device_number AS
+		deviceNumber,p.remark,
+		p.device_name AS deviceName,
+		p.manufacturer_Id AS manufacturerId,
+		p.device_modelNumber AS deviceModelNumber,
+		p.device_type AS deviceType,
+		p.functional_type AS functionalType,
+	    tt.channel_number AS
+		channelNumber, tt.support_video_flag AS isVideo, p.bar_code AS
+		barCode,install_time AS installTime,p.procurement_time
+		as procurementTime, tt.terminal_manufacturer as terminalManufacturer,
+		tt.id as terminalTypeId, tt.terminal_type as terminalType
+		FROM zw_m_device_info p
+		inner join zw_m_terminal_type tt on tt.id = p.terminal_type_id and tt.flag = 1
+		WHERE p.flag = 1 and
+		p.device_number = BINARY
+		#{deviceNumber}
+	</select>
+    <!--判断device是否绑定组织 -->
+    <select id="getIsBand" parameterType="string" resultType="int">
+		SELECT
+		count(*) from zw_m_device_group WHERE
+		flag=1
+		and
+		device_id = #{id}
+	</select>
+    <!-- 根据终端ID查询终端 -->
+    <select id="getDevice" resultType="String">
+		select device_number from
+		zw_m_device_info where id = #{id} and flag = 1
+	</select>
+
+    <!-- 查询所有绑定的终端 -->
+    <select id="findAllBindDevice" resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+		SELECT deviceInfo.*
+		FROM zw_m_device_info deviceInfo
+		INNER JOIN zw_m_config c
+		ON deviceInfo.id = c.device_id AND c.flag = 1
+		INNER JOIN
+		zw_m_vehicle_info info ON info.id = c.vehicle_id AND info.flag=1
+		WHERE deviceInfo.flag = 1 and deviceInfo.device_type = #{type}
+		ORDER BY
+		create_data_time DESC
+	</select>
+
+    <select id="findAllBindPerson" resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+		SELECT deviceInfo.*
+		FROM zw_m_device_info deviceInfo
+		INNER JOIN zw_m_config c
+		ON deviceInfo.id = c.device_id AND c.flag = 1
+		INNER JOIN
+		zw_m_people_info info ON info.id = c.vehicle_id AND info.flag=1 and
+		c.monitor_type='1'
+		WHERE deviceInfo.flag = 1
+		ORDER BY
+		create_data_time DESC
+	</select>
+
+
+    <select id="cheackIsBand" resultType="int">
+		select count(*) from
+		zw_m_config where device_id = #{id} and flag = 1
+	</select>
+    <!-- 修改设备时查询设备编号是否重复(排除当前设备编号) -->
+    <select id="findIsExist" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+		SELECT * FROM zw_m_device_info WHERE flag = 1 and device_number = BINARY
+		#{deviceNumber} and id <![CDATA[ <> ]]>
+		#{id}
+
+	</select>
+
+    <update id="updateChannelID">
+		UPDATE zw_m_device_info set channel_id=#{0} WHERE
+		device_number=#{1}
+	</update>
+
+    <select id="getChannelIDByVid" resultType="string">
+		select d.channel_id
+		from zw_m_device_info d
+		LEFT JOIN zw_m_config c on c.device_id=d.id
+		LEFT JOIN zw_m_vehicle_info v on v.id=c.vehicle_id
+		WHERE v.id=#{vid}
+		AND c.flag=1
+	</select>
+
+    <!-- 修改通讯类型 -->
+    <update id="updateDeviceType">
+		UPDATE zw_m_device_info SET DEVICE_TYPE = #{1} WHERE
+		ID = #{0}
+	</update>
+
+    <!-- 修改功能类型 -->
+    <update id="updateDeviceFunctionalType">
+		UPDATE zw_m_device_info SET FUNCTIONAL_TYPE = #{1}
+		WHERE ID = #{0}
+	</update>
+
+    <!-- 查询终端组织Id -->
+    <select id="findDeviceGroupId" parameterType="string"
+            resultType="string">
+		select
+		d.org_id
+		from zw_m_device_info dg
+		where d.id = #{id}
+		and d.flag = 1
+	</select>
+
+    <!-- 根据终端编号查询终端所属组织id -->
+    <select id="fingGroupIdByDeviceNumber" parameterType="String"
+            resultType="String">
+		select
+		di.org_id
+		from zw_m_device_info di where
+		di.device_number= BINARY #{deviceNumber} and di.flag=1
+	</select>
+
+    <!-- 根据车辆id查询绑定终端组织id -->
+    <select id="fingGroupIdByVehicleId" parameterType="String"
+            resultType="String">
+		select
+		di.org_id from
+		zw_m_config c left join
+		zw_m_device_info di on c.device_id = di.id and
+		di.flag=1 where
+		c.vehicle_id=#{vehicleId} and c.flag=1
+	</select>
+    <select id="getDeviceCount" resultType="Integer">
+        SELECT COUNT(1) FROM zw_m_device_info de
+        WHERE de.flag = 1
+        AND
+        de.create_data_time LIKE'%%'
+        AND de.group_id IN
+        <foreach item="item" collection="groupList" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam !=''">
+                AND ( de.device_number LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                OR de.device_name LIKE
+                CONCAT('%',#{param.simpleQueryParam},'%')
+                )
+            </if>
+        </if>
+    </select>
+
+    <!-- 根据车辆id查询绑定终端组织id -->
+    <select id="getDeviceTypeByVid" parameterType="String"
+            resultType="String">
+		SELECT di.device_type FROM zw_m_config c
+		LEFT JOIN
+		zw_m_device_info di ON di.id=c.device_id AND di.flag=1
+		WHERE
+		c.vehicle_id=#{vehicle} AND c.flag=1
+	</select>
+
+    <!-- 根据车辆名查询绑定终端类型 -->
+    <select id="getDeviceTypeByBrand" parameterType="String"
+            resultType="String">
+		SELECT di.device_type FROM zw_m_config c
+		LEFT JOIN
+		zw_m_device_info di ON di.id=c.device_id AND di.flag=1
+		LEFT JOIN
+		zw_m_vehicle_info vi ON vi.id=c.vehicle_id AND vi.flag=1
+		WHERE
+		vi.brand= BINARY #{brand} AND c.flag=1
+	</select>
+    <!-- 根据人名查询绑定终端类型 -->
+    <select id="getDeviceTypeByPnumber" parameterType="String"
+            resultType="String">
+		SELECT di.device_type FROM zw_m_config c
+		LEFT JOIN
+		zw_m_device_info di ON di.id=c.device_id AND di.flag=1
+		LEFT JOIN
+		zw_m_people_info pi ON pi.id=c.vehicle_id AND pi.flag=1
+		WHERE
+		pi.people_number= BINARY #{peopleNumber} AND c.flag=1
+	</select>
+
+
+    <!-- 根据设备Id获取鉴权码 -->
+    <select id="getDeviceAuthCode" parameterType="String"
+            resultType="String">
+		SELECT d.auth_code FROM zw_m_device_info d where d.id=#{deviceId} and d.flag = 1
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 查询终端厂商 -->
+    <select id="getTerminalTypeNameByFacturerName" resultType="String">
+		SELECT
+		tt.terminal_type
+		FROM
+			zw_m_terminal_type tt
+		WHERE
+		tt.flag = 1
+		and tt.terminal_manufacturer = #{name}
+		ORDER BY tt.create_data_time ASC
+	</select>
+
+    <!-- 根据id查询终端型号 -->
+    <select id="geTerminalTypeInfoByName" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		SELECT
+		id,
+		terminal_manufacturer,
+		terminal_type,
+		support_photo_flag,
+		cameras_number,
+		support_driving_recorder_flag,
+		support_monitoring_flag,
+		support_video_flag,
+		audio_format,
+		channel_number,
+		device_channel_id
+		FROM
+		zw_m_terminal_type
+		WHERE
+		flag = 1 AND terminal_type = #{name}
+	</select>
+
+
+    <select id="getTerminalTypeInfoBy" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		SELECT
+			*
+		FROM
+			zw_m_terminal_type
+		WHERE
+			terminal_manufacturer = #{terminalManufacturer} AND terminal_type = BINARY #{terminalType} and flag = 1
+	</select>
+
+
+
+
+
+    <update id="updateDeviceManufacturer" parameterType="com.zw.platform.domain.basicinfo.form.DeviceForm">
+		update zw_m_device_info
+		set
+			manufacturer_id = #{manufacturerId},
+			device_modelNumber = #{deviceModelNumber}
+		WHERE
+		flag = 1 AND id = #{id}
+	</update>
+
+    <select id="getAllTermialTypeKey" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		SELECT CONCAT(terminal_manufacturer,"_",terminal_type) terminalManufacturer,id FROM zw_m_terminal_type WHERE flag = 1
+	</select>
+
+    <!-- 通过终端类型、终端厂商、终端型号获取终端id -->
+    <select id="advancedQueryGetDeviceId" resultType="string">
+        SELECT zmdi.id
+        FROM zw_m_device_info zmdi
+        left join (select terminal_manufacturer,id from zw_m_terminal_type zmtt where flag =1 ) t
+        on zmdi.terminal_type_id = t.id
+        WHERE
+        zmdi.flag = 1
+        <if test="deviceType != null and deviceType != ''">
+            AND zmdi.device_type = #{deviceType}
+        </if>
+        <if test="terminalManufacturer != null and terminalManufacturer != ''">
+            AND t.terminal_manufacturer = #{terminalManufacturer}
+        </if>
+        <if test="terminalType != null and terminalType != ''">
+            AND zmdi.terminal_type_id = #{terminalType}
+        </if>
+        <if test="groupId != null and groupId != ''">
+            AND zmdi.org_id = #{groupId}
+        </if>
+    </select>
+
+
+    <select id="getAllMacAddress" resultType="String">
+        SELECT distinct mac_Address
+        from zw_m_device_info
+        where flag = 1
+    </select>
+    <select id="findAllDeviceConfig" resultType="com.zw.platform.domain.infoconfig.dto.ConfigMonitorDTO">
+        SELECT d.id as deviceId, d.device_number as deviceNumber, d.terminal_type_id, d.manu_facturer,
+               c.id AS configId, g.group_id AS groupId
+        FROM zw_m_device_info d
+        LEFT JOIN zw_m_device_group g ON g.device_id = d.id AND g.flag = 1
+        LEFT JOIN zw_m_config c on c.device_id = d.id  and c.flag = 1
+        WHERE d.flag = 1
+    </select>
+    <select id="findAllTerminalType" resultType="com.zw.platform.domain.realTimeVideo.VideoChannelSetting">
+        SELECT
+        id, physics_channel, logic_channel, channel_type, connection_flag, sort, stream_type
+        FROM
+        zw_m_device_channel_setting
+        WHERE
+        flag = 1
+    </select>
+
+    <select id="getTerminalTypeInfoDeviceId" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+        select zmtt.*
+        from zw_m_device_info zmdi
+                 inner join zw_m_terminal_type zmtt on zmdi.terminal_type_id = zmtt.id and zmtt.flag = 1
+        where zmdi.flag = 1
+          and zmdi.id = #{deviceId}
+    </select>
+</mapper>

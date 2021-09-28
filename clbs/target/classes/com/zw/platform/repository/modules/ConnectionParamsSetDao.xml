@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.ConnectionParamsSetDao">
+    <insert id="save809ConnectionParamsSet" parameterType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+    	INSERT INTO zw_m_809_setting 
+    		(id,ip,ip_branch,port,user_name,password,center_id,m,ia,ic,platform_id,version_flag,permit_id,zone_description,authorize_code1,
+    		authorize_code2,video_ip,video_port,create_data_time,create_data_username,platform_name,protocol_type,
+    		branch_server,branch_status,main_client,main_status,server_status,group_id,group_property)
+    	VALUES
+    		(#{id},#{ip},#{ipBranch},#{port},#{userName},#{password},#{centerId},#{m},#{ia},#{ic},#{platformId},#{versionFlag},
+    		#{permitId},#{zoneDescription},#{authorizeCode1},#{authorizeCode2},#{videoIp},#{videoPort},#{createDataTime},
+    		#{createDataUsername},#{platformName},#{protocolType},#{branchServer},#{branchStatus},#{mainClient},
+    		#{mainStatus},#{serverStatus},#{groupId},#{groupProperty})
+    </insert>
+
+    <update id="update809ConnectionParamsSet" parameterType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+    	UPDATE zw_m_809_setting SET
+    		ip=#{ip},port=#{port},ip_branch=#{ipBranch},user_name=#{userName},password=#{password},center_id=#{centerId},m=#{m},ia=#{ia},ic=#{ic},
+    		platform_id=#{platformId},version_flag=#{versionFlag},permit_id=#{permitId},zone_description=#{zoneDescription},
+    		authorize_code1=#{authorizeCode1},authorize_code2=#{authorizeCode2},video_ip=#{videoIp},video_port=#{videoPort},
+    		update_data_time=#{updateDataTime},update_data_username=#{updateDataUsername},platform_name=#{platformName},
+    		protocol_type=#{protocolType},branch_server=#{branchServer},branch_status=#{branchStatus},main_client=#{mainClient},
+    		main_status=#{mainStatus},server_status=#{serverStatus},group_id=#{groupId},group_property=#{groupProperty},
+    		809_mapping_flag=#{mappingFlag}
+    	WHERE
+    		flag = 1 AND id = #{id}
+    </update>
+
+    <update id="delete809ConnectionParamsSet" parameterType="java.util.List">
+        delete from zw_m_809_setting WHERE id IN
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="get809ConnectionParamsSet"
+            parameterType="com.zw.platform.domain.connectionparamsset_809.PlantParamQuery"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT
+        <include refid="809PlatParam"></include>
+        FROM zw_m_809_setting WHERE flag = 1
+        <if test="null != id and '' != id">
+            AND id = #{id}
+        </if>
+        <if test="null != platformName and '' != platformName">
+            AND platform_name = #{platformName}
+        </if>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="get809ParamSet" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT
+        id, ip, ip_branch, center_id
+        FROM zw_m_809_setting WHERE flag = 1
+        <if test="null != id and '' != id">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="get809ConnectionParamsByIds" parameterType="java.util.List"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT
+        <include refid="809PlatParam"></include>
+        FROM zw_m_809_setting WHERE flag = 1
+        AND id IN
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <sql id="809PlatParam">
+        id,ip,ip_branch,port,user_name,password,center_id,m,ia,ic,platform_id,version_flag,permit_id,zone_description,authorize_code1,
+    	authorize_code2,video_ip,video_port,create_data_time,create_data_username,platform_name,protocol_type,group_id,group_property,
+    	branch_server,branch_status,main_client,main_status,server_status,data_filter_status,update_data_time,update_data_username,809_mapping_flag
+    </sql>
+
+    <select id="check809PlatFormSole" parameterType="String" resultType="String">
+    	SELECT id FROM zw_m_809_setting WHERE flag = 1 AND platform_name = #{platFormName}
+    </select>
+
+    <select id="check809ProtocolType" parameterType="String" resultType="String">
+    	SELECT id FROM zw_m_809_setting WHERE flag = 1 AND protocol_type = #{protocolType}
+    </select>
+
+    <select id="check809ProtocolTypeIp" resultType="String">
+        SELECT GROUP_CONCAT(id SEPARATOR ',') id
+        FROM zw_m_809_setting
+        WHERE flag = 1 AND protocol_type <![CDATA[<>]]> #{protocolType} AND ip = #{ip}
+        <if test="pid != null and pid != ''">
+            AND id <![CDATA[<>]]> #{pid}
+        </if>
+    </select>
+
+    <select id="get809Ip" parameterType="com.zw.platform.domain.connectionparamsset_809.T809PlantFormCheck"
+            resultType="String">
+        SELECT CONCAT('#',ip,'#',ip_branch,'#') FROM zw_m_809_setting WHERE flag = 1 AND protocol_type = #{protocolType}
+        <if test="pid != null and pid != ''">
+            AND id NOT IN (#{pid})
+        </if>
+    </select>
+
+    <select id="getSolePlantParamId" parameterType="com.zw.platform.domain.connectionparamsset_809.T809PlantFormCheck"
+            resultType="String">
+		SELECT id
+		FROM zw_m_809_setting
+		WHERE flag = 1 AND ip = #{ip} AND protocol_type = #{protocolType} AND (center_id = #{centerId} OR group_id = #{groupId})
+	</select>
+
+    <select id="getSolePlantParamData" parameterType="com.zw.platform.domain.connectionparamsset_809.T809PlantFormCheck"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT
+        <include refid="809PlatParam"></include>
+        FROM zw_m_809_setting
+        WHERE flag = 1 AND ip = #{ip} AND group_id = #{groupId}
+        <if test="centerId != null and centerId != ''">
+            AND center_id = #{centerId}
+        </if>
+    </select>
+
+    <select id="getGroupId" parameterType="String" resultType="String">
+        select group_id from zw_m_809_setting WHERE
+        <if test="centerId != null and centerId != ''">
+            center_id = #{centerId}
+            and
+        </if>
+        ip = #{ip} and flag = 1
+    </select>
+
+    <select id="getPlatformFlag" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT
+        id, group_id, center_id, ip, platform_name
+        FROM zw_m_809_setting
+        WHERE
+        <if test="centerId != null and centerId != ''">
+            center_id = #{centerId}
+            AND
+        </if>
+        ip = #{ip}
+        AND flag = 1
+    </select>
+
+    <select id="getPlatformGroupId" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+		SELECT
+		group_id
+		FROM zw_m_809_setting
+		WHERE
+		id = #{id} AND
+		center_id = #{centerId} AND
+		ip = #{serviceIp}
+		AND flag = 1
+	</select>
+
+    <select id="getPlatformIpByConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+		  	SELECT
+		  	s.id,
+			s.ip,
+			center_id
+			FROM zw_m_809_config cf
+			INNER JOIN zw_m_809_setting s ON cf.setting_id = s.id
+			AND s.flag = 1
+			WHERE cf.config_id = #{configId} AND cf.flag = 1
+	</select>
+
+    <insert id="add809AlarmMapping" parameterType="com.zw.platform.domain.connectionparamsset_809.T809AlarmMapping">
+        insert into zw_m_808_809_mapping
+        (id,809_setting_id,808_pos,809_pos,`time`,protocol_type,flag,create_data_time,create_data_username)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.settingId},
+            #{item.pos808},
+            #{item.pos809},
+            #{item.time},
+            #{item.protocolType},
+            #{item.flag},
+            #{item.createDataTime},
+            #{item.createDataUsername}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="delete809AlarmMapping" parameterType="com.zw.platform.domain.connectionparamsset_809.T809AlarmSetting">
+        delete from zw_m_808_809_mapping where 809_setting_id = #{settingId}
+	</delete>
+
+    <!--根据809settingid和协议号查询是否设置了报警映射-->
+    <select id="get809Mapping" resultType="Integer">
+		SELECT
+		809_mapping_flag
+		FROM zw_m_809_setting WHERE flag = 1
+		AND id = #{id}
+		and protocol_type = #{protocol}
+	</select>
+
+    <!--根据809settingid和协议号查询是否设置了报警映射-->
+    <update id="update809AlarmMapping" parameterType="com.zw.platform.domain.connectionparamsset_809.T809AlarmSetting">
+		update
+		zw_m_809_setting
+		set
+		809_mapping_flag = 1
+		where id = #{settingId}
+		and flag = 1
+	</update>
+
+    <!--根据809settingid和协议号查询是否设置了报警映射-->
+    <select id="get809AlarmMapping" parameterType="com.zw.platform.domain.connectionparamsset_809.T809AlarmSetting"
+            resultType="com.zw.platform.domain.connectionparamsset_809.AlarmSettingBean">
+		select
+		GROUP_CONCAT(DISTINCT 808_pos SEPARATOR ',') as pos808 ,809_pos as pos809 ,`time`
+		from
+		zw_m_808_809_mapping
+		where 809_setting_id = #{settingId}
+		and protocol_type = #{protocolType}
+		and flag = 1
+		group by 809_pos
+	</select>
+
+    <select id="getPlatformInfoByConfigId" parameterType="string" resultType="map">
+		  	SELECT
+		  	s.platform_name as platformName,
+			vi.brand,s.protocol_type as protocolType
+			FROM zw_m_809_setting s
+			inner join zw_m_809_config sc on sc.setting_id = s.id and sc.flag = 1
+			inner join zw_m_config c on c.id = sc.config_id
+			inner join zw_m_vehicle_info vi on vi.id = c.vehicle_id and vi.flag = 1
+			WHERE sc.id = #{id} AND c.flag = 1
+			AND s.flag = 1
+	</select>
+
+    <select id="getPlatformInfoBySettingId" parameterType="string" resultType="map">
+		  	SELECT
+		  	s.platform_name as platformName,
+			vi.brand
+			FROM zw_m_809_setting s
+			inner join zw_m_809_config sc on sc.setting_id = s.id and sc.flag = 1
+			inner join zw_m_config c on c.id = sc.config_id
+			inner join zw_m_vehicle_info vi on vi.id = c.vehicle_id and vi.flag = 1
+			WHERE s.id = #{id} AND c.flag = 1
+			AND s.flag = 1
+	</select>
+
+    <select id="getT809ConnectionStatusAndGroupIdById" resultType="map">
+		 SELECT group_id as groupId,group_CONCAT((case `branch_status` when 1 then 1 else 0 end )  &amp; (case `main_status` when 1 then 1 else 0 end )) as connectionStatus  from zw_m_809_setting where group_id=
+	(SELECT group_id from zw_m_809_setting where id=#{id} and flag =1 and server_status =1) and server_status=1 and flag =1
+	</select>
+    <select id="getT809ConnectionStatusByGroupId" resultType="string">
+      SELECT group_CONCAT((case `branch_status` when 1 then 1 else 0 end )  &amp; (case `main_status` when 1 then 1 else 0 end ) ) as finalStatus  from zw_m_809_setting where group_id=#{groupId} and server_status=1 and flag=1
+
+    </select>
+
+    <!-- 根据809连接id查询809连接协议类型 -->
+    <select id="getConnectionProtocolTypeById" parameterType="string" resultType="Integer">
+          SELECT protocol_type FROM zw_m_809_setting WHERE id = #{plateFormId} AND flag = 1
+    </select>
+
+    <!-- 根据809连接id查询809连接所属企业 -->
+    <select id="getConnectionGroupIdById" parameterType="string" resultType="string">
+          SELECT group_id FROM zw_m_809_setting WHERE id = #{plateFormId} AND flag = 1
+    </select>
+
+    <!-- 根据监控对象绑定id查询监控对象绑定的809连接参数 -->
+    <select id="getPlatformInfoByMonitorConfigId" parameterType="string"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+		  	SELECT
+            s.id,
+            s.ip,
+            s.ip_branch,
+            s.port,
+            s.user_name,
+            s.password,
+            s.center_id,
+            s.m,
+            s.ia,
+            s.ic,
+            s.platform_id,
+            s.version_flag,
+            s.permit_id,
+            s.zone_description,
+            s.protocol_type,
+            s.group_id,
+            s.group_property
+			FROM zw_m_809_config cf
+			INNER JOIN zw_m_809_setting s ON cf.setting_id = s.id
+			AND s.flag = 1
+			WHERE cf.config_id = #{configId} AND cf.flag = 1
+	</select>
+
+    <!-- 根据809连接id查询809连接完整信息 -->
+    <select id="getConnectionInfoById" parameterType="string"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+		  	SELECT
+            id,
+            ip,
+            ip_branch,
+            port,
+            user_name,
+            password,
+            center_id,
+            m,
+            ia,
+            ic,
+            platform_id,
+            platform_name,
+            version_flag,
+            permit_id,
+            zone_description,
+            protocol_type,
+            group_id,
+            group_property
+			FROM zw_m_809_setting
+			WHERE id = #{id} AND flag = 1
+	</select>
+
+    <!--  获取808-809映射关系  -->
+    <!--    <select id="get808PosBy809PosAndProtocolType" resultType="com.zw.platform.domain.connectionparamsset_809.T809AlarmMapping" >-->
+    <!--        SELECT protocol_type as protocolType ,808_pos AS pos808 ,-->
+    <!--        809_pos AS pos809-->
+    <!--        FROM zw_m_808_809_mapping-->
+    <!--        WHERE-->
+    <!--&lt;!&ndash;        809_pos IN&ndash;&gt;-->
+    <!--&lt;!&ndash;        <foreach collection="alarmTypeList" item="alarmType" open="(" separator="," close=")">&ndash;&gt;-->
+    <!--&lt;!&ndash;            #{alarmType}&ndash;&gt;-->
+    <!--&lt;!&ndash;        </foreach>&ndash;&gt;-->
+    <!--        flag = 1-->
+    <!--    </select>-->
+
+    <select id="get808PosAnd809PosByProtocolType"
+            resultType="com.zw.platform.domain.connectionparamsset_809.T809AlarmMapping">
+        SELECT protocol_type as protocolType ,808_pos AS pos808 ,
+        809_pos AS pos809
+        FROM zw_m_808_809_mapping
+        WHERE
+        flag = 1
+        <if test="protocolType != null ">
+            and protocol_type = #{protocolType}
+        </if>
+    </select>
+
+    <!--    通过808pos得到809pos    -->
+    <select id="get809PosBy808Pos" resultType="string">
+        SELECT 809_pos AS 809Pos
+        FROM  zw_m_808_809_mapping
+        WHERE 808_pos = #{808Pos}
+        AND flag = 1
+    </select>
+    <select id="get809IdsByCenterId" resultType="string">
+        select id from zw_m_809_setting where center_id=#{centerId} and flag =1
+        <if test="null != id and '' != id">
+            AND id != #{id}
+        </if>
+    </select>
+    <select id="get809IdsByPlatformName" resultType="string">
+        select id from zw_m_809_setting where platform_name=#{platformName} and flag =1
+        <if test="null != id and '' != id">
+            AND id != #{id}
+        </if>
+    </select>
+
+    <select id="get809ConnectionParamSetsByProtocolType"
+            resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        SELECT zm809s.*
+        FROM zw_m_809_setting zm809s
+        WHERE zm809s.flag = 1
+          AND zm809s.protocol_type = #{protocolType}
+        ORDER BY zm809s.create_data_time DESC
+    </select>
+
+    <select id="get809ByProtocolType" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        select id, platform_name from zw_m_809_setting
+        where protocol_type = #{type}
+        and flag = 1
+        order by create_data_time DESC
+    </select>
+
+    <select id="listPlatformNameByIdIn" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        select id, platform_name from zw_m_809_setting
+        where id IN
+        <foreach collection="collection" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and flag = 1
+    </select>
+
+    <select id="get809ByProtocolTypeAndOrgId" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+          select id, platform_name from zw_m_809_setting
+        where protocol_type = #{protocolType} and group_id in
+        <foreach item="item" collection="orgIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+        order by create_data_time DESC
+    </select>
+    <select id="get809PlatByIds" resultType="com.zw.platform.domain.connectionparamsset_809.PlantParam">
+        select id, platform_name from zw_m_809_setting
+        where flag = 1 and id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        order by create_data_time DESC
+    </select>
+</mapper>

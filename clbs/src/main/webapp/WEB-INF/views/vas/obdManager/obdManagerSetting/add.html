@@ -1,0 +1,106 @@
+<style type="text/css">
+	form#bindForm .dropdown-menu{min-width: 335px;}
+  #deviceNameGroup .name{display: inline-block;}
+  #deviceNameGroup .type{display: none;}
+
+  #deviceNameGroup.typeGroup .name{display: none;}
+  #deviceNameGroup.typeGroup .type{display: inline-block;}
+</style>
+<form th:action="@{/v/obdManager/obdManagerSetting/add}"
+ id="bindForm" role="form" action="#"
+	method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">设置OBD管理</h4>
+	</div>
+     <div class="modal-body" style="padding: 20px 20px 0px 20px;">
+      	<div class="row">
+			<div class="col-md-12">
+				<input id="obdTypeList" th:value="${type}" type="hidden"/><!--车型分类集合-->
+				<input id="referent" th:value="${referent}" type="hidden"/><!--参考对象集合-->
+				<input id = "vid" name="vehicleId" th:value="*{vehicleInfo.id}" type="hidden"/>
+				<div class="form-group">
+					<label class="col-md-2 control-label"> <label
+						class="text-danger">*</label> 监控对象：</label>
+					<div class="col-md-4">
+						<input autocomplete="off" style="cursor: pointer" th:value="*{vehicleInfo.brand}" placeholder="请输入监控对象" class="form-control" readonly />
+					</div>
+					<label class="col-md-2 control-label">参考对象：</label>
+					<div class="col-md-4">
+						<div class="input-group" style="margin-right:15px;">
+							<input type="text" class="form-control" id="referentList">
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-white dropdown-toggle"
+									data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu" style="width:100%!important">
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			 </div>
+		 </div>
+		 <div class="row">
+               <div class="col-md-12">
+                    <div class="panel-body">
+                         <div class="tab-content" >
+							 <hr/>
+							 <div class="form-group">
+								 <label class="col-sm-2 control-label">
+									OBD参数
+								 </label>
+							 </div>
+							<div class="form-group" id="deviceNameGroup">
+								<label class="col-md-2 control-label"><label
+										class="text-danger">*</label>车型分类：</label>
+								<div class="col-md-4">
+			                       <select id = "deviceType" class="form-control">
+									   <option value="0">乘用车</option>
+									   <option value="1" selected>商用车</option>
+			                       	</select>
+			                    </div>
+
+								<label class="col-md-2 control-label">
+									<label class="text-danger">*</label>
+									<span class="name">车型名称：</span>
+									<span class="type">发动机类型：</span>
+								</label>
+								<div class="col-md-4">
+									<select id = "typeList"  name = "obdVehicleTypeId" class="form-control"></select>
+								</div>
+							</div>
+							<div class="form-group">
+							<label class="col-md-2 control-label">车型ID：</label>
+								<div class="col-md-4">
+									<input style="cursor: pointer" id="vehicleTypeId"  class="form-control" readonly />
+								</div>
+							<label class="col-md-2 control-label">OBD采集间隔(秒)：</label>
+								<div class="col-md-4">
+									<input autocomplete="off" value="1" id="time" name = "time" maxlength="2" placeholder="请输入OBD采集间隔" class="form-control" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		 <input type="text" th:value="${session.avoidRepeatSubmitToken}"
+				name="avoidRepeatSubmitToken" class="avoidRepeatSubmitToken" hidden>
+	  </div>
+      <div class="modal-footer">
+		<button class="btn btn-primary" type="button" id="doSubmit">
+			<strong>提 交</strong>
+		</button>
+		<button type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+	<label id="error_label_add" class='error' style='display: none;'></label>
+</form>
+<script th:inline="javascript">
+	var sensorNull = [[#{sensor.null}]];
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="/clbs/resources/js/obdSettingAdd.js"></script>

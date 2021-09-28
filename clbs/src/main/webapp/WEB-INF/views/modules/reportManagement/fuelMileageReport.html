@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>油量里程报表</title>
+	<div th:replace="fragments/header">header</div>
+	<link rel="stylesheet" href="/clbs/resources/css/overSpeed.css">
+</head>
+<body>
+<section id="container">
+	<div th:replace="fragments/nav">nav</div>
+	<section class="main-content-wrapper">
+		<div th:replace="fragments/menu">menu</div>
+		<section id="main-content">
+			<div class="row eightIsZero">
+				<div class="col-md-12">
+					<ul class="breadcrumb">
+						<li><a th:href="@{/}">首页</a></li>
+						<li class="active">报表管理</li>
+						<li class="active">传感器报表</li>
+						<li class="active">油量里程报表</li>
+					</ul>
+					<h1 class="h1">油量里程报表</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="col-md-12 col-sm-12 noPadding">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch">
+								<h3 class="panel-title fwb">查询</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa chevron-down" id="stretch-chevron"></i>
+								</div>
+							</div>
+							<div class="panel-body" id="stretch-body">
+								<div class="col-md-12 alarmSearchToolPanel">
+									<form id="fuellist" class="form-horizontal" action="#"
+										  method="post" role="form">
+										<div class="form-group">
+											<label class="col-md-1 col-sm-3 control-label">
+												<i class="fa fa-question-circle fa-lg" data-toggle="tooltip" data-placement="top"
+												   title="" data-original-title="组织树显示的车辆，为【油量管理设置】中设置了参数的车辆">
+												</i>
+												组织：</label>
+											<input class="form-control hidden"/>
+											<div class="has-feedback fastClear col-md-3 col-sm-8">
+												<select name="queryType" id="queryType" class="Inlinesearch form-control treeSelect">
+													<option value="monitor" selected="">监控对象</option>
+													<option value="group">企业</option>
+													<option value="assignment">分组</option>
+												</select>
+												<input style="cursor: pointer; background-color: #fafafa;"
+													   placeholder="请选择" class="form-control moreQueryGroup"
+													   id="groupSelect" name="groupSelect" type="text" autocomplete="off"/>
+												<span class="fa fa-chevron-down form-control-feedback"
+													  style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+													  id="groupSelectSpan"></span>
+												<div id="menuContent" class="menuContent">
+													<ul id="treeDemo" class="ztree"></ul>
+												</div>
+											</div>
+											<label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+											<div class="col-md-4 col-sm-8 searchListSelect">
+												<input style="cursor: pointer; background-color: #fafafa;"
+													   class="form-control layer-date laydate-icon"
+													   id="timeInterval" name="timeInterval" readonly/>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-md-12 control-label" id="dateSearchData">
+												<button id="todayClick" type="button" class="btn btn-primary" name="0"
+														onclick="fuelMileageReport.inquireClick(0)">今天
+												</button>
+												<button id="yesterdayClick" type="button" class="btn btn-primary"
+														name="-1" onclick="fuelMileageReport.inquireClick(-1)">前一天
+												</button>
+												<button id="nearlyThreeDays" type="button" class="btn btn-primary"
+														name="-3" onclick="fuelMileageReport.inquireClick('curMonth')">当月
+												</button>
+												<button id="nearlySevenDays" type="button" class="btn btn-primary"
+														name="-7" onclick="fuelMileageReport.inquireClick('preMonth')">前一月
+												</button>
+												<button id="inquireClick" type="button"
+														class="btn btn-primary search-btn" name="1"
+														onclick="fuelMileageReport.inquireClick(1)"><i
+														class="glyphicon glyphicon-search"></i> 查询
+												</button>
+												<button disabled id="exportAlarm" type="button"
+														class="btn btn-purple export-btn"><i
+														class="glyphicon glyphicon-log-out"></i> 导出
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12 col-sm-12 noPadding">
+						<div class="panel panel-default">
+							<div class="panel-heading" id="stretch2">
+								<h3 class="panel-title fwb">数据列表</h3>
+								<div class="actions pull-right listActions">
+									<i class="fa chevron-down" id="stretch2-chevron"></i>
+								</div>
+							</div>
+							<div class="panel-body fixed-table-body" id="stretch2-body">
+								<div class="ToolPanel">
+									<div class="bars pull-left">
+										<div class="btn-group pull-left barsMargin" role="group">
+											<form role="form" onkeydown="if(event.keyCode==13)return false;">
+												<label><input autocomplete="off" type="text" class="Inlinesearch form-control"
+															  id="simpleQueryParam" name="simpleQueryParam"
+															  placeholder="请输入监控对象"></label>
+												<button type="button" id="search_button"
+														class="btn btn-outline btn-default">搜索
+												</button>
+											</form>
+										</div>
+									</div>
+									<div class="columns btn-group pull-right personnelInformation">
+										<button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+												title="刷新">
+											<i class="glyphicon glyphicon-refresh icon-refresh"></i>
+										</button>
+										<div class="keep-open btn-group" title="定制显示列">
+											<button id="customizeColumns" type="button"
+													class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+												<i class="glyphicon glyphicon-th icon-th"></i> <span
+													class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" role="menu" id="Ul-menu-text"></ul>
+										</div>
+									</div>
+								</div>
+								<table id="dataTable"
+									   class="table table-striped table-bordered table-hover noCheckTable"
+									   cellspacing="0" width="100%">
+									<thead>
+									<tr>
+										<th class="text-center">序号</th>
+										<th class="text-center">监控对象</th>
+										<th class="text-center">所属企业</th>
+										<th class="text-center">开始日期</th>
+										<th class="text-center">结束日期</th>
+										<th class="text-center">天数(天)</th>
+										<th class="text-center">用油量(L)</th>
+										<th class="text-center">加油量(L)</th>
+										<th class="text-center">漏油量(L)</th>
+										<th class="text-center">平均油耗(L/百公里)</th>
+										<th class="text-center">终端里程(km)</th>
+									</tr>
+									</thead>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</section>
+</section>
+<!--加油量数据详情-->
+<div id="detail" class="right-panel detailContentBody">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title fwb">加油量数据详情(L)</h3>
+			<div class="actions pull-right">
+				<span class="glyphicon glyphicon-remove detail-close" onclick="fuelMileageReport.closeDrawer()"></span>
+			</div>
+		</div>
+		<div class="panel-body" id="detailBody">
+			<div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+				<div class="panel panel-default">
+					<div class="panel-body fixed-table-body">
+						<table id="detailTable"
+							   class="table table-striped table-bordered table-hover noCheckTable dataTable no-footer"
+							   cellspacing="0" width="100%" aria-describedby="dataTable_info">
+							<thead>
+							<tr role="row">
+								<th class="text-center">序号</th>
+								<th class="text-center">时间</th>
+								<th class="text-center">总油量</th>
+								<th class="text-center">主油箱油量</th>
+								<th class="text-center">副油箱油量</th>
+								<th class="text-center">主油箱加油量</th>
+								<th class="text-center">副油箱加油量</th>
+							</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer detail-footer" style="padding-bottom:11px;">
+			<button type="button" class="btn btn-default btn-off" style="width:74.15px"
+					onclick="fuelMileageReport.closeDrawer()">关 &nbsp;闭
+			</button>
+		</div>
+	</div>
+</div>
+<div id="detail2" class="right-panel detailContentBody">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title fwb">漏油量数据详情(L)</h3>
+			<div class="actions pull-right">
+				<span class="glyphicon glyphicon-remove detail-close" onclick="fuelMileageReport.closeDrawer()"></span>
+			</div>
+		</div>
+		<div class="panel-body" id="detailBody2">
+			<div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+				<div class="panel panel-default">
+					<div class="panel-body fixed-table-body">
+						<table id="detailTable2"
+							   class="table table-striped table-bordered table-hover noCheckTable dataTable no-footer"
+							   cellspacing="0" width="100%" aria-describedby="dataTable_info">
+							<thead>
+							<tr role="row">
+								<th class="text-center">序号</th>
+								<th class="text-center">时间</th>
+								<th class="text-center">总油量</th>
+								<th class="text-center">主油箱油量</th>
+								<th class="text-center">副油箱油量</th>
+								<th class="text-center">主油箱漏油量</th>
+								<th class="text-center">副油箱漏油量</th>
+							</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer detail-footer" style="padding-bottom:11px;">
+			<button type="button" class="btn btn-default btn-off" style="width:74.15px"
+					onclick="fuelMileageReport.closeDrawer()">关 &nbsp;闭
+			</button>
+		</div>
+	</div>
+</div>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{export.fail}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.Geocoder"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/fuelMileageReport.js"></script>
+</html>

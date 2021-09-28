@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DriverDiscernStatisticsDao">
+
+    <select id="pageQuery" resultType="com.zw.platform.dto.driverMiscern.DriverDiscernStatisticsDto">
+        select * from zw_m_vehicle_driver_identification vdi
+        inner join zw_m_vehicle_info v on v.id = vdi.monitor_id and v.flag = 1
+        where
+        v.id in
+        <foreach collection="ids" open="(" item="item" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="query.identificationResult != null">
+            and vdi.identification_result = #{query.identificationResult}
+        </if>
+        <if test="query.identificationType != null">
+            and vdi.identification_type = #{query.identificationType}
+        </if>
+        and vdi.identification_time between #{query.identificationStartDate} and #{query.identificationEndDate}
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+            and v.brand like concat('%',#{query.simpleQueryParam},'%')
+        </if>
+        order by vdi.identification_time desc
+    </select>
+
+    <select id="find" resultType="com.zw.platform.dto.driverMiscern.DriverDiscernStatisticsDto">
+        select * from zw_m_vehicle_driver_identification
+        where
+        monitor_id in
+        <foreach collection="ids" open="(" item="item" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="query.identificationResult != null">
+            and identification_result = #{query.identificationResult}
+        </if>
+        <if test="query.identificationType != null">
+            and identification_type = #{query.identificationType}
+        </if>
+        and identification_time between #{query.identificationStartDate} and #{query.identificationEndDate}
+    </select>
+
+    <select id="detail" resultType="com.zw.platform.dto.driverMiscern.DriverDiscernStatisticsDetailDto">
+        select * from zw_m_vehicle_driver_identification
+        where
+        monitor_id = #{id}
+        and identification_time &lt;= #{time}
+        order by identification_time DESC
+        limit 5
+    </select>
+
+    <insert id="save" parameterType="com.zw.platform.domain.reportManagement.form.DriverDiscernReportDo">
+        insert into zw_m_vehicle_driver_identification
+        (id, monitor_id, driver_id, identification_time, identification_type, identification_result , match_rate, match_threshold, latitude, longitude, image_url, video_url, face_id, card_number, photo_flag )
+        values
+        (#{reportDo.id}, #{reportDo.monitorId}, #{reportDo.driverId}, #{reportDo.identificationTime}, #{reportDo.identificationType}, #{reportDo.identificationResult},
+         #{reportDo.matchRate}, #{reportDo.matchThreshold}, #{reportDo.latitude}, #{reportDo.longitude}, #{reportDo.imageUrl}, #{reportDo.videoUrl}, #{reportDo.faceId}, #{reportDo.cardNumber}, 1 )
+    </insert>
+
+    <select id="findDeleteData" resultType="com.zw.platform.domain.reportManagement.form.DriverDiscernReportDo">
+        select id, image_url
+        from zw_m_vehicle_driver_identification
+        where photo_flag = 1
+        and identification_time &lt;= #{dateTime}
+    </select>
+
+    <update id="delete">
+        update zw_m_vehicle_driver_identification
+        set photo_flag = 0
+        where id in
+        <foreach collection="ids" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="getById" resultType="com.zw.platform.domain.reportManagement.form.DriverDiscernReportDo">
+        select * from zw_m_vehicle_driver_identification
+        where id = #{id}
+    </select>
+
+    <update id="setImageUrl">
+        update zw_m_vehicle_driver_identification
+        set image_url = #{imageUrl}
+        where id = #{id}
+    </update>
+
+    <update id="setVideoUrl">
+        update zw_m_vehicle_driver_identification
+        set video_url = #{videoUrl}
+        where id = #{id}
+    </update>
+
+</mapper>

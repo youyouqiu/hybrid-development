@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>车辆管理</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/bootstrap-select.min.css">
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">监控对象</li>
+                            <li class="active">车辆信息</li>
+                            <li class="active">车辆管理</li>
+                        </ul>
+                        <h1 class="h1 ">车辆管理</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="leftTreeBox">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="orgPannel">
+                                    <h3 class="panel-title fwb">组织架构</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="orgPannel-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" style="padding: 0px;" id="orgPannel-body">
+                                    <div class="form-group" style="margin-top: 15px;padding:5px">
+                                        <div class="col-md-5" style="padding:0" id="treeSearchTypeBox">
+                                        </div>
+                                        <div class="col-md-7" style="padding:0">
+                                            <input autocomplete="off" id="search_condition" name="search" class="form-control"
+                                                style="margin-bottom: 10px;" type="text" placeholder="请输入分组名称" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                        style="padding: 0px;height:699px !important;">
+                                        <ul id="treeDemo" class="ztreee" style="height:684px !important;overflow:auto;">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch" style="cursor:pointer;">
+                                    <h3 class="panel-title fwb">运营类别<span class="caret"></span></h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-up" id="stretch-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body fixed-table-body" style="display: none;" id="stretch-body">
+                                    <div class="ToolPanel">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form">
+                                                    <label><input type="text" class="Inlinesearch form-control"
+                                                            id="purposeCategoryQuery"
+                                                            onkeydown="vehicleList.findType(event)" autocomplete="off"
+                                                            placeholder="请输入运营类别"></label>
+                                                    <button type="button" id="search_buttonTwo"
+                                                        class="btn btn-outline btn-default">搜索
+                                                    </button>
+                                                    <input id="hiddenText" type="text" style="display:none" />
+                                                </form>
+                                            </div>
+                                            <div th:if="${hasRole}" class="dropdown pull-left">
+                                                <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1Two" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                    <li onclick="vehicleList.cleanPueposeVal()"><a id="addIdTwo"
+                                                            data-toggle="modal" data-target="#addVehiclePurpose"><i
+                                                                class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/monitoring/vehicle/exportVehiclePurpose}"
+                                                            id="exportIdTwo"><i
+                                                                class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                    </li>
+                                                    <li><a id="del_modelTwo"><i
+                                                                class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/monitoring/vehicle/importTwo}"
+                                                            id="importIdTwo" data-toggle="modal"
+                                                            data-target="#commonSmWin"><i
+                                                                class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="dataTables"
+                                        class="table table-striped table-bordered table-hover text-center checkTable"
+                                        cellspacing="0" width="100%">
+                                        <thead>
+                                            <div th:if="${hasRole}">
+                                                <tr>
+                                                    <th></th>
+                                                    <th class="text-center"><input type="checkbox" id="checkAllTwo"
+                                                            onclick="vehicleList.checkAllTwo(this)"></th>
+                                                    <th class="text-center">操作设置</th>
+                                                    <th class="text-center">运营类别</th>
+                                                    <th class="text-center">备注</th>
+                                                </tr>
+                                            </div>
+                                            <div th:if="!${hasRole}">
+                                                <tr>
+                                                    <th></th>
+                                                    <th class="text-center">运营类别</th>
+                                                    <th class="text-center">备注</th>
+                                                </tr>
+                                            </div>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch2">
+                                    <h3 class="panel-title fwb">车辆列表</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body fixed-table-body" id="stretch2-body">
+                                    <div class="ToolPanel">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form">
+                                                    <label><input type="text" class="Inlinesearch form-control"
+                                                            id="simpleQueryParam" name="simpleQueryParam"
+                                                            autocomplete="off" placeholder="请输入车牌号/终端号/终端手机号"></label>
+                                                    <button type="button" id="search_button"
+                                                        onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                    </button>
+                                                    <input id="hiddenText" type="text" style="display:none" />
+                                                </form>
+                                            </div>
+                                            <div th:if="${hasRole}" class="dropdown pull-left barsMargin">
+                                                <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">操作菜单<span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                    <li><a th:href="@{/m/basicinfo/monitoring/vehicle/add}" id="addId"
+                                                            data-toggle="modal" data-target="#commonWin"><i
+                                                                class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a>
+                                                    </li>
+                                                    <li><a id="exportId"><i
+                                                                class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                    </li>
+                                                    <li><a href="javascript:void(0);" id="batchEditBtn"><i
+                                                                class="glyphicon glyphicon-edit icoPaddingLeft"></i>批量修改</a>
+                                                    </li>
+                                                    <li><a href="javascript:void(0);" id="del_model"><i
+                                                                class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/monitoring/vehicle/import}"
+                                                            id="importId" data-toggle="modal"
+                                                            data-target="#commonSmWin"><i
+                                                                class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                    </li>
+                                                </ul>
+                                                <input id="transValue" type="hidden" />
+                                            </div>
+                                            <div class="btn-group pull-left barsMargin">
+                                                <button type="button" id="advanced_search"
+                                                    class="btn btn-outline btn-default">高级查询
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="columns btn-group pull-right vehicleManagement">
+                                            <button id="refreshTable" class="btn btn-default" type="button"
+                                                name="refresh" title="刷新">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group" title="定制显示列">
+                                                <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="advanced_content" style="display: none" class="form-group clearfix">
+                                        <label class="control-label" style="display: inline-block">行驶证到期状态：</label>
+                                        <div style="display: inline-block;width: 120px;">
+                                            <select name="xsz" id="xsz" class="form-control">
+                                                <option selected="selected" value="0">全部</option>
+                                                <option value="1">即将到期</option>
+                                                <option value="2">已到期</option>
+                                            </select>
+                                        </div>
+                                        <label class="control-label"
+                                            style="display: inline-block;margin-left: 20px;">运输证到期状态：</label>
+                                        <div style="display: inline-block;width: 120px;">
+                                            <select name="ysz" id="ysz" class="form-control">
+                                                <option selected="selected" value="0">全部</option>
+                                                <option value="1">即将到期</option>
+                                                <option value="2">已到期</option>
+                                            </select>
+                                        </div>
+                                        <label class="control-label"
+                                            style="display: inline-block;margin-left: 20px;">车辆保养到期状态：</label>
+                                        <div style="display: inline-block;width: 120px;">
+                                            <select name="maintenanceType" id="maintenanceType" class="form-control">
+                                                <option selected="selected" value="0">全部</option>
+                                                <option value="2">已到期</option>
+                                            </select>
+                                        </div>
+                                        <button id="inquireClickOne" type="button" class="btn btn-primary search-btn"
+                                            onclick="myTable.requestData()"><i class="glyphicon glyphicon-search"></i>
+                                            查询 </button>
+                                        <button id="emptyBtn" type="button" class="btn btn-default">清空</button>
+                                    </div>
+                                    <div style="overflow:auto">
+                                        <table id="dataTable"
+                                            class="table table-striped table-bordered table-hover checkTable"
+                                            cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th><input type="checkbox" id="checkAll"
+                                                            onclick="vehicleList.checkAll(this)"></th>
+                                                    <th>操作设置</th>
+                                                    <th>车牌号</th>
+                                                    <th>所属企业</th>
+                                                    <th>终端号</th>
+                                                    <th>终端手机号</th>
+                                                    <th>分组</th>
+                                                    <th>类别标准</th>
+                                                    <th>车辆类别</th>
+                                                    <th>车辆类型</th>
+                                                    <th>道路运输证号</th>
+                                                    <th>行驶证号</th>
+                                                    <th>车辆别名</th>
+                                                    <th>车主</th>
+                                                    <th>车主电话</th>
+                                                    <th>车辆等级</th>
+                                                    <th>电话是否校验</th>
+                                                    <th>车辆颜色</th>
+                                                    <th>车牌颜色</th>
+                                                    <th>燃料类型</th>
+                                                    <th>区域属性</th>
+                                                    <th>省、直辖市</th>
+                                                    <th>市、区</th>
+                                                    <th>车辆状态</th>
+                                                    <th>运营类别</th>
+                                                    <th>所属行业</th>
+                                                    <th>核定载人数</th>
+                                                    <th>核定载质量</th>
+                                                    <th>车辆技术等级有效期</th>
+                                                    <th>是否维修</th>
+                                                    <th>创建时间</th>
+                                                    <th>修改时间</th>
+                                                    <th>保养里程数(km)</th>
+                                                    <th>保养有效期</th>
+                                                    <th>车台安装日期</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="photoDiv" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">查看照片</h4>
+                            </div>
+                            <div class="modal-body">
+                                <img id="photoImg" class="img-rounded" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- --新增车辆用途-- -->
+                <div class="modal fade" id="addVehiclePurpose" tabindex="-1" aria-hidden="true" data-backdrop="static"
+                    role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form th:action="@{/v/monitoring/orderMsg}" id="addSubmit" role="form" action="#"
+                                method="post" class="form-horizontal">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close"></button>
+                                    <h4 class="modal-title" id="increaseVehiclePurpose">新增运营类别</h4>
+                                    <input class="hidden" id="vid" name="vid" value="">
+                                    <input class="hidden" name="orderType" value="9">
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row" id="purposeCategories">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                <label class="text-danger">*</label> 运营类别：</label>
+                                            <div class=" col-md-7">
+                                                <input type="text" placeholder="请输入运营类别" class="form-control"
+                                                    id="purposeCategory" name="purposeCategory" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">备&nbsp;&nbsp;&nbsp;注：</label>
+                                            <div class=" col-md-7">
+                                                <textarea rows="3" cols="20" placeholder="请输入运营说明" class="form-control"
+                                                    id="description" name="description"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" id="goOverspeedSettings" class="btn btn-primary">提交</button>
+                                    <button type="button" class="btn btn-default btn-off"
+                                        data-dismiss="modal">关闭</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- --修改车辆用途-- -->
+                <div class="modal fade" id="updateVehiclePurpose" tabindex="-1" aria-hidden="true"
+                    data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <form th:action="@{/m/basicinfo/monitoring/vehicle/updateVehiclePurposeCategory}"
+                                th:object="${result}" id="updateSubmit" action="#" role="form" method="post"
+                                class="form-horizontal">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close"></button>
+                                    <h4 class="modal-title" id="modifyVehiclePurpose">修改运营类别</h4>
+                                    <input class="hidden" id="vid9" name="vid" value="">
+                                    <input class="hidden" name="orderType" value="9">
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label"><label class="text-danger">*</label>
+                                                运营类别：</label>
+                                            <div class=" col-md-7">
+                                                <input type="text" placeholder="请输入运营类别" class="form-control"
+                                                    id="vehiclePurposeCategory" name="vehiclePurposeCategory" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">备&nbsp;&nbsp;&nbsp;注：</label>
+                                            <div class=" col-md-7">
+                                                <textarea rows="3" cols="20" placeholder="请输入运营说明" class="form-control"
+                                                    id="vehicleDescription" name="vehicleDescription"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="update">提交</button>
+                                    <button type="button" class="btn btn-default btn-off"
+                                        data-dismiss="modal">关闭</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+    <script src="/clbs/resources/js/bootstrap-select.min.js"></script>
+    <script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+    <script th:inline="javascript">
+        var selectItem = '请至少勾选一项';
+        var publicDelete = [[#{ public.delete }]];
+        var publicError = [[#{ public.error }]];
+        var vehiclePurposeNull = [[#{ vehicle.purpose.null }]];
+        var publicSize20 = [[#{ public.size20.length }]];
+        var publicSize30 = [[#{ public.size30.length }]];
+        var vehiclePurposeExists = [[#{ vehicle.purpose.exists }]];
+
+        var publicMinLength = [[#{ public.minSize2.length }]];
+    </script>
+    <script src="/wro/vehicleList.js" th:src="@{/wro/vehicleList.js}"></script>
+</body>
+
+</html>

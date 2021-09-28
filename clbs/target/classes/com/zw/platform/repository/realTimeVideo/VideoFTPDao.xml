@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.platform.repository.realTimeVideo.VideoFTPDao" >
+  <resultMap id="BaseResultMap" type="com.zw.platform.domain.realTimeVideo.VideoFTPForm" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="vehicle_id" property="vehicleId" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="VARCHAR" />
+    <result column="alarm_type" property="alarmType" jdbcType="INTEGER" />
+    <result column="channel_number" property="channelNumber" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="flag" property="flag" jdbcType="SMALLINT" />
+    <result column="create_data_time" property="createDataTime" jdbcType="TIMESTAMP" />
+    <result column="create_data_username" property="createDataUsername" jdbcType="VARCHAR" />
+    <result column="update_data_time" property="updateDataTime" jdbcType="TIMESTAMP" />
+    <result column="update_data_username" property="updateDataUsername" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, vehicle_id, temp_name, temp_url, upload_time, name, url, start_time, end_time, alarm_type, channel_number,flag, create_data_time,
+    create_data_username, update_data_time, update_data_username
+  </sql>
+  <select id="getFtpList" resultType="com.zw.platform.domain.realTimeVideo.VideoFTPQuery" parameterType="com.zw.platform.domain.realTimeVideo.VideoFTPQuery" >
+    select
+    <include refid="Base_Column_List" />
+    from zw_m_video_ftp
+    where
+    vehicle_id=#{vehicleId}
+    <if test="channelNumber != 0" >
+      and channel_number=#{channelNumber}
+    </if>
+    and start_time &gt;= #{startTime}
+    and end_time &lt;= #{endTime}
+    ORDER BY channel_number,start_time
+  </select>
+  
+   <select id="getFtpByUrl" resultType="com.zw.platform.domain.realTimeVideo.VideoFTPQuery">
+    select
+    <include refid="Base_Column_List" />
+    from zw_m_video_ftp
+    where
+    vehicle_id=#{vehicleId}
+    <if test="channelNumber != 0" >
+      and channel_number=#{channelNumber}
+    </if>
+    <if test="url != null and url != ''" >
+      and url=#{url}
+    </if>
+  </select>
+
+  <insert id="insert" parameterType="com.zw.platform.domain.realTimeVideo.VideoFTPForm" >
+    insert into zw_m_video_ftp (id, vehicle_id, temp_name, temp_url, upload_time, name,
+      url, start_time, end_time, alarm_type, channel_number, type, 
+      flag, create_data_time, create_data_username, 
+      update_data_time, update_data_username)
+    values (#{id}, #{vehicleId}, #{tempName},
+      #{tempUrl},#{uploadTime},#{name},
+      #{url}, #{startTime}, #{endTime},
+      #{alarmType}, #{channelNumber},#{type},
+      #{flag}, #{createDataTime}, #{createDataUsername},
+      #{updateDataTime}, #{updateDataUsername})
+  </insert>
+  
+</mapper>

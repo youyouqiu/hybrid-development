@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.common.AdasCommonDao">
+
+    <select id="getEventMap" resultType="hashmap">
+       SELECT CONCAT(function_id,"") as functionId,risk_event as riskEvent ,risk_type as riskType from zw_m_risk_event
+	</select>
+    <select id="getRiskLevelMap" resultType="hashmap">
+        SELECT risk_value as riskValue,risk_level as riskLevel from zw_m_risk_level
+    </select>
+
+    <select id="getEvent808Map"  resultType="hashmap">
+        SELECT CONCAT(re.function_id,"") as eventId,map.808_pos as 808Id from zw_m_risk_event re,zw_m_808_809_mapping map where re.808_pos=map.808_pos  and map.flag =1
+
+    </select>
+    <select id="queryEventCommonFieldAndName" resultType="map">
+        SELECT DISTINCT event_common_field as field,event_common_name  as name from zw_m_risk_event  where event_common_field is not null
+    </select>
+    <select id="queryCommonFieldEvents" resultType="map">
+     SELECT DISTINCT event_common_field as field,GROUP_CONCAT(function_id) as event from zw_m_risk_event
+     where event_common_field is not null GROUP BY event_common_field
+
+    </select>
+</mapper>

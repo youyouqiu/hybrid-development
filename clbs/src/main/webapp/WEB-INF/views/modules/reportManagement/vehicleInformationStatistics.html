@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>车辆信息统计</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/overSpeed.css">
+</head>
+<style>
+    .layui-laydate {
+        z-index: 1030 !important;
+    }
+
+    .nav-tabs {
+        border-bottom: none;
+    }
+    #detailBody{
+        overflow-x: hidden;
+    }
+    .right-panel{
+        width: 1000px;
+        right: -1000px;
+    }
+</style>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">车辆信息统计</li>
+                    </ul>
+                    <h1 class="h1">车辆信息统计</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="lifeCycleForm" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <div class="col-md-4">
+                                                <label class="col-md-2  control-label">组织：</label>
+                                                <input class="form-control hidden"/>
+                                                <div class="has-feedback fastClear col-md-10">
+                                                    <input style="cursor: pointer; background-color: #fafafa;"
+                                                           autocomplete="off"
+                                                           placeholder="请选择组织" class="form-control" type="text"
+                                                           id="groupSelect" name="groupSelect"/>
+                                                    <span class="fa fa-chevron-down form-control-feedback"
+                                                          style="top: 0; right: 15px;cursor:pointer;"
+                                                          aria-hidden="true"
+                                                          id="groupSelectSpan"></span>
+                                                    <div id="menuContent" class="menuContent">
+                                                        <ul id="treeDemo" class="ztree"></ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 noPadding">
+                                                <label class="col-md-4 control-label searchListSelect">时间：</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" id="month" name="month"
+                                                           style="cursor: pointer; background-color: #fafafa;"
+                                                           readonly
+                                                           class="form-control layer-date laydate-icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 control-label" id="dateSearchData">
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="vehicleInformationStatistics.inquireClick(1)"><i
+                                                        class="glyphicon glyphicon-search"></i> 查询
+                                                </button>
+                                                <button id="exportAlarm" type="button" disabled
+                                                        class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch3">
+                                <h3 class="panel-title fwb">车辆信息统计图</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch3-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch3-body" style="display: none;">
+                                <div id="trendEchart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">车辆信息统计列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel" style="">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <label><input type="text" class="Inlinesearch form-control"
+                                                              id="simpleQueryParam" name="simpleQueryParam"
+                                                              autocomplete="off"
+                                                              style="width:300px"
+                                                              placeholder="请输入所属企业"></label>
+                                                <button type="button" id="search_button"
+                                                        class="btn btn-outline btn-default">搜索
+                                                </button>
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button"
+                                                name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle btn-border-radius"
+                                                    data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table id="dataTable"
+                                       class="table table-striped table-bordered table-hover noCheckTable myDriverTable"
+                                       cellspacing="0" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">序号</th>
+                                        <th class="text-center">所属企业</th>
+                                        <th class="text-center">日均车辆入网率</th>
+                                        <th class="text-center">日均车辆上线率</th>
+                                        <th class="text-center">日均轨迹完整率</th>
+                                        <th class="text-center">日均数据合格率</th>
+                                        <th class="text-center">日均卫星定位漂移率</th>
+                                        <th class="text-center">日均车辆超速次数</th>
+                                        <th class="text-center">日均疲劳驾驶时长</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <ul id="dropDown-q" class="dropdown-menu"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+
+<!--组织中车辆明细统计详情抽屉-->
+<div id="maskLayer" style="position: fixed;width: 100vw;height: 100vh;top: 0;z-index: 9998;background: #0a0a0a;display: none;opacity: 0"></div>
+<div id="detail" class="right-panel detailContentBody">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title fwb">组织中车辆明细统计
+                <!--<div class="carName">
+                    <i class="toopTip-btn-left" style="display: inline-block"
+                       onclick="vehicleInformationStatistics.left_arrow()">
+                        <img data-toggle="tooltip" data-placement="left"
+                             src="/clbs/resources/img/car-left.svg"
+                             width="16px" data-original-title="上一月">
+                    </i>
+                    <span id="detailMonth">-</span>
+                    <i class="toopTip-btn-right" style="display: inline-block"
+                       onclick="vehicleInformationStatistics.right_arrow()">
+                        <img data-toggle="tooltip" data-placement="right" title=""
+                             src="/clbs/resources/img/car-right.svg" width="16px"
+                             data-original-title="下一月">
+                    </i>
+                </div>-->
+            </h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close"
+                      onclick="vehicleInformationStatistics.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body" id="detailBody">
+            <div class="form-group clearfix">
+                <div id="trendDetailEchart"></div>
+            </div>
+            <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title fwb">数据列表</h3>
+                    </div>
+                    <div class="panel-body fixed-table-body">
+                        <!-- <div class="ToolPanel" style="">
+                             <div class="bars pull-left">
+                                 <div class="btn-group pull-left barsMargin" role="group">
+                                     <form role="form">
+                                         <label><input type="text" class="Inlinesearch form-control"
+                                                       id="detailSimpleQueryParam" name="detailSimpleQueryParam"
+                                                       autocomplete="off"
+                                                       style="width:300px"
+                                                       placeholder="请输入监控对象关键字"></label>
+                                         <button type="button" id="searchDetailTable"
+                                                 class="btn btn-outline btn-default">搜索
+                                         </button>
+                                     </form>
+                                 </div>
+                             </div>
+                         </div>-->
+                        <table id="detailTable"
+                               class="table table-striped table-bordered table-hover noCheckTable dataTable no-footer"
+                               cellspacing="0" width="100%" aria-describedby="dataTable_info">
+                            <thead>
+                            <tr role="row">
+                                <th class="text-center">序号</th>
+                                <th class="text-center">监控对象</th>
+                                <!--<th class="text-center">车牌颜色</th>-->
+                                <th class="text-center">日期</th>
+                                <th class="text-center">入网状态</th>
+                                <!--<th class="text-center">营运状态</th>-->
+                                <th class="text-center">上线状态</th>
+                                <th class="text-center">轨迹完整率</th>
+                                <th class="text-center">数据合格率</th>
+                                <th class="text-center">定位漂移次数</th>
+                                <th class="text-center">车辆超速次数</th>
+                                <th class="text-center">疲劳驾驶时长</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <a id="detailExport" type="button" class="btn btn-purple export-btn" href="javascript:void(0);">
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </a>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px"
+                    onclick="vehicleInformationStatistics.closeDetail()">关 &nbsp;闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var vehicleSelectGroup = [[#{Vehicle.select.group}]];
+    var exportTitle = [[#{export.confirm.title}]];
+    var exportFail = [[#{export.fail}]];
+    var dateNumError = [[#{outArea.dateNum.error}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+</script>
+<script src="/clbs/resources/js/echarts-4.1.js"></script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/vehicleInformationStatistics.js"></script>
+</html>

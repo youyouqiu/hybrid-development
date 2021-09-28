@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.driverscore.AdasDriverScoreDao">
+
+    <select id="getGroupDriverGeneralScoreInfos"
+            resultType="com.zw.adas.domain.driverScore.show.AdasDriverGroupGeneralScoreShow">
+select score as score,score_ring_ratio as scoreRingRatio,total_driver as totalDriver,
+bad_behavior as badBehavior,bad_behavior_ring_ratio as badBehaviorRingRatio,
+day_of_driver_time as dayOfDriverTime,hundred_mile_bad_behavior as hundredMileBadBehavior,
+hundred_mile_bad_behavior_ring_ratio as hundredMileBadBehaviorRingRatio,average_speed as averageSpeed,
+lucidity as lucidity,vigilance as vigilance, focus as focus,consciousness as consciousness,
+stationarity as stationarity from zw_m_group_driver_score  where time=#{time} and group_id=#{groupId}
+
+        </select>
+
+    <select id="getGroupDriverGeneralScoreInfoList"
+            resultType="com.zw.adas.domain.driverScore.show.AdasDriverGroupGeneralScoreListShow">
+        SELECT group_id as groupId,card_number_name as driverNameCardNumber,
+        travel_mile as driverMile,
+        travel_times as driverTimes,
+        day_of_driver_time as averageDriverTime,
+        average_speed as averageSpeed,
+        alarm as alarm,score as score,
+        driver_group_id as driverGroupId
+        from zw_m_group_driver_score_list
+        where group_id =#{query.groupId}
+        and time =#{query.time}
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+            AND card_number_name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+        </if>
+    </select>
+
+    <select id="getDriverScoreProfessionalInfo"
+            resultType="com.zw.adas.domain.driverScore.show.AdasDriverScoreProfessionalInfoShow">
+SELECT score as score ,score_ring_ratio as scoreRingRatio,
+bad_behavior as badBehavior,bad_behavior_ring_ratio as badBehaviorRingRatio,hundred_mile_bad_behavior as  hundredMileBadBehavior,hundred_mile_bad_behavior_ring_ratio as hundredMileBadBehaviorRingRatio,
+travel_mile as driverMile,
+ day_of_driver_time as dayOfDriverTime, lucidity as lucidity ,vigilance as vigilance,
+focus as  focus,consciousness as consciousness,stationarity as stationarity,
+  event_infos as eventInfoStr,score_range as scoreRange, driver_group_id as driverGroupId from zw_m_group_driver_score_list
+  where  group_id=#{query.groupId} and  time=#{query.time}
+
+            AND card_number_name =#{query.cardNumberName}
+    </select>
+
+    <select id="getDriverScoreProfessionalInfos"
+            resultType="com.zw.adas.domain.driverScore.show.AdasDriverScoreProfessionalInfoShow">
+        SELECT group_id as groupId, card_number_name as cardNumberName,score as score ,score_ring_ratio as
+        scoreRingRatio,
+        bad_behavior as badBehavior,bad_behavior_ring_ratio as badBehaviorRingRatio,
+        hundred_mile_bad_behavior as hundredMileBadBehavior,
+        hundred_mile_bad_behavior_ring_ratio as hundredMileBadBehaviorRingRatio,travel_mile as driverMile,
+        day_of_driver_time as dayOfDriverTime, lucidity as lucidity ,vigilance as vigilance,
+        focus as focus,consciousness as consciousness,stationarity as stationarity,
+        event_infos as eventInfoStr from zw_m_group_driver_score_list
+        where group_id in
+        <foreach item="item" collection="query.groupIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and time=#{query.time}
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam!=''">
+            AND card_number_name LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+        </if>
+    </select>
+
+    <select id="getCurrentPageDriverScoreProfessionalInfos"
+            resultType="com.zw.adas.domain.driverScore.show.AdasDriverScoreProfessionalInfoShow">
+        SELECT group_id as groupId, card_number_name as cardNumberName,score as score ,score_ring_ratio as
+        scoreRingRatio,
+        bad_behavior as badBehavior,bad_behavior_ring_ratio as badBehaviorRingRatio,
+        hundred_mile_bad_behavior as hundredMileBadBehavior,
+        hundred_mile_bad_behavior_ring_ratio as hundredMileBadBehaviorRingRatio,travel_mile as driverMile,
+        day_of_driver_time as dayOfDriverTime, lucidity as lucidity ,vigilance as vigilance,
+        focus as focus,consciousness as consciousness,stationarity as stationarity,
+        event_infos as eventInfoStr,score_range as scoreRange from zw_m_group_driver_score_list
+        where
+        <foreach item="item" collection="query.queryParams" open="(" separator="or" close=")">
+            group_id = #{item.groupId}
+            AND card_number_name = #{item.cardNumberName}
+        </foreach>
+        and time=#{query.time}
+    </select>
+
+    <select id="getMaxRangeByGroupIdsAndTime" resultType="integer">
+        SELECT score_range as total from zw_m_group_driver_score_list
+        where group_id =#{groupId} and time =#{time}
+        group by score_range ORDER BY total desc limit 1
+    </select>
+
+</mapper>

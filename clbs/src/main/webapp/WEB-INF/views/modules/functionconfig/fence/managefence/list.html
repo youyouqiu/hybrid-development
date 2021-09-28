@@ -1,0 +1,2251 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>围栏管理</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="resources/css/electronicFence-map.css" th:href="@{/resources/css/electronicFence-map.css}">
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <div th:replace="fragments/menu">menu</div>
+    <!--main content start-->
+    <section class="main-content-wrapper">
+        <section id="main-content">
+            <div class="row">
+                <div class="col-md-12">
+                    <!--breadcrumbs start -->
+                    <ul class="breadcrumb">
+                       <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">应用管理</li>
+                        <li class="active">电子围栏</li>
+                        <li class="active">围栏管理</li>
+                    </ul>
+                    <!--breadcrumbs end -->
+                    <h1 class="h1 ">围栏管理</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">围栏管理</h3>
+                        </div>
+                        <!--围栏线路预览-->
+                        <div class="panel-body">
+                             <h2 th:if="${hasRole}" class="panel-title fwb fenceSaveDownLine"><i class="fa  fa-briefcase"></i><span style="padding: 0 10px;">工具</span><i class="fa fa-caret-right"></i>
+                                <a class="fenceA" id="point"><i class="fa fa-map-marker"></i><span>标注</span></a>
+                                <a class="fenceA" id="line"><i class="fa fa-minus"></i><span>线</span></a>
+                                <!-- 行驶轨迹按钮，此功能没有意义，暂时屏蔽，误删 -->
+                                <a class="fenceA" id="aTOb"><i class="fa fa-expand"></i><span>导航路线</span></a>
+                                <a class="fenceA" id="rectangle"><i class="fa fa-square-o"></i><span>矩形</span></a>
+                                <a class="fenceA" id="circle"><i class="fa fa-circle-o"></i><span>圆形</span></a>
+                                <a class="fenceA" id="polygon"><i class="fa fa-bookmark-o"></i><span>多边形</span></a>
+                                <!-- <a class="areaSave" id="areaSave"><i class="fa  fa-star"></i><span>行政区域保存</span></a> -->
+                            </h2>
+                            <div id="MapContainer" class="mapArea"></div>
+                           <!--  行政区域下拉框 -->
+                            <!--  行政区域下拉框  end-->
+                            <div id="map-button" class="button-group">
+                                <input type="button" class="button" value="卫星" id="showSetMap"/>
+                            </div>
+                            <!-- AB点路线搜索 -->
+                            <div>
+                                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/add}" id="a2B" role="form" action="#" method="post">
+                                    <div id="myPageTop" class="form-group">
+                                    	<div class="navList">
+                                    		<div class="form-group navigationRoute">
+		                                        <label class="col-md-4 control-label">*线路名称：</label>
+		                                        <div class=" col-md-7 start-input" >
+		                                            <input style="width:100%;" placeholder="请输入路线名称" type="text" class="form-control" id="nameA2B" name="name" />
+		                                        </div>
+                                    		</div>
+                                    		<div class="form-group navigationRoute">
+		                                        <label class="col-md-4 control-label">*偏移量(m)：</label>
+		                                        <div class=" col-md-7 start-input">
+		                                            <input style="width:100%;" placeholder="请输入数字" onkeyup="value=value.replace(/[^0-9]/g,'') " class="form-control" id="widthA2B" name="width"/>
+		                                        </div>
+                                    		</div>
+                                    		<div class="form-group navigationRoute">
+		                                        <label class="col-md-4 control-label">起点：</label>
+		                                        <div class="col-md-7 start-input">
+		                                            <input style="width:100%;" placeholder="请输入起点查询" id="startPoint" name="startPoint" type="text" class="form-control" />
+		                                        </div>
+                                    		</div>
+                                    		<div class="form-group navigationRoute">
+		                                        <label class="col-md-4 control-label" id="passName" style="display:none;">途经点：</label>
+		                                        <div class="col-md-7 start-input" style="display:none;" id="pass_div">
+		                                            <input style="width:100%;" placeholder="" id="passPoint" name="passPoint" type="text" class="form-control" />
+		                                        </div>
+                                    		</div>
+                                    		<div class="form-group navigationRoute">
+		                                        <div id="ssPass"></div>
+		                                        <label class="col-md-4 control-label">终点：</label>
+		                                        <div class="col-md-7">
+		                                            <input style="width:100%;" placeholder="请输入终点查询" id="endPoint" type="text" class="form-control" />
+		                                        </div>
+                                    		</div>
+	                                    </div>
+                                        <div class="col-md-12 control-label">
+                                            <input type="hidden" id="pointSeqsA2B" name="pointSeqs" />
+                                            <input type="hidden" id="longitudesA2B" name="longitudes" />
+                                            <input type="hidden" id="latitudesA2B" name="latitudes" />
+                                            <input type="hidden" id="descriptionA2B" name="description" />
+                                            <button type="button" class="btn btn-inquire" onclick="fenceManagementList.save();">保存</button>
+                                            <button type="button" class="btn btn-inquire" onclick="fenceManagementList.inquire();">查询</button>
+                                            <button type="button" class="btn btn-default" onclick="fenceManagementList.closeAtoB();fenceManagementList.clearErrorMsg()">关闭</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="panel"></div>
+                            <div id="result"></div>
+                        </div>
+                        <!--围栏线路预览-->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title fwb">围栏列表</h3>
+                            <div class="actions pull-right">
+                                <i class="fa fa-chevron-down"></i>
+                                <!-- <i class="fa fa-times"></i> -->
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body">
+                            <!--工具面板-->
+		                    <div class="ToolPanel">
+		                        <div class="bars pull-left">
+		                            <div class="btn-group pull-left barsMargin" role="group">
+		                                <form role="form">
+		                                   <label><input type="text" class="Inlinesearch form-control" id="simpleQueryParam1" name="simpleQueryParam1" placeholder="请输入关键字"></label>
+		                                   <button type="button" onclick="myTable1.filter()" class="btn btn-outline btn-default" id="enter">搜索</button>
+		                                   <input id="hiddenText" type="text" style="display:none" />
+		                                </form>
+		                            </div>
+		                            <div th:if="${hasRole}" class="dropdown pull-left">
+		                                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">操作菜单<span class="caret"></span>
+		                                </button>
+		                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+		                                   <li><a href="javascript:void(0);" id="del_model"><i class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a></li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="columns btn-group pull-right fenceManagement">
+		                            <button id="refreshTable" class="btn btn-default" type="button" name="refresh" title="刷新">
+		                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+		                            </button>
+		                            <div class="keep-open btn-group" title="定制显示列">
+		                                <button id="customizeColumns" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		                                    <i class="glyphicon glyphicon-th icon-th"></i> <span class="caret"></span>
+		                                </button>
+		                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+		                                </ul>
+		                            </div>
+		                        </div>
+		                    </div>
+                            <table id="exampleTest"
+                                   class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <tr>
+                                    <th style=" width:1px; padding:0"></th>
+                                    <th style="width:30px; padding:10px"><input type="checkbox" id="checkAll"></th>
+                                    <th>操作设置</th>
+                                    <th>名称</th>
+                                    <th>描述</th>
+                                    <th>类型</th>
+                                    <th>形状</th>
+                                    <th>创建人</th>
+                                    <th>创建时间</th>
+                                    <th>预览</th>
+                                </tr>
+                                </thead>
+                            </table>
+                            <!--数据表格end-->
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+    <!--main content end-->
+	<div th:replace="fragments/footer">footer</div>
+</section>
+<!-- 标注 -->
+<div class="modal fade" id="mark" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">标注</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增标注表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/marker}" id="marker" role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group" style="display:none;">
+                            <input type="hidden" id="addOrUpdateMarkerFlag" name="addOrUpdateMarkerFlag" value="" />
+                            <input type="hidden" id="markerId" name="markerId" value=""/>
+                            <label class="col-md-3 control-label">标注经度：</label>
+                            <div class=" col-md-3">
+                                <input id="mark-lng" type="text" value="" class="form-control" readonly="readonly" name="longitude"/>
+                            </div>
+                            <label class="col-md-2 control-label">标注纬度：</label>
+                            <div class=" col-md-3">
+                                <input id="mark-lat" type="text" value="" class="form-control" readonly="readonly" name="latitude"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 标注名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入标注名称" class="form-control" id="markerName" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">标注类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="markerType" name="type">
+                                    <option value="普通标记">普通标记</option>
+                                    <option value="线路点">线路点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="4" id="markerDescription" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                   <div class="modal-footer">
+                   <button type="button" id="annotatedSave" class="btn btn-primary">保存</button>
+                   <button type="button" onclick="fenceManagementList.clearErrorMsg()" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!--线-->
+<div class="modal fade" id="addLine" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">线路</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/add}" id="addLineForm" role="form" action="#" method="post">
+                    <table id="table-lng-lat" class="table table-striped table-bordered table-hover table-lng-lat">
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                        	<input type="hidden" id="addOrUpdateLineFlag" name="addOrUpdateLineFlag" />
+                        	<input type="hidden" id="lineId" name="lineId" />
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 线路名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入线路名称" class="form-control" id="lineName1" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">线路类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="lineType1" name="type">
+                                    <option value="国道">国道</option>
+                                    <option value="省道">省道</option>
+                                    <option value="县道">县道</option>
+                                    <option value="高速">高速</option>
+                                    <option value="高架立交">高架立交</option>
+                                    <option value="其他小路">其他小路</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 偏移量(m)：</label>
+                            <div class=" col-md-8">
+                                <!--<input type="text" onkeyup="value=value.replace(/[^0-9]/g,'') "   class="form-control" name="width"/>-->
+                                <input placeholder="请输入数字" onkeyup="value=value.replace(/[^0-9]/g,'') " class="form-control" id="lineWidth1" name="width"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="lineDescription1" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="pointSeqs" name="pointSeqs" />
+                        <input type="hidden" id="longitudes" name="longitudes" />
+                        <input type="hidden" id="latitudes" name="latitudes" />
+                        <button type="button" id="threadSave" class="btn btn-primary">保存</button>
+                        <button type="button" onclick="fenceManagementList.clearErrorMsg()" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 矩形 -->
+<div class="modal fade" id="rectangle-form" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">矩形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/rectangles}" id="rectangles" role="form" action="#" method="post">
+               <!-- <form class="form-horizontal"  id="rectangles" role="form" action="#" method="post">-->
+                    <table id="rectangle-lng-lat1" class="table table-striped table-bordered table-hover table-lng-lat">
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="hidden" id="addOrUpdateRectangleFlag" name="addOrUpdateRectangleFlag" />
+                            <input type="hidden" id="rectangleId" name="rectangleId" />
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入区域名称" class="form-control" id="rectangleName" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="rectangleType" name="type">
+                                    <option value="危险区域">危险区域</option>
+                                    <option value="违规区域">违规区域</option>
+                                    <option value="休息区">休息区</option>
+                                    <option value="接驳点">接驳点</option>
+                                    <option value="普通区域">普通区域</option>
+                                    <option value="途经点">途经点</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-md-3 control-label">形状：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="rectangleShape" name="shape">
+                                    <option value="矩形">矩形</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="rectangleDescription" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+            <div class="modal-footer">
+                <input type="hidden" id="pointSeqsRectangles" name="pointSeqs" />
+                <input type="hidden" id="longitudesRectangles" name="longitudes" />
+                <input type="hidden" id="latitudesRectangles" name="latitudes" />
+                <button type="button" id="rectangleSave" class="btn btn-primary">保存</button>
+                <button type="button" onclick="fenceManagementList.clearErrorMsg()" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+            </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 多边形 -->
+<div class="modal fade" id="myModal" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">多边形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增围栏表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/polygons}" id="polygons" role="form" action="#" method="post">
+               <!-- <form class="form-horizontal"  id="polygons" role="form" action="#" method="post">-->
+                    <table id="table-lng-lat1" class="table table-striped table-bordered table-hover table-lng-lat">
+                    </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="form-group">
+                            <input type="hidden" id="addOrUpdatePolygonFlag" name="addOrUpdatePolygonFlag" />
+                            <input type="hidden" id="polygonId" name="polygonId"/>
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入区域名称" class="form-control" id="polygonName" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="polygonType" name="type">
+                                    <option value="危险区域">危险区域</option>
+                                    <option value="违规区域">违规区域</option>
+                                    <option value="休息区">休息区</option>
+                                    <option value="接驳点">接驳点</option>
+                                    <option value="普通区域">普通区域</option>
+                                    <option value="途经点">途经点</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group hidden">
+                            <label class="col-md-3 control-label">形状：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="polygonShape" name="shape">
+                                <option value="多边形">多边形</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="polygonDescription" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+            <div class="modal-footer">
+                <input type="hidden" id="pointSeqsPolygons" name="pointSeqs" />
+                <input type="hidden" id="longitudesPolygons" name="longitudes" />
+                <input type="hidden" id="latitudesPolygons" name="latitudes" />
+                <button type="button" id="polygonSave" class="btn btn-primary">保存</button>
+                <button type="button" onclick="fenceManagementList.clearErrorMsg()" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+            </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 圆形 -->
+<div class="modal fade" id="circleArea" tabindex="-1" aria-hidden="true" data-backdrop="static" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                <h4 class="modal-title">圆形</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 新增圆形区域表单 -->
+                <form class="form-horizontal" th:action="@{/m/functionconfig/fence/managefence/circles}" id="circles" role="form" action="#" method="post">
+                    <div class="row">
+                        <div class="form-group" style="display:none;">
+                            <input type="hidden" id="addOrUpdateCircleFlag" name="addOrUpdateCircleFlag" />
+                            <input type="hidden" id="circleId" name="circleId" />
+                            <label class="col-md-3 control-label">圆心经度：</label>
+                            <div class=" col-md-3">
+                                <input id="circle-lng" type="text" value="11" class="form-control" readonly="readonly" name="longitude"/>
+                            </div>
+                            <label class="col-md-2 control-label">圆心纬度：</label>
+                            <div class=" col-md-3">
+                                <input id="circle-lat" type="text" value="" class="form-control" readonly="readonly" name="latitude"/>
+                            </div>
+                        </div>
+                        <div class="form-group" style="display:none;">
+                            <label class="col-md-3 control-label">半径(米)：</label>
+                            <div class=" col-md-8">
+                                <input id="circle-radius" type="text" value="" class="form-control" readonly="readonly" name="radius"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label"><label class="text-danger">*</label> 区域名称：</label>
+                            <div class=" col-md-8">
+                                <input type="text" placeholder="请输入区域名称" class="form-control" id="circleName" name="name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">区域类型：</label>
+                            <div class=" col-md-8">
+                                <select class="form-control" id="circleType" name="type">
+                                    <option value ="危险区域">危险区域</option>
+                                    <option value ="违规区域">违规区域</option>
+                                    <option value ="休息区">休息区</option>
+                                    <option value ="接驳点">接驳点</option>
+                                    <option value ="普通区域">普通区域</option>
+                                    <option value ="途经点">途经点</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">描述：</label>
+                            <div class=" col-md-8">
+                                <textarea class="form-control" rows="3" id="circleDescription" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="roundSave" class="btn btn-primary">保存</button>
+                <button type="button" onclick="fenceManagementList.clearErrorMsg()" class="btn btn-default btn-off" data-dismiss="modal">取消</button>
+            </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=6b953aec395d345fd37e1b5434d587a9&plugin=AMap.DistrictSearch,AMap.MouseTool,AMap.Driving,AMap.Autocomplete,AMap.Geocoder,AMap.PlaceSearch,AMap.PolyEditor,AMap.CircleEditor"></script>
+<script th:inline="javascript">
+	var lineNameNull=[[#{line.name.null}]];
+	var deviationNull=[[#{deviation.null}]];
+	var areaNameNull=[[#{area.name.null}]];
+	var markerNameNull=[[#{marker.name.null}]];
+    var rectangle_array = [];
+    //围栏修改
+    var amendCircle,amendPolygon,amendLine,polyFence;
+    //单选
+    var subChk = $("input[name='subChk']");
+    var subChkOrBit = $("input[name='subChkOrBit']");
+	//显示隐藏列
+	var menu_text = "";
+	var table = $("#exampleTest tr th:gt(1)");
+	//是否已初始化轨迹列表
+    var orbitExist = false;
+    //表格
+    var myTable1;
+
+	var btnWaypoints = [];
+
+	//每次拖拽后的起点和终点
+	var dragStart = [];
+	var dragEnd = [];
+
+	var rectangle = false;
+	var map;
+	var district, polygons = [], citycode;
+	var polyline;
+	var route_text,address_start,address_end;
+
+	var temp;
+	var passFlag = false;
+	var isMapThreeDFlag = true;
+
+	var right_num,start_xy_right,end_xy_right,old_start_name,old_end_name,start_marker,pass_marker,end_marker,old_pass_name,pass_xy_right;
+	var pass_point = [];
+	var pass_point_array = [];
+
+	var all_lng_lat = [];
+	var old_lng_lat = [];
+	var citySelect = document.getElementById('city');
+	var districtSelect = document.getElementById('district');
+	var areaSelect = document.getElementById('biz_area');
+	var clickPosition;
+	var autoOptions = {input: "startPoint"};
+	var auto = new AMap.Autocomplete(autoOptions);
+	//查询
+	var pathList = [];
+	var hasSearch = false;
+	//保存
+	var submitFlag6 = false;
+    //实例化3D楼块图层
+    var buildings;
+  	//卫星地图
+    var satellLayer;
+  	//在地图中添加MouseTool插件
+    var mouseTool;
+    var contextMenu;
+
+	fenceManagementList = {
+
+		init: function(){
+
+	      	//创建地图
+            map = new AMap.Map("MapContainer", {
+            	resizeEnable: false,
+                rotateEnable:true,
+                zoomEnable:false,
+                showBuildingBlock: true,
+                zoom: 14
+            });
+          	//卫星地图
+			satellLayer = new AMap.TileLayer.Satellite();
+            satellLayer.setMap(map);
+            satellLayer.hide();
+            //在map中添加3D楼块图层
+    		buildings = new AMap.Buildings();
+            buildings.setMap(map);
+          	//在地图中添加MouseTool插件
+            mouseTool = new AMap.MouseTool(map);
+			//显示隐藏列
+			menu_text += "<li><label><input type=\"checkbox\" checked=\"checked\" class=\"toggle-vis\" data-column=\"" + parseInt(2) +"\" disabled />"+ table[0].innerHTML +"</label></li>"
+			for(var i = 1; i < table.length; i++){
+			    menu_text += "<li><label><input type=\"checkbox\" checked=\"checked\" class=\"toggle-vis\" data-column=\"" + parseInt(i+2) +"\" />"+ table[i].innerHTML +"</label></li>"
+			};
+			$("#Ul-menu-text").html(menu_text);
+		    //表格列定义
+		    var columnDefs1 = [ {
+		        //第一列，用来显示序号
+		        "searchable" : false,
+		        "orderable" : false,
+		        "targets" : 0
+		    } ];
+		    var columns1 = [{
+		        //第一列，用来显示序号
+		        "data" : null,
+		        "class" : "text-center"
+		    }, {
+		        //第一列，用来显示序号
+		        "data" : null,
+		        "class" : "text-center",
+		        render: function (data, type, row, meta) {
+		            var result = '';
+		            result += '<input  type="checkbox" name="subChk"  value="' + row.id + '" />';
+		            return result;
+		        }
+		    },{
+		        "data" : null,
+		        "class" : "text-center", //最后一列，操作按钮
+		        render : function(data, type, row, meta) {
+		            var editUrlPath = myTable1.editUrl + row.id + ".gsp"; //修改地址
+		            var roleUrlPre = /*[[@{/c/user/roleList_{id}.gsp}]]*/'url';
+		            var result = '';
+		            //修改按钮
+		            result += '<button value="'+ row.id +'#'+ row.shape +'" onclick="fenceManagementList.updateFence(this.value)" type="button" class="editBtn editBtn-info"><i class="fa fa-pencil"></i> 修改</button>&nbsp;';
+		            //删除按钮
+		            result += '<button type="button" onclick="fenceManagementList.deleteMap();myTable1.deleteItem(\'' + row.id + '\')" class="deleteButton editBtn disableClick"><i class="fa fa-trash-o"></i> 删除</button>';
+		            return result;
+		        }
+		    }, {
+		        "data" : "name",
+		        "class" : "text-center"
+		    },  {
+		        "data" : "description",
+		        "class" : "text-center"
+		    },{
+		        "data" : "type",
+		        "class" : "text-center"
+		    },{
+		        "data" : "shape",
+		        "class" : "text-center",
+		        render: function (data, type, row, meta) {
+		            if (data == "zw_m_marker") {
+		                return '标记';
+		            } else if (data == "zw_m_line") {
+		                return '线';
+		            } else if (data == "zw_m_polygon") {
+		                return "多边形";
+		            } else if (data == "zw_m_rectangle") {
+		                return "矩形";
+		            } else if (data == "zw_m_circle") {
+		                return "圆";
+		            }
+		        }
+		    }, {
+		        "data" : "createDataUsername",
+		        "class" : "text-center"
+		    }, {
+		        "data" : "createDataTime",
+		        "class" : "text-center",
+		        render: function (data, type, row, meta) {
+		    		return (data != null && data.length > 10) ? data.substr(0, 10) : "";
+				}
+		    },{
+		        "data" : "null",
+		        "class" : "text-center",
+		        render : function(data, type, row, meta) {
+		            var result = '';
+		            result += '<button type="button" value="'+ row.id +'#'+ row.shape +'" onclick="fenceManagementList.removeRightEvent();fenceManagementList.preview(this.value)" class="editBtn editBtn-info"><i class="fa fa-eye"></i>预览</button>&nbsp;';
+		            result += '<button type="button" value="'+ row.id +'#'+ row.shape +'" onclick="fenceManagementList.removeRightEvent();fenceManagementList.canclePreview(this.value)" class="deleteButton editBtn disableClick"><i class="fa fa-trash-o"></i>取消预览</button>';
+		            return result;
+		        }
+		    }];
+		    //ajax参数
+		    var ajaxDataParamFun1 = function(d) {
+		        d.simpleQueryParam = $('#simpleQueryParam1').val(); //模糊查询
+		    };
+		    //表格setting
+		    var setting = {
+		        listUrl:/*[[@{/m/functionconfig/fence/managefence/list}]]*/'url',
+		        // listUrl:"/m/functionconfig/fence/managefence/list",
+		        //listUrl : /*[[@{/c/user/list.gsp}]]*/'url',
+		        //editUrl : "/clbs/m/basicinfo/monitoring/ThingInfo/edit_",
+		        //deleteUrl :"/clbs/m/functionconfig/fence/managefence/delete_",
+		        //editUrl: /*[[@{/m/basicinfo/monitoring/ThingInfo/edit_}]]*/'url',
+		        deleteUrl: /*[[@{/m/functionconfig/fence/managefence/delete_}]]*/'url',
+		        deletemoreUrl: /*[[@{/m/functionconfig/fence/managefence/deletemore}]]*/'url',
+		        enableUrl : /*[[@{/c/user/enable_}]]*/'url',
+		        disableUrl : /*[[@{/c/user/disable_}]]*/'url',
+		        columnDefs : columnDefs1, //表格列定义
+		        columns : columns1, //表格列
+		        dataTableDiv : 'exampleTest', //表格
+		        ajaxDataParamFun : ajaxDataParamFun1, //ajax参数
+		        pageable : true, //是否分页
+		        showIndexColumn : true, //是否显示第一列的索引列
+		        enabledChange : true
+		    };
+
+		    //创建表格ter
+		    myTable1 = new TG_Tabel.createNew(setting);
+		    //表格初始化
+		    myTable1.init();
+
+            map.on("click",function(){
+           	 	if(map.getStatus().zoomEnable){
+           		 	map.setStatus({zoomEnable: false});
+           	 	}else{
+           		 	map.setStatus({zoomEnable: true});
+           	 	}
+           	});
+          	//创建右键菜单
+            contextMenu = new AMap.ContextMenu();
+            contextMenu.addItem("设为起点", function() {
+            	 passFlag = true;
+            	 $("#myPageTop").show();
+            	 $("#aTOb").addClass("fenceA-active");
+            	 if(start_marker != undefined){
+            		 start_marker.setMap(null);
+            	 };
+            	 right_num = 0;
+            	 start_marker = new AMap.Marker({
+            	     map: map,
+            	     position: contextMenuPositon,
+            	     icon: new AMap.Icon({
+            	         size: new AMap.Size(40, 50),  //图标大小
+            	         image: "https://webapi.amap.com/theme/v1.3/markers/n/start.png"
+            	     })
+            	 });
+            }, 0);
+            contextMenu.addItem("设为途经点", function() {
+            	passFlag = true;
+            	if(pass_marker != undefined){
+            		pass_marker.setMap(null);
+            	};
+                right_num = 1;
+                pass_marker = new AMap.Marker({
+                    map: map,
+                    position: contextMenuPositon,
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(40, 50),  //图标大小
+                        image: "https://webapi.amap.com/theme/v1.3/markers/n/mid.png"
+                    })
+                });
+            }, 1);
+            contextMenu.addItem("设为终点", function() {
+            	passFlag = true;
+            	$("#myPageTop").show();
+            	$("#aTOb").addClass("fenceA-active");
+                right_num = 2;
+                if(end_marker != undefined){
+                	end_marker.setMap(null);
+                };
+                end_marker = new AMap.Marker({
+                    map: map,
+                    position: contextMenuPositon,
+                    icon: new AMap.Icon({
+                        size: new AMap.Size(40, 50),  //图标大小
+                        image: "https://webapi.amap.com/theme/v1.3/markers/n/end.png"
+                    })
+                });
+            }, 2);
+            //地图绑定鼠标右击事件——弹出右键菜单
+            map.on('rightclick', function(e) {
+            	clickPosition = new Array();
+            	clickPosition = [e.lnglat.lng, e.lnglat.lat];
+            	if($("#aTOb").hasClass("fenceA-active")){
+            		contextMenu.open(map, e.lnglat);
+            		contextMenuPositon = e.lnglat;
+            	}
+            });
+            AMap.event.addListener(contextMenu,"close",function(e){
+                if(right_num == 0){
+                    start_xy_right = new AMap.LngLat(clickPosition[0],clickPosition[1]);
+                    var geocoder = new AMap.Geocoder({
+                        radius: 1000,
+                        extensions: "base"
+                    });
+                    geocoder.getAddress(start_xy_right, function(status, result) {
+                        if (status === 'complete' && result.info === 'OK') {
+                            var start_name = result.regeocode.addressComponent.province + result.regeocode.addressComponent.district + result.regeocode.addressComponent.township;
+                            old_start_name = start_name;
+                            $("#startPoint").attr("value",start_name);
+                        };
+                    });
+                    right_num = undefined;
+                }else if(right_num == 1){
+
+                	pass_xy_right = new AMap.LngLat(clickPosition[0],clickPosition[1]);
+                	pass_point = [];
+                	pass_point.push([clickPosition[0],clickPosition[1]]);
+                	var geocoder = new AMap.Geocoder({
+                        radius: 1000,
+                        extensions: "base"
+                    });
+                    geocoder.getAddress(pass_xy_right, function(status, result) {
+                        if (status === 'complete' && result.info === 'OK') {
+                            var pass_name = result.regeocode.addressComponent.province + result.regeocode.addressComponent.district + result.regeocode.addressComponent.township;
+                            old_pass_name = pass_name;
+                            $("#passPoint").attr("value",pass_name);
+                            $("#passName").show();
+                            $("#pass_div").show();
+                        };
+                    });
+                    right_num = undefined;
+                }else if(right_num == 2){
+                    end_xy_right = new AMap.LngLat(clickPosition[0],clickPosition[1]);
+                    var geocoder = new AMap.Geocoder({
+                        radius: 1000,
+                        extensions: "base"
+                    });
+                    geocoder.getAddress(end_xy_right, function(status, result) {
+                        if (status === 'complete' && result.info === 'OK') {
+                            var end_name = result.regeocode.addressComponent.province + result.regeocode.addressComponent.district + result.regeocode.addressComponent.township;
+                            old_end_name = end_name;
+                            $("#endPoint").attr("value",end_name);
+                        };
+                    });
+                    right_num = undefined;
+                };
+
+                if(start_xy_right != undefined && end_xy_right != undefined && passFlag == true){
+                    map.clearMap();
+                    var path = [];
+                    var arr = [];
+                    path.push(start_xy_right);
+                    path.push(end_xy_right);
+                    var driving = new AMap.Driving({
+                        map: map,
+                        panel: "panel"
+                    });
+                    driving.setPolicy(AMap.DrivingPolicy.LEAST_DISTANCE);
+                    driving.search(start_xy_right , end_xy_right);
+                    AMap.event.addListener(driving,"complete",function(e){
+                        address_start = e.start.name;
+                        address_end = e.end.name;
+                        driving.clear();
+                        arr.push([e.origin.lng,e.origin.lat]);
+                        if(pass_point.length != 0){
+                        	arr.push(pass_point[0]);
+                        }else if(btnWaypoints.length > 0){
+                        	for(var i = 0; i < btnWaypoints.length; i++){
+                        		arr.push(btnWaypoints[i]);
+                        	}
+                        };
+                        arr.push([e.destination.lng,e.destination.lat]);
+                        //拖拽插件
+                        map.plugin("AMap.DragRoute",function(){
+                            var route = new AMap.DragRoute(map, arr, AMap.DrivingPolicy.LEAST_DISTANCE); //构造拖拽导航类
+                            route.search(); //查询导航路径并开启拖拽导航
+                            AMap.event.addListener(route,"complete",function(type,target,data){
+                               //每次拖拽后的起点和终点
+                            	start_xy_right = new AMap.LngLat(type.data.origin.lng,type.data.origin.lat);
+                            	end_xy_right = new AMap.LngLat(type.data.destination.lng,type.data.destination.lat);
+                                var waypoints = [];
+                                var pass_new_point = [];
+                                btnWaypoints = [];
+                                var typeTarget = route.getWays();
+                                if(typeTarget.length > 0){
+                                    var new_point = [];
+                                    for(var i = 0; i < typeTarget.length; i++){
+                                    	new_point.push([typeTarget[i].lng,typeTarget[i].lat]);
+                                    	pass_new_point.push(new AMap.LngLat(typeTarget[i].lng,typeTarget[i].lat));
+                                        waypoints.push([typeTarget[i].lng,typeTarget[i].lat]);
+                                        btnWaypoints.push([typeTarget[i].lng,typeTarget[i].lat]);
+                                    };
+                                    var geocoder_new = new AMap.Geocoder({
+                                        radius: 1000,
+                                        extensions: "base"
+                                    });
+                                    var pass_point_name = [];
+                                    geocoder_new.getAddress(pass_new_point, function(status, result) {
+                                        if (status === 'complete' && result.info === 'OK') {
+                                            for(var i = 0; i < result.regeocodes.length; i++){
+                                            	pass_point_name.push(result.regeocodes[i].addressComponent.province + result.regeocodes[i].addressComponent.district + result.regeocodes[i].addressComponent.township);
+                                            };
+                                            $("#passPoint").attr("value",pass_point_name[0]);
+                                            +
+                                            $("#passName").show();
+                                            $("#pass_div").show();
+                                            var html = "";
+                                            if(pass_point_name.length > 1){
+                                            	for(var s = 1; s < pass_point_name.length; s++){
+                                                	html += '<div class="form-group navigationRoute"><label class="col-md-4 control-label">途经点：</label><div class="col-md-7 start-input"><input placeholder="" value="'+ pass_point_name[s] +'" name="passPoint" type="text" class="form-control" /> </div></div>'
+                                                };
+                                                $("#ssPass").html(html);
+                                            }else{
+                                            	$("#ssPass").html(html);
+                                            }
+                                            pass_point_name = [];
+                                        };
+                                    });
+                                    pass_point_array = [];
+                                    for(var l = 0; l < new_point.length; l++){
+                                    	pass_point_array.push(new_point[l]);
+                                    };
+                                }else{
+                                	pass_point_array = [];
+                                	$("#passName").hide();
+                                    $("#pass_div").hide();
+                                };
+                                var driving_agan = new AMap.Driving({
+                                    map:map,
+                                    panel:"panel",
+                                    hideMarkers:true
+                                });
+                                driving_agan.setPolicy(AMap.DrivingPolicy.LEAST_DISTANCE);
+                                var start_xy = new AMap.LngLat(route.getRoute()[0].lng,route.getRoute()[0].lat);
+                                var end_xy = new AMap.LngLat(route.getRoute()[route.getRoute().length-1].lng,route.getRoute()[route.getRoute().length-1].lat);
+                                all_lng_lat.push(start_xy);
+                                all_lng_lat.push(end_xy);
+                                //逆地理编码
+                                var geocoder_string = new AMap.Geocoder({
+                                    radius: 1000,
+                                    extensions: "base"
+                                });
+                                geocoder_string.getAddress(all_lng_lat, function(status, result) {
+                                    if (status === 'complete' && result.info === 'OK') {
+                                    	fenceManagementList.geocoder_CallBack(result);
+                                    };
+                                });
+                                all_lng_lat = [];
+                                driving_agan.search(start_xy,end_xy,{waypoints:waypoints});
+                                AMap.event.addListener(driving_agan,"complete",function(e){
+                                	var pointSeqs = ""; // 点序号
+                                    var longitudes = ""; // 所有的经度
+                                    var latitudes = ""; // 所有的纬度
+                                    var text1 = document.getElementById("startPoint").value;
+                                    var text2 = document.getElementById("endPoint").value;
+                                    var m = 0;
+                                	for(var i = 0; i < e.routes[0].steps.length; i++){
+                                		for(var j = 0; j < e.routes[0].steps[i].path.length; j++){
+                                			pathList.push([e.routes[0].steps[i].path[j].lng,e.routes[0].steps[i].path[j].lat]);
+                                			pointSeqs += (m++) + ",";
+                                			longitudes += e.routes[0].steps[i].path[j].lng + ",";
+                                			latitudes += e.routes[0].steps[i].path[j].lat + ",";
+                                		}
+                                	};
+                                	if (pointSeqs.length > 0) {
+                                		pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+                                	}
+                                	if (longitudes.length > 0) {
+                                		longitudes = longitudes.substr(0, longitudes.length - 1);
+                                	}
+                                	if (latitudes.length > 0) {
+                                		latitudes = latitudes.substr(0, latitudes.length - 1);
+                                	}
+                                	$("#pointSeqsA2B").val(pointSeqs);
+                                    $("#longitudesA2B").val(longitudes);
+                                    $("#latitudesA2B").val(latitudes);
+                                    $("#descriptionA2B").val(text1 + "  到   " + text2);
+                                    fenceManagementList.informationList(e);
+                                    $("#result").show();
+                                    pass_point = [];
+                                    driving_agan.clear();
+
+                                });
+                                temp = route.getRoute();
+                            });
+                        });
+                    });
+                    passFlag = false;
+                }
+            });
+            AMap.event.addDomListener(document.getElementById('point'), 'click', function() {
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+            	contextMenu.close();
+            	map.clearMap();
+            	fenceManagementList.clearMarker();
+            	$("#myPageTop").hide();
+            	$("#result").hide();
+                .marker();
+            }, false);
+            AMap.event.addDomListener(document.getElementById('line'), 'click', function() {
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+            	contextMenu.close();
+            	map.clearMap();
+            	fenceManagementList.clearLine();
+            	$("#myPageTop").hide();
+            	$("#result").hide();
+                mouseTool.polyline();
+            }, false);
+            AMap.event.addDomListener(document.getElementById('aTOb'), 'click', function() {
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+                contextMenu.close();
+            	map.clearMap();
+            });
+            AMap.event.addDomListener(document.getElementById('polygon'), 'click', function() {
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+            	contextMenu.close();
+            	map.clearMap();
+            	fenceManagementList.clearPolygon();
+            	$("#myPageTop").hide();
+            	$("#result").hide();
+                mouseTool.polygon();
+            }, false);
+            AMap.event.addDomListener(document.getElementById('circle'), 'click', function() {
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+            	contextMenu.close();
+            	map.clearMap();
+            	fenceManagementList.clearCircle();
+            	$("#myPageTop").hide();
+            	$("#result").hide();
+                mouseTool.circle();
+            }, false);
+            AMap.event.addDomListener(document.getElementById('rectangle'), 'click', function() {
+            	rectangle = true;
+            	map.off("rightclick",amendLine);
+                map.off("rightclick",amendPolygon);
+                map.off("rightclick",amendCircle);
+            	contextMenu.close();
+            	map.clearMap();
+            	fenceManagementList.clearRectangle();
+            	$("#myPageTop").hide();
+            	$("#result").hide();
+                mouseTool.rectangle();
+            }, false);
+          	//画围栏弹出窗
+            AMap.event.addListener(mouseTool, "draw", function(e) {
+                if(e.obj.CLASS_NAME == "AMap.Polyline" || e.obj.CLASS_NAME == "AMap.Polygon"){
+                    var pointSeqs = ""; // 点序号
+                    var longitudes = ""; // 所有的经度
+                    var latitudes = ""; // 所有的纬度
+                    var array = new Array();
+                    var path = e.obj.getPath();
+                    for(var i=0; i< path.length; i++){
+                        array.push([path[i].lng,path[i].lat]);
+                    };
+                    // 去除array中相邻的重复点
+                    array = fenceManagementList.removeAdjoinRepeatPoint(array);
+                    var fileinfo= "";
+                    for(var i=0; i<array.length; i++){
+                        fileinfo += '<tr>';
+                        fileinfo += '<td>'+ i + '</td>';
+                        fileinfo += '<td>'+ 'aa' +'</td>';
+                        fileinfo += '<td>'+ 'bb' +'</td>';
+                        fileinfo += '</tr>';
+                    };
+                    $('#tal').html(fileinfo);
+                    //矩形判断
+                    for(var i=0; i<array.length; i++){
+                        $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(2)").text(array[i][0]);
+                        $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(3)").text(array[i][1]);
+                        pointSeqs += i + ","; // 点序号
+                        longitudes += array[i][0] + ","; // 把所有的经度组合到一起
+                        latitudes += array[i][1] + ","; // 把所有的纬度组合到一起
+                    }
+                    // 去掉点序号、经度、纬度最后的一个逗号
+                    if (pointSeqs.length > 0) {
+                        pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+                    }
+                    if (longitudes.length > 0) {
+                        longitudes = longitudes.substr(0, longitudes.length - 1);
+                    }
+                    if (latitudes.length > 0) {
+                        latitudes = latitudes.substr(0, latitudes.length - 1);
+                    }
+                    $("#pointSeqs").val(pointSeqs);
+                    $("#longitudes").val(longitudes);
+                    $("#latitudes").val(latitudes);
+                    $("#pointSeqsRectangles").val(pointSeqs);
+                    $("#longitudesRectangles").val(longitudes);
+                    $("#latitudesRectangles").val(latitudes);
+                    $("#pointSeqsPolygons").val(pointSeqs);
+                    $("#longitudesPolygons").val(longitudes);
+                    $("#latitudesPolygons").val(latitudes);
+                    if(e.obj.CLASS_NAME == "AMap.Polyline"){
+                        $("#addOrUpdateLineFlag").val("0"); // 如果是新增，给此文本框赋值为0
+                        setTimeout(function(){$("#addLine").modal("show");},200);
+                    }else{
+                        if(rectangle == true){
+                        	$("#addOrUpdateRectangleFlag").val("0"); // 如果是新增，给此文本框赋值为0
+                            setTimeout(function(){$("#rectangle-form").modal("show");},200);
+                            rectangle = false;
+                        }else{
+                        	$("#addOrUpdatePolygonFlag").val("0"); // 如果是新增，给此文本框赋值为0
+                        	setTimeout(function(){$("#myModal").modal("show");},200);
+                        };
+                    }
+                }else if(e.obj.CLASS_NAME == "AMap.Circle"){
+                	$("#addOrUpdateCircleFlag").val("0"); // 如果是新增，给此文本框赋值为0
+                    var center = e.obj.getCenter();
+                    var radius = e.obj.getRadius();
+                    $("#circle-lng").attr("value",center.lng);
+                    $("#circle-lat").attr("value",center.lat);
+                    $("#circle-radius").attr("value",radius);
+                    $("#circleArea").modal("show");
+                }else if(e.obj.CLASS_NAME == "AMap.Marker"){
+                	$("#addOrUpdateMarkerFlag").val("0"); // 如果是新增，给此文本框赋值为0
+                    var marker = e.obj.getPosition();
+                    $("#mark-lng").attr("value",marker.lng);
+                    $("#mark-lat").attr("value",marker.lat);
+                    $('#mark').modal("show");
+                };
+                $(".btn-off").on("click",function(){
+                	$(".fenceA").removeClass("fenceA-active");
+                	mouseTool.close(true);
+                    $(".modal").modal("hide");
+                    e.obj.hide();
+                });
+            });
+
+
+
+
+	      	//-----------------------------------------------
+		},
+		//围栏管理工具切换
+		fenceAClick: function(){
+	        $(".fenceA").removeClass("fenceA-active");
+	        $(this).addClass("fenceA-active");
+		},
+		//线
+	    doSubmits1: function(thisBtn){
+	        if(fenceManagementList.validate_line()){
+	        	thisBtn.disabled = true;
+	            $("#addLineForm").ajaxSubmit(function() {
+	                //  $("#addLine").close();
+	                $("#addLine").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                //layer.msg("保存成功");
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //标注
+	    doSubmits2: function(thisBtn){
+	        if (fenceManagementList.validate_marker()) {
+	        	thisBtn.disabled = true;
+	            $("#marker").ajaxSubmit(function() {
+	                //  $("#addLine").close();
+	                $("#mark").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                //layer.msg("保存成功");
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //圆
+	    doSubmits3: function(thisBtn){
+	        if (fenceManagementList.validate_circle()) {
+	        	thisBtn.disabled = true;
+	            $("#circles").ajaxSubmit(function() {
+
+	                //  $("#addLine").close();
+	                $("#circleArea").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                //layer.msg("保存成功");
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //矩形
+	    doSubmits4: function(thisBtn){
+	        if (fenceManagementList.validate_rectangle()) {
+	        	thisBtn.disabled = true;
+	            $("#rectangles").ajaxSubmit(function() {
+
+	                //  $("#addLine").close();
+	                $("#rectangle-form").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                //layer.msg("保存成功");
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //多边形
+	    doSubmits: function(thisBtn){
+	        if (fenceManagementList.validate_polygon()) {
+	        	thisBtn.disabled = true;
+	            $("#polygons").ajaxSubmit(function() {
+
+	                //  $("#addLine").close();
+	                $("#myModal").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                //layer.msg("保存成功");
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //轨迹
+	    doSubmits5: function(thisBtn){
+	        if (fenceManagementList.validate_orbit()) {
+	        	thisBtn.disabled = true;
+	            $("#orbit").ajaxSubmit(function () {
+	                $("#trajectory").modal("hide");
+	                $(".fenceA").removeClass("fenceA-active");
+	                mouseTool.close(true);
+	                window.location.reload();
+	            });
+	        }
+	    },
+	    //围栏预览
+	    preview: function(fenceId_shape){
+	        $('body,html').animate({'scrollTop':245},400)
+	        map.clearMap();
+	        // ajax访问后端查询
+	        $.ajax({
+	            type: "POST",
+	            url: "previewFence",
+	            data: {"fenceId_shape" : fenceId_shape},
+	            dataType: "json",
+	            success: function (data) {
+	                if (data.success) {
+	                    var dataList = data.obj;
+	                    if (dataList != null && dataList.length > 0) {
+	                        for (var i = 0; i < dataList.length; i++) {
+	                            var fenceType = dataList[i].fenceType;
+	                            var fenceData = dataList[i].fenceData;
+	                            if (fenceType == "zw_m_marker") { // 标注
+	                            	fenceManagementList.drawMark(fenceData, map);
+	                            } else if (fenceType == "zw_m_line") { // 线
+	                            	fenceManagementList.drawLine(fenceData, map);
+	                            } else if (fenceType == "zw_m_rectangle") { // 矩形
+	                            	fenceManagementList.drawRectangle(fenceData, map);
+	                            } else if (fenceType == "zw_m_polygon") { // 多边形
+	                            	fenceManagementList.drawPolygon(fenceData, map);
+	                            } else if (fenceType == "zw_m_circle") { // 圆形
+	                            	fenceManagementList.drawCircle(fenceData, map);
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    },
+	    updateFence: function(fenceId_shape){
+	        var strs = fenceId_shape.split("#");
+	        var fenceId = strs[0];
+	        var shape = strs[1];
+	        map.clearMap();
+	        $('body,html').animate({'scrollTop':245},400)
+	        // ajax访问后端查询
+	        $.ajax({
+	            type: "POST",
+	            url: "previewFence",
+	            data: {"fenceId_shape" : fenceId_shape},
+	            dataType: "json",
+	            success: function (data) {
+	                if (data.success) {
+	                    var dataList = data.obj;
+	                    if (dataList != null && dataList.length > 0) {
+	                    	$("#myPageTop").hide();
+	                    	$("#result").hide();
+	                    	$(".fenceA").removeClass("fenceA-active");
+	                    	mouseTool.close(true);
+	                        for (var i = 0; i < dataList.length; i++) {
+	                            var fenceType = dataList[i].fenceType;
+	                            var fenceData = dataList[i].fenceData;
+	                            var line = dataList[i].line;
+	                            var polygon = dataList[i].polygon;
+	                            if (fenceType == "zw_m_marker") { // 标注
+	                            	map.off("rightclick",amendLine);
+	                                map.off("rightclick",amendPolygon);
+	                                map.off("rightclick",amendCircle);
+	                                fenceManagementList.drawMark(fenceData, map);
+	                                polyFence.setDraggable(true);
+	                                polyFence.on("mouseup",function(e){
+	                                	$("#addOrUpdateMarkerFlag").val("1"); // 修改标注，给此文本框赋值为1
+	                                    $("#markerId").val(fenceId); // 标注id
+	                                	// 标注修改框弹出时给文本框赋值
+	                                	$("#markerName").val(fenceData.name);
+	                                	$("#markerType").val(fenceData.type);
+	                                	$("#markerDescription").val(fenceData.description);
+	                                    $("#mark-lng").attr("value",e.lnglat.lng);
+	                                    $("#mark-lat").attr("value",e.lnglat.lat);
+	                                    $('#mark').modal('show');
+	                                });
+	                            } else if (fenceType == "zw_m_line") { // 线
+	                            	fenceManagementList.drawLine(fenceData, map);
+	                                var lineEditor = new AMap.PolyEditor(map, polyFence);
+	                                lineEditor.open();
+	                               map.off("rightclick",amendCircle);
+	                               map.off("rightclick",amendPolygon);
+	                               amendLine = function(){
+	                            	   fenceManagementList.rightClickHandler(fenceType, line, fenceId);
+	                               };
+	                               map.on("rightclick",amendLine);
+	                            } else if (fenceType == "zw_m_rectangle") { // 矩形
+	                            	fenceManagementList.drawRectangle(fenceData, map);
+	                                mouseTool.rectangle();
+	                                rectangle = true;
+	                               	AMap.event.addListener(mouseTool, "draw", function(e){
+	                                	polyFence.setMap(null);
+	                                	var changeArray = e.obj.getPath();
+	                                    var pointSeqs = ""; // 点序号
+	                                    var longitudes = ""; // 所有的经度
+	                                    var latitudes = ""; // 所有的纬度
+	                                    var array = new Array();
+	                                    for(var i=0; i< changeArray.length; i++){
+	                                        array.push([changeArray[i].lng,changeArray[i].lat]);
+	                                    };
+	                                    for(var i=0; i<array.length; i++){
+	                                        $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(2)").text(array[i][0]);
+	                                        $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(3)").text(array[i][1]);
+	                                        pointSeqs += i + ","; // 点序号
+	                                        longitudes += array[i][0] + ","; // 把所有的经度组合到一起
+	                                        latitudes += array[i][1] + ","; // 把所有的纬度组合到一起
+	                                    }
+	                                    // 去掉点序号、经度、纬度最后的一个逗号
+	                                    if (pointSeqs.length > 0) {
+	                                        pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+	                                    }
+	                                    if (longitudes.length > 0) {
+	                                        longitudes = longitudes.substr(0, longitudes.length - 1);
+	                                    }
+	                                    if (latitudes.length > 0) {
+	                                        latitudes = latitudes.substr(0, latitudes.length - 1);
+	                                    }
+	                               		$("#addOrUpdateRectangleFlag").val("1"); // 修改矩形，给此文本框赋值为1
+	                                    $("#rectangleId").val(fenceId); // 矩形区域id
+	                               		// 矩形修改框弹出时给文本框赋值
+	                                   	$("#rectangleName").val(fenceData.name);
+	                                   	$("#rectangleType").val(fenceData.type);
+	                                   	$("#rectangleDescription").val(fenceData.description);
+	                                    $("#pointSeqsRectangles").val(pointSeqs);
+	                                    $("#longitudesRectangles").val(longitudes);
+	                                    $("#latitudesRectangles").val(latitudes);
+	                                    setTimeout(function(){$("#rectangle-form").modal("show");},200);
+	                                });
+	                                map.off("rightclick",amendLine);
+	                                map.off("rightclick",amendPolygon);
+	                                map.off("rightclick",amendCircle);
+	                            } else if (fenceType == "zw_m_polygon") { // 多边形
+	                            	fenceManagementList.drawPolygon(fenceData, map);
+	                                var polygonEditor = new AMap.PolyEditor(map, polyFence);
+	                                polygonEditor.open();
+	                                map.off("rightclick",amendCircle);
+	                                map.off("rightclick",amendLine);
+	                                amendPolygon = function(){
+	                                	fenceManagementList.rightClickHandler(fenceType, polygon, fenceId);
+	                                };
+	                                map.on("rightclick",amendPolygon);
+	                            } else if (fenceType == "zw_m_circle") { // 圆形
+	                            	fenceManagementList.drawCircle(fenceData, map);
+	                                var circleEditor= new AMap.CircleEditor(map, polyFence);
+	                                circleEditor.open();
+	                                map.off("rightclick",amendLine);
+	                                map.off("rightclick",amendPolygon);
+	                                amendCircle = function(){
+	                                	$("#addOrUpdateCircleFlag").val("1"); // 修改圆，给此文本框赋值为1
+	                                    $("#circleId").val(fenceId); // 圆形区域id
+	                            		// 圆形区域修改框弹出时给文本框赋值
+	                                	$("#circleName").val(fenceData.name);
+	                                	$("#circleType").val(fenceData.type);
+	                                	$("#circleDescription").val(fenceData.description);
+
+	                                    var center = polyFence.getCenter();
+	                                    var radius = polyFence.getRadius();
+	                                    $("#circle-lng").attr("value",center.lng);
+	                                    $("#circle-lat").attr("value",center.lat);
+	                                    $("#circle-radius").attr("value",radius);
+	                                    setTimeout(function(){$("#circleArea").modal("show")},200);
+	                                }
+	                                map.on("rightclick",amendCircle);
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    },
+	    //修改时右键点击事件:type-围栏类型；data-当前修改需要回显的数据
+	    rightClickHandler: function(type, data, fenceId){
+	    	var changeArray = polyFence.getPath();
+	        var pointSeqs = ""; // 点序号
+	        var longitudes = ""; // 所有的经度
+	        var latitudes = ""; // 所有的纬度
+	        var array = new Array();
+	        for(var i=0; i< changeArray.length; i++){
+	            array.push([changeArray[i].lng,changeArray[i].lat]);
+	        };
+	        for(var i=0; i<array.length; i++){
+	            $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(2)").text(array[i][0]);
+	            $("#table-lng-lat tbody tr:nth-child(" + parseInt(i+1) + ")").children("td:nth-child(3)").text(array[i][1]);
+	            pointSeqs += i + ","; // 点序号
+	            longitudes += array[i][0] + ","; // 把所有的经度组合到一起
+	            latitudes += array[i][1] + ","; // 把所有的纬度组合到一起
+	        }
+	        // 去掉点序号、经度、纬度最后的一个逗号
+	        if (pointSeqs.length > 0) {
+	            pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+	        }
+	        if (longitudes.length > 0) {
+	            longitudes = longitudes.substr(0, longitudes.length - 1);
+	        }
+	        if (latitudes.length > 0) {
+	            latitudes = latitudes.substr(0, latitudes.length - 1);
+	        }
+	    	if (type == "zw_m_line") {
+	    		$("#addOrUpdateLineFlag").val("1"); // 修改线路，给此文本框赋值为1
+	    		$("#lineId").val(fenceId); // 线路id
+	    		// 路线修改框弹出时给文本框赋值
+	        	$("#lineName1").val(data.name);
+	        	$("#lineType1").val(data.type);
+	        	$("#lineWidth1").val(data.width);
+	        	$("#lineDescription1").val(data.description);
+	            $("#pointSeqs").val(pointSeqs);
+	            $("#longitudes").val(longitudes);
+	            $("#latitudes").val(latitudes);
+	            setTimeout(function(){$("#addLine").modal("show");},200);
+	    	} else if (type == "zw_m_rectangle") {
+	    		$("#addOrUpdateRectangleFlag").val("1"); // 修改矩形，给此文本框赋值为1
+	            $("#rectangleId").val(fenceId); // 矩形区域id
+	    		// 矩形修改框弹出时给文本框赋值
+	        	$("#rectangleName").val(data.name);
+	        	$("#rectangleType").val(data.type);
+	        	$("#rectangleDescription").val(data.description);
+	            $("#pointSeqsRectangles").val(pointSeqs);
+	            $("#longitudesRectangles").val(longitudes);
+	            $("#latitudesRectangles").val(latitudes);
+	            setTimeout(function(){$("#rectangle-form").modal("show");},200);
+	    	} else if (type == "zw_m_polygon") {
+	    		$("#addOrUpdatePolygonFlag").val("1"); // 修改多边形，给此文本框赋值为1
+	            $("#polygonId").val(fenceId); // 多边形区域id
+	    		// 多边形修改框弹出时给文本框赋值
+	        	$("#polygonName").val(data.name);
+	        	$("#polygonType").val(data.type);
+	        	$("#polygonDescription").val(data.description);
+	            $("#pointSeqsPolygons").val(pointSeqs);
+	            $("#longitudesPolygons").val(longitudes);
+	            $("#latitudesPolygons").val(latitudes);
+	            setTimeout(function(){$("#myModal").modal("show");},200);
+	    	}
+	    },
+	    canclePreview: function(fenceId){
+	        map.clearMap();
+	    },
+	    //标注
+	    drawMark: function(mark, thisMap){
+	        var dataArr = [];
+	        dataArr.push(mark.longitude);
+	        dataArr.push(mark.latitude);
+	        polyFence = new AMap.Marker({
+	            position: dataArr
+	        });
+	        polyFence.setMap(thisMap);
+	        thisMap.setFitView(polyFence);
+	    },
+	    //线
+	    drawLine: function(line, thisMap){
+	       var dataArr = new Array();
+	       if (line != null && line.length > 0) {
+	           for (var i in line) {
+	               dataArr[i] = [line[i].longitude, line[i].latitude];
+	           }
+	       }
+	       polyFence = new AMap.Polyline({
+	           path: dataArr, //设置线覆盖物路径
+	           strokeColor: "#3366FF", //线颜色
+	           strokeOpacity: 1, //线透明度
+	           strokeWeight: 5, //线宽
+	           strokeStyle: "solid", //线样式
+	           strokeDasharray: [10, 5]
+	           //补充线样式
+	       });
+	       polyFence.setMap(thisMap);
+	       thisMap.setFitView(polyFence);
+	   },
+	   //矩形
+	   drawRectangle: function(rectangle, thisMap) {
+	        var dataArr = new Array();
+	        if (rectangle != null) {
+	            dataArr.push([rectangle.leftLongitude, rectangle.leftLatitude]); // 左上角
+	            dataArr.push([rectangle.rightLongitude, rectangle.leftLatitude]); // 右上角
+	            dataArr.push([rectangle.rightLongitude, rectangle.rightLatitude]); // 右下角
+	            dataArr.push([rectangle.leftLongitude, rectangle.rightLatitude]); // 左下角
+	        }
+	        polyFence = new AMap.Polygon({
+	            path: dataArr,//设置多边形边界路径
+	            strokeColor: "#FF33FF", //线颜色
+	            strokeOpacity: 0.2, //线透明度
+	            strokeWeight: 3, //线宽
+	            fillColor: "#1791fc", //填充色
+	            fillOpacity: 0.35
+	            //填充透明度
+	        });
+	        polyFence.setMap(thisMap);
+	        thisMap.setFitView(polyFence);
+	    },
+	    //多边形
+	    drawPolygon: function(polygon, thisMap){
+	        var dataArr = new Array();
+	        if (polygon != null && polygon.length > 0) {
+	            for (var i in polygon) {
+	                dataArr.push([polygon[i].longitude, polygon[i].latitude]);
+	            }
+	        }
+	        polyFence = new AMap.Polygon({
+	            path: dataArr,//设置多边形边界路径
+	            strokeColor: "#FF33FF", //线颜色
+	            strokeOpacity: 0.2, //线透明度
+	            strokeWeight: 3, //线宽
+	            fillColor: "#1791fc", //填充色
+	            fillOpacity: 0.35
+	            //填充透明度
+	        });
+	        polyFence.setMap(thisMap);
+	        thisMap.setFitView(polyFence);
+	    },
+	    //圆形
+	    drawCircle: function(circle, thisMap){
+	        polyFence = new AMap.Circle({
+	            center: new AMap.LngLat(circle.longitude, circle.latitude),// 圆心位置
+	            radius: circle.radius, //半径
+	            strokeColor: "#F33", //线颜色
+	            strokeOpacity: 1, //线透明度
+	            strokeWeight: 3, //线粗细度
+	            fillColor: "#ee2200", //填充颜色
+	            fillOpacity: 0.35
+	            //填充透明度
+	        });
+	        polyFence.setMap(thisMap);
+	        thisMap.setFitView(polyFence);
+	    },
+	    //全选
+	    checkAll: function(){
+	        $("input[name='subChk']").prop("checked",this.checked);
+	    },
+	    //单选
+	    subChkClick: function(){
+	        $("#checkAll").prop("checked",subChk.length ==subChk.filter(":checked").length ? true:false );
+	    },
+	    //批量删除
+	    delModelClick: function(){
+	        //判断是否至少选择一项
+	        var chechedNum=$("input[name='subChk']:checked").length;
+	        if(chechedNum==0){
+	        	layer.msg([[#{select.item}]]);
+	            return
+	        }
+	        var checkedList = new Array();
+	        $("input[name='subChk']:checked").each(function () {
+	            checkedList.push($(this).val());
+	        });
+	        myTable1.deleteItems({'deltems':checkedList.toString()});
+	    },
+	    //清除地图和右键功能，预防修改和其他操作同时进行
+	    deleteMap: function(){
+	    	fenceManagementList.removeRightEvent();
+	    	map.clearMap();
+	    },
+	    //清除右键功能
+	    removeRightEvent: function(){
+	    	map.off("rightclick",amendLine);
+	        map.off("rightclick",amendPolygon);
+	        map.off("rightclick",amendCircle);
+	    },
+	    //全选
+	    orBitCheckAll: function(){
+	        $("input[name='subChkOrBit']").prop("checked",this.checked);
+	    },
+	    //单选
+	    subChkOrBitClick: function(){
+	        $("#orBitCheckAll").prop("checked",subChkOrBit.length ==subChkOrBit.filter(":checked").length ? true:false );
+	    },
+	    //回车查询
+	    simpleQueryParamKeyup: function(event){
+			if (event.keyCode == "13") {
+				//回车执行查询
+				$('#enter').click();
+			}
+	    },
+	    //刷新
+	    refreshTable: function(){
+	    	$("#simpleQueryParam1").val("");
+	    	myTable1.filter();
+	    },
+	    inquire: function(){
+	    	map.clearMap();
+	    	pathList = [];
+	    	var pointSeqs = ""; // 点序号
+	        var longitudes = ""; // 所有的经度
+	        var latitudes = ""; // 所有的纬度
+	        var text1 = document.getElementById("startPoint").value;
+	        var text2 = document.getElementById("endPoint").value;
+	        var path = [];
+	        var arr = [];
+	        if(text1 !="" && text2 != ""){
+	        	hasSearch = true;
+	            path.push({keyword:text1});
+	            path.push({keyword:text2});
+	            var driving = new AMap.Driving({
+	                map: map,
+	                panel: "panel"
+	            });
+	            driving.setPolicy(AMap.DrivingPolicy.LEAST_DISTANCE);
+	            if(start_xy_right != undefined && end_xy_right != undefined /*&& text1 == old_start_name && text2 == old_end_name*/){
+	                driving.search(start_xy_right,end_xy_right,{waypoints:pass_point_array});
+	            }else{
+	                driving.search(path);
+	            };
+	            AMap.event.addListener(driving,"complete",function(e){
+	            	address_start = e.start.name;
+	                address_end = e.end.name;
+	                fenceManagementList.informationList(e);
+	                driving.clear();
+	                arr.push([e.origin.lng,e.origin.lat]);
+	                if(pass_point_array.length > 0){
+	                	for(var m = 0; m < pass_point_array.length; m++){
+	                		arr.push(pass_point_array[m]);
+	                	};
+	                };
+	                arr.push([e.destination.lng,e.destination.lat]);
+	                //拖拽插件
+	                map.plugin("AMap.DragRoute",function(){
+	                    var route = new AMap.DragRoute(map, arr, AMap.DrivingPolicy.LEAST_DISTANCE); //构造拖拽导航类
+	                    route.search(); //查询导航路径并开启拖拽导航
+	                    AMap.event.addListener(route,"complete",function(type,target,data){
+	                		start_xy_right = new AMap.LngLat(type.data.origin.lng,type.data.origin.lat);
+	                    	end_xy_right = new AMap.LngLat(type.data.destination.lng,type.data.destination.lat);
+	                        var waypoints = [];
+	                        var pass_inquire_point = [];
+	                        btnWaypoints = [];
+	                        pass_point_array = [];
+	                        var typeTarget = route.getWays();
+	                        if(typeTarget.length > 0){
+	                            for(var i = 0; i < typeTarget.length; i++){
+	                                waypoints.push([typeTarget[i].lng,typeTarget[i].lat]);
+	                                pass_inquire_point.push(new AMap.LngLat(typeTarget[i].lng,typeTarget[i].lat));
+	                                pass_point_array.push([typeTarget[i].lng,typeTarget[i].lat]);
+	                                btnWaypoints.push([typeTarget[i].lng,typeTarget[i].lat]);
+	                            };
+	                            var geocoder_inquire= new AMap.Geocoder({
+	                                radius: 1000,
+	                                extensions: "base"
+	                            });
+	                            var pass_point_inquire = [];
+	                            geocoder_inquire.getAddress(pass_inquire_point, function(status, result) {
+	                                if (status === 'complete' && result.info === 'OK') {
+	                                    for(var i = 0; i < result.regeocodes.length; i++){
+	                                    	pass_point_inquire.push(result.regeocodes[i].addressComponent.province + result.regeocodes[i].addressComponent.district + result.regeocodes[i].addressComponent.township);
+	                                    };
+	                                    $("#passPoint").attr("value",pass_point_inquire[0]);
+	                                    $("#passName").show();
+	                                    $("#pass_div").show();
+	                                    var html = "";
+	                                    if(pass_point_inquire.length > 1){
+	                                    	for(var s = 1; s < pass_point_inquire.length; s++){
+	                                        	html += '<div class="form-group navigationRoute"><label class="col-md-4 control-label">途经点：</label><div class="col-md-7 start-input"><input placeholder="" value="'+ pass_point_inquire[s] +'" name="passPoint" type="text" class="form-control" /> </div></div>'
+	                                        };
+	                                        $("#ssPass").html(html);
+	                                    }else{
+	                                    	$("#ssPass").html(html);
+	                                    }
+	                                    pass_point_inquire = [];
+	                                };
+	                            });
+	                        }else{
+	                        	$("#passName").hide();
+	                            $("#pass_div").hide();
+	                        };
+	                        var driving_agan = new AMap.Driving({
+	                            map:map,
+	                            panel:"panel",
+	                            hideMarkers:true
+	                        });
+	                        driving_agan.setPolicy(AMap.DrivingPolicy.LEAST_DISTANCE);
+	                        var start_xy = new AMap.LngLat(route.getRoute()[0].lng,route.getRoute()[0].lat);
+	                        var end_xy = new AMap.LngLat(route.getRoute()[route.getRoute().length-1].lng,route.getRoute()[route.getRoute().length-1].lat);
+	                        all_lng_lat.push(start_xy);
+	                        all_lng_lat.push(end_xy);
+	                        //逆地理编码
+	                        fenceManagementList.geocoder();
+	                        driving_agan.search(start_xy,end_xy,{waypoints:waypoints});
+	                        AMap.event.addListener(driving_agan,"complete",function(e){
+	                        	var m = 0;
+	                        	for(var i = 0; i < e.routes[0].steps.length; i++){
+	                        		for(var j = 0; j < e.routes[0].steps[i].path.length; j++){
+	                        			pathList.push([e.routes[0].steps[i].path[j].lng,e.routes[0].steps[i].path[j].lat]);
+	                        			pointSeqs += (m++) + ",";
+	                        			longitudes += e.routes[0].steps[i].path[j].lng + ",";
+	                        			latitudes += e.routes[0].steps[i].path[j].lat + ",";
+	                        		}
+	                        	};
+	                        	if (pointSeqs.length > 0) {
+	                        		pointSeqs = pointSeqs.substr(0, pointSeqs.length - 1);
+	                        	}
+	                        	if (longitudes.length > 0) {
+	                        		longitudes = longitudes.substr(0, longitudes.length - 1);
+	                        	}
+	                        	if (latitudes.length > 0) {
+	                        		latitudes = latitudes.substr(0, latitudes.length - 1);
+	                        	}
+	                        	$("#pointSeqsA2B").val(pointSeqs);
+	                            $("#longitudesA2B").val(longitudes);
+	                            $("#latitudesA2B").val(latitudes);
+	                            $("#descriptionA2B").val(text1 + "  到   " + text2);
+	                            fenceManagementList.informationList(e);
+	                            $("#result").show();
+	                            driving_agan.clear();
+	                        });
+	                        temp = route.getRoute();
+	                    });
+	                });
+	            });
+	        }else{
+	        	layer.msg("请完善起点和终点！");
+	        }
+	    },
+	    //绘制驾车导航路段
+	    driveDrawFoldline: function(num){
+	        var drawpath = new Array();
+	        drawpath = steps[num].path;
+	        if(polyline != null){
+	            polyline.setMap(null);
+	        }
+	        polyline = new AMap.Polyline({
+	                map: map,
+	                path: drawpath,
+	                strokeColor: "#FF3030",
+	                strokeOpacity: 0.9,
+	                strokeWeight: 8,
+	                zIndex:100,
+	                strokeDasharray: [10, 5]
+	            });
+
+	        map.setFitView(polyline);
+	    },
+	    //逆地理编码
+	    geocoder: function(){
+	        var geocoder = new AMap.Geocoder({
+	            radius: 1000,
+	            extensions: "base"
+	        });
+	        geocoder.getAddress(all_lng_lat, function(status, result) {
+	            if (status === 'complete' && result.info === 'OK') {
+	            	fenceManagementList.geocoder_CallBack(result);
+	            }
+	        });
+	        all_lng_lat = [];
+	    },
+	    geocoder_CallBack: function(data){
+	        address_start = data.regeocodes[0].addressComponent.province + data.regeocodes[0].addressComponent.district + data.regeocodes[0].addressComponent.township; //返回地址描述
+	        address_end = data.regeocodes[1].addressComponent.province + data.regeocodes[1].addressComponent.district + data.regeocodes[1].addressComponent.township;
+	    },
+	  	//列表显示详情
+	    informationList: function(e){
+	        var routeS = e.routes;
+	        var direction_icon;
+	        if (routeS.length <= 0){
+	            document.getElementById("result").innerHTML = "未查找到任何结果!<br />建议：<br />1.请确保所有字词拼写正确。<br />2.尝试不同的关键字。<br />3.尝试更宽泛的关键字。";
+	        }
+	        else{
+	            route_text="";
+	            for(var v =0; v< routeS.length;v++){
+	                //驾车步骤数
+	                steps = routeS[v].steps
+	                for(var i=0 ;i< steps.length;i++){
+	                    if(steps[i].action == "左转"){
+	                        direction_icon = "turn-left";
+	                    }else if(steps[i].action == "右转"){
+	                        direction_icon = "turn-right";
+	                    }else if(steps[i].action == "向左前方行驶"){
+	                        direction_icon = "turn-leftup";
+	                    }else if(steps[i].action == "向右前方行驶"){
+	                        direction_icon = "turn-rightup";
+	                    }else if(steps[i].action == "靠左"){
+	                        direction_icon = "turn-keepleft";
+	                    }else if(steps[i].action == "靠右"){
+	                        direction_icon = "turn-keepright";
+	                    }else if(steps[i].action == ""){
+	                        direction_icon = "turn-advance";
+	                    };
+	                    route_text += "<dt class=\"route " + direction_icon + "\" onClick=\"fenceManagementList.driveDrawFoldline('" + i + "')\" index=\"0\"><div class=\"beforedt\"></div><div class=\"afterdt\"></div>" + steps[i].instruction + "</dt>";
+	                }
+	            }
+	            var road_array = [];
+	            for(var r = 0; r < e.routes[0].steps.length; r++){
+	                if(e.routes[0].steps[r].road != ""){
+	                    road_array.push(e.routes[0].steps[r].road);
+	                };
+	            };
+	            for(var a = 0; a < road_array.length; a++){
+	                if(road_array[a] == road_array[a+1]){
+	                    road_array.splice(a,1);
+	                };
+	            };
+	            var road_title = "";
+	            for(var s = 0; s < road_array.length; s++){
+	                road_title += road_array[s] + ">";
+	            };
+	            var road_text = "";
+	            if(road_array.length <= 4){
+	                for(var t = 0; t < road_array.length; t++){
+	                    road_text += road_array[t] + ">";
+	                }
+	            }else{
+	                road_text = road_array[0] + ">" + road_array[1] + ">......>" + road_array[road_array.length-2] + ">" + road_array[road_array.length-1];
+	            };
+	            //输出行车路线指示
+	            $("#startPoint").val(address_start);
+	            $("#endPoint").val(address_end);
+	            route_text = "<div class=\"amap-lib-driving\"><div class=\"planTitle\"><h3 title=\"" + road_title+ "\"><b>" + road_text + "</b></h3></div><dl style=\"display:block\" class=\"plan plan-nobus\"><dt class=\"start\"><div class=\"beforedt\"></div><div class=\"afterdt\"></div><b>" + address_start + "</b></dt>" + route_text + "<dt class=\"end\"><div class=\"beforedt\"></div><b>" + address_end +"</b></dt></dl></div>";
+	            document.getElementById("result").innerHTML = route_text;
+	        };
+	    },
+	  	//保存
+	    save: function(){
+	    	if (submitFlag6) {  // 防止重复提交
+	    		return;
+	    	}else{
+	    		var text1 = $("#startPoint").val();
+	    	    var text2 = $("#endPoint").val();
+	    	    var ps = $("#pointSeqsA2B").val();
+	    	    var lon = $("#longitudesA2B").val();
+	    	    var lat = $("#latitudesA2B").val();
+	    	    if (ps == null || lon == null || lat == null || ps == "" || lon == "" || lat == "") {
+	    	    	layer.msg("请输入起点、终点，点击查询后再保存哦");
+	    	    	return ;
+	    	    }
+	    		if (fenceManagementList.validate_A2B()) {
+	    			submitFlag6 = true;
+	    			layer.closeAll();
+	    			layer.load(2);
+	    		    $("#a2B").ajaxSubmit(function() {
+	    		    	layer.msg("保存成功");
+	    		        window.location.reload();
+	    		    })
+	    		}
+	    	}
+	    },
+	    search: function(obj){
+	        //清除地图上所有覆盖物
+	        for (var i = 0, l = polygons.length; i < l; i++) {
+	            polygons[i].setMap(null);
+	        }
+	        var option = obj[obj.options.selectedIndex];
+	        var keyword = option.text; //关键字
+	        district.setLevel(option.value); //行政区级别
+	        district.setExtensions('all');
+	        //行政区查询
+	        district.search(keyword, function(status, result) {
+	            getData(result);
+	        });
+	    },
+	    setCenter: function(obj){
+	        map.setCenter(obj[obj.options.selectedIndex].center)
+	    },
+        //卫星地图及3D地图切换
+        showSetMapChange3D: function(){
+            if(isMapThreeDFlag){
+                $("#showSetMap").addClass("map-active");
+                buildings.setMap(null);
+                satellLayer.show();
+                isMapThreeDFlag = false;
+            }else{
+                $("#showSetMap").removeClass("map-active");
+                buildings.setMap(map);
+                satellLayer.hide();
+                isMapThreeDFlag = true;
+            }
+        },
+        closeAtoB: function(){
+        	map.off("rightclick",amendLine);
+            map.off("rightclick",amendPolygon);
+            map.off("rightclick",amendCircle);
+        	contextMenu.close();
+        	map.clearMap();
+        	$("#myPageTop").hide();
+        	$("#result").hide();
+        	$("#aTOb").removeClass("fenceA-active");
+
+        	$("#nameA2B").val("");
+        	$("#widthA2B").val("");
+        	$("#startPoint").val("");
+        	$("#passPoint").val("");
+        	$("#endPoint").val("");
+        },
+        clearData: function(){
+        	$("#startPoint").attr("value","");
+        	$("#endPoint").attr("value","");
+        	$("#ssPass").html("");
+        	$("#passName").css("display","none");
+        	$("#pass_div").css("display","none");
+        	start_xy_right = undefined;
+        	end_xy_right = undefined;
+        	pass_xy_right = undefined;
+        	$("#myPageTop").hide();
+        	$("#result").hide();
+        },
+        //去除array中相邻的重复点
+        removeAdjoinRepeatPoint: function(array){
+        	//去除array中相邻的重复点
+            var tempArray = new Array();
+            if (null != array && array.length > 1) {
+            	tempArray.push([array[0][0], array[0][1]]);
+            	for (var i=1; i<array.length; i++) {
+                	var templongtitude = array[i][0];
+                	var templatitude = array[i][1];
+                	if (templongtitude == array[i-1][0] && templatitude == array[i-1][1]) {
+                		continue;
+                	} else {
+                		tempArray.push([templongtitude, templatitude]);
+                	}
+                }
+            	array = tempArray;
+            }
+            return array;
+        },
+        //保存行政区域
+        areaSaveClick: function(){
+            var province = $("#province option:selected").text();
+            var city = $("#city option:selected").text();
+            var district = $("#district option:selected").text();
+            var biz_area = $("#biz_area option:selected").text();
+        },
+      	//AB点
+      	aTObClick: function(){
+        	mouseTool.close(true);
+        	fenceManagementList.clearData();
+        	map.clearMap();
+        	$("#myPageTop").show();
+      	},
+      	startPointClick: function(){
+        	autoOptions.input = "startPoint";
+        	new AMap.Autocomplete(autoOptions);
+      	},
+      	endPointClick: function(){
+        	autoOptions.input = "endPoint";
+        	new AMap.Autocomplete(autoOptions);
+      	},
+      	startPointKeyDown: function(event){
+        	var e = event || window.event || arguments.callee.caller.arguments[0];
+        	if(e && e.keyCode == 13){
+        		fenceManagementList.inquire();
+        	};
+      	},
+      	endPointKeyDown: function(event){
+        	var e = event || window.event || arguments.callee.caller.arguments[0];
+        	if(e && e.keyCode == 13){
+        		fenceManagementList.inquire();
+        	};
+      	},
+      	//清空标注
+      	clearMarker: function(){
+      		$("#addOrUpdateMarkerFlag").val("0");
+      	    $("#markerId").val("");
+      		$("#markerName").val("");
+      		$("#markerDescription").val("");
+      	    $("#mark-lng").attr("value","");
+      	    $("#mark-lat").attr("value","");
+      	},
+     	//清空线路
+      	clearLine: function(){
+      		$("#addOrUpdateLineFlag").val("0");
+      		$("#lineId").val("");
+      		$("#lineName1").val("");
+      		$("#lineWidth1").val("");
+      		$("#lineDescription1").val("");
+      	    $("#pointSeqs").val("");
+      	    $("#longitudes").val("");
+      	    $("#latitudes").val("");
+      	},
+     	//清空矩形
+      	clearRectangle: function(){
+      		$("#addOrUpdateRectangleFlag").val("0");
+      	    $("#rectangleId").val("");
+      		$("#rectangleName").val("");
+      		$("#rectangleDescription").val("");
+      	    $("#pointSeqsRectangles").val("");
+      	    $("#longitudesRectangles").val("");
+      	    $("#latitudesRectangles").val("");
+      	},
+     	//清空多边形
+      	clearPolygon: function(){
+      		$("#addOrUpdatePolygonFlag").val("0");
+      	    $("#polygonId").val("");
+      		$("#polygonName").val("");
+      		$("#polygonDescription").val("");
+      	    $("#pointSeqsPolygons").val("");
+      	    $("#longitudesPolygons").val("");
+      	    $("#latitudesPolygons").val("");
+      	},
+      	//清空圆形
+      	clearCircle: function(){
+      		$("#addOrUpdateCircleFlag").val("0");
+      	    $("#circleId").val("");
+      		$("#circleName").val("");
+      		$("#circleDescription").val("");
+      	    $("#circle-lng").attr("value","");
+      	    $("#circle-lat").attr("value","");
+      	    $("#circle-radius").attr("value","");
+      	},
+     	//线路添加时验证
+      	validate_line: function(){
+      		return	$("#addLineForm").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				width : {
+      					required : true,
+      					maxlength : 10
+      				},
+      				description : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : lineNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				width : {
+      					required : deviationNull,
+      					maxlength : "长度不超过10"
+      				},
+      				description : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+      	//标注添加时验证
+      	validate_marker: function(){
+      		return	$("#marker").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 50
+      				},
+      				description : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : markerNameNull,
+      					maxlength : "长度不超过50"
+      				},
+      				description : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+      	//轨迹添加时验证
+      	validate_orbit: function(){
+      		return	$("#orbit").validate({
+      			rules : {
+      				lineName : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				lineWidth : {
+      					required : true,
+      					maxlength : 10
+      				},
+      				lineDescription : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				lineName : {
+      					required : lineNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				lineWidth : {
+      					required : deviationNull,
+      					maxlength : "长度不超过10"
+      				},
+      				lineDescription : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+     	//ab点添加时验证
+      	validate_A2B: function(){
+      		return	$("#a2B").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				width : {
+      					required : true,
+      					maxlength : 10
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : lineNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				width : {
+      					required : deviationNull,
+      					maxlength : "长度不超过10"
+      				}
+      			}
+      		}).form();
+      	},
+      	//矩形添加时验证
+      	validate_rectangle: function(){
+      		return	$("#rectangles").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				type : {
+      					required : false,
+      					maxlength : 20
+      				},
+      				description : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : areaNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				type : {
+      					required : deviationNull,
+      					maxlength : "长度不超过20"
+      				},
+      				description : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+     	//圆形区域添加时验证
+      	validate_circle: function(){
+      		return	$("#circles").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				type : {
+      					required : false,
+      					maxlength : 20
+      				},
+      				description : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : areaNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				type : {
+      					required : "请选择区域类型",
+      					maxlength : "长度不超过20"
+      				},
+      				description : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+      	//多边形区域添加时验证
+      	validate_polygon: function(){
+      		return	$("#polygons").validate({
+      			rules : {
+      				name : {
+      					required : true,
+      					maxlength : 20
+      				},
+      				type : {
+      					required : false,
+      					maxlength : 20
+      				},
+      				description : {
+      					maxlength : 100
+      				}
+      			},
+      			messages : {
+      				name : {
+      					required : areaNameNull,
+      					maxlength : "长度不超过20"
+      				},
+      				type : {
+      					required : "请选择区域类型",
+      					maxlength : "长度不超过20"
+      				},
+      				description : {
+      					maxlength : "长度不超过100"
+      				}
+      			}
+      		}).form();
+      	},
+     	//清除错误信息
+      	clearErrorMsg: function(){
+      		$("label.error").hide();
+      		$(".error").removeClass("error");
+      	},
+	    //other
+
+
+	}
+
+	$(function(){
+
+		fenceManagementList.init();
+
+		window.onload = function() {
+			map.plugin(["AMap."], function() {
+				map.addControl(new AMap.ToolBar());
+			});
+			if(location.href.indexOf('&guide=1')!==-1){
+				map.setStatus({scrollWheel:false})
+			}
+		}
+
+		//围栏管理工具切换
+	    $(".fenceA").bind("click",fenceManagementList.fenceAClick);
+		//线
+		$("#threadSave").bind("click",fenceManagementList.doSubmits1);
+	    //标注
+		$("#annotatedSave").bind("click",fenceManagementList.doSubmits2);
+	    //圆
+	    $("#roundSave").bind("click",fenceManagementList.doSubmits3);
+	    //矩形
+	    $("#rectangleSave").bind("click",fenceManagementList.doSubmits4);
+	    //多边形
+	    $("#polygonSave").bind("click",fenceManagementList.doSubmits);
+	    //轨迹
+	    $("#trackSave").bind("click",fenceManagementList.doSubmits5);
+	    //全选
+	    $("#checkAll").bind("click",fenceManagementList.checkAll);
+	    //单选
+	    subChk.bind("click",fenceManagementList.subChkClick);
+	    //批量删除
+	    $("#del_model").bind("click",fenceManagementList.delModelClick);
+	    //全选
+	    $("#orBitCheckAll").bind("click",fenceManagementList.orBitCheckAll);
+	    //单选
+	    subChkOrBit.bind("click",fenceManagementList.subChkOrBitClick);
+	    //回车查询
+	    $('#simpleQueryParam1').bind('keyup',fenceManagementList.simpleQueryParamKeyup);
+	    //刷新
+		$("#refreshTable").bind("click",fenceManagementList.refreshTable);
+        //卫星地图及3D地图切换
+        $("#showSetMap").bind("click",fenceManagementList.showSetMapChange3D);
+      	//保存行政区域
+        $("#areaSave").bind("click",fenceManagementList.areaSaveClick);
+      	//AB点
+        $("#aTOb").bind("click",fenceManagementList.aTObClick);
+        $("#startPoint").bind("click",fenceManagementList.startPointClick);
+        $("#endPoint").bind("click",fenceManagementList.endPointClick);
+        $("#startPoint").bind("keydown",fenceManagementList.startPointKeyDown);
+        $("#endPoint").bind("keydown",fenceManagementList.endPointKeyDown);
+
+	})
+</script>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+</body>
+</html>

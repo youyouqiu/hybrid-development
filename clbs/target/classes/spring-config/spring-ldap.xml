@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:ldap="http://www.springframework.org/schema/ldap"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/ldap 
+       http://www.springframework.org/schema/ldap/spring-ldap.xsd">
+
+    <context:annotation-config />
+
+    <ldap:context-source id="TcontextSource"
+                         url="${ldap.url}"
+                         base="${ldap.base}"
+                         username="${ldap.userDn}"
+                         password="${ldap.password}">
+        <ldap:pooling
+                test-on-borrow="true"
+                test-while-idle="true" max-active = "100" max-total="200" max-idle="50"/>
+    </ldap:context-source>
+
+    <ldap:ldap-template id="ldapTemplate" context-source-ref="TcontextSource"/>
+
+    <ldap:repositories base-package="com.zw.platform.domain.core,com.zw.adas.domain.core" />
+
+    <bean class="com.zw.platform.domain.core.impl.GroupRepoImpl" />
+
+    <bean class="com.zw.platform.domain.core.impl.DepartmentRepoImpl" />
+
+    <bean class="org.springframework.ldap.core.support.BaseLdapPathBeanPostProcessor" />
+    <!--主动安全配置文件-->
+    <!--    <bean class="com.zw.adas.service.core.impl.AdasUserServiceImpl">-->
+    <!--        <property name="directoryType" value="NORMAL"/>-->
+    <!--    </bean>-->
+    <import resource="classpath:spring-config/spring-adas-ldap.xml"/>
+</beans>

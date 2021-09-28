@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.BrandDao">
+   <!-- 新增品牌 -->
+    <insert id="addBrand" parameterType="com.zw.platform.domain.basicinfo.form.BrandForm">
+        insert into zw_m_brand (id, brand_name,
+		describtion, flag, create_data_time,
+		create_data_username)
+		values (#{id}, #{brandName}, #{describtion},
+		#{flag},
+		#{createDataTime}, #{createDataUsername})
+    </insert>
+   <!-- 新增机型 -->
+    <insert id="addBrandModels" parameterType="com.zw.platform.domain.basicinfo.form.BrandModelsForm">
+        insert into zw_m_brand_models (id, brand_id,model_name,
+		describtion, flag, create_data_time,
+		create_data_username)
+		values (#{id}, #{brandId}, #{modelName}, #{describtion},
+		#{flag},
+		#{createDataTime}, #{createDataUsername})
+    </insert>
+	<!--根据名称查找品牌-->
+	<select id="findBrandByName" parameterType="string" resultType="com.zw.platform.domain.basicinfo.BrandInfo">
+		SELECT brandinfo.* FROM  zw_m_brand brandinfo
+		WHERE flag = 1
+		<if test="name != null and name != ''">
+			AND brand_name = BINARY #{name}
+		</if>
+	</select>
+	<!--根据名称查找机型-->
+	<select id="findBrandModelsByName" parameterType="string" resultType="com.zw.platform.domain.basicinfo.BrandModelsInfo">
+		SELECT brandmodelsinfo.* FROM  zw_m_brand_models brandmodelsinfo
+		WHERE flag = 1
+		<if test="name != null and name != ''">
+			AND model_name = BINARY #{name}
+		</if>
+	</select>
+	<!--根据id查询品牌-->
+	<select id="getBrand" parameterType="string" resultType="com.zw.platform.domain.basicinfo.BrandInfo">
+		SELECT * FROM  zw_m_brand WHERE id = #{id} AND  flag = 1
+	</select>
+	<!--根据id查询机型-->
+	<select id="getBrandModels" parameterType="string" resultType="com.zw.platform.domain.basicinfo.BrandModelsInfo">
+		SELECT brandmodels.*,(SELECT brand_name from zw_m_brand where id=brandmodels.brand_id and flag=1) brandName FROM  zw_m_brand_models brandmodels WHERE id = #{id} AND  flag = 1
+	</select>
+
+	<!--根据品牌id查询机型-->
+	<select id="findBrandModelsByBrandId" parameterType="string" resultType="com.zw.platform.domain.basicinfo.BrandModelsInfo">
+		SELECT id,bm.model_name AS modelName FROM zw_m_brand_models bm WHERE bm.flag =1 AND bm.brand_id = #{id}
+	</select>
+
+	<!--修改品牌-->
+	<update id="updateBrand" parameterType="com.zw.platform.domain.basicinfo.form.BrandForm">
+		UPDATE zw_m_brand SET
+        brand_name = #{brandName}, describtion = #{describtion},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+	</update>
+	<!--修改机型-->
+	<update id="updateBrandModels" parameterType="com.zw.platform.domain.basicinfo.form.BrandModelsForm">
+		UPDATE zw_m_brand_models SET
+        model_name = #{modelName}, describtion = #{describtion},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+	</update>
+	<!-- 根据条件查询flog为1的所有品牌 -->
+	<select id="findBrand" parameterType="com.zw.platform.domain.basicinfo.query.BrandQuery" resultType="com.zw.platform.domain.basicinfo.BrandInfo">
+		SELECT brandinfo.* FROM zw_m_brand brandinfo where flag=1
+		<if test="brandName != null and brandName!=''">
+			AND brand_name LIKE BINARY
+			CONCAT('%',#{brandName},'%')
+		</if>
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 根据条件查询flog为1的所有机型 -->
+	<select id="findBrandModels" parameterType="com.zw.platform.domain.basicinfo.query.BrandModelsQuery" resultType="com.zw.platform.domain.basicinfo.BrandModelsInfo">
+		SELECT brandmodeldsinfo.*,brand.brand_name as brandName FROM zw_m_brand_models brandmodeldsinfo
+		INNER JOIN zw_m_brand brand ON brand.id=brandmodeldsinfo.brand_id
+		where brandmodeldsinfo.flag=1 AND  brand.flag=1
+		<if test="simpleQueryParam != null and simpleQueryParam!=''">
+			AND (brand.brand_name LIKE BINARY
+			CONCAT('%',#{simpleQueryParam},'%')
+			OR BINARY brandmodeldsinfo.model_name LIKE
+			CONCAT('%',#{simpleQueryParam},'%'))
+		</if>
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 查询品牌导出 -->
+	<select id="findBrandExport"  resultType="com.zw.platform.domain.basicinfo.form.BrandForm">
+		SELECT brand.* FROM zw_m_brand brand where flag=1
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 查询机型导出 -->
+	<select id="findBrandModelsExport"  resultType="com.zw.platform.domain.basicinfo.form.BrandModelsForm">
+		SELECT brandmodels.*,(SELECT brand_name from zw_m_brand where id=brandmodels.brand_id and flag=1) brandName FROM zw_m_brand_models brandmodels
+		where flag=1
+		ORDER BY create_data_time DESC
+	</select>
+	<!-- 批量新增品牌 -->
+	<insert id="addBrandMore" parameterType="com.zw.platform.domain.basicinfo.form.BrandForm">
+		INSERT INTO zw_m_brand (id, brand_name, describtion,flag,create_data_time,create_data_username)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+				 separator=",">
+			(#{item.id}, #{item.brandName}, #{item.describtion},#{item.flag},
+			#{item.createDataTime}, #{item.createDataUsername})
+		</foreach>
+	</insert>
+	<!-- 批量新增机型 -->
+	<insert id="addBrandModelsMore" parameterType="com.zw.platform.domain.basicinfo.form.BrandModelsForm">
+		INSERT INTO zw_m_brand_models (id, brand_id,model_name, describtion,flag,create_data_time,create_data_username)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+				 separator=",">
+			(#{item.id}, #{item.brandId},#{item.modelName}, #{item.describtion},#{item.flag},
+			#{item.createDataTime}, #{item.createDataUsername})
+		</foreach>
+	</insert>
+	<!--判断品牌是否绑定机型-->
+	<select id="getIsBandModel" parameterType="string" resultType="int">
+		SELECT count(*) from zw_m_brand_models WHERE
+		flag=1
+		and
+		brand_id = #{id}
+	</select>
+	<!--批量判断品牌是否绑定机型-->
+	<select id="getIsBandModelByBatch"  resultType="int">
+		SELECT count(*) from zw_m_brand_models WHERE
+		flag=1
+		and
+		brand_id in
+		<foreach item="idItem" collection="list" open="(" separator=","
+				 close=")">
+			#{idItem}
+		</foreach>
+	</select>
+	<!-- 根据id删除一个品牌 -->
+	<update id="deleteBrandById">
+		update zw_m_brand set flag = 0 WHERE id = #{id}
+	</update>
+	<!-- 根据id批量品牌 -->
+	<update id="deleteBrandByBatch">
+		update zw_m_brand set flag = 0 WHERE id in
+		<foreach item="idItem" collection="list" open="(" separator=","
+				 close=")">
+			#{idItem}
+		</foreach>
+	</update>
+	<!-- 根据id删除一个机型 -->
+	<update id="deleteBrandModelsById">
+		update zw_m_brand_models set flag = 0 WHERE id = #{id}
+	</update>
+	<!-- 批量删除机型 -->
+	<update id="deleteBrandModelsByBatch">
+		update zw_m_brand_models set flag = 0 WHERE id in
+		<foreach item="idItem" collection="list" open="(" separator=","
+				 close=")">
+			#{idItem}
+		</foreach>
+	</update>
+	<select id="countBrandAndBrandModel" parameterType="string" resultType="com.zw.platform.domain.basicinfo.form.BrandModelsForm">
+		SELECT bm.* FROM zw_m_brand_models bm
+		INNER JOIN zw_m_brand b ON b.id = bm.brand_id
+		WHERE bm.model_name = BINARY #{modelName} AND b.brand_name = BINARY #{brandName}
+	</select>
+</mapper>

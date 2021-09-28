@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.DrivingRecordReportDao">
+    <insert id="addDrivingRecordInfo" parameterType="com.zw.platform.domain.reportManagement.DrivingRecordInfo">
+        INSERT INTO zw_m_driving_record_collection (
+        id,monitor_id,monitor_name,group_name,
+        collection_command,collection_command_describe,msgSNAck,create_data_time,
+        create_data_username,update_data_username)
+        VALUES (
+        #{id},#{monitorId},#{monitorName},#{groupName},
+        #{collectionCommand},#{collectionCommandDescribe},#{msgSNAck},#{createDataTime},
+        #{createDataUsername},#{updateDataUsername})
+    </insert>
+
+    <update id="updateDrivingRecordInfo" parameterType="com.zw.platform.domain.reportManagement.DrivingRecordInfo">
+        UPDATE
+        zw_m_driving_record_collection
+        SET message = #{message},update_data_time = #{updateDataTime}
+        WHERE id = #{id} AND flag = 1
+    </update>
+
+    <select id="getDrivingRecordDataByMonitionId" resultType="com.zw.platform.domain.reportManagement.DrivingRecordInfo">
+        SELECT
+        monitor_id,
+        monitor_name,
+        group_name,
+        collection_command_describe,
+        message,
+        create_data_time,
+        update_data_time
+        FROM zw_m_driving_record_collection
+        WHERE monitor_id IN
+        <foreach item="item" collection="monitorIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        AND create_data_time BETWEEN #{queryStartTime} AND #{queryEndTime} AND flag = 1 ORDER BY create_data_time DESC
+    </select>
+
+    <select id="getDrivingRecordByMsgSNAck" parameterType="com.zw.platform.domain.reportManagement.query.DrivingRecordInfoQuery"
+            resultType="com.zw.platform.domain.reportManagement.DrivingRecordInfo">
+        SELECT
+        id,
+        create_data_time
+        FROM zw_m_driving_record_collection
+        WHERE monitor_id = #{monitorId} AND msgSNAck = #{msgSNAck} AND collection_command = #{collectionCommand}
+        AND create_data_time BETWEEN #{minDate} AND #{maxDate} AND flag = 1
+    </select>
+</mapper>

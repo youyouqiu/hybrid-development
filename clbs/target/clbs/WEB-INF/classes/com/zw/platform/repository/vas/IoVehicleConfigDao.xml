@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.IoVehicleConfigDao">
+
+
+    <!-- 新增 -->
+    <insert id="add" parameterType="com.zw.platform.domain.vas.switching.IoVehicleConfig">
+        INSERT INTO zw_m_io_vehicle_config (
+        id, flag,create_data_time,create_data_username,io_site,function_id,vehicle_id,io_type,high_signal_type,low_signal_type
+        )
+        VALUES(
+        #{id}, #{flag}, #{createDataTime},#{createDataUsername},#{ioSite}, #{functionId},#{vehicleId}, #{ioType}, #{highSignalType}, #{lowSignalType}
+        )
+    </insert>
+
+    <!-- 批量新增 -->
+    <insert id="addBatch" parameterType="java.util.List">
+        INSERT INTO zw_m_io_vehicle_config (
+        id,
+        flag,create_data_time,create_data_username,io_site,function_id,vehicle_id,io_type,high_signal_type,low_signal_type
+        )
+        VALUES
+        <foreach collection="ioVehicleConfigs" item="item" index="index" separator=",">
+            (#{item.id}, #{item.flag}, #{item.createDataTime},#{item.createDataUsername},#{item.ioSite},
+            #{item.functionId},#{item.vehicleId}, #{item.ioType}, #{item.highSignalType}, #{item.lowSignalType})
+        </foreach>
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateIoConfig" parameterType="com.zw.platform.domain.vas.switching.IoVehicleConfig">
+        UPDATE zw_m_io_vehicle_config SET
+        io_site = #{ioSite},
+        function_id = #{functionId},
+        vehicle_id = #{vehicleId},
+        io_type = #{ioType},
+        high_signal_type = #{highSignalType},
+        low_signal_type = #{lowSignalType},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id}
+    </update>
+
+
+
+    <select id="findByPageRedis" parameterType="list" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT DISTINCT v.id AS vehicle_id,c.id as seting_id,c.id as id, v.brand, vt.vehicle_type, v.group_id groups
+        FROM zw_m_vehicle_info v
+        LEFT JOIN zw_m_io_vehicle_config c ON c.vehicle_id = v.id AND c.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1
+        WHERE v.flag = 1
+        AND v.id IN
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY v.`id`
+        ORDER BY v.create_data_time DESC,v.id ASC
+    </select>
+
+    <!-- 查询  -->
+    <select id="findByPage" parameterType="com.zw.platform.util.common.BaseQueryBean" resultType="com.zw.platform.domain.vas.switching.SwitchingSignal">
+        SELECT  DISTINCT v.id AS vehicle_id,c.id as seting_id,c.id as id, v.brand, vt.vehicle_type, v.group_id groups
+        FROM zw_m_vehicle_info v
+        INNER JOIN `zw_m_config` con ON v.id =  con.vehicle_id AND con.flag = 1
+        INNER JOIN zw_m_device_info di ON con.device_id = di.id AND di.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id =  au.assignment_id AND au.flag = 1
+        LEFT JOIN zw_m_io_vehicle_config c ON c.vehicle_id = v.id AND c.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1
+        WHERE v.flag = 1
+        AND au.user_id = #{userId}
+        AND v.brand NOT LIKE '扫%'
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="param != null">
+            <if test="param.simpleQueryParam != null and param.simpleQueryParam!=''">
+                AND v.brand LIKE CONCAT('%',#{param.simpleQueryParam},'%')
+            </if>
+            <if test="param.groupId != null and param.groupId!=''">
+                AND a.org_id = #{param.groupId}
+            </if>
+            <if test="param.assignmentId != null and param.assignmentId!=''">
+                AND a.id = #{param.assignmentId}
+            </if>
+            <if test="param.protocol != null and param.protocol!=''">
+                AND di.device_type = #{param.protocol}
+            </if>
+        </if>
+        GROUP BY v.`id`
+        ORDER BY v.create_data_time DESC,v.id ASC
+    </select>
+
+    <select id="getVehicleBindIos" resultType="Map">
+      SELECT
+	vc.id,
+	vc.io_site ioSite,
+	vc.function_id functionId,
+	vc.vehicle_id vehicleId,
+	vc.io_type ioType,
+	vc.high_signal_type highSignalType,
+	vc.low_signal_type lowSignalType,
+	st. name ,st.state_one as stateOne, st.state_two as stateTwo
+    FROM
+	zw_m_io_vehicle_config vc
+    JOIN zw_m_switch_type st ON vc.function_id = st.id
+    WHERE
+	vc.vehicle_id = #{vehicleId} and vc.io_type = #{ioType} and vc.flag = 1 order by vc.io_site
+    </select>
+
+
+    <update id="deleteByVehicleId" parameterType="string">
+        UPDATE zw_m_io_vehicle_config set flag=0 WHERE vehicle_id = #{vehicleId}
+    </update>
+
+    <update id="deleteByVehicleIds" parameterType="string">
+        UPDATE zw_m_io_vehicle_config set flag=0 WHERE vehicle_id IN
+        <foreach collection="vehicleIds" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 批量新增报警参数 -->
+    <insert id="addAlarmParameterBatch" parameterType="java.util.List">
+        INSERT INTO zw_m_alarm_parameter (
+        id,
+        param_code,alarm_type_id,default_value,io_monitor_id,create_data_time
+        )
+        VALUES
+        <foreach collection="alarmParameters" item="item" index="index" separator=",">
+            (uuid(), #{item.paramCode}, #{item.alarmTypeId},#{item.defaultValue},#{item.ioMonitorId},now())
+        </foreach>
+    </insert>
+
+    <select id="findByIds" resultType="com.zw.platform.domain.vas.switching.IoVehicleConfig">
+        select * from zw_m_io_vehicle_config
+        where flag = 1 and vehicle_id = #{vehicleId} and id in (
+        <foreach collection="ids" item="item" index="index" separator=",">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+    <update id="delAlarmParaByIds">
+        UPDATE zw_m_alarm_parameter set flag=0 WHERE id IN
+        <foreach collection="ids" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="delAlarmParaSettingByIds">
+        UPDATE zw_m_alarm_parameter_setting
+        SET flag = 0
+        WHERE flag = 1
+        AND vehicle_id = #{vehicleId}
+        AND alarm_parameter_id IN
+        <foreach collection="ids" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="delLevelAlarm">
+        UPDATE zw_m_alarm_parameter set flag=0 WHERE io_monitor_id = #{vehicleId} and alarm_type_id IN
+        <foreach collection="levelAlarms" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+    <select id="getLevelAlarm" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+        SELECT * FROM zw_m_alarm_type WHERE flag=1
+        <if test="tankerNo!=null">
+            AND (
+                name like CONCAT('罐仓',#{tankerNo},'异常报警')
+                or name like CONCAT('罐仓',#{tankerNo},'装料报警')
+                or name like CONCAT('罐仓',#{tankerNo},'卸料报警')
+                )
+        </if>
+        <if test="tankerNo==null">
+            AND (
+                name like '罐仓_异常报警'
+                or name like '罐仓_装料报警'
+                or name like '罐仓_卸料报警'
+            )
+        </if>
+    </select>
+
+    <update id="delVehicleConfigByIds">
+        UPDATE zw_m_io_vehicle_config set flag=0 WHERE vehicle_id = #{vehicleId} and id IN
+        <foreach collection="ids" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findAlarmParameterIdsByVehicleId" resultType="String">
+       select
+       ap.id from zw_m_alarm_parameter ap
+      LEFT JOIN zw_m_alarm_type alt ON ap.alarm_type_id=alt.id  AND alt.flag=1
+      where ap.flag = 1 and ap.io_monitor_id =  #{ioMonitorId} and alt.type = 'ioAlarm'
+    </select>
+
+    <select id="findIoConfigBy" parameterType="string" resultType="com.zw.platform.domain.vas.alram.IoVehicleConfigInfo">
+        SELECT ivc.* ,st.state_one as stateOne ,st.state_two as stateTwo
+        FROM zw_m_io_vehicle_config ivc
+        INNER JOIN zw_m_switch_type st ON ivc.function_id = st.id AND st.flag = 1
+        WHERE ivc.flag = 1 AND ivc.vehicle_id = #{vehicleId}
+    </select>
+
+    <select id = "getBindIoInfoByVehicleId" parameterType="string" resultType="com.zw.app.domain.monitor.SwitchInfo">
+        SELECT
+	        vc.io_site ioSite,
+	        vc.io_type ioType,
+            vc.high_signal_type highSignalType,
+            vc.low_signal_type lowSignalType,
+            st. NAME,
+            st.state_one as stateOne,
+            st.state_two as stateTwo
+        FROM
+            zw_m_io_vehicle_config vc
+        JOIN zw_m_switch_type st ON vc.function_id = st.id
+        WHERE
+            vc.vehicle_id = #{vehicleId}
+        AND vc.flag = 1
+        ORDER BY
+            vc.io_type,
+            io_site
+    </select>
+
+    <select id="findIoConfigByVehicleId" parameterType="string" resultType="string">
+        select id FROM zw_m_io_vehicle_config vc
+        where vc.flag = 1 AND vc.vehicle_id = #{vehicleId}
+    </select>
+
+    <select id="findByIoTypeAndSite" resultType="com.zw.platform.domain.vas.switching.IoVehicleConfig">
+        select id,
+               io_site,
+               function_id,
+               vehicle_id,
+               io_type,
+               high_signal_type,
+               low_signal_type
+        from zw_m_io_vehicle_config
+        where flag = 1
+          and io_site = #{ioSite}
+          and io_type = #{IoType}
+          and vehicle_id = #{vehicleId}
+    </select>
+
+    <select id="findParaIdByAlarmTypeIdAndIoMonitorId" resultType="java.lang.String">
+        select id
+        from zw_m_alarm_parameter
+        where flag = 1
+          and alarm_type_id = #{alarmTypeId}
+          and io_monitor_id = #{ioMonitorId}
+    </select>
+</mapper>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>SIM卡管理</title>
+    <div th:replace="fragments/header">header</div>
+</head>
+
+<body>
+    <section id="container">
+        <div th:replace="fragments/nav">nav</div>
+        <section class="main-content-wrapper">
+            <div th:replace="fragments/menu">menu</div>
+            <section id="main-content">
+                <div class="row eightIsZero">
+                    <div class="col-md-12">
+                        <ul class="breadcrumb">
+                            <li><a th:href="@{/}">首页</a></li>
+                            <li class="active">设备管理</li>
+                            <li class="active">SIM卡管理</li>
+                        </ul>
+                        <h1 class="h1 ">SIM卡管理</h1>
+                    </div>
+                </div>
+                <div class="row">
+
+
+
+                    <div class="col-md-12">
+                        <div class="leftTreeBox">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="orgPannel">
+                                    <h3 class="panel-title fwb">组织架构</h3>
+                                    <div class="actions pull-right listActions">
+                                        <i class="fa chevron-down" id="orgPannel-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body" style="padding: 0px;" id="orgPannel-body">
+                                    <div class="form-group" style="margin-top: 15px;">
+
+                                        <div class="col-md-12">
+                                            <input autocomplete="off" id="search_condition" name="search" class="form-control"
+                                                style="margin-bottom: 10px;" type="text" placeholder="请输入企业名称" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                        style="padding: 0px;height:624px !important;">
+                                        <ul id="treeDemo" class="ztreee" style="height:615px !important;overflow:auto;">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+
+
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading" id="stretch">
+                                    <h3 class="panel-title fwb">终端手机号列表</h3>
+                                    <div class="actions pull-right">
+                                        <i class="fa chevron-down" id="stretch-chevron"></i>
+                                    </div>
+                                </div>
+                                <div class="panel-body fixed-table-body" id="stretch-body">
+                                    <div class="ToolPanel">
+                                        <div class="bars pull-left">
+                                            <div class="btn-group pull-left barsMargin" role="group">
+                                                <form role="form">
+                                                    <label>
+                                                        <input type="text" class="Inlinesearch form-control"
+                                                            id="simpleQueryParam" name="simpleQueryParam"
+                                                            placeholder="请输入终端手机号/监控对象/终端号/真实SIM卡号" autocomplete="off">
+                                                    </label>
+                                                    <button type="button" id="search_button"
+                                                        onclick="myTable.requestData()"
+                                                        class="btn btn-outline btn-default">搜索
+                                                    </button>
+                                                    <input id="hiddenText" type="text" style="display:none" />
+                                                </form>
+                                            </div>
+                                            <div th:if="${hasRole}" class="dropdown pull-left">
+                                                <button class="btn btn-default dropdown-toggle" type="button"
+                                                    id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="true">
+                                                    操作菜单<span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                    <li><a th:href="@{/m/basicinfo/equipment/simcard/add}" id="addId"
+                                                            data-toggle="modal" data-target="#commonWin"><i
+                                                                class="glyphicon glyphicon-plus icoPaddingLeft"></i>新增</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/equipment/simcard/export}"
+                                                            id="exportId"><i
+                                                                class="glyphicon glyphicon-log-out icoPaddingLeft"></i>导出</a>
+                                                    </li>
+                                                    <li><a href="#" id="del_model"><i
+                                                                class="glyphicon glyphicon-trash icoPaddingLeft"></i>批量删除</a>
+                                                    </li>
+                                                    <li><a th:href="@{/m/basicinfo/equipment/simcard/import}"
+                                                            id="importId" data-toggle="modal"
+                                                            data-target="#commonSmWin"><i
+                                                                class="glyphicon glyphicon-log-in icoPaddingLeft"></i>导入</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="columns btn-group pull-right simCardManagement">
+                                            <button id="refreshTable" class="btn btn-default" type="button"
+                                                name="refresh" title="刷新">
+                                                <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                            </button>
+                                            <div class="keep-open btn-group" title="定制显示列">
+                                                <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="overflow:auto">
+                                        <table id="dataTable"
+                                            class="table table-striped table-bordered table-hover checkTable"
+                                            cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th><input type="checkbox" id="checkAll"></th>
+                                                    <th>操作设置</th>
+                                                    <th>下发状态</th>
+                                                    <th>ICCID</th>
+                                                    <th>IMEI</th>
+                                                    <th>IMSI</th>
+                                                    <th>终端手机号</th>
+                                                    <th>真实SIM卡号</th>
+                                                    <th>所属企业</th>
+                                                    <th>启停状态</th>
+                                                    <th>运营商</th>
+                                                    <th>发放地市</th>
+                                                    <th>套餐流量(M)</th>
+                                                    <th>当日流量(M)</th>
+                                                    <th>当月流量(M)</th>
+                                                    <th>流量最后更新时间</th>
+                                                    <th>月预警流量(M)</th>
+                                                    <th>流量月结日</th>
+                                                    <th>修正系数</th>
+                                                    <th>预警系数</th>
+                                                    <th>小时流量阈值(M)</th>
+                                                    <th>日流量阈值(M)</th>
+                                                    <th>月流量阈值(M)</th>
+                                                    <th>激活日期</th>
+                                                    <th>到期时间</th>
+                                                    <th>终端号</th>
+                                                    <th>监控对象</th>
+                                                    <th>创建时间</th>
+                                                    <th>修改时间</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <div th:replace="fragments/footer">footer</div>
+</body>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script th:inline="javascript">
+    var sendCommandComplete = [[#{ send.command.complete }]];
+    var selectItem = [[#{ select.item }]];
+</script>
+<script src="wro/simCardList.js" th:src="@{/wro/simCardList.js}"></script>
+
+</html>

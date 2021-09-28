@@ -1,0 +1,32 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <description>Spring 整合 MyBatis</description>
+    <!-- 在基本的MyBatis中，session 工厂可以使用SqlSessionFactoryBuilder.来创建。在MyBatis-Spring中，使用了SqlSessionFactoryBean来替代。 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="mysqlDataSource"/>
+        <!-- 指定sqlMapConfig总配置文件，订制的environment在spring容器中不在生效 -->
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+    <!-- Mybatis 映射文件路径 用逗号隔开 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage"
+                  value="com.zw.platform.repository.core,com.zw.platform.repository.modules,com.zw.platform.repository.vas,
+					com.zw.platform.repository.energy,com.zw.platform.repository.realTimeVideo,com.cb.platform.repository.mysqlDao,
+					com.zw.app.repository.mysql,com.zw.talkback.repository.mysql,com.zw.api.repository.mysql,
+					com.zw.platform.repository.other.protocol,com.zw.platform.basic.repository,com.zw.platform.repository.oilsubsidy" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
+	<bean id="sqlSessionFactory3" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="shardingDataSource"/>
+		<!-- 指定sqlMapConfig总配置文件，订制的environment在spring容器中不在生效 -->
+		<property name="configLocation" value="classpath:mybatis.xml"/>
+	</bean>
+	<!-- Mybatis 映射文件路径 用逗号隔开 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zw.platform.repository.sharding" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory3" />
+	</bean>
+</beans>

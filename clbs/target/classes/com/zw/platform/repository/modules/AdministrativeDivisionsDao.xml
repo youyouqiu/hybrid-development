@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.AdministrativeDivisionsDao">
+
+    <select id="getDivisionsCodeByProvinceName" resultType="java.lang.String">
+      SELECT divisions_code FROM zw_m_administrative_divisions WHERE province_name = #{provinceName} AND type = #{type}
+    </select>
+
+    <select id="getDivisionsCodeByCityName" resultType="java.util.Map">
+      SELECT divisions_code,province_name FROM zw_m_administrative_divisions WHERE city_name = #{cityName} AND type = #{type}
+    </select>
+
+    <select id="getDivisionsCodeByCountyName" resultType="java.util.Map">
+      SELECT divisions_code,province_name,city_name FROM zw_m_administrative_divisions WHERE county_name = #{countyName} AND type = #{type}
+    </select>
+
+    <!-- 根据行政区划代码查询行政区划信息 -->
+    <select id="getInfoByDivisionsCode" parameterType="String" resultType="com.zw.platform.domain.basicinfo.AdministrativeDivisionsInfo">
+        SELECT province_name,city_name,county_name,divisions_code
+        FROM zw_m_administrative_divisions
+        WHERE divisions_code = #{divisionsCode}
+    </select>
+
+    <select id="getAll" resultType="com.zw.platform.domain.basicinfo.AdministrativeDivisionsInfo">
+      SELECT * FROM zw_m_administrative_divisions
+    </select>
+</mapper>

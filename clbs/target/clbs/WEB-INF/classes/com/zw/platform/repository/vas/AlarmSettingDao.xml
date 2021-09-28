@@ -1,0 +1,771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.AlarmSettingDao">
+
+    <!-- 查询报警参数设置了的车辆 -->
+    <select id="findVehicleAlarmSetting" resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT distinct ap.vehicle_id vehicleId, v.brand, vt.vehicle_type, v.group_id groups, alt.type ,alt.pos
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON ap.vehicle_id = v.id AND v.flag = 1
+        INNER JOIN zw_m_config c ON c.vehicle_id = v.id AND c.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON v.id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        LEFT JOIN zw_m_vehicle_type vt ON vt.id = v.vehicle_type AND vt.flag = 1
+        WHERE ap.flag = 1
+        AND alt.type != 'videoAlarm'
+        AND au.user_id = #{userId}
+        AND a.org_id IN
+        <foreach item="item" collection="groupList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ORDER BY ap.create_data_time DESC
+    </select>
+
+    <!-- 通过对象id查询人员信息 -->
+    <select id="findPeopleById" parameterType="string" resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT p.id,p.people_number brand, di.id deviceId, di.device_type deviceType, GROUP_CONCAT(DISTINCT p.org_id SEPARATOR ';') as groupId
+        FROM zw_m_people_info p
+		INNER JOIN zw_m_config c ON c.vehicle_id = p.id AND c.flag = 1
+		INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+		WHERE
+		p.flag = 1
+		AND p.id = #{id}
+    </select>
+    <!--根据id查询车、热、物信息-->
+    <select id="findPeopleOrVehicleOrThingById" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+      select * from (select id,brand,plate_color from zw_m_vehicle_info where id = #{id} and flag = 1 union all
+                     select id,people_number as brand,'' as plate_color from zw_m_people_info where id = #{id} and flag = 1 union all
+                     select id,thing_number as brand,'' as plate_color from zw_m_thing_info where id = #{id} and flag = 1) t limit 1
+    </select>
+
+    <!-- 根据车辆id查询报警参数设置 -->
+    <select id="findByVehicleId" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+
+    </select>
+
+    <select id="findByMoIds" resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT ap.*, alt.id as alarmTypeId, alt.name, alt.type, p.param_code, p.description, alt.sendFlag, alt.pos
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE ap.flag = 1
+        AND alt.type != 'videoAlarm'
+        and ap.vehicle_id in
+        <foreach item="item" collection="moIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by ap.id
+    </select>
+
+    <!-- 根据对象id查询报警参数设置 -->
+    <select id="findById" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+		SELECT ap.*,alt.id as alarmTypeId,alt.name,alt.type,p.param_code,p.description,alt.sendFlag,alt.pos
+		FROM zw_m_alarm_parameter_setting ap
+		INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+		INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+		WHERE ap.flag = 1
+		AND alt.type != 'videoAlarm'
+		AND ap.vehicle_id = #{vehicleId}
+		order by ap.create_data_time
+	</select>
+    <!-- 选择指定车辆中有指定报警参数的id -->
+    <select id="findByVehicleIds" resultType="java.lang.String">
+        SELECT
+        ap.vehicle_id AS vehicleId
+        FROM
+        zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id
+        WHERE
+        ap.flag = 1 AND alt.flag = 1 AND alt.type != 'videoAlarm' AND p.flag = 1
+        AND ap.vehicle_id in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据车辆id集合查询报警参数id和监控对象类型( -->
+    <select id="findAlarmSettingByBatch" resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT ap.id,
+        ap.vehicle_id,
+        ap.alarm_parameter_id,
+        ap.parameter_value,
+        alarm_push,
+        ap.ignore,
+        alt.id as alarmTypeId,
+        alt.name,
+        alt.type,
+        p.param_code,
+        p.description,
+        alt.sendFlag,
+        alt.pos,
+        v.brand,
+        v.monitorType
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        INNER JOIN
+        (
+        select c.vehicle_id as id,
+        c.monitor_type as monitorType,
+        case c.monitor_type
+        when "0" then vi.brand
+        when "1" then pi.people_number
+        else ti.thing_number end as brand
+        from (select vehicle_id, monitor_type
+        from zw_m_config
+        where vehicle_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and flag = 1) c
+        left JOIN zw_m_vehicle_info vi on c.vehicle_id = vi.id and vi.flag = 1
+        left JOIN zw_m_people_info pi on c.vehicle_id = pi.id and pi.flag = 1
+        left JOIN zw_m_thing_info ti on c.vehicle_id = ti.id and ti.flag = 1
+        ) v ON ap.vehicle_id = v.id WHERE ap.flag = 1 AND alt.type != 'videoAlarm'
+    </select>
+
+    <!-- 根据对象id查询报警参数设置map -->
+    <resultMap id="AlarmResultMap" type="com.zw.platform.domain.vas.alram.AlarmSetting">
+        <result property="id" column="id"/>
+        <result property="vehicleId" column="vehicle_id"/>
+        <result property="alarmParameterId" column="alarm_parameter_id"/>
+        <result property="parameterValue" column="parameter_value"/>
+        <result property="alarmPush" column="alarm_push"/>
+        <result property="ignore" column="ignore"/>
+    </resultMap>
+    <select id="findMapById" resultMap="AlarmResultMap">
+   		SELECT ap.id, ap.vehicle_id, ap.alarm_parameter_id, ap.parameter_value, ap.alarm_push, ap.ignore
+		FROM zw_m_alarm_parameter_setting ap
+		INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+		INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+		WHERE ap.flag = 1
+		AND alt.type != 'videoAlarm'
+		AND ap.vehicle_id = #{vehicleId}
+		order by ap.create_data_time
+	</select>
+
+    <!-- 查询所有报警参数设置 -->
+    <select id="findAllAlarmParameter" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+		SELECT p.*,alt.id AS alarmTypeId,alt.name,alt.type,alt.sendFlag,alt.pos,alt.protocol_type,alt.platform_or_device
+		FROM zw_m_alarm_parameter p
+		INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+		WHERE p.flag = 1
+		AND alt.type != 'videoAlarm' AND p.io_monitor_id IS NULL
+		order by p.create_data_time
+	</select>
+
+    <!-- 根据车辆id查询报警参数设置 -->
+    <select id="findSettingByVid" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT ap.*,alt.pos
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        <!-- INNER JOIN zw_m_vehicle_info v ON ap.vehicle_id = v.id AND v.flag = 1 -->
+        WHERE ap.flag = 1
+        AND alt.type != 'videoAlarm'
+        AND ap.vehicle_id = #{vehicleId}
+    </select>
+    <!-- 根据车辆id集合查询报警参数设置id集合 -->
+    <select id="findSettingsByVehicleIds" parameterType="java.util.Map"
+            resultType="com.zw.platform.domain.vas.alram.AlarmParameterSetting">
+        SELECT ap.id, ap.vehicle_id, ap.alarm_parameter_id, ap.parameter_value, ap.alarm_push, ap.ignore, alt.sendFlag
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE ap.flag = 1
+        AND ap.vehicle_id IN
+        <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND alt.type IN
+        <foreach item="item" collection="types" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--批量删除 -->
+    <delete id="deleteAlarmSettingByBatch" parameterType="String">
+        delete from zw_m_alarm_parameter_setting
+        where id IN
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <!-- and flag = 1 -->
+    </delete>
+
+    <!--根据车辆ids批量删除 -->
+    <delete id="deleteByVehicleIds" parameterType="String">
+        DELETE FROM zw_m_alarm_parameter_setting
+        WHERE flag = 1
+        AND vehicle_id IN
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND alarm_parameter_id NOT IN (SELECT n.id FROM
+        (SELECT p.id FROM zw_m_alarm_parameter p
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE alt.type = 'videoAlarm'
+        AND p.flag = 1) AS n)
+    </delete>
+
+    <!-- 新增报警参数设置 -->
+    <insert id="addAlarmSettingByBatch" parameterType="com.zw.platform.domain.vas.alram.AlarmParameterSetting">
+        INSERT INTO zw_m_alarm_parameter_setting (id, vehicle_id, alarm_parameter_id, parameter_value, flag,
+        create_data_time, create_data_username, alarm_push,`ignore`)
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.vehicleId}, #{item.alarmParameterId}, #{item.parameterValue}, #{item.flag},
+            #{item.createDataTime}, #{item.createDataUsername}, #{item.alarmPush},#{item.ignore})
+        </foreach>
+    </insert>
+
+    <!-- 查询相同报警类型的参数设置id -->
+    <select id="findSameAlarmTypeSetting" parameterType="String"
+            resultType="String">
+		SELECT apa.id FROM zw_m_alarm_parameter_setting apa
+		INNER JOIN zw_m_alarm_parameter pa ON pa.id = apa.alarm_parameter_id AND pa.flag = 1
+		INNER JOIN
+		(SELECT p.alarm_type_id,ap.vehicle_id FROM zw_m_alarm_parameter_setting ap
+		INNER JOIN zw_m_alarm_parameter p ON p.id = ap.alarm_parameter_id AND p.flag = 1
+		WHERE ap.flag = 1
+		AND ap.id = #{id}) t ON t.alarm_type_id = pa.alarm_type_id
+		WHERE apa.flag = 1
+		AND apa.vehicle_id = t.vehicle_id
+	</select>
+
+    <!-- 查询参考车辆报警参数 -->
+    <select id="findParameterByVehicleId" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT aps.vehicle_id,
+               aps.alarm_parameter_id,
+               aps.parameter_value,
+               aps.alarm_push,
+               alt.id alarmTypeId,
+               alt.pos,
+               alt.name,
+               alt.type,
+               aps.ignore,
+               ap.param_code
+        FROM zw_m_alarm_parameter_setting aps
+                 INNER JOIN zw_m_alarm_parameter ap ON aps.alarm_parameter_id = ap.id AND ap.flag = 1
+                 INNER JOIN zw_m_alarm_type alt ON ap.alarm_type_id = alt.id AND alt.flag = 1
+        WHERE aps.flag = 1
+          and ap.io_monitor_id is null
+          and aps.vehicle_id = #{vehicleId}
+    </select>
+
+    <!-- 根据车辆id查询其打开开关的报警类型 -->
+    <select id="findAlarmTypeByVid" resultType="com.zw.platform.domain.vas.alram.AlarmType">
+		SELECT DISTINCT a.* FROM zw_m_alarm_type a
+			INNER JOIN zw_m_alarm_parameter ap ON ap.alarm_type_id = a.id AND ap.flag = 1
+			INNER JOIN zw_m_alarm_parameter_setting aps ON aps.alarm_parameter_id = ap.id AND aps.flag =1
+		WHERE a.flag = 1
+		AND aps.vehicle_id = #{vehicleId}
+	</select>
+
+    <!-- 删除关联关系（逻辑删除） -->
+    <update id="deleteAlarmSettingByVehicleId" parameterType="String">
+      update zw_m_alarm_parameter_setting
+	      set flag = 0
+	      where vehicle_id = #{vehicleId}
+	      and flag = 1
+	  </update>
+
+    <delete id="deleteBatchAlarmSettingByVehicleId">
+        DELETE FROM zw_m_alarm_parameter_setting WHERE flag = 1 and vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+    </delete>
+
+    <select id="findAlarmByVidAndType" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT ap.*,alt.id as alarmTypeId,alt.name,alt.type,p.param_code,p.description,alt.sendFlag,alt.pos, v.brand
+        FROM zw_m_alarm_parameter_setting ap
+        INNER JOIN zw_m_alarm_parameter p ON ap.alarm_parameter_id = p.id AND p.flag = 1
+        INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+        INNER JOIN zw_m_vehicle_info v ON ap.vehicle_id = v.id AND v.flag = 1
+        WHERE ap.flag = 1
+        AND ap.vehicle_id = #{vehicleId}
+        AND alt.name IN
+        <foreach item="item" collection="alarmTypeId" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="saveAlarmParamter" parameterType="string" resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+	     select ap.default_value , ap.alarm_type_id , aps.* from zw_m_alarm_parameter ap
+		 LEFT  JOIN  zw_m_alarm_parameter_setting aps on ap.id = aps.alarm_parameter_id and aps.flag = 1 and aps.vehicle_id = #{vehicleId}
+         INNER  JOIN zw_m_alarm_type aType on aType.id = ap.alarm_type_id and aType.flag = 1
+		 where aType.name = '超速报警' and ap.flag = 1
+	</select>
+
+    <update id="updateAlarmSettings" parameterType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+		update zw_m_alarm_parameter_setting
+		set parameter_value = #{parameterValue}
+		where vehicle_id = #{vehicleId} and alarm_parameter_id = #{alarmParameterId}
+		and flag = 1
+	</update>
+
+    <insert id="addAlarmSetting" parameterType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+	    INSERT INTO zw_m_alarm_parameter_setting (
+		id, vehicle_id, alarm_parameter_id,
+		parameter_value,alarm_push,flag, create_data_time,
+		create_data_username
+		)
+		VALUES
+			(#{id}, #{vehicleId}, #{alarmParameterId},
+			#{parameterValue}, #{alarmPush}, #{flag},
+			#{createDataTime}, #{createDataUsername})
+  	</insert>
+
+    <select id="findAlarmSettingByVid" resultType="java.lang.String">
+        SELECT DISTINCT vehicle_id FROM zw_m_alarm_parameter_setting where vehicle_id in
+        <foreach item="item" collection="vehicleList" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and alarm_push=2 and flag=1
+    </select>
+
+    <!-- 查询联动策略设置 -->
+    <select id="findLinkageSettingList" resultType="com.zw.platform.domain.vas.alram.AlarmLinkageParam">
+	     select id, vehicle_id, alarm_type_id, photo_id, recording_id, output_control_id, video_flag,msg_id,upload_audio_resources_flag,
+	            alarm_handle_type,alarm_handle_result,handle_username,alarm_handle_linkage_check
+	     from zw_m_special_alarm
+		 where vehicle_id = #{vehicleId} and flag = 1
+	</select>
+
+    <!-- 查询拍照录像设置 -->
+    <select id="findPhotoSetting" resultType="com.zw.platform.domain.vas.alram.PhotoParam">
+	     select id, way_id, command, time, save_sign, resolution, quality, luminance, contrast, saturability, chroma from zw_m_photo_setting
+		 where id = #{id} and flag = 1
+	</select>
+
+    <!-- 查询联动策略参考车牌 -->
+    <select id="findAlarmLinkageReferenceVehicles" parameterType="String"
+            resultType="com.zw.platform.domain.basicinfo.VehicleInfo">
+        SELECT distinct c.vehicle_id as id
+        FROM
+        zw_m_config c
+        INNER JOIN zw_m_special_alarm sa ON sa.vehicle_id = c.vehicle_id AND sa.flag = 1
+        INNER JOIN zw_m_device_info di ON di.id = c.device_id AND di.flag = 1
+        INNER JOIN zw_m_assignment_vehicle av ON c.vehicle_id = av.vehicle_id AND av.flag = 1
+        INNER JOIN zw_m_assignment a ON a.id = av.assignment_id AND a.flag = 1
+        INNER JOIN zw_m_assignment_user au ON av.assignment_id = au.assignment_id AND au.flag = 1
+        WHERE c.flag = 1
+        AND au.user_id = #{userId}
+        AND c.vehicle_id not in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        AND di.device_type in
+        <foreach item="item" collection="deviceTypes" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ORDER BY sa.create_data_time DESC
+    </select>
+
+    <!--批量删除联动策略 -->
+    <delete id="deleteLinkageSettingByBatch" parameterType="String">
+        delete from zw_m_special_alarm
+        where id IN
+        <foreach item="item" collection="list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </delete>
+
+    <!--批量删除联动策略设置参数 -->
+    <delete id="deletePhotoSettingByBatch" parameterType="String">
+        delete from zw_m_photo_setting
+        where id IN
+        <foreach item="item" collection="list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </delete>
+
+    <!--批量删除联动策略设置参数 -->
+    <update id="deleteOutputControlSettingByBatch" parameterType="String">
+        delete from zw_m_output_setting
+        where id IN
+        <foreach item="item" collection="list" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and flag = 1
+    </update>
+
+
+    <delete id="deleteRoadAlarmSpeedLimit">
+        DELETE
+        FROM
+            zw_m_alarm_parameter_setting
+        WHERE
+            id NOT IN (
+                SELECT
+                    id
+                FROM
+                    (
+                        SELECT
+                            id,
+                            vehicle_id,
+                            COUNT(1) c,
+                            max(create_data_time)
+                        FROM
+                            zw_m_alarm_parameter_setting
+                        WHERE
+                            flag = 1
+                        AND alarm_parameter_id = '5b9b465c-bc26-11e6-a4a6-cec0c932ce01'
+                        GROUP BY
+                            vehicle_id
+                        HAVING
+                            c > 1
+                    ) ids
+            )
+        AND flag = 1
+        AND alarm_parameter_id = '5b9b465c-bc26-11e6-a4a6-cec0c932ce01'
+    </delete>
+
+    <!-- 保存联动策略设置参数 -->
+    <insert id="addPhotoSettingByBatch" parameterType="com.zw.platform.domain.vas.alram.PhotoParam">
+        INSERT INTO zw_m_photo_setting (
+        id, way_id, command, time, save_sign, resolution, quality, luminance,
+        contrast, saturability, chroma, flag, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.wayId}, #{item.command}, #{item.time}, #{item.saveSign}, #{item.resolution},
+            #{item.quality}, #{item.luminance},
+            #{item.contrast}, #{item.saturability}, #{item.chroma}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 根据车辆ID查询报警参数设置 -->
+    <select id="findAlarmParameterByIoMonitorId" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+        SELECT p.*, alt.id alarmTypeId, alt.name, alt.type, alt.sendFlag, alt.pos,
+               st.state_one, st.state_two, ivc.high_signal_type, ivc.low_signal_type
+        FROM zw_m_alarm_parameter p
+                 INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+                 INNER JOIN zw_m_io_vehicle_config ivc ON ivc.vehicle_id = p.io_monitor_id AND ivc.flag = 1
+                 INNER JOIN zw_m_switch_type st ON ivc.function_id = st.id AND st.flag = 1
+        WHERE p.flag = 1
+          AND alt.type != 'videoAlarm'
+          AND p.io_monitor_id = #{ioMonitorId}
+        GROUP BY p.id
+        order by p.create_data_time
+    </select>
+
+    <!--查找短信下发设置参数-->
+    <select id="findMsgSetting" parameterType="String" resultType="com.zw.platform.domain.vas.alram.Msgparam">
+        select msg_content as msgContent,marks
+        from zw_m_msg_setting
+        where id = #{id} and flag = 1
+    </select>
+
+    <!-- 保存联动策略短信参数 -->
+    <insert id="addMsgSettingByBatch" parameterType="com.zw.platform.domain.vas.alram.Msgparam">
+        INSERT INTO zw_m_msg_setting (
+        id, msg_content, marks,
+        text_type, message_type_one, message_type_two,
+        flag, create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="param" separator=",">
+            (#{param.id}, #{param.msgContent}, #{param.marks},
+            #{param.textType}, #{param.messageTypeOne}, #{param.messageTypeTwo},
+            #{param.flag}, #{param.createDataTime}, #{param.createDataUsername})
+        </foreach>
+    </insert>
+
+    <!-- 保存联动策略输出控制参数 -->
+    <insert id="addOutputControlSettingByBatch" parameterType="com.zw.platform.domain.vas.alram.OutputControl">
+        INSERT INTO zw_m_output_setting (
+        id, vehicle_id, peripheral_id, control_time, control_subtype, outlet_set, analog_output_ratio,flag, auto_flag,
+        create_data_time, create_data_username
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.vehicleId}, #{item.peripheralId},
+            #{item.controlTime},#{item.controlSubtype},#{item.outletSet},
+            #{item.analogOutputRatio},#{item.flag},#{item.autoFlag},#{item.createDataTime},#{item.createDataUsername})
+        </foreach>
+    </insert>
+
+
+    <!--查找联动策略输出控制参数-->
+    <select id="findOutputControlSetting" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.OutputControl">
+        select *
+        from zw_m_output_setting
+        where id = #{id} and flag = 1
+    </select>
+
+    <!-- 保存联动策略输出控制参数 -->
+    <insert id="addOutputControlSetting" parameterType="com.zw.platform.domain.vas.alram.OutputControl">
+        INSERT INTO zw_m_output_setting (
+        id, vehicle_id, peripheral_id, control_time, control_subtype, outlet_set, analog_output_ratio,flag, auto_flag, create_data_time, create_data_username
+        )
+        VALUES
+            (#{id}, #{vehicleId}, #{peripheralId}, #{controlTime},#{controlSubtype},#{outletSet},
+            #{analogOutputRatio},#{flag},#{autoFlag},#{createDataTime},#{createDataUsername})
+    </insert>
+
+
+    <!--查找车辆输出控制参数-->
+    <select id="getVehicleOutputControlSetting" parameterType="String"
+            resultType="com.zw.platform.domain.vas.alram.OutputControl">
+        select *
+        from zw_m_output_setting
+        where vehicle_id = #{vehicleId} and flag = 1
+    </select>
+
+
+    <update id="updateVehicleOutputControlSetting" parameterType="String">
+		update zw_m_output_setting
+		set flag = 0
+		where vehicle_id = #{vehicleId}
+		and auto_flag = 0
+	</update>
+
+    <delete id="deleteMsgSettingByBatch">
+        DELETE FROM zw_m_msg_setting WHERE id IN
+        <foreach collection="msgIds" item="msgId" open="(" separator="," close=")">
+            #{msgId}
+        </foreach>
+    </delete>
+
+
+    <!-- 根据监控对象id查询I/0报警参数设置 -->
+    <select id="findIoAlarmValueByVehicleId" parameterType="string" resultType="java.util.HashMap">
+        SELECT
+            mat.pos,aps.parameter_value
+        FROM
+            zw_m_alarm_parameter_setting aps
+        INNER JOIN zw_m_alarm_parameter ap ON aps.alarm_parameter_id = ap.id
+        AND ap.flag = 1
+        INNER JOIN zw_m_alarm_type mat ON ap.alarm_type_id = mat.id
+        AND mat.flag = 1
+        AND mat.type = 'ioAlarm'
+        WHERE
+            aps.vehicle_id = #{vehicleId}
+        AND aps.flag = 1
+        ORDER BY mat.pos
+    </select>
+
+    <select id="getSpeedLimitByVehicleId" parameterType="string" resultType="int">
+        SELECT default_value FROM zw_m_alarm_parameter_setting aps
+        INNER JOIN zw_m_alarm_parameter ap ON ap.id = aps.alarm_parameter_id AND ap.flag = 1
+        INNER JOIN zw_m_alarm_type aty ON aty.id = ap.alarm_type_id AND aty.flag = 1
+        WHERE aps.flag = 1 AND ap.param_code = "param2" AND aty.pos = 76 AND aps.vehicle_id = #{vehicleId}
+        limit 1
+    </select>
+
+    <select id="getSpeedLimitByVehicleIds" parameterType="string" resultType="java.util.HashMap">
+        SELECT DISTINCT aps.vehicle_id monitorId,ap.default_value speedLimit FROM zw_m_alarm_parameter_setting aps
+        INNER JOIN zw_m_alarm_parameter ap ON ap.id = aps.alarm_parameter_id AND ap.flag = 1
+        INNER JOIN zw_m_alarm_type aty ON aty.id = ap.alarm_type_id AND aty.flag = 1
+        WHERE aps.flag = 1 AND ap.param_code = "param2" AND aty.pos = 76 AND aps.vehicle_id IN
+        <foreach collection="monitorIds" close=")" open="(" separator="," item="monitorId">
+            #{monitorId}
+        </foreach>
+
+    </select>
+
+    <select id="findAllAlarmParameterByProtocolType" parameterType="string"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+                SELECT p.*,alt.id AS alarmTypeId,alt.name,alt.type,alt.sendFlag,alt.pos,alt.protocol_type,alt.platform_or_device
+                FROM zw_m_alarm_parameter p
+                INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+                WHERE p.flag = 1
+                AND alt.type != 'videoAlarm' AND p.io_monitor_id IS NULL AND (alt.protocol_type = 0 OR alt.protocol_type = #{deviceType})
+                order by p.create_data_time, p.param_code
+    </select>
+    <select id="findLinkageSettingListByMonitorIds"
+            resultType="com.zw.platform.domain.vas.alram.AlarmLinkageParam">
+        select id, vehicle_id, alarm_type_id, photo_id, recording_id, video_flag,msg_id,output_control_id from
+        zw_m_special_alarm
+        where vehicle_id in
+        <foreach collection="monitorIds" item="monitorId" open="(" separator="," close=")">
+            #{monitorId}
+        </foreach>
+        and flag = 1
+    </select>
+
+
+    <select id="findAllParameterByProtocolType" parameterType="string"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+                SELECT p.*,alt.id AS alarmTypeId,alt.name,alt.type,alt.sendFlag,alt.pos,alt.protocol_type,alt.platform_or_device
+                FROM zw_m_alarm_parameter p
+                INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+                WHERE p.flag = 1
+                AND alt.type != 'videoAlarm' AND alt.type != 'highPrecisionAlarm'  AND p.io_monitor_id IS NULL AND (alt.protocol_type = 0 OR alt.protocol_type = #{deviceType})
+                order by p.create_data_time
+    </select>
+
+
+    <select id="findHighPrecisionAlarmByProtocolType" parameterType="string"
+            resultType="com.zw.platform.domain.vas.alram.AlarmSetting">
+                SELECT p.*,alt.id AS alarmTypeId,alt.name,alt.type,alt.sendFlag,alt.pos,alt.protocol_type,alt.platform_or_device
+                FROM zw_m_alarm_parameter p
+                INNER JOIN zw_m_alarm_type alt ON p.alarm_type_id = alt.id AND alt.flag = 1
+                WHERE p.flag = 1
+                AND  alt.type = 'highPrecisionAlarm'  AND p.io_monitor_id IS NULL AND (alt.protocol_type = 0 OR alt.protocol_type = #{deviceType})
+                order by p.create_data_time
+    </select>
+
+    <select id="findAlarmTypeIdByVehicleId" parameterType="string" resultType="string">
+        select alarm_type_id from zw_m_special_alarm as sa where sa.flag = 1
+        and sa.vehicle_id = #{vehicleId} and sa.msg_id IS NOT NULL
+    </select>
+
+    <select id="listPhotoSetting" resultType="com.zw.platform.domain.vas.alram.PhotoDTO">
+        select id, way_id, command, time, save_sign, resolution, quality, luminance, contrast, saturability, chroma
+        from zw_m_photo_setting
+        where id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and flag = 1
+    </select>
+    <select id="listMsgSetting" resultType="com.zw.platform.domain.vas.alram.MsgParamDTO">
+        select id, msg_content, marks, text_type, message_type_one, message_type_two
+        from zw_m_msg_setting
+        where id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and flag = 1
+    </select>
+    <select id="listOutputControlSetting" resultType="com.zw.platform.domain.vas.alram.OutputControlDTO">
+        select *
+        from zw_m_output_setting
+        where id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and flag = 1
+    </select>
+
+    <insert id="addSpecialAlarmDOByBatch">
+        INSERT INTO zw_m_special_alarm (
+        id, vehicle_id, alarm_type_id, photo_id, recording_id, output_control_id,
+        video_flag, flag, create_data_time, create_data_username,msg_id,upload_audio_resources_flag
+        ,alarm_handle_type,alarm_handle_result,handle_username,alarm_handle_linkage_check
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.vehicleId}, #{item.alarmTypeId}, #{item.photoId},
+            #{item.recordingId},#{item.outputControlId},
+            #{item.videoFlag}, #{item.flag}, #{item.createDataTime},
+            #{item.createDataUsername},#{item.msgId},#{item.uploadAudioResourcesFlag},
+            #{item.alarmHandleType}, #{item.alarmHandleResult}, #{item.handleUsername}, #{item.alarmHandleLinkageCheck})
+        </foreach>
+    </insert>
+
+    <select id="getAlarmTypeParameterByTypes" resultType="com.zw.platform.domain.vas.alram.AlarmParameter">
+        SELECT
+            zmat.pos alarmType,
+            zmap.id id,
+            zmap.param_code paramCode
+        FROM
+            zw_m_alarm_type zmat
+                LEFT JOIN zw_m_alarm_parameter zmap ON zmat.id = zmap.alarm_type_id
+                AND zmap.flag = 1
+        where zmat.flag = 1 and zmat.type in
+        <foreach collection="types" item="type" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+    </select>
+
+    <select id="getIoAlarmTypeParameterByMoId" resultType="com.zw.platform.domain.vas.alram.AlarmParameter">
+        SELECT zmat.pos           alarmType,
+               zmap.id            id,
+               zmap.param_code    paramCode,
+               zmap.io_monitor_id ioMonitorId
+        FROM zw_m_alarm_type zmat
+                 LEFT JOIN zw_m_alarm_parameter zmap ON zmat.id = zmap.alarm_type_id
+            AND zmap.flag = 1
+        where zmat.flag = 1
+          and zmat.type = 'ioAlarm'
+          and zmap.io_monitor_id = #{moId}
+    </select>
+
+    <select id="getDefaultAlarmParameterSetting"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT zmap.param_code,
+        zmap.default_value parameterValue,
+        zmat.pos,
+        zmat.name,
+        zmat.type
+        FROM zw_m_alarm_parameter zmap
+        INNER JOIN zw_m_alarm_type zmat ON zmap.alarm_type_id = zmat.id AND zmat.flag = 1
+        WHERE zmap.flag = 1
+        AND zmap.io_monitor_id IS NULL
+        AND (zmat.protocol_type = 0 OR zmat.protocol_type = #{deviceType})
+        AND zmat.type in
+        <foreach collection="types" item="type" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+        order by zmap.create_data_time, zmap.param_code
+    </select>
+
+    <select id="getAlarmParameterByAlarmParameterIds"
+            resultType="com.zw.platform.domain.vas.alram.AlarmParameter">
+        SELECT zmap.id,
+               zmap.param_code paramCode,
+               zmat.pos alarmType,
+               zmat.NAME alarmTypeName,
+               zmat.type
+        FROM zw_m_alarm_parameter zmap
+                 LEFT JOIN zw_m_alarm_type zmat ON zmat.id = zmap.alarm_type_id
+            AND zmat.flag = 1
+        WHERE zmap.flag = 1
+          AND zmap.id in
+        <foreach collection="alarmParameterIds" item="alarmParameterId" open="(" separator="," close=")">
+            #{alarmParameterId}
+        </foreach>
+    </select>
+    <select id="findIoParameterByVehicleId"
+            resultType="com.zw.platform.domain.vas.alram.form.AlarmParameterSettingForm">
+        SELECT aps.vehicle_id,
+               aps.alarm_parameter_id,
+               aps.parameter_value,
+               aps.alarm_push,
+               alt.id alarmTypeId,
+               alt.pos,
+               alt.NAME,
+               alt.type,
+               aps.IGNORE,
+               ap.param_code
+        FROM zw_m_alarm_parameter ap
+                 INNER JOIN zw_m_alarm_type alt ON ap.alarm_type_id = alt.id
+            AND alt.flag = 1
+                 LEFT JOIN zw_m_alarm_parameter_setting aps ON aps.alarm_parameter_id = ap.id
+            AND aps.flag = 1
+        WHERE ap.flag = 1
+          AND ap.io_monitor_id = #{vehicleId}
+    </select>
+</mapper>

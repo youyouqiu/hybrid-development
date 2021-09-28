@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.TerminalTypeDao">
+
+    <!-- 获取终端型号列表 -->
+    <select id="getTerminalTypeList" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo"
+            parameterType="string">
+        SELECT
+        id,
+        terminal_manufacturer,
+        terminal_type,
+        support_photo_flag,
+        cameras_number,
+        support_driving_recorder_flag,
+        support_monitoring_flag,
+        support_video_flag,
+        active_safety,
+        all_in_one,
+        audio_format,
+        sampling_rate,
+        vocal_tract,
+        storage_audio_format,
+        storage_sampling_rate,
+        storage_vocal_tract,
+        channel_number,
+        device_channel_id
+        FROM
+        zw_m_terminal_type
+        WHERE
+        flag = 1
+        <if test="simpleQueryParam != null and simpleQueryParam != ''">
+            AND terminal_type LIKE CONCAT('%',#{simpleQueryParam},'%')
+        </if>
+        order by create_data_time desc
+    </select>
+
+
+    <select id="getChannelParamByChannelId" resultType="com.zw.platform.domain.basicinfo.DeviceChannelSettingInfo">
+        SELECT
+        id,
+        physics_channel,
+        logic_channel,
+        channel_type,
+        connection_flag,
+        sort,
+        stream_type
+        FROM
+        zw_m_device_channel_setting
+        WHERE
+        flag = 1
+        AND id IN
+        <foreach item="item" collection="channelId" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY sort ASC
+    </select>
+
+
+    <!-- 根据id查询终端型号信息 -->
+    <select id="getTerminalTypeInfo" parameterType="string"
+            resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		SELECT
+		id,
+		terminal_manufacturer,
+		terminal_type,
+		support_photo_flag,
+		cameras_number,
+		support_driving_recorder_flag,
+		support_monitoring_flag,
+		support_video_flag,
+		active_safety,
+        all_in_one,
+		audio_format,
+		sampling_rate,
+		vocal_tract,
+		storage_audio_format,
+		storage_sampling_rate,
+		storage_vocal_tract,
+		channel_number,
+		device_channel_id
+		FROM
+		zw_m_terminal_type
+		WHERE
+		flag = 1 AND id = #{terminalTypeId}
+	</select>
+
+
+    <select id="getDeviceIdByTerminalTypeId" resultType="string">
+		SELECT
+		  id
+		FROM
+			zw_m_device_info
+		WHERE
+			terminal_type_id = #{terminalTypeId}
+			AND flag = 1
+	</select>
+
+    <!-- 查询终端厂商 -->
+    <select id="getTerminalManufacturer" resultType="string">
+		SELECT
+		distinct  di.value
+		FROM
+			zw_c_dictionary di
+		WHERE
+		type = 'TERMINAL_MANUFACTURER'
+		ORDER BY di.value ASC
+	</select>
+
+
+    <!-- 根据id查询终端型号 -->
+    <select id="getTerminalTypeInfoByIds" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+        SELECT
+        id,
+        terminal_manufacturer,
+        terminal_type,
+        support_photo_flag,
+        cameras_number,
+        support_driving_recorder_flag,
+        support_monitoring_flag,
+        support_video_flag,
+        audio_format,
+        channel_number,
+        device_channel_id
+        FROM
+        zw_m_terminal_type
+        WHERE
+        flag = 1 AND id IN
+        <foreach collection="typeIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 逻辑删除终端型号音视频参数 -->
+    <update id="deleteChannelSet">
+        UPDATE
+        zw_m_device_channel_setting
+        SET flag = 0
+        WHERE flag = 1 AND id IN
+        <foreach collection="settingId" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <!-- 逻辑删除终端型号 -->
+    <update id="deleteTerminalType">
+        UPDATE zw_m_terminal_type
+        SET flag = 0
+        WHERE flag = 1 AND id IN
+        <foreach collection="terminalTypeId" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 新增终端型号 -->
+    <insert id="addTerminalType" parameterType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		INSERT INTO zw_m_terminal_type (
+			id,
+			terminal_manufacturer,
+			terminal_type,
+			support_photo_flag,
+			cameras_number,
+			support_driving_recorder_flag,
+			support_monitoring_flag,
+			support_video_flag,
+			active_safety,
+			all_in_one,
+			audio_format,
+			sampling_rate,
+			vocal_tract,
+			storage_audio_format,
+			storage_sampling_rate,
+			storage_vocal_tract,
+			channel_number,
+			device_channel_id,
+			flag,
+			create_data_time,
+			create_data_username
+		) VALUES (
+			#{id},
+			#{terminalManufacturer},
+			#{terminalType},
+			#{supportPhotoFlag},
+			#{camerasNumber},
+			#{supportDrivingRecorderFlag},
+			#{supportMonitoringFlag},
+			#{supportVideoFlag},
+			#{activeSafety},
+			#{allInOne},
+			#{audioFormat},
+			#{samplingRate},
+			#{vocalTract},
+			#{storageAudioFormat},
+			#{storageSamplingRate},
+			#{storageVocalTract},
+			#{channelNumber},
+			#{deviceChannelId},
+			#{flag},
+			#{createDataTime},
+			#{createDataUsername}
+		)
+	</insert>
+
+
+    <!-- 修改终端型号数据 -->
+    <update id="updateTerminalType" parameterType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+        UPDATE zw_m_terminal_type
+        SET
+        <if test="terminalManufacturer != null">
+            terminal_manufacturer = #{terminalManufacturer},
+        </if>
+        <if test="terminalType != null">
+            terminal_type = #{terminalType},
+        </if>
+        support_photo_flag = #{supportPhotoFlag},
+        cameras_number = #{camerasNumber},
+        support_driving_recorder_flag = #{supportDrivingRecorderFlag},
+        support_monitoring_flag = #{supportMonitoringFlag},
+        support_video_flag = #{supportVideoFlag},
+        active_safety=#{activeSafety},
+        all_in_one=#{allInOne},
+        audio_format = #{audioFormat},
+        sampling_rate = #{samplingRate},
+        vocal_tract = #{vocalTract},
+        storage_audio_format = #{storageAudioFormat},
+        storage_sampling_rate = #{storageSamplingRate},
+        storage_vocal_tract = #{storageVocalTract},
+        channel_number = #{channelNumber},
+        device_channel_id = #{deviceChannelId},
+        update_data_time = #{updateDataTime},
+        update_data_username = #{updateDataUsername}
+        WHERE id = #{id} and flag = 1
+    </update>
+
+    <!-- 新增终端型号视频参数设置 -->
+    <insert id="addChannelSetParam" parameterType="com.zw.platform.domain.basicinfo.DeviceChannelSettingInfo">
+        INSERT INTO zw_m_device_channel_setting (
+        id,
+        physics_channel,
+        logic_channel,
+        channel_type,
+        connection_flag,
+        sort,
+        stream_type,
+        flag
+        ) VALUES
+        <foreach collection="info" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.physicsChannel},
+            #{item.logicChannel},
+            #{item.channelType},
+            #{item.connectionFlag},
+            #{item.sort},
+            #{item.streamType},
+            1
+            )
+        </foreach>
+    </insert>
+
+    <!-- 修改终端型号关联的视频参数设置 -->
+    <update id="updateChannelSetParam" parameterType="com.zw.platform.domain.basicinfo.DeviceChannelSettingInfo">
+		UPDATE zw_m_device_channel_setting
+		SET physics_channel = #{physicsChannel},
+		logic_channel = #{logicChannel},
+		channel_type = #{channelType},
+		connection_flag = #{connectionFlag},
+		stream_type = #{streamType}
+		WHERE id = #{id} and flag = 1
+	</update>
+
+
+
+
+    <!-- 查询终端厂商 -->
+    <select id="getTerminalTypeByFacturerName" resultType="java.util.HashMap">
+        SELECT
+        tt.id, tt.terminal_type as terminalType
+        FROM
+        zw_m_terminal_type tt
+        WHERE
+        tt.flag = 1
+        <if test="name != null and name != ''">
+            AND tt.terminal_manufacturer = #{name}
+        </if>
+        ORDER BY tt.create_data_time ASC
+    </select>
+    <!-- 根据终端厂商和终端型号查询数据库中是否存在重复记录-->
+    <select id="getTerminalTypeByTerminalManufacturer" resultType="string">
+		SELECT
+		terminal_type
+		FROM
+		zw_m_terminal_type
+		WHERE
+		terminal_manufacturer = #{terminalManufacturer}
+		AND terminal_type = BINARY #{terminalType}
+		AND flag = 1
+	</select>
+
+    <!--  通过终端id 和mac地址查询是否有已经存在的mac地址  -->
+    <select id="getListByDeviceIdAndMacAddress" resultType="com.zw.platform.domain.basicinfo.DeviceInfo">
+        SELECT di.id , di.mac_address
+        from zw_m_device_info di
+        where di.flag = 1
+        and mac_address = #{macAddress}
+    </select>
+
+
+    <!-- 批量新增终端型号 -->
+    <insert id="addTerminalTypeToBatch">
+        INSERT INTO zw_m_terminal_type (
+        id,
+        terminal_manufacturer,
+        terminal_type,
+        support_photo_flag,
+        cameras_number,
+        support_driving_recorder_flag,
+        support_monitoring_flag,
+        support_video_flag,
+        active_safety,
+        all_in_one,
+        audio_format,
+        channel_number,
+        device_channel_id,
+        sampling_rate,
+        vocal_tract,
+        storage_audio_format,
+        storage_sampling_rate,
+        storage_vocal_tract,
+        flag,
+        create_data_time,
+        create_data_username
+        ) VALUES
+        <foreach collection="info" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.terminalManufacturer},
+            #{item.terminalType},
+            #{item.supportPhotoFlag},
+            #{item.camerasNumber},
+            #{item.supportDrivingRecorderFlag},
+            #{item.supportMonitoringFlag},
+            #{item.supportVideoFlag},
+            #{item.activeSafety},
+            #{item.allInOne},
+            #{item.audioFormat},
+            #{item.channelNumber},
+            #{item.deviceChannelId},
+            #{item.samplingRate},
+            #{item.vocalTract},
+            #{item.storageAudioFormat},
+            #{item.storageSamplingRate},
+            #{item.storageVocalTract},
+            #{item.flag},
+            #{item.createDataTime},
+            #{item.createDataUsername}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- 获取终端型号列表 -->
+    <select id="getAllTerminalType" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+		SELECT
+		id,
+		terminal_manufacturer,
+		terminal_type,
+		support_photo_flag,
+		cameras_number,
+		support_driving_recorder_flag,
+		support_monitoring_flag,
+		support_video_flag,
+		audio_format,
+		channel_number,
+		active_safety,
+	    sampling_rate,
+        vocal_tract,
+        storage_audio_format,
+        storage_sampling_rate,
+        storage_vocal_tract,
+		all_in_one
+		FROM
+		zw_m_terminal_type
+		WHERE
+		flag = 1
+  		order by create_data_time desc
+	</select>
+
+
+    <select id="findTerminalTypeInfo" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+        SELECT
+        id,
+        terminal_manufacturer,
+        terminal_type,
+        support_photo_flag,
+        cameras_number,
+        support_driving_recorder_flag,
+        support_monitoring_flag,
+        support_video_flag,
+        audio_format,
+        channel_number,
+        device_channel_id
+        FROM
+        zw_m_terminal_type
+        WHERE
+        flag = 1 AND id IN
+        <foreach collection="terminalTypeIds" item="terminalTypeId" open="(" separator="," close=")">
+            #{terminalTypeId}
+        </foreach>
+    </select>
+
+    <select id="getTerminalTypeChannelInfo" parameterType="java.util.List"
+            resultType="com.zw.platform.domain.realTimeVideo.VideoChannelSetting">
+        SELECT
+        physics_channel, logic_channel, channel_type, connection_flag, sort, stream_type
+        FROM
+        zw_m_device_channel_setting
+        WHERE
+        flag = 1 AND id IN
+        <foreach collection="channelList" item="channel" open="(" separator="," close=")">
+            #{channel}
+        </foreach>
+    </select>
+
+    <select id="getTerminalTypeInfoBy" resultType="com.zw.platform.domain.basicinfo.TerminalTypeInfo">
+        SELECT *
+        FROM zw_m_terminal_type
+        WHERE terminal_manufacturer = #{terminalManufacturer}
+          AND terminal_type = BINARY #{terminalType}
+          and flag = 1
+    </select>
+
+
+</mapper>

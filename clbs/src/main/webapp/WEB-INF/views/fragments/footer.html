@@ -1,0 +1,68 @@
+<footer>
+	<style>
+		#modal-load-wrapper{
+			min-height:200px;
+			position:relative;
+			text-align: center;
+		}
+		#modal-load-wrapper #modal-load{
+			top:100px;
+			margin-top:-16px;
+		}
+	</style>
+	<div class="imitateMenuBg"></div>
+	<div class="defaultFootBg">
+    	<p><span id="copyRight"></span>&nbsp;<a href="" target="_blank" id="website"></a><br/><a href="https://beian.miit.gov.cn/" target="_blank" id="record"></a></p>
+	</div>
+</footer>
+<script src="resources/js/bootstrap/js/bootstrap.min.js" th:src="@{/resources/js/bootstrap/js/bootstrap.min.js}"></script>
+<script src="resources/js/waypoints.min.js" th:src="@{/resources/js/waypoints.min.js}"></script>
+<script src="resources/js/jquery.nanoscroller.min.js" th:src="@{/resources/js/jquery.nanoscroller.min.js}"></script>
+<script src="resources/js/bootstrap-toggle.min.js" th:src="@{/resources/js/bootstrap-toggle.min.js}"></script>
+<script src="resources/js/jquery.validate.min.js" th:src="@{/resources/js/jquery.validate.min.js}"></script>
+<script  src="resources/js/toastr.min.js" th:src="@{/resources/js/toastr.min.js}"></script>
+<script src="resources/js/bootstrap-suggest.min.js" th:src="@{/resources/js/bootstrap-suggest.min.js}"></script>
+<script type="text/javascript" src="/clbs/resources/js/inputClear.min.js" th:src="@{/resources/js/inputClear.min.js}"></script>
+<script src="/clbs/resources/js/jQueryPowertip/justtool.js"></script>
+<script src="/wro/common-footer.js" th:src="@{/wro/common-footer.js}"></script>
+<script th:inline="javascript">
+    var sensorModelError = [[#{sensorModel.error}]];
+</script>
+<div th:replace="common/common_window::window(windowId=commonWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_lg_window::window(windowId=commonLgWin)">公共弹出窗口(大)</div>
+<div th:replace="common/common_sm_window::window(windowId=commonSmWin)">公共弹出窗口(小)</div>
+<div th:replace="common/common_window::window(windowId=uploaderWin)">公共上传窗口</div>
+<div th:replace="common/common_chat_window::window(windowId=chatWin)">聊天窗口</div>
+<script>
+	$(function(){
+        // <!--优化模态框加载慢问题-->
+        var modal_load_html = '',
+			common_modal=$("#commonWin,#commonLgWin,#commonSmWin");
+        modal_load_html+='<div class="layui-layer-loading" id="modal-load-wrapper">\n' +
+            '\t<div id="modal-load" class="layui-layer-content layui-layer-loading2"></div>\n' +
+            '</div>';
+
+        common_modal.find('.modal-content').html(modal_load_html);
+        common_modal.on("hidden.bs.modal", function() {
+            $(this).removeData("bs.modal");
+            $(this).find('.modal-content').html(modal_load_html);
+        });
+
+        //解决批量设置未勾选数据时body不能滚动的bug(由于modal打开时给body添加了class="modal-open")
+        $('#settingMoreBtn,#batchTactics').on('click', function(){
+            var chechedNum = $("input[name='subChk']:checked").length;
+            if (chechedNum == 0) {
+                layer.msg("至少选择一项！");
+                return false;
+            }
+        });
+	})
+	//解决打开弹出框后页面抖动
+	$('.modal.fade').on('show.bs.modal', function () {
+		$("#header-content").css({'padding-right':"17px"});
+	});
+
+	$('.modal.fade').on('hidden.bs.modal', function () {
+		$("#header-content").css({'padding-right':"0"});
+	});
+</script>

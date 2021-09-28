@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>809平台数据交互管理</title>
+    <div th:replace="fragments/header">header</div>
+    <style>
+        #vehicleInfoDataBox, .highsearch {
+            display: none
+        }
+        #treeNoInfo{
+            display: none;
+            margin: 10px 0 0 15px;
+        }
+    </style>
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">系统管理</li>
+                        <li class="active">809管理</li>
+                        <li class="active">809平台数据交互管理</li>
+                    </ul>
+                    <h1 class="h1 ">809平台数据交互管理</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="leftTreeBox fuelConsumption">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title fwb">类别列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="padding: 0px;">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <div class="col-md-9">
+                                        <input id="categoryTreeInput" name="groupSelect" class="form-control"
+                                               style="margin-bottom: 10px;" type="text" autocomplete="off" maxlength="30"
+                                               placeholder="请输入类别名称"/>
+                                    </div>
+                                    <div class="col-md-3 btnPadding">
+                                        <div class="columns btn-group pull-right">
+                                            <div class="keep-open btn-group">
+                                                <button id="customizeColumns" style="padding-top:8px" type="button"
+                                                        class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                    <span class="glyphicon glyphicon-align-justify"></span> <span
+                                                        class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu alarmSettingDropdown" role="menu"
+                                                    id="Ul-menu-text-v">
+                                                    <label class="radio-inline" style="margin-left:10px;">
+                                                        <input name="deviceCheck" value="11" type="radio"
+                                                               class="deviceCheck" checked> 吉林
+                                                    </label>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12  panelCarBg"
+                                     style="padding: 0px; height:630px!important;">
+                                    <div id="treeNoInfo">未查询到匹配项</div>
+                                    <ul id="categoryTree" class="ztreee"
+                                        style="height:615px!important;overflow:auto;"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="interactiveData" class="rightDataList" style="padding-right: 0px;padding-left: 10px;">
+                        <div th:replace="modules/jl/vehicle/railwayVehicle">停运车辆数据</div>
+                        <div th:replace="modules/jl/vehicle/policeVehicle">报警车辆数据</div>
+                        <div th:replace="modules/jl/vehicle/vehicleInfoData">车辆信息数据</div>
+                        <div th:replace="modules/jl/vehicle/orgInfoData">企业信息数据</div>
+                        <div th:replace="modules/jl/vehicle/vehicleOperationState">车辆运营状态数据</div>
+                        <div th:replace="modules/jl/vehicle/platformAssessData">平台考核数据</div>
+                        <div th:replace="modules/jl/vehicle/orgAssessData">企业考核数据</div>
+                        <div th:replace="modules/jl/vehicle/violationVehicle">违规车辆数据</div>
+                        <div th:replace="modules/jl/vehicle/orgVehicleAssessData">企业车辆违规考核数据</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var maxSelectItem = [[#{max.select.item}]];
+    var treeMaxLength5000 = [[#{tree.maxLength5000}]];
+    var exportFail = [[#{export.fail}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var maxSelectItem = [[#{max.select.item}]];
+</script>
+<script src="resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="resources/js/webSocket.js" th:src="@{/resources/js/webSocket.js}"></script>
+<script src="resources/js/ungzip/pako.min.js" th:src="@{/resources/js/ungzip/pako.min.js}"></script>
+<script src="resources/js/ungzip/ungzip.js" th:src="@{/resources/js/ungzip/ungzip.js}"></script>
+<script src="/clbs/resources/js/jlmr809/jlmrCommon.js"></script>
+<script src="/clbs/resources/js/jlmr809/categoryTree.js"></script>
+<!--重构日期控件(添加季度选择功能)-->
+<script src="/clbs/resources/js/jlmr809/refactoringDate.js"></script>
+<!--上报数据/停运车辆数据-->
+<script src="/clbs/resources/js/jlmr809/dataInteraction.js"></script>
+<!--上报数据/报警车辆数据-->
+<script src="/clbs/resources/js/jlmr809/policeVehicle.js"></script>
+<!--请求数据/车辆信息数据-->
+<script src="/clbs/resources/js/jlmr809/vehicleInfoData.js"></script>
+<!--请求数据/企业信息数据-->
+<script src="/clbs/resources/js/jlmr809/orgInfoData.js"></script>
+<!--请求数据/车辆运营状态数据-->
+<script src="/clbs/resources/js/jlmr809/vehicleOperationState.js"></script>
+<!--请求数据/平台考核数据-->
+<script src="/clbs/resources/js/jlmr809/platformAssessData.js"></script>
+<!--请求数据/企业考核数据-->
+<script src="/clbs/resources/js/jlmr809/orgAssessData.js"></script>
+<!--上报数据/违规车辆数据-->
+<script src="/clbs/resources/js/jlmr809/violationVehicle.js"></script>
+<!--请求数据/企业车辆违规考核数据-->
+<script src="/clbs/resources/js/jlmr809/orgVehicleAssessData.js"></script>
+
+</html>

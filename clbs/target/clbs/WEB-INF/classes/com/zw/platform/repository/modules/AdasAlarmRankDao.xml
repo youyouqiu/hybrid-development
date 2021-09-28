@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.AdasAlarmRankDao">
+    <select id="getGroupRank" resultType="com.zw.adas.domain.riskManagement.bean.AdasGroupRank">
+        SELECT
+        c.org_id as groupId,
+        sum(r.total) as total
+        FROM
+        (
+        SELECT DISTINCT
+        a.org_id,
+        v.vehicle_id AS vid
+        FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle v ON v.assignment_id = a.id
+        AND a.flag = 1
+        AND v.flag = 1
+        AND a.id in
+        <foreach item="item" collection="groupIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and a.org_id in
+        <foreach item="item" collection="orgIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        ) c
+        INNER JOIN zw_m_vehicle_adas_event_rank r ON r.vid = c.vid
+        where r.time BETWEEN #{startTime} and #{endTime}
+        group by c.org_id  ORDER BY total DESC
+    </select>
+
+
+    <select id="getVehicleRank" resultType="com.zw.platform.domain.leaderboard.VehicleRank">
+        SELECT
+        v.brand,
+        r.vid,
+        sum(r.total) as total,
+        v.group_id as groupId
+        FROM
+        zw_m_vehicle_adas_event_rank r
+        INNER JOIN zw_m_vehicle_info v ON r.vid = v.id
+        where v.flag = 1
+        and r.time BETWEEN #{startTime} and #{endTime}
+        and r.vid in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        r.vid
+        ORDER BY
+        total
+        DESC
+    </select>
+
+
+    <select id="getRankTotal" resultType="java.lang.Integer">
+        select sum(total) from zw_m_vehicle_adas_event_rank
+        where
+        vid in
+        <foreach item="item" collection="vids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and time between #{startTime} and #{endTime}
+    </select>
+
+
+    <select id="getRankOfGroup" resultType="com.zw.platform.domain.leaderboard.GroupRank">
+        SELECT
+        c.org_id as groupId,
+        sum(r.total) as total
+        FROM
+        (
+        SELECT DISTINCT
+        a.org_id,
+        v.vehicle_id AS vid
+        FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle v ON v.assignment_id = a.id
+        AND a.flag = 1
+        AND v.flag = 1
+        AND a.id in
+        <foreach item="item" collection="assignmentIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and a.org_id in
+        <foreach item="item" collection="groupIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="parmGroupIds!=null">
+            and a.org_id in
+            <foreach item="item" collection="parmGroupIds" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+        </if>
+        ) c
+        INNER JOIN zw_m_vehicle_adas_event_rank r ON r.vid = c.vid
+        where r.time BETWEEN #{startTime} and #{endTime}
+        GROUP BY c.org_id ORDER BY total DESC
+    </select>
+
+
+    <select id="getRankOfVehicle" resultType="com.zw.platform.domain.leaderboard.VehicleRank">
+        SELECT
+        v.brand,
+        r.vid,
+        sum(r.total) as total,
+        v.group_id as groupId
+        FROM
+        zw_m_vehicle_adas_event_rank r
+        INNER JOIN zw_m_vehicle_info v ON r.vid = v.id
+        where v.flag = 1
+        and r.time BETWEEN #{startTime} and #{endTime}
+        and r.vid in
+        <foreach item="item" collection="vehicleIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="param!=null">
+            and v.brand LIKE CONCAT('%',#{param},'%')
+        </if>
+        GROUP BY
+        r.vid
+        ORDER BY
+        total
+        DESC
+    </select>
+
+    <select id="findADriverByOrgUUidSet" resultType="com.zw.platform.domain.leaderboard.DriverRank">
+        SELECT
+        i.id,
+        i. NAME as driverName,
+        i.card_number,
+        i.org_id as groupId
+        FROM
+        zw_m_professionals_info i
+        WHERE
+        i.flag = 1
+        AND i.lock_type = 1
+        and i.org_id in
+        <foreach item="item" collection="orgUUidSet" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        <if test="queryParam!=null and queryParam!=''"> AND i.NAME LIKE BINARY CONCAT('%',#{queryParam},'%') </if>
+    </select>
+
+</mapper>

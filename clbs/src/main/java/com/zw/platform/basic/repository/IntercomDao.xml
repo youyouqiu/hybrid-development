@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.IntercomDao">
+    <select id="getSortList" resultType="string">
+    SELECT config.vehicle_id
+    from zw_m_intercom_info intercom INNER JOIN zw_m_config config on intercom.id = config.intercom_info_id and config.flag = 1
+    where intercom.flag = 1
+    ORDER BY intercom.create_data_time
+    </select>
+
+    <insert id="insert" parameterType="com.zw.platform.basic.domain.IntercomDO">
+        replace INTO `zw_m_intercom_info` (`id`, `intercom_device_id`, `group_id`, `simcard_id`, `user_id`,
+        `device_password`, `priority`, `customer_code`, `number`, `original_model_id`,
+        `text_enable`, `image_enable`, `audio_enable`, `status`, `record_enable`,`flag`, `create_data_time`, `create_data_username`)
+        VALUES (#{id}, #{intercomDeviceId}, #{orgId}, #{simcardId}, #{userId}, #{devicePassword}, #{priority}, #{customerCode},
+        #{number}, #{originalModelId}, #{textEnable}, #{imageEnable}, #{audioEnable}, #{status}, #{recordEnable},
+        #{flag}, #{createDataTime}, #{createDataUsername})
+    </insert>
+
+    <select id="getByIntercomDeviceNum" resultType="com.zw.platform.basic.domain.IntercomDO">
+        select `id`, `intercom_device_id`, `group_id` orgId, `simcard_id`, `user_id`,
+        `device_password`, `priority`, `customer_code`, `number`, `original_model_id`,
+        `text_enable`, `image_enable`, `audio_enable`, `status`, `record_enable`,`flag`, `create_data_time`, `create_data_username`
+         from `zw_m_intercom_info` where flag = 1 and intercom_device_id = #{intercomDeviceNum}
+    </select>
+
+    <select id="getDetailByConfigId" resultType="com.zw.platform.basic.dto.IntercomDTO">
+        SELECT c.id configId,c.vehicle_id id,c.monitor_type,c.device_id,c.sim_card_id,sci.simcard_number simCardNumber,
+        c.device_id,device.device_number,1 as bindType,c.intercom_info_id,
+        case when c.monitor_type = '0'  then car.group_id when c.monitor_type = '1' then peo.org_id ELSE th.group_id end as orgId,
+        case when c.monitor_type = '0'  then car.brand when c.monitor_type = '1' then peo.people_number ELSE th.thing_number end as name,
+        case when c.monitor_type = '0'  then car.aliases when c.monitor_type = '1' then peo.`name` ELSE th.`name` end as alias,
+        ini.`status`,ini.device_password,ini.intercom_device_id intercomDeviceNumber,ini.original_model_id,ini.priority,ini.user_id,
+        ini.customer_code,ini.number callNumber,ini.text_enable,ini.image_enable,ini.audio_enable,ini.record_enable,
+        GROUP_CONCAT(DISTINCT a.assignment_id) groupId,GROUP_CONCAT(DISTINCT ass.`name`) groupName, GROUP_CONCAT(a.assignment_id,';',a.knob_no) groupKnobNos,
+        im.`name` intercomModelName,om.model_id originalModel, om.audio_conference_enable, om.video_conference_enable,
+        om.video_call_enable,om.send_text_enable,om.send_image_enable,om.send_audio_enable,om.temp_group_enable,om.video_func_enable,om.comments,
+        om.knob_num,om.max_friend_num
+        from zw_m_config c
+        INNER  JOIN zw_m_intercom_info ini on c.intercom_info_id=ini.id and ini.flag = 1
+        LEFT JOIN zw_m_vehicle_info car on c.vehicle_id = car.id and car.flag=1
+        LEFT JOIN zw_m_people_info peo on c.vehicle_id = peo.id and peo.flag=1
+        LEFT JOIN zw_m_thing_info th on c.vehicle_id = th.id and th.flag=1
+        LEFT JOIN zw_m_sim_card_info sci ON c.sim_card_id = sci.id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info device on c.device_id = device.id
+        LEFT JOIN zw_m_assignment_vehicle a on c.vehicle_id = a.vehicle_id and a.flag = 1 and a.knob_no<![CDATA[ <> ]]>''
+        LEFT JOIN zw_m_assignment ass on a.assignment_id = ass.id and ass.flag = 1 and ass.types = 1
+        LEFT JOIN zw_m_original_model om ON om.`index` = ini.original_model_id AND om.flag = 1
+        LEFT JOIN zw_m_intercom_model im ON im.original_model_id = om.`index` AND im.flag = 1
+        where c.flag = 1
+        and c.id = #{configId}
+        GROUP BY  c.id
+    </select>
+
+    <select id="getDetailByConfigIds" resultType="com.zw.platform.basic.dto.IntercomDTO">
+        SELECT c.id configId,c.vehicle_id id,c.monitor_type,c.device_id,c.sim_card_id,sci.simcard_number simCardNumber,
+        c.device_id,device.device_number,1 as bindType,c.intercom_info_id,
+        case when c.monitor_type = '0' then car.group_id when c.monitor_type = '1' then peo.org_id ELSE th.group_id end
+        as orgId,
+        case when c.monitor_type = '0' then car.brand when c.monitor_type = '1' then peo.people_number ELSE
+        th.thing_number end as name,
+        case when c.monitor_type = '0' then car.aliases when c.monitor_type = '1' then peo.`name` ELSE th.`name` end as
+        alias,
+        ini.`status`,ini.device_password,ini.intercom_device_id
+        intercomDeviceNumber,ini.original_model_id,ini.priority,ini.user_id,
+        ini.customer_code,ini.number callNumber,ini.text_enable,ini.image_enable,ini.audio_enable,ini.record_enable,
+        GROUP_CONCAT(DISTINCT a.assignment_id) groupId,GROUP_CONCAT(DISTINCT ass.`name`) groupName,
+        GROUP_CONCAT(a.assignment_id,';',a.knob_no) groupKnobNos,
+        im.`name` intercomModelName,om.model_id originalModel, om.audio_conference_enable, om.video_conference_enable,
+        om.video_call_enable,om.send_text_enable,om.send_image_enable,om.send_audio_enable,om.temp_group_enable,om.video_func_enable,om.comments,
+        om.knob_num,om.max_friend_num
+        from zw_m_config c
+        INNER JOIN zw_m_intercom_info ini on c.intercom_info_id=ini.id and ini.flag = 1
+        LEFT JOIN zw_m_vehicle_info car on c.vehicle_id = car.id and car.flag=1
+        LEFT JOIN zw_m_people_info peo on c.vehicle_id = peo.id and peo.flag=1
+        LEFT JOIN zw_m_thing_info th on c.vehicle_id = th.id and th.flag=1
+        LEFT JOIN zw_m_sim_card_info sci ON c.sim_card_id = sci.id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info device on c.device_id = device.id
+        LEFT JOIN zw_m_assignment_vehicle a on c.vehicle_id = a.vehicle_id and a.flag = 1 and a.knob_no<![CDATA[ <> ]]>
+        ''
+        LEFT JOIN zw_m_assignment ass on a.assignment_id = ass.id and ass.flag = 1 and ass.types = 1
+        LEFT JOIN zw_m_original_model om ON om.`index` = ini.original_model_id AND om.flag = 1
+        LEFT JOIN zw_m_intercom_model im ON im.original_model_id = om.`index` AND im.flag = 1
+        where c.flag = 1
+        and c.id in
+        <foreach collection="configIds" open="(" close=")" separator="," item="configId">
+            #{configId}
+        </foreach>
+        GROUP BY c.id
+    </select>
+
+    <select id="getDetailByMonitorIds" resultType="com.zw.platform.basic.dto.IntercomDTO">
+        SELECT c.id configId,c.vehicle_id id,c.monitor_type,c.device_id,c.sim_card_id,sci.simcard_number simCardNumber,
+        c.device_id,device.device_number,1 as bindType,c.intercom_info_id,
+        case when c.monitor_type = '0' then car.group_id when c.monitor_type = '1' then peo.org_id ELSE th.group_id end
+        as orgId,
+        case when c.monitor_type = '0' then car.brand when c.monitor_type = '1' then peo.people_number ELSE
+        th.thing_number end as name,
+        case when c.monitor_type = '0' then car.aliases when c.monitor_type = '1' then peo.`name` ELSE th.`name` end as
+        alias,
+        ini.`status`,ini.device_password,ini.intercom_device_id
+        intercomDeviceNumber,ini.original_model_id,ini.priority,ini.user_id,
+        ini.customer_code,ini.number callNumber,ini.text_enable,ini.image_enable,ini.audio_enable,ini.record_enable,
+        GROUP_CONCAT(DISTINCT a.assignment_id) groupId,GROUP_CONCAT(DISTINCT ass.`name`) groupName,
+        GROUP_CONCAT(a.assignment_id,';',a.knob_no) groupKnobNos,
+        im.`name` intercomModelName,om.model_id originalModel, om.audio_conference_enable, om.video_conference_enable,
+        om.video_call_enable,om.send_text_enable,om.send_image_enable,om.send_audio_enable,om.temp_group_enable,om.video_func_enable,om.comments,
+        om.knob_num,om.max_friend_num,om.max_group_num
+        from zw_m_config c
+        INNER JOIN zw_m_intercom_info ini on c.intercom_info_id=ini.id and ini.flag = 1
+        LEFT JOIN zw_m_vehicle_info car on c.vehicle_id = car.id and car.flag=1
+        LEFT JOIN zw_m_people_info peo on c.vehicle_id = peo.id and peo.flag=1
+        LEFT JOIN zw_m_thing_info th on c.vehicle_id = th.id and th.flag=1
+        LEFT JOIN zw_m_sim_card_info sci ON c.sim_card_id = sci.id AND sci.flag = 1
+        LEFT JOIN zw_m_device_info device on c.device_id = device.id
+        LEFT JOIN zw_m_assignment_vehicle a on c.vehicle_id = a.vehicle_id and a.flag = 1 and a.knob_no<![CDATA[ <> ]]>
+        ''
+        LEFT JOIN zw_m_assignment ass on a.assignment_id = ass.id and ass.flag = 1 and ass.types = 1
+        LEFT JOIN zw_m_original_model om ON om.`index` = ini.original_model_id AND om.flag = 1
+        LEFT JOIN zw_m_intercom_model im ON im.original_model_id = om.`index` AND im.flag = 1
+        where c.flag = 1
+        and c.vehicle_id in
+        <foreach collection="monitorIds" open="(" close=")" separator="," item="monitorId">
+            #{monitorId}
+        </foreach>
+        GROUP BY c.id
+    </select>
+
+    <delete id="deleteByIds">
+        DELETE FROM zw_m_intercom_info where id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="clearConfigIntercomId">
+        update zw_m_config
+        set intercom_info_id = null
+        where
+        id in
+        <foreach collection="configIds" item="configId" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </update>
+
+    <select id="getIntercomDeviceNum" resultType="string" parameterType="string">
+        SELECT intercom_device_id from zw_m_intercom_info
+        where flag = 1
+        <if test="interDeviceNumList!=null and interDeviceNumList.size()>0">
+            and intercom_device_id in
+            <foreach collection="interDeviceNumList" item="interDeviceNum" open="(" close=")" separator=",">
+                #{interDeviceNum}
+            </foreach>
+        </if>
+    </select>
+
+    <insert id="addByBatch" parameterType="com.zw.platform.basic.domain.IntercomDO">
+        INSERT INTO `zw_m_intercom_info` (`id`, `intercom_device_id`, `group_id`, `simcard_id`, `user_id`,
+        `device_password`, `priority`, `customer_code`, `number`, `original_model_id`,
+        `text_enable`, `image_enable`, `audio_enable`, `status`, `record_enable`,`flag`, `create_data_time`,
+        `create_data_username`)
+        VALUES
+        <foreach collection="intercomList" item="item" index="index" separator=",">
+            (#{item.id}, #{item.intercomDeviceId}, #{item.orgId}, #{item.simcardId}, #{item.userId},
+            #{item.devicePassword}, #{item.priority},
+            #{item.customerCode},
+            #{item.number}, #{item.originalModelId}, #{item.textEnable}, #{item.imageEnable}, #{item.audioEnable},
+            #{item.status}, #{item.recordEnable},
+            #{item.flag}, #{item.createDataTime}, #{item.createDataUsername}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.zw.platform.basic.domain.IntercomDO">
+        update `zw_m_intercom_info`
+        <set>
+            update_data_time = now(),
+            <if test="devicePassword != null">
+                device_password = #{devicePassword},
+            </if>
+            <if test="priority != null">
+                priority = #{priority},
+            </if>
+            <if test="textEnable != null">
+                text_enable = #{textEnable},
+            </if>
+            <if test="imageEnable != null">
+                image_enable = #{imageEnable},
+            </if>
+            <if test="audioEnable != null">
+                audio_enable = #{audioEnable},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="intercomDeviceId != null">
+                intercom_device_id = #{intercomDeviceId},
+            </if>
+            <if test="customerCode != null">
+                customer_code = #{customerCode},
+            </if>
+            <if test="simcardId != null">
+                simcard_id = #{simcardId},
+            </if>
+            <if test="recordEnable !=null">
+                record_enable = #{recordEnable},
+            </if>
+            <if test="updateDataUsername != null">
+                update_data_time = #{updateDataUsername},
+            </if>
+        </set>
+        where id = #{id} and flag = 1
+    </update>
+</mapper>

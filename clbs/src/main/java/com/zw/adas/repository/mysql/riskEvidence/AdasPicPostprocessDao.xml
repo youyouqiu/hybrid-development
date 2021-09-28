@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.adas.repository.mysql.riskEvidence.AdasPicPostprocessDao">
+
+    <update id="unmarkPicPostprocess">
+        UPDATE zw_m_config SET pic_postprocess = 0 WHERE flag = 1 AND vehicle_id IN
+        <foreach collection="collection" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="markPicPostprocess">
+        UPDATE zw_m_config SET pic_postprocess = 1 WHERE flag = 1 AND vehicle_id IN
+        <foreach collection="collection" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

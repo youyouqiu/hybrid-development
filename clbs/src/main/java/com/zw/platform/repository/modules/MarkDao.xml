@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.modules.MarkDao">
+	<update id="deleteMarker">
+		update zw_m_marker
+		set flag = 0
+		where id = #{fenceId}
+	</update>
+
+	<!-- 查询标注 -->
+	<select id="findMarkById" parameterType="string"
+		resultType="com.zw.platform.domain.functionconfig.Mark">
+		SELECT mark.*, zmft.color_code, zmft.transparency FROM zw_m_marker mark
+		left join zw_m_fence_info zmfi on zmfi.shape = mark.id and zmfi.flag = 1
+		left join zw_m_fence_type zmft on zmft.id = zmfi.fence_type_id and zmft.flag = 1
+		WHERE mark.flag = 1
+		<if test="id != null and id != ''">
+			AND mark.id = #{id}
+		</if>
+		ORDER BY mark.create_data_time DESC
+	</select>
+
+	<!-- 查询标注 -->
+	<select id="findMarkByIds"
+		resultType="com.zw.platform.domain.functionconfig.Mark">
+		SELECT mark.* FROM zw_m_marker mark
+		WHERE flag = 1
+		AND mark.id IN
+		<foreach item="item" collection="ids" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		ORDER BY create_data_time DESC
+	</select>
+
+	<!--新增标注-->
+	<insert id="marker" parameterType="com.zw.platform.domain.functionconfig.form.MarkForm">
+		INSERT INTO zw_m_marker (
+		id, name, longitude, latitude, type, group_id, description, create_data_time, create_data_username, mark_icon
+		)
+		VALUES(
+		#{id}, #{name}, #{longitude}, #{latitude}, #{type},#{groupId},#{description},#{createDataTime},#{createDataUsername}, #{markIcon}
+		)
+	</insert>
+	<!-- 新增电子围栏总表 -->
+	<insert id="fenceInfo" parameterType="com.zw.platform.domain.functionconfig.form.ManageFenceFrom">
+		INSERT INTO zw_m_fence_info (id, type, shape, flag, create_data_time, create_data_username, fence_type_id)
+		VALUES (#{id}, #{type}, #{shape}, #{flag}, #{createDataTime}, #{createDataUsername}, #{typeId})
+	</insert>
+	<!-- 修改标注 -->
+	<update id="updateMarker" parameterType="com.zw.platform.domain.functionconfig.form.MarkForm">
+		UPDATE zw_m_marker m
+		SET
+	        m.name = #{name},
+	        m.longitude = #{longitude},
+	        m.latitude = #{latitude},
+	        m.type = #{type},
+	        m.description = #{description},
+	        m.update_data_time = #{updateDataTime},
+	        m.update_data_username = #{updateDataUsername},
+	        m.mark_icon = #{markIcon}
+        WHERE m.id = #{markerId}
+	</update>
+
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.api.repository.mysql.MonitorInfoDao">
+    <select id="getIdByName" parameterType="string" resultType="string">
+        SELECT DISTINCT v.id FROM
+        (
+            SELECT car.id id, car.brand brand, car.flag FROM
+            zw_m_vehicle_info car WHERE car.flag=1
+            UNION
+            SELECT peo.id id, peo.people_number brand ,peo.flag FROM
+            zw_m_people_info peo WHERE peo.flag=1
+            UNION
+            SELECT thing.id , thing.thing_number brand, thing.flag FROM
+            zw_m_thing_info thing where thing.flag =1
+        ) v
+        WHERE
+        v.flag = 1 AND v.brand in
+        <foreach item="item" collection="name" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getDriverInfo" resultType="com.zw.api.domain.DriverInfo">
+        SELECT ic_card_agencies AS agency, ic_card_end_date AS expireDate, card_number as idNumber,name as name
+        FROM zw_m_professionals_info
+        WHERE identity = #{identity}
+          AND name = #{name}
+          AND flag = 1
+          AND lock_type = 1
+        ORDER BY create_data_time DESC
+        LIMIT 1
+    </select>
+</mapper>

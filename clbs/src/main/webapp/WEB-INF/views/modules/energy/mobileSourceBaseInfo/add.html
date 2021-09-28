@@ -1,0 +1,229 @@
+<form th:action="@{/m/basicinfo/monitoring/vehicle/add}" id="addForm"
+	role="form" action="#" method="post" class="form-horizontal">
+	<div class="modal-header">
+		<button id="doXAdd" type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h4 class="modal-title">新建车辆</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="form-group">
+					<label class="col-md-2 control-label"><label
+						class="text-danger">*</label> 车牌号：</label>
+					<div class="col-md-4">
+						<input name="brand" placeholder="请输入车牌号" type="text" id="brand"
+							class="form-control" />
+					</div>
+					<label class="col-md-2 control-label"><label
+						class="text-danger">*</label> 所属企业：</label>
+					<div class="has-feedback col-md-4">
+						<input name="groupName" th:value="${groupName}" class="form-control" id="zTreeCitySel"
+							placeholder="请选择所属企业" readonly="readonly" style="background-color: #fafafa; cursor: pointer;"  type="text" />
+					    <span id="zTreeCitySelSpan" class="fa fa-chevron-down form-control-feedback"
+                                                          aria-hidden="true"></span>		
+						<div class="ztreeModelBox" id="zTreeContent">
+							<ul id="ztreeDemo" class="ztree"></ul>
+						</div>
+						<input id = "selectGroup" th:value="${orgId}" name = "groupId" type="text" hidden="true" />
+						<label id="error_label_add" class="error" style="display: none;"></label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">别名：</label>
+					<div class="col-md-4">
+						<input name="aliases" placeholder="请输入车辆别名" type="text"
+							class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">车主：</label>
+					<div class="col-md-4">
+						<input name="vehicleOwner" placeholder="请输入车主" type="text"
+							class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+				    <label class="col-md-2 control-label">车辆类型：</label>
+					<div class="col-md-4">
+					    <select name="vehicleType" placeholder="请输入车辆类型" id="vehicleType"
+							class="form-control">
+						</select>
+					</div>
+					<label class="col-md-2 control-label">车主电话：</label>
+					<div class="col-md-4">
+						<input name="vehicleOwnerPhone" placeholder="请输入车主电话" type="text"
+							class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+				    <label class="col-md-2 control-label">车辆颜色：</label>
+					<div class="col-md-4">
+						<select name="vehicleColor" placeholder="请选择车辆颜色"
+							class="form-control">
+							<option selected="selected" value="0">黑色</option>
+							<option value="1">白色</option>
+							<option value="2">红色</option>
+							<option value="3">蓝色</option>
+							<option value="4">紫色</option>
+							<option value="5">黄色</option>
+							<option value="6">绿色</option>
+							<option value="7">粉色</option>
+							<option value="8">棕色</option>
+							<option value="9">灰色</option>
+						</select>
+					</div>
+					<label class="col-md-2 control-label">车牌颜色：</label>
+					<div class="col-md-4">
+						<select name="plateColor" placeholder="请选择车牌颜色"
+							class="form-control plateColorSelect"></select>
+					</div>
+				</div>
+				<div class="form-group">
+				    <label class="col-md-2 control-label">发动机号：</label>
+					<div class="col-md-4">
+						<input name="engineNumber" placeholder="请输入发动机号" type="text"
+							class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">车架号：</label>
+					<div class="col-md-4">
+						<input name="chassisNumber" placeholder="请输入车架号" type="text"
+							class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">燃料类型：</label>
+					<div class="col-md-4">
+						<select name="fuelType" class="form-control" id="fuelType" placeholder="请输入燃料类型">
+							<optgroup label="柴油" id="dieselOil">
+                            </optgroup>
+                            <optgroup label="汽油" id="gasoline">
+                            </optgroup>
+                            <optgroup label="天然气" id="naturalGas">
+                             <!--  <option value="CNG">CNG</option> -->
+                            </optgroup>
+						</select>
+					</div>
+					<label class="col-md-2 control-label">区域属性：</label>
+					<div class="col-md-4">
+						<select name="areaAttribute" placeholder="请选择区域属性"
+							class="form-control">
+                              <option value="省内">省内</option>
+                              <option value="跨省">跨省</option>
+                              <option value="进京报备">进京报备</option>
+						</select>
+					</div>
+				</div>
+				<div data-toggle="distpicker">
+					<div class="form-group">
+						<label class="col-md-2 control-label">省、直辖市：</label>
+						<div class="col-md-4">
+						    <label class="sr-only" for="province1">Province</label> 
+	                        <select class="form-control" name="province" id="province1"></select>
+						</div>
+						<label class="col-md-2 control-label">市、区：</label>
+						<div class="col-md-4">
+						    <label class="sr-only" for="city1">City</label>
+	                        <select class="form-control" name="city" id="city1"></select>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">车辆用途：</label>
+                    <div class="col-md-4">
+						<select name="vehiclePurpose" class="form-control" id="vehiclePurpose"> 
+                              
+						</select>
+					</div>
+					<label class="col-md-2 control-label">车辆状态：</label>
+                    <div class="col-md-4">
+						<select name="isStarts" class="form-control">
+                              <option selected="selected" value="1" >启用</option>
+                              <option value="0" >停用</option>
+						</select>
+						<input id="radionOn"  type="text" hidden="true" />
+						<input id="radionOff"  type="text" hidden="true" />
+					</div>
+				</div>
+				<div class="form-group">
+				    <label class="col-md-2 control-label">道路运输证号：</label>
+					<div class="col-md-4">
+						<input id="transportNumber" name="roadTransportNumber" placeholder="请输入道路运输证号" type="text"
+							class="form-control" />
+					</div>
+					<label class="col-md-2 control-label">车辆营运证号：</label>
+					<div class="col-md-4">
+						<input name="vehiclOperationNumber" placeholder="请输入车辆营运证号" type="text"
+							class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label" for="transportValidity">道路运输证有效期：</label> 
+						<div class="col-md-4">
+							<input style="cursor: pointer;  background-color: #fafafa;" autocomplete="off"
+								class="form-control layer-date laydate-icon" placeholder="请选择有效期"
+							    id="transportValidity" name="roadTransportValidity" />
+					</div>
+					<label class="col-md-2 control-label">车辆保险单号：</label>
+					<div class="col-md-4">
+						<input name="vehicleInsuranceNumber" placeholder="请输入车辆保险单号" type="text"
+							class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+ 					<label class="col-md-2 control-label" for="technologyValidity">技术等级有效期：</label>
+						<div class="col-md-4">
+							<input style="cursor: pointer;  background-color: #fafafa;" autocomplete="off"
+								class="form-control layer-date laydate-icon" placeholder="请选择有效期"
+								id="technologyValidity" name="vehicleTechnologyValidity" />
+					    </div>
+					
+					<label class="col-md-2 control-label">备&emsp;&emsp;注：</label>
+					<div class="col-md-4">
+						<input name="remark" placeholder="请输入备注" type="text"
+							class="form-control" />
+					</div>
+				</div>
+			   <div class="form-group">
+					<div class="col-md-7">
+						<table width="50%" border="0" cellspacing="0" cellpadding="0">
+							<tbody>
+								<tr>
+									<td align="left">
+									<div id="localImag"><img id="preview" src="" style="display: none;"></div>
+									<input id="vehiclephoto" name="vehiclePhoto" type="hidden" /> 
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<div class="inpFilePhoto">
+											<input type="file" accept="image/gif,image/jpeg,image/jpg,image/png" name="file" id="doc" style="width:202px;" onchange="vehicleAdd.setImagePreview();">
+											<label class="changeFile" for="doc">载入车辆照片</label>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+	
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button id="doSubmitAdd" class="btn btn-primary" type="button">
+			<strong>提 交</strong>
+		</button>
+		<button id="doCloseAdd" type="button" class="btn btn-default" data-dismiss="modal">
+			<strong>关 闭</strong>
+		</button>
+	</div>
+</form>
+<script type="text/javascript" src="/clbs/resources/js/sendAjax.js" th:src="@{/resources/js/sendAjax.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.data.js" th:src="@{/resources/js/CityDistpicker/distpicker.data.js}"></script>
+<script src="resources/js/CityDistpicker/distpicker.js" th:src="@{/resources/js/CityDistpicker/distpicker.js}"></script>
+<script th:inline="javascript">
+	var vehicleBrandNull = [[#{vehicle.brand.null}]];
+	var vehicleBrandError = [[#{vehicle.brand.error}]];
+	var vehicleBrandExists = [[#{vehicle.brand.exists}]];
+	var phoneError = [[#{phone.error}]];
+</script>
+<script src="/wro/vehicleAdd.js" th:src="@{/wro/vehicleAdd.js}"></script>

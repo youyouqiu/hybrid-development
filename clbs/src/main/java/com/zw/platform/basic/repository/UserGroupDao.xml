@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.basic.repository.UserGroupDao">
+
+    <insert id="addGroups2User" parameterType="list">
+
+    </insert>
+
+    <insert id="batchAdd">
+        insert into zw_m_assignment_user (id, user_id, assignment_id,
+        flag, create_data_time, create_data_username)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id}, #{item.userId},
+            #{item.groupId},
+            #{item.flag}, now(),
+            #{item.createDataUsername})
+        </foreach>
+    </insert>
+
+    <update id="deleteByGroupId">
+        update zw_m_assignment_user
+        set flag = 0
+        where assignment_id = #{groupId}
+          and flag = 1
+    </update>
+
+    <update id="deleteByGroupIds">
+        update zw_m_assignment_user
+        set flag = 0
+        where assignment_id in
+        <foreach collection="groupIds" separator="," open="(" close=")" item="groupId" index=",">
+            #{groupId}
+        </foreach>
+          and flag = 1
+    </update>
+
+    <update id="deleteUserGroupByUserAndGroupIds">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and user_id = #{userId}
+        and assignment_id in
+        <foreach item="item" collection="ids" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="deleteUserGroupByUserIdAndGroupId">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+        and assignment_id = #{groupId}
+        and user_id in
+        <foreach item="item" collection="userIds" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+
+    </update>
+
+    <update id="deleteByUserId">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1
+          and user_id = #{userId}
+    </update>
+
+    <update id="deleteByUserIds">
+        update zw_m_assignment_user
+        set flag = 0
+        where flag = 1 and user_id in
+        <foreach collection="userIds" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 查询用户分组权限 -->
+    <select id="getUserAssignmentByVehicleId"
+            resultType="com.zw.platform.basic.dto.GroupDTO">
+        SELECT DISTINCT a.id, a.name FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_vehicle av ON av.assignment_id = a.id AND av.flag = 1
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        and av.vehicle_id in
+        <foreach item="item" collection="vehicleIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <!-- 查询用户分组权限 -->
+    <select id="findUserGroupIds" resultType="String">
+        SELECT  a.id FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id
+        WHERE a.flag = 1 AND au.flag = 1
+        AND au.user_id = #{userId}
+        <if test="groupList != null">
+            AND a.group_id in
+            <foreach item="item" collection="orgIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY a.create_data_time desc, a.name
+    </select>
+
+    <select id="getUserIdsByGroupId" resultType="java.lang.String">
+        select user_id from zw_m_assignment_user where assignment_id = #{groupId} and flag = 1
+    </select>
+
+    <select id="getUserIdsByGroupIds" resultType="com.zw.platform.basic.dto.UserGroupDTO">
+        select user_id,assignment_id as groupId from zw_m_assignment_user where flag =1 and  assignment_id in
+        <foreach collection="groupIds" separator="," open="(" close=")" item="groupId" index=",">
+            #{groupId}
+        </foreach>
+    </select>
+
+    <select id="getAssignedUserIdByIdAndUserId" resultType="java.lang.String">
+        SELECT DISTINCT user_id
+        FROM zw_m_assignment_user
+        WHERE flag = 1
+        AND assignment_id = #{groupId}
+        AND user_id IN
+        <foreach item="item" collection="userIdList" separator="," open="("
+                 close=")">
+            #{item}
+        </foreach>
+        ORDER BY create_data_time DESC
+    </select>
+
+    <select id="getBingUserIdByOrgId" resultType="java.lang.String">
+        SELECT DISTINCT assu.user_id
+        FROM zw_m_assignment_user assu
+        LEFT JOIN zw_m_assignment ass ON assu.assignment_id = ass.id
+        WHERE assu.flag = 1 AND ass.flag = 1
+        AND ass.group_id IN
+        <foreach item="item" collection="list" separator=","
+                 open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getAll" resultType="com.zw.platform.basic.dto.UserGroupDTO">
+      select user_id,assignment_id as groupId from zw_m_assignment_user where flag = 1
+    </select>
+
+    <select id="getByGroupIdsAndUserId" resultType="com.zw.platform.basic.dto.GroupDTO">
+        SELECT a.id, a.name, a.org_id, a.create_data_time FROM zw_m_assignment a
+        INNER JOIN zw_m_assignment_user au ON a.id = au.assignment_id AND au.flag = 1
+        WHERE a.flag = 1
+        AND au.user_id = #{userId}
+        <if test="orgIds != null and orgIds.size() > 0">
+            AND a.org_id in
+            <foreach item="item" collection="orgIds" separator=","
+                     open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by a.create_data_time desc
+    </select>
+
+</mapper>

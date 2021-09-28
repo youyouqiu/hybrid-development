@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.other.protocol.jl.StoppedVehicleDao">
+    <select id="recordPage" parameterType="com.zw.platform.domain.other.protocol.jl.dto.StoppedVehicleRecordQuery"
+            resultType="com.zw.platform.domain.other.protocol.jl.dto.StoppedVehicleRecordDto">
+        select * from zw_m_stopped_vehicle
+        where monitor_id in
+        <foreach collection="query.vehicleIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="query.uploadDateStart !=null">
+            and upload_time BETWEEN #{query.uploadDateStart} and #{query.uploadDateEnd}
+        </if>
+        <if test="query.state != null">
+            and upload_state = #{query.state}
+        </if>
+        <if test="query.stopCauseCode != null">
+            and stop_cause_code = #{query.stopCauseCode}
+        </if>
+        <if test="query.simpleQueryParam != null and query.simpleQueryParam != ''">
+            and monitor_name like concat('%', #{query.simpleQueryParam},'%')
+        </if>
+        order by upload_time desc
+    </select>
+
+    <insert id="addRecode" parameterType="com.zw.platform.domain.other.protocol.jl.dto.StoppedVehicleRecordDto">
+      INSERT INTO zw_m_stopped_vehicle
+        (
+            id,
+            monitor_id,
+            monitor_name,
+            start_date,
+            end_date,
+            stop_cause_code,
+            plate_color,
+            group_name,
+            upload_time,
+            upload_state,
+            operator,
+            error_msg
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.monitorId},
+            #{item.monitorName},
+            #{item.startDate},
+            #{item.endDate},
+            #{item.stopCauseCode},
+            #{item.plateColor},
+            #{item.groupName},
+            #{item.uploadTime},
+            #{item.uploadState},
+            #{item.operator},
+            #{item.errorMsg}
+            )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.3//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.platform.repository.vas.ForwardVehicleManageDao">
+    <insert id="add" parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlForm">
+ INSERT INTO zw_m_oil_subsidy_url_info (
+        id,docking_code_org_id,forwarding_platform_id,url,user_name,password,docking_code,create_data_time,create_data_username,flag
+        )
+        VALUES(
+         #{id}, #{dockingCodeOrgId}, #{forwardingPlatformId}, #{url},  #{userName}, #{password}, #{dockingCode},#{createDataTime},#{createDataUsername},#{flag}
+        )
+    </insert>
+    <update id="update" parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlForm">
+      update zw_m_oil_subsidy_url_info  set  docking_code_org_id=#{dockingCodeOrgId},forwarding_platform_id=#{forwardingPlatformId},
+      url=#{url},user_name=#{userName},password=#{password},docking_code=#{dockingCode},update_data_time=#{updateDataTime},
+      update_data_username=#{updateDataUsername} where id=#{id} and flag =1
+
+    </update>
+
+    <update id="updateDownloadStatus" parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlForm">
+        update zw_m_oil_subsidy_url_info set download_status=#{downloadStatus} ,download_time=#{downloadTime} where id=#{id} and flag =1
+    </update>
+
+
+    <!-- 在编辑的时候，这里处于性能考虑，只要返回一条数据id即可-->
+    <select id="getForwardVehicleByDockingCode" resultType="string">
+        select id from zw_m_oil_subsidy_vehicle_info where flag =1 and docking_code=#{dockingCode} limit 1
+    </select>
+
+    <select id="getForwardVehiclesByDockingCode"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        select * from zw_m_oil_subsidy_vehicle_info where flag =1 and docking_code=#{dockingCode}
+    </select>
+
+    <select id="getForwardVehicleIdByDockingCode" resultType="string">
+        select distinct match_vehicle_id from zw_m_oil_subsidy_vehicle_info where flag =1 and docking_code=#{dockingCode} and match_vehicle_id is not null
+    </select>
+
+    <update id="deleteForwardVehicleByDockingCode">
+      update zw_m_oil_subsidy_vehicle_info set flag =0  where flag =1 and docking_code=#{dockingCode}
+    </update>
+    <select id="findById" parameterType="String"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlInfo">
+        SELECT  * FROM zw_m_oil_subsidy_url_info       WHERE flag = 1       AND id = #{id}
+    </select>
+
+    <update id="delete">
+        update zw_m_oil_subsidy_url_info set flag =0 where id =#{id} and flag =1
+    </update>
+
+
+    <select id="queryInfos" parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlQuery"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilDownloadUrlInfo">
+        SELECT * FROM zw_m_oil_subsidy_url_info
+        WHERE flag = 1
+
+        <choose>
+            <when test="dockingCodeOrgIds != null and dockingCodeOrgIds.size() > 0">
+                and docking_code_org_id in
+                <foreach item="item" collection="dockingCodeOrgIds" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+                and docking_code_org_id='-1'
+            </otherwise>
+        </choose>
+        order by create_data_time desc
+
+
+    </select>
+
+    <select id="getIdByDockingCode" resultType="string">
+        select id from zw_m_oil_subsidy_url_info where flag =1 and docking_code=#{dockingCode}
+        <if test="id != null and id !=''">
+            AND id !=#{id}
+        </if>
+    </select>
+
+    <!-- 根据number查询流量传感器 -->
+    <select id="queryVehicleInfos"
+            parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleQuery"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleInfo">
+        SELECT zi.*, zv.group_id as vehicleOrgId FROM zw_m_oil_subsidy_vehicle_info zi left join zw_m_vehicle_info zv on
+        zi.match_vehicle_id = zv.id and zv.flag = 1
+        WHERE zi.flag = 1
+        <if test="query.searchParam != null and query.searchParam !=''">
+            and ((docking_code_org_id in
+            <foreach item="item" collection="query.dockingCodeOrgIds" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+            and zi.brand like CONCAT('%',#{query.searchParam},'%'))
+
+            <if test="query.searchDockingCodeOrgIds != null and query.searchDockingCodeOrgIds.size > 0">
+                or docking_code_org_id in
+                <foreach item="item" collection="query.searchDockingCodeOrgIds" open="(" separator=","
+                         close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="query.matchStatus != null and query.searchParam !=''">
+                or zi.match_status = #{query.matchStatus}
+            </if>
+            )
+
+        </if>
+
+            and docking_code_org_id in
+            <foreach item="item" collection="query.dockingCodeOrgIds" open="(" separator=","
+                     close=")">
+                #{item}
+            </foreach>
+
+        order by zi.brand
+    </select>
+
+    <select id="getOilForwardVehicleById" parameterType="java.lang.String"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+    SELECT zi.*, zv.group_id as vehicleOrgId FROM zw_m_oil_subsidy_vehicle_info zi left join zw_m_vehicle_info zv on
+        zi.match_vehicle_id = zv.id and zv.flag = 1
+    WHERE zi.id = #{id}
+    </select>
+
+    <select id="getOilForwardVehicleByIds" parameterType="java.lang.String"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        SELECT * FROM zw_m_oil_subsidy_vehicle_info
+        WHERE id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 检查已经有绑定关系的线路id -->
+    <select id="checkBindLineIds" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT distinct line_id FROM zw_m_oil_subsidy_vehicle_info
+        WHERE flag = 1
+        and line_id in
+        <foreach item="item" collection="lineIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getBindLineVehicleId" parameterType="java.lang.String"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        SELECT forwarding_platform_id,match_vehicle_id,org_code,line_id FROM zw_m_oil_subsidy_vehicle_info
+        WHERE flag = 1
+        and line_id = #{lineId}
+    </select>
+
+    <update id="bindLine">
+      update zw_m_oil_subsidy_vehicle_info set line_id = #{lineId}  where id = #{id}
+    </update>
+
+    <select id="checkVehicle" resultType="java.lang.String">
+        SELECT id FROM zw_m_vehicle_info
+        WHERE flag = 1
+        and group_id in
+        <foreach item="item" collection="orgIds" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and brand = #{brand}
+        and plate_color = #{plateColor}
+    </select>
+
+    <update id="changeSuccessBindStatus">
+
+        update zw_m_oil_subsidy_vehicle_info set match_status = 1,failed_reason = NULL,match_time = #{time},
+        update_data_time = #{time}, update_data_username = #{update_data_username},
+        <trim prefix="match_vehicle_id=case" suffix="end">
+            <foreach collection="oilForwardVehicleForms" item="item" index="index">
+                <if test="item.matchVehicleId !=null">
+                    when id=#{item.id} then #{item.matchVehicleId}
+                </if>
+            </foreach>
+        </trim>
+        where id in
+        <foreach collection="oilForwardVehicleForms" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <update id="changeFailBindStatus">
+        update zw_m_oil_subsidy_vehicle_info set match_status = 0,failed_reason = 0,match_vehicle_id = NULL,
+        match_time = #{time},update_data_time = #{time}, update_data_username = #{update_data_username}
+        where id in
+        <foreach collection="oilForwardVehicleForms" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <!--油补绑定信息新增-->
+    <select id="getOilVehicles"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilVehicleInfo">
+        SELECT v.org_code as companyId,v.vehicle_code as externalVehicleId, v.match_vehicle_id as vehicleId,v.line_id
+        from zw_m_oil_subsidy_vehicle_info v where v.match_vehicle_id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and v.flag =1
+    </select>
+    <select id="getDevices" resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilVehicleInfo">
+        SELECT d.id as deviceId,d.manufacturer_id,d.device_modelNumber from zw_m_device_info d where id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and d.flag =1
+    </select>
+    <select id="getVehicles" resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilVehicleInfo">
+        SELECT v.id as vehicleId, v.province_id,v.city_id,v.chassis_number as vehicleVin from zw_m_vehicle_info v where
+        id in
+        <foreach item="item" collection="ids" open="(" separator=","
+                 close=")">
+            #{item}
+        </foreach>
+        and v.flag =1
+    </select>
+
+    <select id="getLines" resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilVehicleInfo">
+        SELECT l.id as lineId,l.identify as lineNo from zw_m_oil_subsidy_line_info l where l.id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and l.flag =1
+    </select>
+    <select id="getAllBindVehicle" resultType="com.zw.platform.domain.connectionparamsset_809.T809ForwardConfig">
+         select config.vehicle_id as id, v.brand,c.config_id,s.id plantFormId,s.platform_name plantFormName, s.`ip` plantFormIp,s.`port` plantFormPort,s.protocol_type,
+        v.plate_color vehicleColor,s.center_id platFormCenterId,v.vehicle_code
+        from zw_m_809_config c
+        INNER JOIN zw_m_config config on c.config_id= config.id and config.flag=1
+        INNER JOIN zw_m_oil_subsidy_vehicle_info v on config.vehicle_id = v.match_vehicle_id and v.flag=1
+        INNER JOIN zw_m_809_setting s on c.setting_id = s.id and s.flag=1
+        where c.protocol_type = 1603
+        and c.flag =1
+    </select>
+
+    <update id="deleteVehicleByIds">
+        update zw_m_oil_subsidy_vehicle_info set flag = 0 where
+        id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </update>
+
+
+    <select id="getBindVehicleId" resultType="java.lang.String">
+        SELECT match_vehicle_id from zw_m_oil_subsidy_vehicle_info where id in
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and flag =1
+        and match_status = 1
+    </select>
+
+    <insert id="addForwardVehicles"
+            parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        insert into zw_m_oil_subsidy_vehicle_info
+        (id,docking_code_org_id,brand,plate_color,forwarding_platform_id,industry_category,
+        vehicle_status,frame_number,match_status,failed_reason,match_time,line_id,match_vehicle_id,
+        docking_code,vehicle_code,province_code,org_code,city_code,county_code,
+        create_data_time,create_data_username,flag
+        )
+        values
+        <foreach collection="forwardVehicles" separator="," item="item">
+            (#{item.id},#{item.dockingCodeOrgId},#{item.brand},#{item.plateColor},#{item.forwardingPlatformId},#{item.industryCategory},
+            #{item.vehicleStatus},#{item.frameNumber},#{item.matchStatus},#{item.failedReason},#{item.matchTime},#{item.lineId},#{item.matchVehicleId},
+            #{item.dockingCode},#{item.vehicleCode},#{item.provinceCode},#{item.orgCode},#{item.cityCode},#{item.countyCode},
+            #{item.createDataTime},#{item.createDataUsername},#{item.flag})
+        </foreach>
+    </insert>
+    <update id="updateForwardVehicles"
+            parameterType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        insert into zw_m_oil_subsidy_vehicle_info
+        (id,docking_code_org_id,brand,plate_color,forwarding_platform_id,industry_category,
+        vehicle_status,frame_number,match_status,failed_reason,match_time,line_id,match_vehicle_id,
+        docking_code,vehicle_code,province_code,org_code,city_code,county_code,
+        update_data_time,update_data_username,flag
+        )
+        values
+        <foreach collection="forwardVehicles" separator="," item="item">
+            (#{item.id},#{item.dockingCodeOrgId},#{item.brand},#{item.plateColor},#{item.forwardingPlatformId},#{item.industryCategory}
+            ,#{item.vehicleStatus},#{item.frameNumber},#{item.matchStatus},#{item.failedReason},#{item.matchTime},#{item.lineId},#{item.matchVehicleId},
+            #{item.dockingCode},#{item.vehicleCode},#{item.provinceCode},#{item.orgCode},#{item.cityCode},#{item.countyCode},
+            #{item.updateDataTime},#{item.updateDataUsername},#{item.flag})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        id=values(id),docking_code_org_id=values(docking_code_org_id),brand=values(brand),plate_color=values(plate_color),forwarding_platform_id=values(forwarding_platform_id),industry_category=values(industry_category),
+        vehicle_status=values(vehicle_status),frame_number=values(frame_number),match_status=values(match_status),
+        failed_reason=values(failed_reason),match_time=values(match_time),line_id=values(line_id),match_vehicle_id=values(match_vehicle_id),
+        docking_code=values(docking_code),vehicle_code=values(vehicle_code),province_code=values(province_code),org_code=values(org_code),city_code=values(city_code),county_code=values(county_code),
+        update_data_time=values(update_data_time), update_data_username=values(update_data_username), flag=values(flag)
+    </update>
+
+    <!-- 查询企业下所有的车辆信息 -->
+    <select id="getVehicleByOrgIds"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        select veh.id as matchVehicleId,brand,plate_color from zw_m_vehicle_info veh ,zw_m_config config where veh.flag =1 and config.flag =1 and veh.id=config.vehicle_id
+        and group_id in
+        <foreach item="item" collection="orgIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="getForwardVehicleByOrgIds"
+            resultType="com.zw.platform.domain.oilsubsidy.subsidyManage.SubsidyManageResp">
+        select match_vehicle_id as vehicleId ,brand from zw_m_oil_subsidy_vehicle_info
+        where flag =1
+        and match_vehicle_id IS NOT NULL
+        and docking_code_org_id in
+        <foreach item="item" collection="orgIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <select id="getOilPlatInfoData"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        select * from zw_m_oil_subsidy_vehicle_info where flag =3 and docking_code=#{dockingCode}
+    </select>
+
+    <select id="getByVehicleIds"
+            resultType="com.zw.platform.domain.oilsubsidy.forwardvehiclemanage.OilForwardVehicleForm">
+        select id, docking_code_org_id, brand, plate_color, forwarding_platform_id, industry_category, vehicle_status,
+               frame_number, match_status, failed_reason, match_time, line_id, match_vehicle_id, docking_code,
+               vehicle_code, province_code, org_code, city_code, county_code
+        from zw_m_oil_subsidy_vehicle_info
+        where flag = 1
+        and match_vehicle_id is not null
+        and match_vehicle_id in
+        <foreach item="item" collection="vehicleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

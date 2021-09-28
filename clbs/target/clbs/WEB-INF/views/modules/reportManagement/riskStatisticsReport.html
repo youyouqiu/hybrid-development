@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>主动安全统计报表</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/riskStatisticsReport.css">
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">报表管理</li>
+                        <li class="active">主动安全报表</li>
+                        <li class="active">主动安全统计报表</li>
+                    </ul>
+                    <h1 class="h1 ">主动安全统计报表</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch">
+                                <h3 class="panel-title fwb">查询</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body" id="stretch-body">
+                                <div class="col-md-12 alarmSearchToolPanel">
+                                    <form id="hourslist" class="form-horizontal" action="#"
+                                          method="post" role="form">
+                                        <div class="form-group">
+                                            <label class="col-md-1 col-sm-3 control-label">组织：</label>
+                                            <div class="has-feedback fastClear col-md-3 col-sm-8">
+                                                <select name="queryType" id="queryType"
+                                                        class="Inlinesearch form-control treeSelect">
+                                                    <option value="vehicle">监控对象</option>
+                                                    <option value="group">企业</option>
+                                                    <option value="assignment">分组</option>
+                                                </select>
+                                                <input type="text" autocomplete="off"
+                                                       style="cursor: pointer; background-color: #fafafa;"
+                                                       placeholder="请选择" class="form-control moreQueryGroup"
+                                                       id="groupSelect" name="groupSelect"/>
+                                                <span class="fa fa-chevron-down form-control-feedback"
+                                                      style="top: 0; right: 15px;cursor:pointer;" aria-hidden="true"
+                                                      id="groupSelectSpan"></span>
+                                                <div id="menuContent" class="menuContent">
+                                                    <ul id="treeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                            <label class="col-md-1 col-sm-3 control-label searchListSelect">时间：</label>
+                                            <div class="col-md-3 col-sm-8 searchListSelect">
+                                                <input style="cursor: pointer; background-color: #fafafa;"
+                                                       class="form-control layer-date laydate-icon"
+                                                       id="timeInterval" name="timeInterval" readonly/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 control-label btn-alarmRep" id="dateSearchData">
+                                                <button id="todayClick" type="button" class="btn btn-primary"
+                                                        onclick="riskStaticsReport.inquireClick('yes')">昨天
+                                                </button>
+                                                <button id="yesterdayClick" type="button" class="btn btn-primary"
+                                                        onclick="riskStaticsReport.inquireClick(-1)">前一天
+                                                </button>
+                                                <button id="nearlyThreeDays" type="button" class="btn btn-primary"
+                                                        onclick="riskStaticsReport.inquireClick(-3)">前三天
+                                                </button>
+                                                <button id="nearlySevenDays" type="button" class="btn btn-primary"
+                                                        onclick="riskStaticsReport.inquireClick(-7)">前七天
+                                                </button>
+                                                <button id="inquireClick" type="button"
+                                                        class="btn btn-primary search-btn" name="1"
+                                                        onclick="riskStaticsReport.inquireClick(1)"><i
+                                                        class="glyphicon glyphicon-search"></i> 查询
+                                                </button>
+                                                <button id="exportAlarm" type="button"
+                                                        class="btn btn-purple export-btn"><i
+                                                        class="glyphicon glyphicon-log-out"></i> 导出
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12" style="padding-right: 0px; padding-left:0px;">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" id="stretch2">
+                                <h3 class="panel-title fwb">数据列表</h3>
+                                <div class="actions pull-right listActions">
+                                    <i class="fa chevron-down" id="stretch2-chevron"></i>
+                                </div>
+                            </div>
+                            <div class="panel-body fixed-table-body" id="stretch2-body">
+                                <div class="ToolPanel" style="">
+                                    <div class="bars pull-left">
+                                        <div class="btn-group pull-left barsMargin" role="group">
+                                            <form role="form">
+                                                <!--<label><input type="text" class="Inlinesearch form-control"-->
+                                                              <!--id="simpleQueryParam" name="simpleQueryParam"-->
+                                                              <!--style="width:300px" placeholder="请输入关键字"></label>-->
+                                                <!--<button type="button" id="search_button"-->
+                                                        <!--class="btn btn-outline btn-default">搜索-->
+                                                <!--</button>-->
+                                                <input id="hiddenText" type="text" style="display:none"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="columns btn-group pull-right fuelConsumptionS">
+                                        <button id="refreshTable" class="btn btn-default" type="button" name="refresh"
+                                                title="刷新">
+                                            <i class="glyphicon glyphicon-refresh icon-refresh"></i>
+                                        </button>
+                                        <div class="keep-open btn-group" title="定制显示列">
+                                            <button id="customizeColumns" type="button"
+                                                    class="btn btn-default dropdown-toggle btn-border-radius"
+                                                    data-toggle="dropdown">
+                                                <i class="glyphicon glyphicon-th icon-th"></i> <span
+                                                    class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" id="Ul-menu-text">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="overflow:auto" id="dataTableContainer">
+                                    <table id="dataTable"
+                                           class="table table-striped table-bordered table-hover noCheckTable"
+                                           cellspacing="0" width="100%">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center" data-key="index">序号</th>
+                                            <th class="text-center" data-key="brand">监控对象</th>
+                                            <th class="text-center" data-key="plateColor">车牌颜色</th>
+                                            <th class="text-center" data-key="orgName">所属企业</th>
+                                            <th class="text-center" data-key="fatigueDriving">疲劳驾驶</th>
+                                            <th class="text-center" data-key="phone">接打手持电话</th>
+                                            <th class="text-center" data-key="eyeClose">闭眼</th>
+                                            <th class="text-center" data-key="yawning">打哈欠</th>
+                                            <th class="text-center" data-key="smoke">抽烟</th>
+                                            <th class="text-center" data-key="changeLanes">频繁变道</th>
+                                            <th class="text-center" data-key="vehicleOffset">车道偏离</th>
+                                            <th class="text-center" data-key="leftOffset">车道左偏离</th>
+                                            <th class="text-center" data-key="rightOffset">车道右偏离</th>
+                                            <th class="text-center" data-key="vehicleCrash">前向碰撞</th>
+                                            <th class="text-center" data-key="distance">车距过近</th>
+                                            <th class="text-center" data-key="pedestrianCollisions">行人碰撞</th>
+                                            <th class="text-center" data-key="distractedDriving">分神驾驶</th>
+                                            <th class="text-center" data-key="driverException">驾驶员异常</th>
+                                            <th class="text-center" data-key="abnormalPosture">长时间不目视前方</th>
+                                            <th class="text-center" data-key="obstacles">障碍物</th>
+                                            <th class="text-center" data-key="networkSpeed">路网超速</th>
+                                            <th class="text-center" data-key="roadMarkTransfinite">道路标识超限</th>
+                                            <th class="text-center" data-key="inConformityCertificate">人证不符</th>
+                                            <th class="text-center" data-key="timeoutDriving">超时驾驶</th>
+                                            <th class="text-center" data-key="abormalLoad">不按规定上下客</th>
+                                            <th class="text-center" data-key="overMan">超员</th>
+                                            <th class="text-center" data-key="infraredBlocking">红外阻断</th>
+                                            <th class="text-center" data-key="keepOut">遮挡</th>
+                                            <th class="text-center" data-key="noDriverDetected">驾驶员不在驾驶位置</th>
+                                            <th class="text-center" data-key="offWheel">双手同时脱离方向盘</th>
+                                            <th class="text-center" data-key="turn">急转弯</th>
+                                            <th class="text-center" data-key="accelerate">急加速</th>
+                                            <th class="text-center" data-key="slowDown">急减速</th>
+                                            <th class="text-center" data-key="quickCrossing">路口快速通过</th>
+                                            <th class="text-center" data-key="notWearingSeatBelt">未系安全带</th>
+                                            <th class="text-center" data-key="leftBlindAlert">左侧盲区预警</th>
+                                            <th class="text-center" data-key="rightBlindAlert">右侧盲区预警</th>
+                                            <th class="text-center" data-key="rightRearApproach">右侧后方接近</th>
+                                            <th class="text-center" data-key="leftRearApproach">左侧后方接近</th>
+                                            <th class="text-center" data-key="closeBehind">后方接近</th>
+                                            <th class="text-center" data-key="imbalanceTirePressure">胎压不平衡</th>
+                                            <th class="text-center" data-key="slowLeak">慢漏气</th>
+                                            <th class="text-center" data-key="highTirePressure">胎压过高</th>
+                                            <th class="text-center" data-key="lowTirePressure">胎压过低</th>
+                                            <th class="text-center" data-key="highTireTemperature">胎温过高</th>
+                                            <th class="text-center" data-key="neutralTaxiing">空挡滑行</th>
+                                            <th class="text-center" data-key="engineOverdrive">发动机超转</th>
+                                            <th class="text-center" data-key="idleSpeed">怠速</th>
+                                            <th class="text-center" data-key="abnormalFlameOut">异常熄火</th>
+                                            <th class="text-center" data-key="lowBattery">电池电量低报警</th>
+                                            <th class="text-center" data-key="sensorAnomaly">传感器异常</th>
+                                            <th class="text-center" data-key="assistFailure">驾驶员辅助功能失效</th>
+                                            <th class="text-center" data-key="driverBehaviorMonitorFailure">
+                                                驾驶员行为监测功能失效
+                                            </th>
+                                            <th class="text-center" data-key="peripheralStateException">外设状态异常报警</th>
+                                            <th class="text-center" data-key="blindSpotMonitoring">盲区监测</th>
+                                            <th class="text-center" data-key="overSpeed">超速报警</th>
+                                            <th class="text-center" data-key="lineOffset">路线偏离报警</th>
+                                            <th class="text-center" data-key="forbid">禁行报警</th>
+                                            <th class="text-center" data-key="equipmentAbnormal">设备异常</th>
+                                            <th class="text-center" data-key="leftOffsetWarning">车道左偏离预警</th>
+                                            <th class="text-center" data-key="rightOffsetWarning">车道右偏离预警</th>
+                                            <th class="text-center" data-key="other">其它</th>
+                                            <th class="text-center" data-key="total">合计</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+
+<div id="detail" class="right-panel">
+    <div id="detailMask"></div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title fwb">报警明细</h3>
+            <div class="actions pull-right">
+                <span class="glyphicon glyphicon-remove detail-close" onclick="riskStaticsReport.closeDetail()"></span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div style="padding:15px;">
+                <table style="width:100%;" id="detailTopTable">
+                    <tbody>
+                    <tr>
+                        <td style="text-align:right;width:100px">监控对象：</td>
+                        <td style="text-align:left" id="detailMonitorName"></td>
+                        <td style="text-align:right;width:100px">车牌颜色：</td>
+                        <td style="text-align:left" id="detailColor"></td>
+                        <td style="text-align:right;width:100px">所属企业：</td>
+                        <td style="text-align:left" id="detailGroup"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:right;width:100px" id="detailAlarmName"></td>
+                        <td style="text-align:left" id="detailAlarmValue" colspan="3"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="overflow:auto;height:calc(100vh - 220px)" id="detailTableContainer">
+                <table id="detailTable"
+                       class="table table-striped table-bordered table-hover noCheckTable"
+                       cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th class="text-center">序号</th>
+                        <th class="text-center">附件预览</th>
+                        <th class="text-center">报警类型</th>
+                        <th class="text-center">报警开始时间</th>
+                        <th class="text-center">报警结束时间</th>
+                        <th class="text-center">位置</th>
+
+                    </tr>
+                    </thead>
+                    <tbody id="detailTbody">
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer detail-footer" style="padding-bottom:11px;">
+            <a id="detailExport" type="button" class="btn btn-primary export-btn" href="javascript:void(0);">
+                <i class="glyphicon glyphicon-log-out"></i> 导出
+            </a>
+            <button type="button" class="btn btn-default btn-off" style="width:74.15px"
+                    onclick="riskStaticsReport.closeDetail()">关 &nbsp;闭
+            </button>
+        </div>
+    </div>
+</div>
+
+<!--多媒体Modal-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">title</h4>
+            </div>
+            <div class="modal-body">
+                <div class="media-content">
+                    <!--tab-->
+
+                    <div id="showMedia">
+                        <!--media-->
+                        <div id="media" style="height:100%;"></div>
+                        <!--arrow-->
+                        <div class="arrows left-btn" id="arrowsLeft">
+                            <i class="icon icon_left"></i>
+                        </div>
+                        <div class="arrows right-btn" id="arrowsRight">
+                            <i class="icon icon_right"></i>
+                        </div>
+                    </div>
+                    <!--count-->
+                    <div class="media_len">
+                        <span id="current">1</span>
+                        /
+                        <span id="count">20</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var exportFail = [[#{export.fail}]];
+    var maxSelectItem = [[#{max.select.item}]];
+    var vehicleSelectBrand = [[#{Vehicle.select.brand}]];
+    var endtimeComStarttime = [[#{oil.calibration.ascend.endtimeComStarttime}]];
+</script>
+<script src="/resources/js/zTree/js/ztreeSearch.js" th:src="@{/resources/js/zTree/js/ztreeSearch.js}"></script>
+<script src="/clbs/resources/js/riskStaticsReport.js" th:src="@{/resources/js/riskStaticsReport.js}"></script>
+</html>

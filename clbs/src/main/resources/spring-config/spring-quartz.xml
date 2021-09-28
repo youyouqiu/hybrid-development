@@ -1,0 +1,202 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <description>quartz 调度任务</description>
+
+    <!--****************作业*************************** -->
+    <!--<bean id="timingStoredDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.TimingStoredJob"/>
+        <property name="durability" value="true"/>
+    </bean>-->
+
+    <bean id="clearUnKnowDeviceDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.ClearUnKnowDeviceJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="timingUserAccreditDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.TimingUserAccreditJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="deleteJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.DeleteJobDetailJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="createRandomCommand" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.CreateRandomCommand"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="saveExpireRoadTransportDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.SaveExpireRoadTransport"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <bean id="saveExpireLicenseDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.SaveExpireLicense"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <bean id="saveVehicleMaintenanceExpiredDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.SaveVehicleMaintenanceExpired"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <bean id="saveExpireVehicleInsuranceDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.VehicleInsuranceJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <bean id="weatherTask" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.WeatherTask"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="lifecycleExpireRemindJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.LifecycleExpireRemindJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <!-- 中寰项目二期每小时存储风控人员总数 -->
+    <bean id="customerServiceJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.CustomerServiceJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="setCustomerServiceTotalToRedis" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="customerServiceJob"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="1 0 * ? * * "/>
+    </bean>
+
+    <!-- 主干4.1.2存储月报表数据信息 -->
+    <bean id="driverScoreGroupIdsJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.DriverScoreGroupIdsJob"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <!-- 定时刷新平台缓存-->
+    <bean id="platFormCacheTask" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.zw.platform.task.PlatFormCacheTask"/>
+        <property name="durability" value="true"/>
+    </bean>
+    <bean id="setGroupChildIdsTotalToRedis" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="driverScoreGroupIdsJob"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="1 0 0 *  * ?"/>
+    </bean>
+    <!--******************触发器************************** -->
+    <!-- 删除日志 -->
+    <!--<bean id="removeLogTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="removeLogDetail" />
+        &lt;!&ndash; 每周一3点30触发一次 0 30 3 ? * MON&ndash;&gt;
+        <property name="cronExpression" value="0 30 3 ? * MON" />
+    </bean>-->
+    <!-- 儲存每日油價 -->
+    <!--<bean id="timingStored" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">-->
+    <!--    <property name="jobDetail" ref="timingStoredDetail"/>-->
+    <!--    &lt;!&ndash; 每天8点触发一次 0 0 8 * * ?&ndash;&gt;-->
+    <!--    &lt;!&ndash; 0 0/1 * * * ?&ndash;&gt;-->
+    <!--    <property name="cronExpression" value="0 30 7 * * ?"/>-->
+    <!--</bean>-->
+
+    <!-- 定时删除文件 -->
+    <bean id="deleteJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="deleteJobDetail"/>
+        <!-- 每天凌晨2点触发一次 0 0 2 * * ?-->
+        <property name="cronExpression" value="0 0 2 * * ?"/>
+    </bean>
+
+    <!-- 定时截断未知设备表 -->
+    <bean id="clearUnKnowDevice" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="clearUnKnowDeviceDetail"/>
+        <!-- 每天6点触发一次 -->
+        <property name="cronExpression" value="0 0 6 * * ?"/>
+    </bean>
+
+    <!-- 定时查看用户授权截止日期,如果授权截止日期与今天的日期相减为0,则更改用户的状态为停用 -->
+    <bean id="timingUserAccredit" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="timingUserAccreditDetail"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+
+    <!-- 定时给视频连接参数生成随机归属地平台口令和跨域平台口令 -->
+    <bean id="createRandomCommandBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="createRandomCommand"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+
+    <!-- 定时查询出运输证有效期和提前提醒天数满足条件的车辆数据 -->
+    <bean id="saveExpireRoadTransportBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="saveExpireRoadTransportDetail"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+    <!-- 定时查询出行驶证有效期和提前提醒天数满足条件的车辆数据 -->
+    <bean id="saveExpireLicenseBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="saveExpireLicenseDetail"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+    <!-- 定时查询车辆保养到期的车辆数据 -->
+    <bean id="saveVehicleMaintenanceExpiredBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="saveVehicleMaintenanceExpiredDetail"/>
+        <!-- 每天0点触发一次 -->
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+    <!--车辆保险单号： 保险到期时间和提前提醒天数-->
+    <bean id="saveExpireVehicleInsuranceBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="saveExpireVehicleInsuranceDetail"/>
+        <property name="cronExpression" value="0 0 0 * * ?"/>
+    </bean>
+    <!--定时获取全国的天气-->
+    <bean id="weatherTaskBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="weatherTask"/>
+        <property name="cronExpression" value="20 0 * * * ?"/>
+    </bean>
+    <!--定时刷新平台缓存-->
+    <bean id="platformCacheJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="platFormCacheTask"/>
+        <property name="cronExpression" value="0 0 23 * * ?"/>
+    </bean>
+    <!--服务到期查询-->
+    <bean id="lifecycleExpireRemindJobBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="lifecycleExpireRemindJob"/>
+        <property name="cronExpression" value="0 05 0 * * ?"/>
+    </bean>
+    <!-- ************SchedulerFactoryBean************ -->
+    <bean id="quartzScheduler" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <!-- quartz属性文件 -->
+        <property name="configLocation" ref="configLocationResource"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
+        <!--QuartzScheduler 启动时更新己存在的Job QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了 -->
+        <property name="overwriteExistingJobs" value="true"/>
+        <!-- 这个是必须的，QuartzScheduler 延时启动，应用启动完后 QuartzScheduler 再启动 <property name="startupDelay" value="30" /> -->
+        <!-- 表示是否调度随工程启动自动启动，如果是false表示不自动启动，则需要调用scheduler.start()进行启动 -->
+        <property name="autoStartup" value="true"/>
+        <property name="triggers">
+            <list>
+                <!--<ref bean="removeLogTrigger" />-->
+                <!--<ref bean="timingStored"/>-->
+                <ref bean="clearUnKnowDevice"/>
+                <ref bean="timingUserAccredit"/>
+                <ref bean="createRandomCommandBean"/>
+                <ref bean="saveExpireRoadTransportBean"/>
+                <ref bean="saveExpireLicenseBean"/>
+                <ref bean="saveVehicleMaintenanceExpiredBean"/>
+                <ref bean="deleteJob"/>
+                <ref bean="saveExpireVehicleInsuranceBean"/>
+                <ref bean="setCustomerServiceTotalToRedis"/>
+                <ref bean="weatherTaskBean"/>
+                <ref bean="lifecycleExpireRemindJobBean"/>
+                <ref bean="setGroupChildIdsTotalToRedis"/>
+                <ref bean="platformCacheJob"/>
+            </list>
+        </property>
+    </bean>
+    <!-- ************配置文件************ -->
+    <bean id="configLocationResource" class="org.springframework.core.io.ClassPathResource">
+        <constructor-arg value="quartz.properties" type="java.lang.String"/>
+    </bean>
+</beans>

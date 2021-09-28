@@ -1,0 +1,365 @@
+<link rel="stylesheet" href="/clbs/resources/js/rangeSlider/ion.rangeSlider.css">
+<style>
+    .tabHead {
+        font-size: 15px;
+        font-weight: 800;
+        margin: 10px 0 15px;
+    }
+
+    .checkBox {
+        height: 260px;
+        margin-left: -6px;
+        padding: 5px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+    #settingForm input[type='checkbox'], #settingForm input[type='radio'] {
+        vertical-align: -2px;
+    }
+
+    .checkLabel {
+        display: table;
+        width: 100%;
+        margin-bottom: 0;
+        cursor: pointer;
+        font-weight: normal;
+    }
+
+    .columnCheck {
+        display: table-cell;
+    }
+
+    .columnTitle {
+        display: table-cell;
+        width: 100%;
+        padding: 2px;
+    }
+
+    .checkLabel.active .columnTitle {
+        background-color: #d6f3ff;
+    }
+
+    .sortUp, .sortDown {
+        padding: 10px 10px 8px;
+        color: #888;
+        font-size: 12px;
+        outline: none;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        background-color: transparent;
+    }
+
+    .sortUp {
+        margin: 120px 0 20px;
+    }
+
+    .radioBox {
+        margin-top: 30px;
+    }
+
+    .radioBox label {
+        margin-right: 10px;
+        cursor: pointer;
+        font-weight: normal;
+    }
+
+    button[disabled], html input[disabled] {
+        cursor: not-allowed;
+        background-color: #eee;
+    }
+    #speedBox{
+        padding: 90px 20px 0;
+    }
+    /*轨迹线条粗细设置 start*/
+    .line-input{
+        position:relative;
+        width:100%;
+        height: 40px;
+        vertical-align: middle;
+        border: 1px solid #e5e5e5;
+        cursor: pointer;
+    }
+    .line-lists{
+        list-style: none;
+        width:100%;
+        margin:0;
+        padding:0 0px 10px;
+        border: 1px solid #e5e5e5;
+    }
+    .line-lists li{
+        position:relative;
+        width:100%;
+        height:30px;
+        border-bottom:1px solid #F3F3F3;
+    }
+    .line-lists li:hover,.line-lists li.check{
+        background-color: #ecf6fd;
+    }
+    .line-lists li.check .line{
+        background: #108ee9;
+    }
+    .line-content .line{
+        position:absolute;
+        top:50%;
+        left:10px;
+        right:48px;
+        display:inline-block;
+        background: #CCCCCC;
+        transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+    }
+    #settingForm .form-control {
+        cursor: pointer;
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        -ms-appearance: none;
+        background: url(/clbs/resources/img/down.svg) no-repeat scroll right center transparent;
+        background-color: #fafafa;
+    }
+    /*轨迹线条粗细设置 end*/
+</style>
+
+<form th:object="${result}"
+      id="settingForm"
+      role="form"
+      action="#"
+      method="post"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" id="doXAdd" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">设置</h4>
+    </div>
+    <div class="modal-body">
+        <input type="hidden" id="resultList" th:value="${resultList}" >
+        <ul id="columnSetUl" class="nav nav-tabs">
+            <li class="active"><a href="#speedSettingTab" data-toggle="tab">轨迹设置</a></li>
+            <li><a href="#allDataTab" data-toggle="tab">全部/行驶数据</a></li>
+            <li><a href="#obdInfoTab" data-toggle="tab">OBD数据</a></li>
+            <li><a href="#runTab" data-toggle="tab">行驶段数据</a></li>
+            <li><a href="#stopTab" data-toggle="tab">停止段数据</a></li>
+            <li><a href="#alarmTab" data-toggle="tab">报警数据</a></li>
+        </ul>
+        <div class="panel-body">
+            <div class="tab-content entry-content">
+                <!-- 速度设置 -->
+                <div class="tab-pane active" id="speedSettingTab">
+                    <div class="col-md-12">
+                        <h3 class="tabHead">拖拽控制滑块设置速度界点</h3>
+                        <div id="speedBox" class="checkBox">
+                            <input type="text" class="js-range-slider"
+                                   name="my_range" value=""
+                            />
+                        </div>
+                        <h3 class="tabHead">轨迹粗细</h3>
+                        <div class="line-content" style="border:0;">
+                            <div id="lineInput" class="line-input form-control" data-value="6">
+                                <span class="line" style="height: 6px;"></span>
+                            </div>
+                            <ul id="lineLists" class="line-lists" style="display:none;">
+                                <li data-value="2"><span class="line" style="height: 2px;"></span></li>
+                                <li data-value="4"><span class="line" style="height: 4px;"></span></li>
+                                <li data-value="6" class="check"><span class="line" style="height: 6px;"></span></li>
+                                <li data-value="8"><span class="line" style="height: 8px;"></span></li>
+                                <li data-value="10"><span class="line" style="height: 10px;"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 全部/行驶数据 -->
+                <div class="tab-pane" id="allDataTab">
+                    <div class="col-md-10">
+                        <h3 class="tabHead">显示和排序</h3>
+                        <label>
+                            <input type="checkbox" class="allCheck"> 全部显示
+                        </label>
+                        <div id="allCheckBox" class="checkBox"></div>
+                        <div class="radioBox">
+                            <h3 class="tabHead">锁定</h3>
+                            <label>
+                                <input type="radio" name="safetyRadio" value="1"> 1列
+                            </label>
+                            <label>
+                                <input type="radio" name="safetyRadio" value="2"> 2列
+                            </label>
+                            <label>
+                                <input type="radio" name="safetyRadio" value="3"> 3列
+                            </label>
+                            <label>
+                                <input type="radio" name="safetyRadio" value="4"> 4列
+                            </label>
+                            <label>
+                                <input type="radio" name="safetyRadio" value="0"> 不锁定
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="sortUp" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </button>
+                        <button class="sortDown" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- OBD数据 -->
+                <div class="tab-pane" id="obdInfoTab">
+                    <div class="col-md-10">
+                        <h3 class="tabHead">显示和排序</h3>
+                        <label>
+                            <input type="checkbox" class="allCheck"> 全部显示
+                        </label>
+                        <div id="obdInfoCheckBox" class="checkBox"></div>
+                        <div class="radioBox">
+                            <h3 class="tabHead">锁定</h3>
+                            <label>
+                                <input type="radio" name="obdInfoRadio" value="1"> 1列
+                            </label>
+                            <label>
+                                <input type="radio" name="obdInfoRadio" value="2"> 2列
+                            </label>
+                            <label>
+                                <input type="radio" name="obdInfoRadio" value="3"> 3列
+                            </label>
+                            <label>
+                                <input type="radio" name="obdInfoRadio" value="4"> 4列
+                            </label>
+                            <label>
+                                <input type="radio" name="obdInfoRadio" value="0"> 不锁定
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="sortUp" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </button>
+                        <button class="sortDown" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 行驶段数据 -->
+                <div class="tab-pane" id="runTab">
+                    <div class="col-md-10">
+                        <h3 class="tabHead">显示和排序</h3>
+                        <label>
+                            <input type="checkbox" class="allCheck"> 全部显示
+                        </label>
+                        <div id="runCheckBox" class="checkBox"></div>
+                        <div class="radioBox">
+                            <h3 class="tabHead">锁定</h3>
+                            <label>
+                                <input type="radio" name="runRadio" value="1"> 1列
+                            </label>
+                            <label>
+                                <input type="radio" name="runRadio" value="2"> 2列
+                            </label>
+                            <label>
+                                <input type="radio" name="runRadio" value="3"> 3列
+                            </label>
+                            <label>
+                                <input type="radio" name="runRadio" value="4"> 4列
+                            </label>
+                            <label>
+                                <input type="radio" name="runRadio" value="0"> 不锁定
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="sortUp" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </button>
+                        <button class="sortDown" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 停止段数据 -->
+                <div class="tab-pane" id="stopTab">
+                    <div class="col-md-10">
+                        <h3 class="tabHead">显示和排序</h3>
+                        <label>
+                            <input type="checkbox" class="allCheck"> 全部显示
+                        </label>
+                        <div id="stopCheckBox" class="checkBox"></div>
+                        <div class="radioBox">
+                            <h3 class="tabHead">锁定</h3>
+                            <label>
+                                <input type="radio" name="stopRadio" value="1"> 1列
+                            </label>
+                            <label>
+                                <input type="radio" name="stopRadio" value="2"> 2列
+                            </label>
+                            <label>
+                                <input type="radio" name="stopRadio" value="3"> 3列
+                            </label>
+                            <label>
+                                <input type="radio" name="stopRadio" value="4"> 4列
+                            </label>
+                            <label>
+                                <input type="radio" name="stopRadio" value="0"> 不锁定
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="sortUp" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </button>
+                        <button class="sortDown" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- 报警记录 -->
+                <div class="tab-pane" id="alarmTab">
+                    <div class="col-md-10">
+                        <h3 class="tabHead">显示和排序</h3>
+                        <label>
+                            <input type="checkbox" class="allCheck"> 全部显示
+                        </label>
+                        <div id="alarmCheckBox" class="checkBox"></div>
+                        <div class="radioBox">
+                            <h3 class="tabHead">锁定</h3>
+                            <label>
+                                <input type="radio" name="alarmRadio" value="1"> 1列
+                            </label>
+                            <label>
+                                <input type="radio" name="alarmRadio" value="2"> 2列
+                            </label>
+                            <label>
+                                <input type="radio" name="alarmRadio" value="3"> 3列
+                            </label>
+                            <label>
+                                <input type="radio" name="alarmRadio" value="4"> 4列
+                            </label>
+                            <label>
+                                <input type="radio" name="alarmRadio" value="0"> 不锁定
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="sortUp" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-up"></i>
+                        </button>
+                        <button class="sortDown" type="button" disabled>
+                            <i class="glyphicon glyphicon-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="doSubmit" class="btn btn-primary" type="button">
+            <strong>提 交</strong>
+        </button>
+        <button id="doClose" type="button" class="btn btn-default" data-dismiss="modal">
+            <strong>关 闭</strong>
+        </button>
+    </div>
+    <input type="hidden" th:value="${session.avoidRepeatSubmitToken}" name="avoidRepeatSubmitToken"
+           id="avoidRepeatSubmitToken">
+</form>
+<script src="/clbs/resources/js/rangeSlider/ion.rangeSlider.js"></script>
+<script src="/clbs/resources/js/trackPlayback/tableColumnSetting.js"></script>

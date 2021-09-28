@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>平台信息配置</title>
+    <div th:replace="fragments/header">header</div>
+    <link rel="stylesheet" href="/clbs/resources/css/loginCustom.css">
+</head>
+<body>
+<section id="container">
+    <div th:replace="fragments/nav">nav</div>
+    <section class="main-content-wrapper">
+        <div th:replace="fragments/menu">menu</div>
+        <section id="main-content">
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <ul class="breadcrumb">
+                        <li><a th:href="@{/}">首页</a></li>
+                        <li class="active">系统配置</li>
+                        <li class="active">平台个性化配置</li>
+                        <li class="active">平台信息配置</li>
+                    </ul>
+                    <h1 class="h1 ">平台信息配置</h1>
+                </div>
+            </div>
+            <div class="row eightIsZero">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch">
+                            <h3 class="panel-title fwb">登录页</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch-body">
+                            <table id="logo-dataTables" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editLoginSetting" id="updateLogin" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefLoginSetting" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info">
+                                                <i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultLoginSetting" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">登录页个性化设置</td>
+                                    <td class="text-center"><a
+                                            href="javascript:personalizedConfiguration.loginPagesShow()">预览</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editPlatformSite" id="updatePlatformSite"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefPlatformSite" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info">
+                                                <i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultPlatformSite" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">登录页访问域名</td>
+                                    <td class="text-center" id="platformSite"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:class="${session.isAdmin}? 'row eightIsZero' : 'row'">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch2">
+                            <h3 class="panel-title fwb">平台首页</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch2-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch2-body">
+                            <table id="logo-dataTables" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editWebIco" onclick="personalizedConfiguration.init()"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefWebIco" th:if="${session.isAdmin}" type="button"
+                                                    class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultWebIco" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台网页标题ico</td>
+                                    <td class="text-center"><a
+                                            href="javascript:personalizedConfiguration.webIcoPhotoShow()">查看照片</a></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editIndexLogo"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefIndexLogo" type="button" class="editBtn editBtn-info"
+                                                    th:if="${session.isAdmin}">
+                                                <i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultIndexLogo" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台首页Logo</td>
+                                    <td class="text-center"><a
+                                            href="javascript:personalizedConfiguration.indexPagesPhotoShow()">查看照片</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editIndexTitle"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefIndexTitle" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultIndexTitle" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台首页置顶标题</td>
+                                    <td class="text-center" id="topTitleMsg"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editBottomTitle"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefBottomTitle" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultBottomTitle" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台首页置底信息</td>
+                                    <td class="text-center" id="bottomTitleMsg"></td>
+                                </tr>
+
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editResourceName"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefResourceName" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultResourceName" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">平台登录页设置</td>
+                                    <td class="text-center" id="frontPageMsg"></td>
+                                </tr>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="180px">
+                                            <button data-target="#editVideoBg"
+                                                    onclick="personalizedConfiguration.init()" data-toggle="modal"
+                                                    type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefVideoBg" type="button" class="editBtn editBtn-info"
+                                                    th:if="${session.isAdmin}">
+                                                <i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultVideoBg" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">视频窗口水印设置</td>
+                                    <td class="text-center"><a
+                                            href="javascript:personalizedConfiguration.videoBgShow()">查看照片</a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" th:if="${session.isAdmin}">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" id="stretch3">
+                            <h3 class="panel-title fwb">平台提醒</h3>
+                            <div class="actions pull-right">
+                                <i class="fa chevron-down" id="stretch3-chevron"></i>
+                            </div>
+                        </div>
+                        <div class="panel-body fixed-table-body" id="stretch3-body">
+                            <table id="serviceDataTables" class="table table-striped table-bordered table-hover"
+                                   cellspacing="0" width="100%">
+                                <thead>
+                                <div th:if="${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">操作设置</th>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                <div th:if="!${hasRole}">
+                                    <tr>
+                                        <th class="text-center" width="270px">描述</th>
+                                        <th class="text-center">内容</th>
+                                    </tr>
+                                </div>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <div th:if="${hasRole}">
+                                        <td class="text-center" width="300px">
+                                            <button data-target="#editServiceDate"
+                                                    onclick="personalizedConfiguration.init()" id="updateServiceDate"
+                                                    data-toggle="modal" type="button" class="editBtn editBtn-info"><i
+                                                    class="fa fa-pencil"></i>修改
+                                            </button>
+                                            <button id="setDefServiceDate" type="button" th:if="${session.isAdmin}"
+                                                    class="editBtn editBtn-info"><i class="fa fa-pencil"></i>设为默认
+                                            </button>
+                                            <button id="defaultServiceDate" data-toggle="modal" type="button"
+                                                    class="deleteButton editBtn disableClick"><i class="fa fa-set"></i>恢复默认
+                                            </button>
+                                        </td>
+                                    </div>
+                                    <td class="text-center" width="270px">服务到期提前提醒天数</td>
+                                    <td class="text-center" id="serviceNum"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--登录页个性化配置-->
+            <div class="modal fade" id="editLoginSetting" aria-hidden="false"
+                 data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog modal-lg" role="document" style="width: 60%">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台登录页个性化设置</h4>
+                        </div>
+                        <div class="modal-body clearfix" style="overflow:visible;max-height: 600px">
+                            <div class="col-md-4 noPadding">
+                                <div class="selectArea" id="checkBg">
+                                    <p class="psTitle">
+                                        <label class="text-danger">*</label>
+                                        注：图片大小建议1920x1080左右,格式为PNG、JPG、JPEG、SVG、GIF。
+                                    </p>
+                                    <div class="inpFilePhoto">
+                                        <input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                                               name="file"
+                                               id="addBg" style="width:202px;"
+                                               onchange="personalizedConfiguration.setBgImagePreview();">
+                                        <label class="changeFile" for="addBg">上传背景图</label>
+                                    </div>
+                                    <div class="imgPreview">
+                                        <i class="operBtn editButton"></i>
+                                        <img src="" id="curImg" alt="">
+                                        <div id="roundBox"></div>
+                                        <div id="colorMarker"></div>
+                                    </div>
+                                </div>
+                                <div class="selectArea" id="checkLogo">
+                                    <p class="psTitle">
+                                        <label class="text-danger">*</label>
+                                        注：图片大小建议689x123左右,格式为PNG、JPG、JPEG、SVG、GIF。
+                                    </p>
+                                    <div class="inpFilePhoto">
+                                        <input type="file" accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                                               name="file"
+                                               id="addLogo" style="width:202px;"
+                                               onchange="personalizedConfiguration.setImagePreview();">
+                                        <label class="changeFile" for="addLogo">上传LOGO</label>
+                                    </div>
+                                    <div class="imgPreview">
+                                        <i class="operBtn editButton"></i>
+                                        <img src="" id="curLogoImg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8 noRightPadding">
+                                <div id="loginPage">
+                                    <div class="previewBox">
+                                        <div class="transformDiv">
+                                            <div class="login_logo">
+                                                <div class="logoImg">
+                                                    <img id="loginLogoImg" src="" class="img-responsive loginLogoImg">
+                                                </div>
+                                            </div>
+                                            <div id="login-wrapper">
+                                                <div class="panel panel-primary loginBox">
+                                                    <div class="panel-heading">
+                                                        <h3 class="panel-title">登录平台</h3>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <form class="form-horizontal">
+                                                            <div class="form-group">
+                                                                <div class="col-md-12 inputBg">
+                                                                    <input type="text" class="form-control" id="email"
+                                                                           readonly
+                                                                           name='username' autocomplete="off"
+                                                                           maxlength="25"
+                                                                           placeholder="用户名"> <i class="fa"><img
+                                                                        src="/clbs/resources/img/user.svg"
+                                                                        width="15" height="30"
+                                                                        style="margin:0px 0px 0px 5px"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    <input type="password" class="form-control"
+                                                                           id="tg_password"
+                                                                           autocomplete="off" readonly
+                                                                           maxlength="25" placeholder="密码"/>
+                                                                    <i class="fa"><img
+                                                                            src="/clbs/resources/img/password.svg"
+                                                                            width="15"
+                                                                            height="30"
+                                                                            style="margin:0px 0px 0px 5px"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    <div id="slider">
+                                                                        <div id="slider_bg"></div>
+                                                                        <div id="label"></div>
+                                                                        <div id="labelTip" class="logintop">把我滑到右边试试?
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="validate_msg" id="validateMsg"></div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="col-md-12">
+                                                                    <input class="btn btn-block" id="login_ok"
+                                                                           name="submit"
+                                                                           type="button" value="登 &nbsp;录"/>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <footer class="footertc">
+                                            <div class="col-xs-12" id="personalized">
+                                                <span>版本：<label th:text="#{web.version}"
+                                                                style="font-weight:normal"></label></span>
+                                                <p>
+                                                    <span id="loginCopyRight"></span>
+                                                    <!-- <a href="" id="website" th:name="${session.websiteName}"
+                                                        target="_blank"></a>--><br/>
+                                                    <a href="https://beian.miit.gov.cn/"
+                                                       id="record" class="loginRecord"></a>
+                                                </p>
+                                            </div>
+                                        </footer>
+                                    </div>
+                                </div>
+                                <div class="bottomPos">
+                                    <div class="inputPos">
+                                        <label class="col-md-3 control-label">登录框位置：</label>
+                                        <div class="col-md-9 rightRadio">
+                                            <label class="col-md-2">
+                                                <input type="radio" class="inputPos" name="inputPosition" value="1"> 居左
+                                            </label>
+                                            <label class="col-md-2">
+                                                <input type="radio" class="inputPos" name="inputPosition" value="2"
+                                                       checked> 居中
+                                            </label>
+                                            <label class="col-md-2">
+                                                <input type="radio" class="inputPos" name="inputPosition" value="3"> 居右
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="logoPos">
+                                        <label class="col-md-3 control-label">LOGO位置：</label>
+                                        <div class="col-md-9 rightRadio">
+                                            <label class="col-md-2">
+                                                <input type="radio" class="logoPos" name="logoPosition" value="1"> 左上
+                                            </label>
+                                            <label class="col-md-2">
+                                                <input type="radio" class="logoPos" name="logoPosition" value="2"> 右上
+                                            </label>
+                                            <label class="col-md-8">
+                                                <input type="radio" class="logoPos" name="logoPosition" value="3"
+                                                       checked> 跟随登录框
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="text" id="editLoginLogoImg" hidden>
+                            <input type="text" id="editLoginBgImg" hidden>
+                            <button type="button" class="btn btn-primary" id="saveLoginSetting" disabled>提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--登录页效果预览-->
+            <div class="modal fade" id="loginPagesShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document" style="width: 60%">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">登录页预览</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="loginPagesPreview"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--登录页访问域名修改-->
+            <div class="modal fade" id="editPlatformSite" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">登录页访问域名设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">域名：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" id="platformSiteVal" maxlength="2048" placeholder=""
+                                               type="text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-7 col-md-offset-3">
+                                        <div>
+                                            <label class="text-danger" style="margin: 0">*</label> 注：
+                                            请输入已解析到本服务器的域名。通过该域名访问平台，可获取个性化登录页（LOGO、登录页背景图等）。
+                                            <div class="understandMore">
+                                                <a href="javascript:void(0)">了解更多</a>
+                                                <div class="platformSiteTitle">
+                                                    <p style="margin-bottom: 10px">
+                                                        例如，企业希望该企业用户通过该企业域名www.abc.com在任何时候访问平台，
+                                                        平台都能显示该企业的各项个性化设置，如Logo、登录页背景图等。应完成以下设置：</p>
+                                                    <p>1. 解析域名www.abc.com使其指向本平台服务器IP地址；</p>
+                                                    <p>2. 在【登录页访问域名】中设置www.abc.com为登录页访问域名；</p>
+                                                    <p style="margin-bottom: 10px">3. 设置各项个性化设置项（非必要步骤，未设置时有默认设置）。</p>
+                                                    <p>完成以上步骤后，用户通过www.abc.com在任何时候访问平台，都将显示本企业组织的个性化设置。</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="savePlatformSite" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="editServiceDate" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">修改服务到期平台提醒</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form id="servicesForm">
+                                <div class="row">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">描述：</label>
+                                        <div class="col-md-7">
+                                            <input class="form-control inputStyleHide valid" type="text"
+                                                   readonly="readonly"
+                                                   value="服务到期提前提醒天数">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">内容：</label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" name="remindDate" id="remindDate" maxlength="20"
+                                                   placeholder="请输入提前提醒天数"
+                                                   type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="saveServiceDate">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editLoginLogo" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台登录Logo修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">分组名称：</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="登录页Logo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-5">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="localImag"><img id="preview" src=""
+                                                                             style="display: block;"></div>
+                                                    <input id="photograph" name="photograph" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file"
+                                                               accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                                                               name="file" id="doc"
+                                                               style="width:202px;"
+                                                               onchange="personalizedConfiguration.setImagePreview();">
+                                                        <label class="changeFile" for="doc">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <dl class="dl-horizontal" style="margin-top:20px;">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label"><label class="text-danger">*</label>
+                                        注：</label>
+                                    <div class="col-md-9" style="padding-top: 8px">
+                                        图片大小建议689x123左右,格式为PNG、JPG、JPEG、SVG、GIF。
+                                    </div>
+                                </div>
+                                <!-- <dt><label class="text-danger">*</label> 注：</dt>
+                                 <dd>图片大小建议689x123左右,格式为PNG、JPG、JPEG、SVG。</dd>-->
+                            </dl>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="updateLoginLogo">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--修改登录页背景图片-->
+            <div class="modal fade" id="editLoginBg" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台登录背景图修改</h4>
+                        </div>
+                        <div class="modal-body" style="overflow-y: auto;overflow-x: hidden">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">分组名称：</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="登录页背景图">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-5">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="localBgImag"><img id="previewBg" src=""
+                                                                               style="display: block;"></div>
+                                                    <input id="photographBg" name="photograph" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file"
+                                                               accept="image/png,image/gif,image/jpeg,image/svg+xml"
+                                                               name="file" id="docBg"
+                                                               style="width:202px;"
+                                                               onchange="personalizedConfiguration.setBgImagePreview();">
+                                                        <label class="changeFile" for="docBg">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <dl class="dl-horizontal" style="margin-top:20px;">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label"><label class="text-danger">*</label>
+                                        注：</label>
+                                    <div class="col-md-9" style="padding-top: 8px">
+                                        图片大小建议1920x1080左右,格式为PNG、JPG、JPEG、SVG、GIF。
+                                    </div>
+                                </div>
+                                <!--<dt><label class="text-danger">*</label> 注：</dt>
+                                <dd>图片大小建议1920x1080左右,格式为PNG、JPG、JPEG、SVG。</dd>-->
+                            </dl>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="saveLoginBg">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editWebIco" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台网页标题ico修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">描述：</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台网页标题ico">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">内容：</label>
+                                    <div class="col-md-5">
+                                        <table width="50%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="localImag-ico" style="margin-bottom: 10px;"><img
+                                                            id="preview-ico" src="" style="display: block;"></div>
+                                                    <input id="photograph-ico" name="photograph-ico" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file" accept="image/x-icon" name="file"
+                                                               id="doc-ico"
+                                                               style="width:202px;"
+                                                               onchange="personalizedConfiguration.setImagePreviewico();">
+                                                        <label class="changeFile" for="doc-ico" style="width: 130px;text-align: center;">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <dl class="dl-horizontal" style="margin-top:20px;">
+                                <dt><label class="text-danger">*</label> 注：</dt>
+                                <dd>1. 图片格式要求ico格式；</dd>
+                                <dd>2. 图片大小建议为正方形如(32x32、64x64、128x128)左右</dd>
+                            </dl>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="webIco" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editIndexLogo" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台首页Logo修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">描述：</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台首页Logo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">内容：</label>
+                                    <div class="col-md-5">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="localImag-index"><img id="preview-index" src=""
+                                                                                   style="display: block;"></div>
+                                                    <input id="photograph-index" name="photograph-index" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file"
+                                                               accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                                                               name="file" id="doc-index"
+                                                               style="width:202px;"
+                                                               onchange="personalizedConfiguration.setImagePreviewIndex();">
+                                                        <label class="changeFile" for="doc-index">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <dl class="dl-horizontal" style="margin-top:20px;">
+                                <dt><label class="text-danger">*</label> 注：</dt>
+                                <dd>图片大小建议240x80左右；</dd>
+                            </dl>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="IndexLogo" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editIndexTitle" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台首页置顶标题修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台首页置顶标题">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" id="indexTitle" maxlength="20" placeholder=""
+                                               type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="topTitle" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editBottomTitle" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台首页置底信息修改</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台首页置底信息">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">版权信息：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" maxlength="30" id="copyright" type="text"
+                                               placeholder="请输入版权信息"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">官网域名：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" maxlength="50" id="websiteName" type="text"
+                                               placeholder="请输入官网域名"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">备案编号：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" maxlength="50" id="recordNumber" type="text"
+                                               placeholder="请输入备案编号"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="BottomTitle" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editResourceName" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">修改平台登录页设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-7">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="平台登录页设置">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-7">
+                                        <div class="searchListSelect has-feedback">
+                                            <input id="resourceName" class="form-control zTreeCommon"
+                                                   readonly="readonly"
+                                                   style="background-color: #fafafa; cursor: pointer;" placeholder=""
+                                                   type="text"/>
+                                            <input id="frontPage" name="frontPage" type="hidden"/>
+                                            <span class="fa fa-chevron-down form-control-feedback"
+                                                  style="top: 0; right: 2px!important;cursor:pointer;"
+                                                  aria-hidden="true" id="groupSelectSpan"></span>
+                                            <div id="zTreeGroupArea">
+                                                <div id="menuContent" class="menuContent ">
+                                                    <ul id="ztreeDemo" class="ztree"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="frontPageSubmit" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="webIcoPhotoShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台网页标题ico</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row text-center">
+                                <img id="webIcoShow" src="" class="img-thumbnail"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="indexLogoPhotoShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">平台首页Logo</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row text-center">
+                                <img id="homeLogo" src="" class="img-thumbnail"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--视频背景图预览-->
+            <div class="modal fade" id="videoBgPhotoShow" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">视频窗口水印</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row text-center">
+                                <img id="videoBackground" src="" class="img-thumbnail"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="editVideoBg" aria-hidden="false" data-backdrop="static" tabindex="-1"
+                 role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">视频窗口水印设置</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">描述：</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control inputStyleHide valid" type="text" readonly="readonly"
+                                               value="视频窗口水印">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">内容：</label>
+                                    <div class="col-md-5">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tbody>
+                                            <tr>
+                                                <td align="left">
+                                                    <div id="videoBgBox">
+                                                        <img id="preview-videoBg" src="" style="display: block;margin-bottom: 5px">
+                                                    </div>
+                                                    <input id="photograph-videoBg" name="photograph-videoBg" type="hidden"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <div class="inpFilePhoto">
+                                                        <input type="file"
+                                                               accept="image/png,image/jpeg,image/gif,image/svg+xml"
+                                                               name="file" id="videoBgFile"
+                                                               style="width:202px;"
+                                                               onchange="personalizedConfiguration.setImagePreviewVideoBg();">
+                                                        <label class="changeFile" for="videoBgFile">点击选择照片</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <dl class="dl-horizontal" style="margin-top:20px;">
+                                <dt style="width: 124px"><label class="text-danger">*</label> 注：</dt>
+                                <dd style="margin-left: 124px">图片大小建议200x200左右；</dd>
+                            </dl>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="saveVideoBg" class="btn btn-primary">提交</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+</section>
+<div th:replace="fragments/footer">footer</div>
+</body>
+<script th:inline="javascript">
+    var remindDateNull = [[#{personal.remindDate.null}]];
+    var remindDateError = [[#{personal.remindDate.error}]];
+</script>
+<script src="/clbs/resources/js/colzColor.js"></script>
+<script src="/clbs/resources/js/personalizedList.js" th:src="@{/resources/js/personalizedList.js}"></script>
+</html>

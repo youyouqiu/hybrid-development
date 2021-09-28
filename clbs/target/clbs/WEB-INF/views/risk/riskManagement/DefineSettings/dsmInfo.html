@@ -1,0 +1,1024 @@
+<form method="post" id="dsmInfoForm" th:action="@{/v/oilmassmgt/oilvehiclesetting/updateSensorSetting}" role="form"
+      class="form-horizontal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">读取驾驶员监测系统(DMS)参数</h4>
+        <style>
+            .modal-body {
+                padding-left: 60px
+            }
+            .modal-body h4{
+                font-size: 15px;
+                font-weight: 700;
+            }
+
+            .info-span {
+                cursor: pointer;
+            }
+
+            .title-info, .title-info label {
+                color: #ff0000;
+            }
+
+            #globalParameters-content, #dsm-content {
+                margin: 0 -20px 0 -60px;
+                padding:0 20px 0 60px;
+                border-bottom: 1px solid #e5e5e5
+            }
+
+            #dsm-content {
+                margin-bottom: 15px
+            }
+            #dsm-content .info-content{display: none}
+            .dsmInfo .col-md-2{
+                padding-right: 0;
+            }
+        </style>
+    </div>
+    <div class="modal-body dsmInfo">
+        <input type="hidden" id="vehicleId" th:value="*{vehicleId}">
+        <input type="hidden" id="msgId">
+        <input type="hidden" id="dealType" name="deal_type" value="pt">
+        <div class="form-group">
+            <label class="col-md-2 control-label">监控对象：</label>
+            <div class="col-md-8">
+                <input id="brand" th:value="*{brand}" placeholder="请输入监控对象" class="form-control" readonly/>
+            </div>
+        </div>
+        <div class="form-group">
+            <h4 class="col-md-3 col-md-offset-2 text-center">传感器上传参数</h4>
+            <h4 class="col-md-3 col-md-offset-2 text-center">平台设置参数</h4>
+        </div>
+        <div class="form-group">
+            <h4 class="col-md-6">全局参数</h4>
+            <div class="col-md-6 control-label text-right">
+                <span id="globalParameters" class="info-span"><font>隐藏信息</font><span aria-hidden="true"
+                                                                        class="fa fa-chevron-up"></span></span>
+            </div>
+        </div>
+        <div id="globalParameters-content" class="info-content">
+            <div class="form-group">
+                <label class="col-md-2 control-label">拍照分辨率：</label>
+                <div class="col-md-3">
+                    <input id="sensor-cameraResolution" class="form-control" readonly/>
+                </div>
+                <label class="col-md-2 control-label">拍照分辨率：</label>
+                <div class="col-md-3">
+                    <input id="platform-cameraResolution" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">视频录制分辨率：</label>
+                <div class="col-md-3">
+                    <input id="sensor-videoResolution" class="form-control" readonly/>
+                </div>
+                <label class="col-md-2 control-label">视频录制分辨率：</label>
+                <div class="col-md-3">
+                    <input id="platform-videoResolution" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">提示音量：</label>
+                <div class="col-md-3">
+                    <input id="sensor-alarmVolume" class="form-control" readonly/>
+                </div>
+                <label class="col-md-2 control-label">提示音量：</label>
+                <div class="col-md-3">
+                    <input id="platform-alarmVolume" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">灵敏度：</label>
+                <div class="col-md-3">
+                    <input id="sensor-sensitivity" class="form-control" readonly/>
+                </div>
+                <label class="col-md-2 control-label">灵敏度：</label>
+                <div class="col-md-3">
+                    <input id="platform-sensitivity" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">低速阈值：</label>
+                <div class="col-md-3">
+                    <input id="sensor-speedThreshold" class="form-control" readonly/>
+                </div>
+                <label class="col-md-2 control-label">低速阈值：</label>
+                <div class="col-md-3">
+                    <input id="platform-lowSpeed" class="form-control" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3 col-md-offset-2">
+                    <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                </div>
+                <div class="col-md-3 col-md-offset-2">
+                    <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <h4 class="col-md-6">驾驶员监测系统(DMS)</h4>
+        </div>
+        <div id="dsm-content">
+            <div class="form-group">
+                <h4 class="col-md-6">主动抓拍</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="snap" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="snap-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">定时拍照时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-timingCamera" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">定时拍照时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-timingPhotoInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">定距拍照距离间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-fixedCamera" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">定距拍照距离间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-distancePhotoInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-cameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-timingPhoto" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-cameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-dsmAdasTimeInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">主动抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-snapEventEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">主动抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="platform-initiativeCaptureAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">定时抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-timingCapture" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">定时抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="platform-timingCapture" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">定距抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-distanceCapture" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">定距抓拍：</label>
+                    <div class="col-md-3">
+                        <input id="platform-distanceCapture" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-snapEventVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-initiativeCaptureVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">闭眼</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="closeEyes" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                     class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="closeEyes-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-closeEyesSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-closeEyesHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">打哈欠</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="yawn" class="info-span"><font>显示更多</font><span aria-hidden="true" class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="yawn-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-yawnSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-yawnHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">抽烟</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="smoking" class="info-span"><font>显示更多</font><span aria-hidden="true" class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="smoking-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingTimeInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-smokingSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-smokingHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">接打手持电话</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="answerThephone" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                       class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="answerThephone-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-pickUpVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-pickUpCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephonePhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-pickUpCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephonePhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-answerThephoneOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-answerThephoneTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-answerThephoneOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-answerThephoneTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-pickUpTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneTimeInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-pickUpSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-answerThephoneHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">长时间不目视前方</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="driveDeed" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                     class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="driveDeed-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-postureVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-postureCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-postureCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driveDeedOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driveDeedTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driveDeedOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driveDeedTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-postureSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driveDeedHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <h4 class="col-md-6">遮挡/红外阻断报警</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="cover" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                                  class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="cover-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-shutterVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-shutterCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-shutterCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">遮挡一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-coverOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">遮挡一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">遮挡二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-coverTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">遮挡二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">遮挡一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-coverOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">遮挡一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">遮挡二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-coverTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">遮挡二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">红外阻断一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-infraredOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">红外阻断一级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-infraredOneLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">红外阻断二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-infraredTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">红外阻断二级报警：</label>
+                    <div class="col-md-3">
+                        <input id="platform-infraredTwoLevelAlarmEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">红外阻断一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-infraredOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">红外阻断一级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-infraredOneLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">红外阻断二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-infraredTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">红外阻断二级语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-infraredTwoLevelVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-shutterSpeed" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">高速阈值：</label>
+                    <div class="col-md-3">
+                        <input id="platform-coverHighSpeed" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <h4 class="col-md-6">人证不符</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="driverNotMatch" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                          class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="driverNotMatch-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-identVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-identCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-identCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">定时检查：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driverNotMatchEventEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">定时检查：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchCheckSwitch" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-driverNotMatchEventVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-identTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">时间间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-driverNotMatchTimeInterval" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <h4 class="col-md-6">驾驶员不在驾驶位置</h4>
+                <div class="col-md-6 control-label text-right">
+                    <span id="checkIdent" class="info-span"><font>显示更多</font><span aria-hidden="true"
+                                                                      class="fa fa-chevron-down"></span></span>
+                </div>
+            </div>
+            <div id="checkIdent-content" class="info-content">
+                <div class="form-group">
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-checkIdentVideoTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">录制时间：</label>
+                    <div class="col-md-3">
+                        <input id="platform-checkIdentVideoRecordingTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-checkIdentCameraNum" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照张数：</label>
+                    <div class="col-md-3">
+                        <input id="platform-checkIdentPhotographNumber" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-checkIdentCameraTime" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">拍照间隔：</label>
+                    <div class="col-md-3">
+                        <input id="platform-checkIdentPhotographTime" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">未检测到事件：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-checkIdentEventEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">未检测到事件：</label>
+                    <div class="col-md-3">
+                        <input id="platform-checkIdentCheckSwitch" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="sensor-checkIdentEventVoiceEnable" class="form-control" readonly/>
+                    </div>
+                    <label class="col-md-2 control-label">语音提醒：</label>
+                    <div class="col-md-3">
+                        <input id="platform-checkIdentVoiceEnable" class="form-control" readonly/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width sensorBtn" disabled>以传感器为准</botton>
+                    </div>
+                    <div class="col-md-3 col-md-offset-2">
+                        <botton class="btn btn-primary btn-oc-width platformBtn" disabled>以平台设置为准</botton>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label">下发状态：</label>
+            <div class="col-md-3">
+                <input id="dsmPoilSendStatus" class="form-control sendStatus" readonly/>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="dsmInfoRefresh">刷新</button>
+        <button type="button" class="btn btn-primary" id="dsmInfoSend" disabled>修正下发</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+    </div>
+</form>
+<script src="/clbs/resources/js/riskDdfineSettingsDsmInfo.js"></script>
